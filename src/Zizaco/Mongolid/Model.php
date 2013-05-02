@@ -31,7 +31,7 @@ class Model
      *
      * @var CacheComponent
      */
-    protected $laravelCache = null;
+    public static $cacheComponent = null;
 
     /**
      * Indicates if the model should be timestamped.
@@ -465,7 +465,7 @@ class Model
      */
     protected function referencesOne($model, $field, $cachable = true)
     {
-        if($cachable && $this->laravelCache)
+        if($cachable && static::$cacheComponent)
         {
             $instance = $this;
 
@@ -473,7 +473,7 @@ class Model
 
             // For the next 30 seconds (0.5 minutes), the last retrived value (for that Collection and ID)
             // will be returned from cache =)
-            return $this->laravelCache->remember($cache_key, 0.5, function() use ($model, $field, $instance)
+            return static::$cacheComponent->remember($cache_key, 0.5, function() use ($model, $field, $instance)
             {
                 return $model::first(array('_id'=>$instance->$field));
             });
@@ -501,13 +501,13 @@ class Model
             }
         }
 
-        if($cachable && $this->laravelCache)
+        if($cachable && static::$cacheComponent)
         {
             $cache_key = 'reference_cache_'.$model.'_'.md5(serialize($ref_ids));
 
             // For the next 6 seconds (0.1 minute), the last retrived value
             // will be returned from cache =)
-            return $this->laravelCache->remember($cache_key, 0.1, function() use ($model, $ref_ids)
+            return static::$cacheComponent->remember($cache_key, 0.1, function() use ($model, $ref_ids)
             {
                 return $model::where(array('_id'=>array('$in'=>$ref_ids)), [], true);
             });
