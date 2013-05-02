@@ -1,0 +1,24 @@
+{
+    "name": "zizaco/mongolid",
+    "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
+    "keywords": ["odm","mongodb","nosql"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Zizaco Zizuini",
+            "email": "zizaco@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "0.7.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Zizaco\\Mongolid": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
