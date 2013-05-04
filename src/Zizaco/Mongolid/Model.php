@@ -465,22 +465,25 @@ class Model
      */
     protected function referencesOne($model, $field, $cachable = true)
     {
+        $referenced_id = $this->$field;
+
+        if(is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0]))
+            $referenced_id = $referenced_id[0];
+
         if($cachable && static::$cacheComponent)
         {
-            $instance = $this;
-
             $cache_key = 'reference_cache_'.$model.'_'.$this->$field;
 
             // For the next 30 seconds (0.5 minutes), the last retrived value (for that Collection and ID)
             // will be returned from cache =)
-            return static::$cacheComponent->remember($cache_key, 0.5, function() use ($model, $field, $instance)
+            return static::$cacheComponent->remember($cache_key, 0.5, function() use ($model, $field, $referenced_id)
             {
-                return $model::first(array('_id'=>$instance->$field));
+                return $model::first(array('_id'=>$referenced_id));
             });
         }
         else
         {
-            return $model::first(array('_id'=>$this->$field));
+            return $model::first(array('_id'=>$referenced_id));
         }
     }
 
@@ -520,6 +523,32 @@ class Model
         {
             return $model::where(array('_id'=>array('$in'=>$ref_ids)));
         }
+    }
+
+    /**
+     * Return a embedded documents as object
+     */
+    protected function embedsOne($model, $field)
+    {
+        $instance = null;
+        $field = $this->getAttribute($field);
+
+        if(is_array($field))
+        {
+            if( isset($field[0]) )
+            {
+                $document = $field[0];
+            }
+            else
+            {
+                $document = $field;
+            }
+            $instance = new $model;
+            $instance->parseDocument( $document );
+            $instance = $this->polymorph( $instance );
+        }
+
+        return $instance;
     }
 
     /**
