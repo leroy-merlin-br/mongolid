@@ -400,6 +400,16 @@ class Model
     }
 
     /**
+     * Get the collection used by the object
+     * 
+     * @return string Collection name
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
+    }
+
+    /**
      * Set a given attribute on the model.
      *
      * @param  string  $key

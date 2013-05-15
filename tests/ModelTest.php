@@ -255,6 +255,16 @@ class ModelTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetCollectionName()
+    {
+        $prod = new _stubProduct;
+
+        $this->assertEquals(
+            'test_products',
+            $prod->getCollectionName()
+        );
+    }
+
     public function testShouldFill()
     {
         $document = [
