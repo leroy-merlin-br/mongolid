@@ -354,6 +354,39 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('_stubCategory', $result);
     }
 
+    public function testShouldReferenceOneEvenWhenItsAnArray()
+    {
+        $prod = new _stubProduct;
+        $prod->name = "Bacon";
+        $prod->price = 10.50;
+        $prod->category_id = [new MongoId('123')]; // Within an array
+
+        $cat = [
+            '_id'=>new MongoId('123'),
+            'name'=>'BaconCategory',
+        ];
+
+        $query = ['_id'=>$prod->category_id[0]]; // Should query the first value of the array
+
+        $this->categoriesCollection
+            ->shouldReceive('findOne')
+            ->with(
+                $query, []
+            )
+            ->twice()
+            ->andReturn(
+                $cat
+            );
+
+        // Cachable = false
+        $result = $prod->category();
+        $this->assertInstanceOf('_stubCategory', $result);
+
+        // Cachable = true
+        $result = $prod->category(true);
+        $this->assertInstanceOf('_stubCategory', $result);
+    }
+
     public function testShouldReferenceMany()
     {
         $cat = new _stubCategory;
@@ -383,6 +416,31 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $result = $cat->products(true);
         $this->assertInstanceOf('Zizaco\Mongolid\CachableOdmCursor', $result);
+    }
+
+    public function testShouldEmbedOne()
+    {
+        $attr1 = ['name' => 'color'];
+
+        $cat = new _stubCategory;
+        $cat->_id = new MongoId('123');
+        $cat->name = 'BaconCategory';
+        $cat->characteristic = $attr1;
+
+        $result = $cat->characteristic();
+        $this->assertInstanceOf('_stubCharacteristic', $result);
+        $this->assertEquals('color',$result->name);
+
+        $attr1 = ['name' => 'color'];
+
+        $cat = new _stubCategory;
+        $cat->_id = new MongoId('123');
+        $cat->name = 'BaconCategory';
+        $cat->characteristic = [$attr1];
+
+        $result = $cat->characteristic();
+        $this->assertInstanceOf('_stubCharacteristic', $result);
+        $this->assertEquals('color',$result->name);
     }
 
     public function testShouldEmbedMany()
@@ -570,6 +628,11 @@ class _stubCategory extends Model {
     public function characteristics()
     {
         return $this->embedsMany('_stubCharacteristic','characteristics');
+    }
+
+    public function characteristic()
+    {
+        return $this->embedsOne('_stubCharacteristic','characteristic');
     }
 }
 
