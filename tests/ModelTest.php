@@ -523,20 +523,21 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldEmbed()
     {
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('112');
         $cat->name = 'BaconCategory';
 
         $char1 = new _stubCharacteristic;
-        $char1->_id = new MongoId('123');
         $char1->name = 'color';
         $char2 = ['_id'=>new MongoId('456'), 'name'=>'material'];
 
-        // Embed various "types" of products
+        // Embed various "attributes" for products
         $cat->embed('characteristics',$char1); // Mongolid model object
         $cat->embed('characteristics',$char2); // Array
 
         $this->assertContains( $char1->toArray(), $cat->characteristics);
         $this->assertContains( $char2, $cat->characteristics);
+
+        // Check if an _id was generated for the object
+        $this->assertInstanceOf('MongoId', $char1->_id);
 
         // Now lets try with the alternate alias ;)
         unset($cat->characteristics);
@@ -547,6 +548,32 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $this->assertContains( $char1->toArray(), $cat->characteristics);
         $this->assertContains( $char2, $cat->characteristics);
+    }
+
+    public function testUpdateEmbeded()
+    {
+        $cat = new _stubCategory;
+        $cat->name = 'BaconCategory';
+
+        $char1 = new _stubCharacteristic;
+        $char1->name = 'color';
+
+        // Embed color attribute
+        $cat->embed('characteristics',$char1);
+
+        $this->assertContains( $char1->toArray(), $cat->characteristics );
+        $this->assertEquals( 1, count($cat->characteristics) );
+
+        // Check if an _id was generated for the object
+        $this->assertInstanceOf('MongoId', $char1->_id);
+
+        // Change object and update embeded document (since the _id is the same)
+        $char1->name = 'puffins';
+        $cat->embed('characteristics', $char1);
+
+        $this->assertContains( $char1->toArray(), $cat->characteristics );
+        $this->assertEquals( 1, count($cat->characteristics) );
+
     }
 
     public function testShouldUnembed()
