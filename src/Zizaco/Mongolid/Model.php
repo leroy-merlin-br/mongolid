@@ -562,7 +562,9 @@ class Model
     }
 
     /**
-     * Return array of referenced documents as objects
+     * Return array of embedded documents as objects
+     *
+     * @return array Array with the embedded documents
      */
     protected function embedsMany($model, $field)
     {
