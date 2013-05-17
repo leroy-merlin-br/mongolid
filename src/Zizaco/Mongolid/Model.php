@@ -729,7 +729,7 @@ class Model
         }
         elseif(! is_array($target) )
         {
-            trigger_error( get_class($this)." unembed Method second parameter should be an array." );
+            $target = array('_id' => $target);
         }
 
         $documents = $this->getAttribute($field);

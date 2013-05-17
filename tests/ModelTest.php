@@ -587,6 +587,9 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $char1->_id = new MongoId('123');
         $char1->name = 'color';
         $char2 = ['_id'=>new MongoId('456'), 'name'=>'material'];
+        $char3 = new _stubCharacteristic;
+        $char3->_id = new MongoId('456');
+        $char3->name = 'nopah';
 
         $cat = new _stubCategory;
         $cat->_id = new MongoId('112');
@@ -594,13 +597,20 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $cat->characteristics = [
             $char1->toArray(),
             $char2,
+            $char3->toArray(),
         ];
 
         $cat->unembed('characteristics', $char1);
         $this->assertNotContains($char1->toArray(), $cat->characteristics);
         $this->assertContains($char2, $cat->characteristics);
+        $this->assertContains($char3->toArray(), $cat->characteristics);
+
         $cat->unembed('characteristics', $char2);
         $this->assertNotContains($char2, $cat->characteristics);
+        $this->assertContains($char3->toArray(), $cat->characteristics);
+
+        $cat->unembed('characteristics', $char3->_id);
+        $this->assertNotContains($char3, $cat->characteristics);
     }
 
     public function testShouldPolymorph()
