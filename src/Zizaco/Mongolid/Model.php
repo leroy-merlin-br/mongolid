@@ -710,7 +710,7 @@ class Model
 
             $embedded[] = $document;
 
-            $this->setAttribute($field, $embedded);
+            $this->setAttribute($field, array_values($embedded));
         }
     }
 

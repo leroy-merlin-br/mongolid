@@ -574,6 +574,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertContains( $char1->toArray(), $cat->characteristics );
         $this->assertEquals( 1, count($cat->characteristics) );
 
+        // Make sure that the keys still begin from zero. This happens because
+        // PHP array must have a correct sequence of keys in order to be considered
+        // an array by the Mongo driver.
+        $this->assertTrue(array_key_exists(0, $cat->characteristics));
+
     }
 
     public function testShouldUnembed()
