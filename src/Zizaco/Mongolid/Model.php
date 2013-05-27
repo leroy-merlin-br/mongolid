@@ -124,7 +124,7 @@ class Model
      *
      * @param  mixed  $id
      * @param  array  $fields
-     * @return Zizaco\LmongoOdm\MongoModel
+     * @return Zizaco\Mongolid\MongoModel
      */
     public static function first($id = array(), $fields = array())
     {
@@ -184,7 +184,7 @@ class Model
      * @param  array  $query
      * @param  array  $fields
      * @param  boolean  $cachable
-     * @return Zizaco\LmongoOdm\OdmCursor
+     * @return Zizaco\Mongolid\OdmCursor
      */
     public static function where($query = array(), $fields = array(), $cachable = false)
     {      
@@ -224,7 +224,7 @@ class Model
      * Find "all" documents from the collection
      *
      * @param  array  $fields
-     * @return Zizaco\LmongoOdm\OdmCursor
+     * @return Zizaco\Mongolid\OdmCursor
      */
     public static function all( $fields = array() )
     {
@@ -346,7 +346,7 @@ class Model
     }
 
     /**
-     * Returns the LMongo collection object
+     * Returns the Mongo collection object
      *
      * @return MongoDB
      */
