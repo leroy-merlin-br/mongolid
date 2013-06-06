@@ -1,4 +1,5 @@
-<?php namespace Zizaco\Mongolid;
+<?php
+namespace Zizaco\Mongolid;
 
 use MongoClient;
 
@@ -16,14 +17,14 @@ class Model
      *
      * @var string
      */
-    protected $collection = 'temporary';
+    protected $collection = null;
 
     /**
      * The database associated with the model.
      *
      * @var string
      */
-    protected $database = 'mongolid';
+    protected $database = null;
 
     /**
      * The Laravel's cache component. Or other cache manager that
@@ -78,21 +79,17 @@ class Model
      */
     public function save()
     {
-        if (! $this->collection)
-            return false;
+        if (! $this->collection) return false;
 
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
 
         $result = $this->collection()
             ->save( $preparedAttr, array("w" => 1) );
 
-        if(isset($result['ok']) && $result['ok'] )
-        {
+        if(isset($result['ok']) && $result['ok'] ) {
             $this->parseDocument($this->attributes);
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -109,12 +106,9 @@ class Model
         $result = $this->collection()
             ->remove( $preparedAttr );
 
-        if(isset($result['ok']) && $result['ok'] )
-        {
+        if(isset($result['ok']) && $result['ok'] ) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -130,27 +124,22 @@ class Model
     {
         $instance = new static;
 
-        if (! $instance->collection)
-            return false;
+        if (! $instance->collection) return false;
 
         // Get query array
         $query = $instance->prepareQuery($id);
 
         // If fields specified then prepare Mongo's projection
-        if(! empty($fields))
-            $fields = $instance->prepareProjection($fields);
+        if(! empty($fields)) $fields = $instance->prepareProjection($fields);
 
         // Perfodm Mongo's findOne
         $document = $instance->collection()->findOne( $query, $fields );
 
         // If the response is correctly parsed return it
-        if( $instance->parseDocument( $document ) )
-        {
+        if( $instance->parseDocument( $document ) ) {
             $instance = $instance->polymorph( $instance );
             return $instance;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -168,12 +157,10 @@ class Model
     public static function find($id = array(), $fields = array(), $cachable = false)
     {
         $result = static::where( $id, $fields );
-        if( $result->count() == 1 )
-        {
+        if( $result->count() == 1 ) {
             $result->rewind();
             return $result->current();
-        }
-        else{
+        } else{
             return $result;
         }
     }
@@ -200,16 +187,13 @@ class Model
         if(! empty($fields))
             $fields = $instance->prepareProjection($fields);
 
-        if($cachable)
-        {
+        if($cachable) {
             // Perfodm Mongo's find and returns iterable cursor
             $cursor =  new CachableOdmCursor(
                 $query,
                 get_class($instance)
             );
-        }
-        else
-        {
+        } else {
             // Perfodm Mongo's find and returns iterable cursor
             $cursor =  new OdmCursor(
                 $instance->collection()->find( $query, $fields ),
@@ -271,8 +255,7 @@ class Model
      */
     protected function prepareQuery($id)
     {
-        if (! is_array($id))
-        {
+        if (! is_array($id)) {
             // If not an array, then search by _id
             $id = array( '_id' => $id );
         }
@@ -293,18 +276,13 @@ class Model
     private function prepareMongoAttributes($attr)
     {
         // Translate the primary key field into _id
-        if( isset($attr['_id']) )
-        {
+        if( isset($attr['_id']) ) {
             // If its a 24 digits hexadecimal, then it's a MongoId
-            if ($this->isMongoId($attr['_id']))
-            {
+            if ($this->isMongoId($attr['_id'])) {
                 $attr['_id'] = new \MongoId( $attr['_id'] );   
-            }
-            elseif(is_numeric($attr['_id']))
-            {
+            } elseif(is_numeric($attr['_id'])) {
                 $attr['_id'] = (int)$attr['_id'];
-            }
-            else{
+            } else {
                 $attr['_id'] = $attr['_id'];   
             }
         }
@@ -336,8 +314,7 @@ class Model
      */
     protected function db()
     {
-        if(! static::$connection )
-        {
+        if(! static::$connection ) {
             $connector = new MongoDbConnector;
             static::$connection = $connector->getConnection();
         }
@@ -365,16 +342,11 @@ class Model
     {
         $inAttributes = array_key_exists($key, $this->attributes);
 
-        if ($inAttributes)
-        {
+        if ($inAttributes) {
             return $this->attributes[$key];
-        }
-        elseif ($key == 'attributes')
-        {
+        } elseif ($key == 'attributes') {
             return $this->attributes;
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
@@ -430,10 +402,9 @@ class Model
     public function fill( $input )
     {
         foreach ($input as $key => $value) {
-            if( (empty($this->fillable) or in_array($key,$this->fillable)) && ! in_array($key,$this->guarded) )
-            {
+            if( (empty($this->fillable) or in_array($key,$this->fillable)) && ! in_array($key,$this->guarded) ) {
                 $this->setAttribute( $key, $value );
-            }                
+            }
         }
     }
 
@@ -477,11 +448,9 @@ class Model
     {
         $referenced_id = $this->$field;
 
-        if(is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0]))
-            $referenced_id = $referenced_id[0];
+        if(is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0])) $referenced_id = $referenced_id[0];
 
-        if($cachable && static::$cacheComponent)
-        {
+        if($cachable && static::$cacheComponent) {
             $cache_key = 'reference_cache_'.$model.'_'.$this->$field;
 
             // For the next 30 seconds (0.5 minutes), the last retrived value (for that Collection and ID)
@@ -490,9 +459,7 @@ class Model
             {
                 return $model::first(array('_id'=>$referenced_id));
             });
-        }
-        else
-        {
+        } else {
             return $model::first(array('_id'=>$referenced_id));
         }
     }
@@ -504,18 +471,15 @@ class Model
     {
         $ref_ids = $this->$field;
 
-        if (! isset($ref_ids[0]) )
-            return array();
+        if (! isset($ref_ids[0]) ) return array();
 
-        if ($this->isMongoId($ref_ids[0]))
-        {
+        if ($this->isMongoId($ref_ids[0])) {
             foreach ($ref_ids as $key => $value) {
                 $ref_ids[$key] = new \MongoId($value);
             }
         }
 
-        if($cachable && static::$cacheComponent)
-        {
+        if($cachable && static::$cacheComponent) {
             $cache_key = 'reference_cache_'.$model.'_'.md5(serialize($ref_ids));
 
             // For the next 6 seconds (0.1 minute), the last retrived value
@@ -524,13 +488,9 @@ class Model
             {
                 return $model::where(array('_id'=>array('$in'=>$ref_ids)), [], true);
             });
-        }
-        elseif($cachable)
-        {
+        } elseif($cachable) {
             return $model::where(array('_id'=>array('$in'=>$ref_ids)), [], true);
-        }
-        else
-        {
+        } else {
             return $model::where(array('_id'=>array('$in'=>$ref_ids)));
         }
     }
@@ -543,14 +503,10 @@ class Model
         $instance = null;
         $field = $this->getAttribute($field);
 
-        if(is_array($field))
-        {
-            if( isset($field[0]) )
-            {
+        if(is_array($field)) {
+            if( isset($field[0]) ) {
                 $document = $field[0];
-            }
-            else
-            {
+            } else {
                 $document = $field;
             }
             $instance = new $model;
@@ -592,28 +548,19 @@ class Model
      */
     public function attach($field, $obj)
     {
-        if( is_a($obj,'Zizaco\Mongolid\Model') )
-        {
+        if( is_a($obj,'Zizaco\Mongolid\Model') ) {
             $mongoId = $obj->getMongoId();
-        }
-        elseif( is_array($obj) )
-        {
-            if(isset($obj['id']))
-            {
+        } elseif( is_array($obj) ) {
+            if(isset($obj['id'])) {
                 $mongoId = $obj['id'];
-            }
-            elseif(isset($obj['_id']))
-            {
+            } elseif(isset($obj['_id'])) {
                 $mongoId = $obj['_id'];
             }
-        }
-        else
-        {
+        } else {
             $mongoId = $obj;
         }
 
-        if($mongoId != null)
-        {
+        if($mongoId != null) {
             $attr = (array)$this->getAttribute($field);
             $attr[] = $mongoId;
             $this->setAttribute($field, $attr);
@@ -629,33 +576,23 @@ class Model
      */
     public function detach($field, $obj)
     {
-        if( is_a($obj,'Zizaco\Mongolid\Model') )
-        {
+        if( is_a($obj,'Zizaco\Mongolid\Model') ) {
             $mongoId = $obj->getMongoId();
-        }
-        elseif( is_array($obj) )
-        {
-            if(isset($obj['id']))
-            {
+        } elseif( is_array($obj) ) {
+            if(isset($obj['id'])) {
                 $mongoId = $obj['id'];
-            }
-            elseif(isset($obj['_id']))
-            {
+            } elseif(isset($obj['_id'])) {
                 $mongoId = $obj['_id'];
             }
-        }
-        else
-        {
+        } else {
             $mongoId = $obj;
         }
 
-        if($mongoId != null)
-        {
+        if($mongoId != null) {
             $attr = (array)$this->getAttribute($field);
             
             foreach ($attr as $key => $value) {
-                if((string)$value == (string)$mongoId)
-                {
+                if((string)$value == (string)$mongoId) {
                     unset($attr[$key]);
                 }
             }
@@ -673,37 +610,28 @@ class Model
      */
     public function embed($field, &$obj)
     {
-        if( is_a($obj,'Zizaco\Mongolid\Model') )
-        {
+        if( is_a($obj,'Zizaco\Mongolid\Model') ) {
             $document = $obj->toArray();
-        }
-        else
-        {
+        } else {
             $document = $obj;
         }
 
-        if($document != null)
-        {
+        if($document != null) {
             $embedded = (array)$this->getAttribute($field);
 
-            if(isset($document['_id']))
-            {
+            if(isset($document['_id'])) {
                 foreach ($embedded as $key => $value) {
 
-                    if(isset($value['_id']) && $value['_id'] == $document['_id'])
-                    {
+                    if(isset($value['_id']) && $value['_id'] == $document['_id']) {
                         unset($embedded[$key]);
                         break;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 $generatedId = new \MongoId;
                 $document['_id'] = $generatedId;
 
-                if( is_a($obj,'Zizaco\Mongolid\Model') )
-                {
+                if( is_a($obj,'Zizaco\Mongolid\Model') ) {
                     $obj->_id = $generatedId;
                 }
             }
@@ -723,37 +651,31 @@ class Model
      */
     public function unembed($field, $target)
     {
-        if( is_a($target,'Zizaco\Mongolid\Model') )
-        {
+        if( is_a($target,'Zizaco\Mongolid\Model') ) {
             $target = $target->toArray();
-        }
-        elseif(! is_array($target) )
-        {
+        } elseif(! is_array($target) ) {
             $target = array('_id' => $target);
         }
 
         $documents = $this->getAttribute($field);
 
         // Foreach embedded document
-        foreach ($documents as $oKey => $document)
-        {
+        foreach ($documents as $oKey => $document) {
             // Remove it unless...
             $remove = true;
 
-            foreach ($target as $tKey => $tValue) // For each key defined in the target obj
-            {
-                if(isset($document[$tKey]))
-                {
-                    if($target[$tKey] != $document[$tKey]) // The value is equal for the embedded document
-                    {
+            // For each key defined in the target obj
+            foreach ($target as $tKey => $tValue) {
+                if(isset($document[$tKey])) {
+                    // The value is equal for the embedded document 
+                    if($target[$tKey] != $document[$tKey]) {
                         $remove = false;
                     }
                 }
             }
 
             // If not
-            if( $remove )
-            {
+            if( $remove ) {
                 unset($documents[$oKey]); // Remove it
             }
         }
@@ -824,20 +746,15 @@ class Model
     {
         $value = isset($parameters[0]) ? $parameters[0] : null;
 
-        if ('attachTo' == substr($method,0,8)) //
-        {
+        if ('attachTo' == substr($method,0,8)) {
             // Attach a new document or id to an reference array
             $field = strtolower(substr($method,8,1)).substr($method,9);
             $this->attach($field, $value);
-        }
-        elseif ('embedTo' == substr($method,0,7)) //
-        {
+        } elseif ('embedTo' == substr($method,0,7)) {
             // Embed a new document or id to an reference array
             $field = strtolower(substr($method,7,1)).substr($method,8);
             $this->embed($field, $value);
-        }
-        else
-        {
+        } else {
             trigger_error('Call to undefined method '.$method);
         }
     }
@@ -865,7 +782,7 @@ class Model
     }
 
     /**
-     * Conver the model to its string representation.
+     * Convert the model to its string representation.
      *
      * @return string
      */

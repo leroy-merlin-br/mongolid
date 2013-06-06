@@ -1,9 +1,10 @@
-<?php namespace Zizaco\Mongolid;
+<?php
+namespace Zizaco\Mongolid;
 
 use MongoClient;
 
-class MongoDbConnector{
-
+class MongoDbConnector
+{
     /**
      * The connection that will be used.
      *
@@ -19,19 +20,14 @@ class MongoDbConnector{
     public function getConnection( $connectionString = '' )
     {
         // If exists in $shared_connection, use it
-        if( MongoDbConnector::$shared_connection )
-        {
+        if( MongoDbConnector::$shared_connection ) {
             $connection = MongoDbConnector::$shared_connection;
-        }
-        // Else, connect and place connection in $shared_connection
-        else
-        {
+        } else {
+            // Else, connect and place connection in $shared_connection
             try{
                 $connection = new MongoClient($connectionString);
-            }
-            catch(\MongoConnectionException $e)
-            {
-                trigger_error("Failed to connect with string: \"".$connectionString."\"");
+            } catch(\MongoConnectionException $e) {
+                trigger_error('Failed to connect with string: "'.$connectionString.'"');
             }
 
             MongoDbConnector::$shared_connection = $connection;
@@ -39,5 +35,4 @@ class MongoDbConnector{
 
         return $connection;
     }
-
 }
