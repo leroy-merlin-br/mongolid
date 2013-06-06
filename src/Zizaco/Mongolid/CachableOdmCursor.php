@@ -158,7 +158,7 @@ class CachableOdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its string representation.
      *
      * @return string
      */
@@ -168,7 +168,7 @@ class CachableOdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its JSON representation.
      *
      * @return string
      */

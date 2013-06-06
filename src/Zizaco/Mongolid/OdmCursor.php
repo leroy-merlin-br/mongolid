@@ -64,7 +64,7 @@ class OdmCursor implements \Iterator
                 return $result;
             }
         } else {
-            trigger_error("Method $name doens't exists in OdmCursor nor in MongoCursor.");
+            trigger_error('Method '.$name.' does not exist in OdmCursor nor in MongoCursor.');
         }
     }
 
@@ -184,7 +184,7 @@ class OdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its string representation.
      *
      * @return string
      */
@@ -204,7 +204,7 @@ class OdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its JSON representation.
      *
      * @return string
      */

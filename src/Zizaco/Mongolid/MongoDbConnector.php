@@ -27,7 +27,7 @@ class MongoDbConnector
             try{
                 $connection = new MongoClient($connectionString);
             } catch(\MongoConnectionException $e) {
-                trigger_error("Failed to connect with string: \"".$connectionString."\"");
+                trigger_error('Failed to connect with string: "'.$connectionString.'"');
             }
 
             MongoDbConnector::$shared_connection = $connection;

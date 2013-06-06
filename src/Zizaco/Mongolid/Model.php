@@ -448,11 +448,9 @@ class Model
     {
         $referenced_id = $this->$field;
 
-        if(is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0]))
-            $referenced_id = $referenced_id[0];
+        if(is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0])) $referenced_id = $referenced_id[0];
 
-        if($cachable && static::$cacheComponent)
-        {
+        if($cachable && static::$cacheComponent) {
             $cache_key = 'reference_cache_'.$model.'_'.$this->$field;
 
             // For the next 30 seconds (0.5 minutes), the last retrived value (for that Collection and ID)
@@ -461,9 +459,7 @@ class Model
             {
                 return $model::first(array('_id'=>$referenced_id));
             });
-        }
-        else
-        {
+        } else {
             return $model::first(array('_id'=>$referenced_id));
         }
     }
@@ -475,8 +471,7 @@ class Model
     {
         $ref_ids = $this->$field;
 
-        if (! isset($ref_ids[0]) )
-            return array();
+        if (! isset($ref_ids[0]) ) return array();
 
         if ($this->isMongoId($ref_ids[0])) {
             foreach ($ref_ids as $key => $value) {
@@ -787,7 +782,7 @@ class Model
     }
 
     /**
-     * Conver the model to its string representation.
+     * Convert the model to its string representation.
      *
      * @return string
      */
