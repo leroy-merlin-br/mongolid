@@ -16,14 +16,14 @@ class Model
      *
      * @var string
      */
-    protected $collection = 'temporary';
+    protected $collection = null;
 
     /**
      * The database associated with the model.
      *
      * @var string
      */
-    protected $database = 'mongolid';
+    protected $database = null;
 
     /**
      * The Laravel's cache component. Or other cache manager that
