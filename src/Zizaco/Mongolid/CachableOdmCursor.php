@@ -101,10 +101,10 @@ class CachableOdmCursor implements \Iterator
      *
      * @return array
      */
-    public function toArray( $documentsToArray = true, $limit = 20 )
+    public function toArray( $documentsToArray = true, $limit = false )
     {
-        if( $documentsToArray )
-        {
+        $this->limit( ($limit !== false) $limit : $this->info()['limit'] );
+
         if( $documentsToArray ) {
             $result = array();
 
