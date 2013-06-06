@@ -120,12 +120,9 @@ class OdmCursor implements \Iterator
         $this->limit( $limit );
         foreach($this as $document)
         {
-            if( $documentsToArray )
-            {
+            if( $documentsToArray ) {
                 $result[] = $document->getAttributes();
-            }
-            else
-            {
+            } else {
                 $result[] = $document;
             }
         }
