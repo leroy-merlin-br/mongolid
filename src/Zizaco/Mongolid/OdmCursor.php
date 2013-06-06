@@ -117,7 +117,7 @@ class OdmCursor implements \Iterator
     {
         $result = array();
 
-        $this->limit( ($limit !== false) $limit : $this->info()['limit'] );
+        $this->limit( ($limit !== false) ? $limit : $this->info()['limit'] );
 
         foreach($this as $document) {
             if( $documentsToArray ) {

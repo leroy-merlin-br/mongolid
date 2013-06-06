@@ -103,7 +103,7 @@ class CachableOdmCursor implements \Iterator
      */
     public function toArray( $documentsToArray = true, $limit = false )
     {
-        $this->limit( ($limit !== false) $limit : $this->info()['limit'] );
+        $this->limit( ($limit !== false) ? $limit : $this->info()['limit'] );
 
         if( $documentsToArray ) {
             $result = array();
