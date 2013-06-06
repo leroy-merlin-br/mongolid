@@ -1,4 +1,5 @@
-<?php namespace Zizaco\Mongolid;
+<?php
+namespace Zizaco\Mongolid;
 
 class OdmCursor implements \Iterator
 {
@@ -50,26 +51,20 @@ class OdmCursor implements \Iterator
      */
     public function __call($name, $args)
     {
-        if( method_exists( $this->cursor, $name) )
-        {
+        if( method_exists( $this->cursor, $name) ) {
             // Calls the method in MongoCursor
             $result = call_user_func_array( array($this->cursor, $name), $args);
 
             // In case of sort, limit and other methods of the cursor
             // that return itself (for chained method calls), should
             // return $this (OdmCursor object) instead of MongoCursor.
-            if(is_object($result) && get_class($result) == 'MongoCursor')
-            {
+            if(is_object($result) && get_class($result) == 'MongoCursor') {
                 return $this;
-            }
-            else
-            {
+            } else {
                 return $result;
             }
-        }
-        else
-        {
-            trigger_error("Method $name doens't exists in OdmCursor nor in MongoCursor.");
+        } else {
+            trigger_error('Method '.$name.' does not exist in OdmCursor nor in MongoCursor.');
         }
     }
 
@@ -87,7 +82,8 @@ class OdmCursor implements \Iterator
      * Iterator interface rewind (used in foreach)
      *
      */
-    function rewind() {
+    function rewind()
+    {
         $this->cursor->rewind();
         $this->position = 0;
     }
@@ -104,13 +100,10 @@ class OdmCursor implements \Iterator
 
         $document = $this->cursor->current();
 
-        if( $model->parseDocument( $document ) )
-        {
+        if( $model->parseDocument( $document ) ) {
             $model = $model->polymorph( $model );
             return $model;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -120,19 +113,16 @@ class OdmCursor implements \Iterator
      *
      * @return array
      */
-    public function toArray( $documentsToArray = true, $limit = 20 )
+    public function toArray( $documentsToArray = true, $limit = false )
     {
         $result = array();
 
-        $this->limit( $limit );
-        foreach($this as $document)
-        {
-            if( $documentsToArray )
-            {
+        $this->limit( ($limit !== false) ? $limit : $this->info()['limit'] );
+
+        foreach($this as $document) {
+            if( $documentsToArray ) {
                 $result[] = $document->getAttributes();
-            }
-            else
-            {
+            } else {
                 $result[] = $document;
             }
         }
@@ -186,8 +176,7 @@ class OdmCursor implements \Iterator
 
     function sort( $fields )
     {
-        if($this->count() > 1)
-        {
+        if($this->count() > 1) {
             $this->cursor->sort( $fields );
         }
         
@@ -195,7 +184,7 @@ class OdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its string representation.
      *
      * @return string
      */
@@ -204,8 +193,8 @@ class OdmCursor implements \Iterator
         $result = '';
 
         $this->limit(20);
-        foreach($this as $document)
-        {
+
+        foreach($this as $document) {
             $result .= (string)$document;
         }
 
@@ -215,7 +204,7 @@ class OdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its JSON representation.
      *
      * @return string
      */
@@ -223,8 +212,7 @@ class OdmCursor implements \Iterator
     {
         $result = '';
 
-        foreach($this as $document)
-        {
+        foreach($this as $document) {
             $result .= $document->toJson($options);
         }
 

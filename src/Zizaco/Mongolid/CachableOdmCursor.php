@@ -60,8 +60,7 @@ class CachableOdmCursor implements \Iterator
 
         $OdmCursor = $model::where($this->query);
 
-        if( $this->position > 0)
-        {
+        if( $this->position > 0) {
             $OdmCursor->skip($this->position);
         }
 
@@ -102,19 +101,17 @@ class CachableOdmCursor implements \Iterator
      *
      * @return array
      */
-    public function toArray( $documentsToArray = true, $limit = 20 )
+    public function toArray( $documentsToArray = true, $limit = false )
     {
-        if( $documentsToArray )
-        {
+        $this->limit( ($limit !== false) ? $limit : $this->info()['limit'] );
+
+        if( $documentsToArray ) {
             $result = array();
 
-            foreach($this as $document)
-            {
+            foreach($this as $document) {
                 $result[] = $document->getAttributes();
             }
-        }
-        else
-        {
+        } else {
             $result = $this->documents;
         }
 
@@ -161,7 +158,7 @@ class CachableOdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its string representation.
      *
      * @return string
      */
@@ -171,7 +168,7 @@ class CachableOdmCursor implements \Iterator
     }
 
     /**
-     * Conver the cursor to its string representation.
+     * Convert the cursor to its JSON representation.
      *
      * @return string
      */
@@ -179,8 +176,7 @@ class CachableOdmCursor implements \Iterator
     {
         $result = array();
 
-        foreach($this->documents as $document)
-        {
+        foreach($this->documents as $document) {
             $result[] = $document->toJson($options);
         }
 
