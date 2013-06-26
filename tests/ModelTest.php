@@ -638,14 +638,14 @@ class ModelTest extends PHPUnit_Framework_TestCase
             // If its a 24 digits hexadecimal, then it's a MongoId
             if ($this->isMongoId($attr['_id']))
             {
-                $attr['_id'] = new \MongoId( $attr['_id'] );   
+                $attr['_id'] = new \MongoId( $attr['_id'] );
             }
             elseif(is_numeric($attr['_id']))
             {
                 $attr['_id'] = (int)$attr['_id'];
             }
             else{
-                $attr['_id'] = $attr['_id'];   
+                $attr['_id'] = $attr['_id'];
             }
         }
 
@@ -654,6 +654,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 }
 
 class _stubProduct extends Model {
+    protected $database = 'mongolid';
     protected $collection = 'test_products';
     public function category($cached = false)
     {
@@ -662,6 +663,7 @@ class _stubProduct extends Model {
 }
 
 class _stubCategory extends Model {
+    protected $database = 'mongolid';
     protected $collection = 'test_categories';
     public function products($cached = false)
     {

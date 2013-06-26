@@ -117,8 +117,6 @@ class OdmCursor implements \Iterator
     {
         $result = array();
 
-        $this->limit( ($limit !== false) ? $limit : $this->info()['limit'] );
-
         foreach($this as $document) {
             if( $documentsToArray ) {
                 $result[] = $document->getAttributes();
@@ -179,7 +177,7 @@ class OdmCursor implements \Iterator
         if($this->count() > 1) {
             $this->cursor->sort( $fields );
         }
-        
+
         return $this;
     }
 

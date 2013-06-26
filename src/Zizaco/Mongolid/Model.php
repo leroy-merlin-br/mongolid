@@ -122,7 +122,7 @@ class Model
      */
     public static function first($id = array(), $fields = array())
     {
-        $instance = new static;
+        $instance = static::newInstance();
 
         if (! $instance->collection) return false;
 
@@ -174,8 +174,8 @@ class Model
      * @return Zizaco\Mongolid\OdmCursor
      */
     public static function where($query = array(), $fields = array(), $cachable = false)
-    {      
-        $instance = new static;
+    {
+        $instance = static::newInstance();
 
         if (! $instance->collection)
             return false;
@@ -259,7 +259,7 @@ class Model
             // If not an array, then search by _id
             $id = array( '_id' => $id );
         }
-        
+
         // Prepare query array with attributes
         $query = $this->prepareMongoAttributes($id);
 
@@ -279,11 +279,11 @@ class Model
         if( isset($attr['_id']) ) {
             // If its a 24 digits hexadecimal, then it's a MongoId
             if ($this->isMongoId($attr['_id'])) {
-                $attr['_id'] = new \MongoId( $attr['_id'] );   
+                $attr['_id'] = new \MongoId( $attr['_id'] );
             } elseif(is_numeric($attr['_id'])) {
                 $attr['_id'] = (int)$attr['_id'];
             } else {
-                $attr['_id'] = $attr['_id'];   
+                $attr['_id'] = $attr['_id'];
             }
         }
 
@@ -373,7 +373,7 @@ class Model
 
     /**
      * Get the collection used by the object
-     * 
+     *
      * @return string Collection name
      */
     public function getCollectionName()
@@ -531,7 +531,7 @@ class Model
             foreach ($this->$field as $document) {
                 $instance = new $model;
                 $instance->parseDocument( $document );
-                $instance = $this->polymorph( $instance );                
+                $instance = $this->polymorph( $instance );
                 $documents[] = $instance;
             }
         }
@@ -541,7 +541,7 @@ class Model
 
     /**
      * Attach a new document or id to an reference array
-     * 
+     *
      * @param string $field
      * @param mixed $obj _id, document or model instance
      * @return void
@@ -563,13 +563,13 @@ class Model
         if($mongoId != null) {
             $attr = (array)$this->getAttribute($field);
             $attr[] = $mongoId;
-            $this->setAttribute($field, $attr);
+            $this->setAttribute($field, array_unique($attr));
         }
     }
 
     /**
      * Detach a document or id from an reference array
-     * 
+     *
      * @param string $field
      * @param mixed $obj _id, document or model instance
      * @return void
@@ -590,7 +590,7 @@ class Model
 
         if($mongoId != null) {
             $attr = (array)$this->getAttribute($field);
-            
+
             foreach ($attr as $key => $value) {
                 if((string)$value == (string)$mongoId) {
                     unset($attr[$key]);
@@ -603,7 +603,7 @@ class Model
     /**
      * Embed a new document to an attribute. It will also generate an
      * _id for the document if it's not present.
-     * 
+     *
      * @param string $field
      * @param mixed $obj _id, document or model instance
      * @return void
@@ -644,7 +644,7 @@ class Model
 
     /**
      * Embed a new document to an attribute
-     * 
+     *
      * @param string $field
      * @param mixed $target, document or part of the document. Ex: ['name'='Something']
      * @return void
@@ -667,7 +667,7 @@ class Model
             // For each key defined in the target obj
             foreach ($target as $tKey => $tValue) {
                 if(isset($document[$tKey])) {
-                    // The value is equal for the embedded document 
+                    // The value is equal for the embedded document
                     if($target[$tKey] != $document[$tKey]) {
                         $remove = false;
                     }
@@ -707,7 +707,7 @@ class Model
      *          return $instance;
      *      }
      *  }
-     * 
+     *
      * In the example above, if you call Content::first() and the content
      * returned have the key video set, then the object returned will be
      * a VideoContent instead of a Content.
@@ -716,6 +716,16 @@ class Model
     public function polymorph( $instance )
     {
         return $instance;
+    }
+
+    /**
+     * Returns a new instance of the current model
+     *
+     * @return  mixed An instance of the current model
+     */
+    public static function newInstance()
+    {
+        return new static;
     }
 
     /**
@@ -739,7 +749,7 @@ class Model
     public function __set($key, $value)
     {
         // Set attribute
-        $this->setAttribute($key, $value);    
+        $this->setAttribute($key, $value);
     }
 
     public function __call($method, $parameters)
@@ -793,7 +803,7 @@ class Model
 
     /**
      * Checks if a string is a MongoID
-     * 
+     *
      * @param string $string String to be checked.
      * @return boolean
      */
