@@ -486,10 +486,10 @@ class Model
             // will be returned from cache =)
             return static::$cacheComponent->remember($cache_key, 0.1, function() use ($model, $ref_ids)
             {
-                return $model::where(array('_id'=>array('$in'=>$ref_ids)), [], true);
+                return $model::where(array('_id'=>array('$in'=>$ref_ids)), array(), true);
             });
         } elseif($cachable) {
-            return $model::where(array('_id'=>array('$in'=>$ref_ids)), [], true);
+            return $model::where(array('_id'=>array('$in'=>$ref_ids)), array(), true);
         } else {
             return $model::where(array('_id'=>array('$in'=>$ref_ids)));
         }
@@ -765,7 +765,7 @@ class Model
             $field = strtolower(substr($method,7,1)).substr($method,8);
             $this->embed($field, $value);
         } else {
-            trigger_error('Call to undefined method '.$method);
+            throw new \Exception('Call to undefined method '.$method, 1);
         }
     }
 
