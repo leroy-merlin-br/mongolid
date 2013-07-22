@@ -325,11 +325,21 @@ class Model
     /**
      * Returns the Mongo collection object
      *
-     * @return MongoDB
+     * @return MongoDB collection
      */
     protected function collection()
     {
         return $this->db()->{$this->collection};
+    }
+
+    /**
+     * Returns the Mongo collection object
+     *
+     * @return MongoDB collection
+     */
+    public function rawCollection()
+    {
+        return $this->collection();
     }
 
     /**
