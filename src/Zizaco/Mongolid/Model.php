@@ -81,6 +81,7 @@ class Model
     {
         if (! $this->collection) return false;
 
+        $this->prepareTimestamps();
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
 
         $result = $this->collection()
