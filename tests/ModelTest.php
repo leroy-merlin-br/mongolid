@@ -50,6 +50,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($prod->save());
     }
 
+    public function testShouldHasUpdatedAtAndCreatedAtFields()
+    {
+        $prod = new _stubProduct;
+        $prod->name = 'Something';
+
+        $prod->prepareTimestamps();
+
+        $this->assertTrue( $prod->updated_at instanceOf MongoDate );
+        $this->assertTrue( $prod->created_at instanceOf MongoDate );
+    }
+
     public function testShouldDelete()
     {
         $prod = new _stubProduct;

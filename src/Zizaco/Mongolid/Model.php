@@ -1,7 +1,7 @@
 <?php
 namespace Zizaco\Mongolid;
 
-use MongoClient;
+use MongoClient, MongoDate;
 
 class Model
 {
@@ -821,5 +821,18 @@ class Model
     {
         // If its a 24 digits hexadecimal, then it's a MongoId
         return (is_string($string) && strlen($string) == 24 && ctype_xdigit($string));
+    }
+
+    /**
+     * This method set at attributes created_at and updated_at fields.
+     *
+     * @return void
+     */
+    public function prepareTimestamps()
+    {
+        if (! array_key_exists('created_at', $this->attributes) ) {
+            $this->attributes['created_at'] = new MongoDate;
+        }
+        $this->attributes['updated_at'] = new MongoDate;
     }
 }
