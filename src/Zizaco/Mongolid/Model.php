@@ -80,8 +80,9 @@ class Model
     public function save()
     {
         if (! $this->collection) return false;
-
-        $this->prepareTimestamps();
+        if($this->timestamps){
+            $this->prepareTimestamps();
+        }
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
 
         $result = $this->collection()
