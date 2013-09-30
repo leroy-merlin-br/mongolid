@@ -37,6 +37,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     {
         $prod = new _stubProduct;
         $prod->name = 'Something';
+        $prod->prepareTimestamps();
 
         $this->productsCollection
             ->shouldReceive('save')
@@ -337,10 +338,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod = new _stubProduct;
         $prod->name = "Bacon";
         $prod->price = 10.50;
-        $prod->category_id = new MongoId('123');
+        $prod->category_id = new MongoId('51e1eefc065f908c10000411');
 
         $cat = [
-            '_id'=>new MongoId('123'),
+            '_id'=>new MongoId('51e1eefc065f908c10000411'),
             'name'=>'BaconCategory',
         ];
 
@@ -370,10 +371,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod = new _stubProduct;
         $prod->name = "Bacon";
         $prod->price = 10.50;
-        $prod->category_id = [new MongoId('123')]; // Within an array
+        $prod->category_id = [new MongoId('51e1eefc065f908c10000411')]; // Within an array
 
         $cat = [
-            '_id'=>new MongoId('123'),
+            '_id'=>new MongoId('51e1eefc065f908c10000411'),
             'name'=>'BaconCategory',
         ];
 
@@ -401,9 +402,9 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldReferenceMany()
     {
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('123');
+        $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
-        $cat->products = [new MongoId('123'), new MongoId('456')];
+        $cat->products = [new MongoId('51e1eefc065f908c10000411'), new MongoId('51e1eefc065f908c10000412')];
 
         $query = ['_id'=>['$in'=>$cat->products]];
 
@@ -434,7 +435,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $attr1 = ['name' => 'color'];
 
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('123');
+        $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
         $cat->characteristic = $attr1;
 
@@ -445,7 +446,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $attr1 = ['name' => 'color'];
 
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('123');
+        $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
         $cat->characteristic = [$attr1];
 
@@ -460,7 +461,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $attr2 = ['name' => 'material'];
 
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('123');
+        $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
         $cat->characteristics = [
             $attr1, $attr2
@@ -478,13 +479,13 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldAttach()
     {
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('112');
+        $cat->_id = new MongoId('51e1eefc065f908c10000413');
         $cat->name = 'BaconCategory';
 
         $prod1 = new _stubProduct;
-        $prod1->_id = new MongoId('123');
-        $prod2 = ['_id'=>new MongoId('456')];
-        $prod3 = new MongoId('789');
+        $prod1->_id = new MongoId('51e1eefc065f908c10000411');
+        $prod2 = ['_id'=>new MongoId('51e1eefc065f908c10000412')];
+        $prod3 = new MongoId('51e1eefc065f908c10000413');
 
         // Attach various "types" of products
         $cat->attach('products',$prod1); // Mongolid model object
@@ -511,12 +512,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldDetach()
     {
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('112');
+        $cat->_id = new MongoId('51e1eefc065f908c10000413');
         $cat->name = 'BaconCategory';
         $cat->products = [
-            new MongoId('123'),
-            new MongoId('456'),
-            new MongoId('789')
+            new MongoId('51e1eefc065f908c10000411'),
+            new MongoId('51e1eefc065f908c10000412'),
+            new MongoId('51e1eefc065f908c10000413')
         ];
 
         $prod1 = new _stubProduct;
@@ -538,7 +539,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $char1 = new _stubCharacteristic;
         $char1->name = 'color';
-        $char2 = ['_id'=>new MongoId('456'), 'name'=>'material'];
+        $char2 = ['_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material'];
 
         // Embed various "attributes" for products
         $cat->embed('characteristics',$char1); // Mongolid model object
@@ -595,15 +596,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldUnembed()
     {
         $char1 = new _stubCharacteristic;
-        $char1->_id = new MongoId('123');
+        $char1->_id = new MongoId('51e1eefc065f908c10000411');
         $char1->name = 'color';
-        $char2 = ['_id'=>new MongoId('456'), 'name'=>'material'];
+        $char2 = ['_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material'];
         $char3 = new _stubCharacteristic;
-        $char3->_id = new MongoId('456');
+        $char3->_id = new MongoId('51e1eefc065f908c10000412');
         $char3->name = 'nopah';
 
         $cat = new _stubCategory;
-        $cat->_id = new MongoId('112');
+        $cat->_id = new MongoId('51e1eefc065f908c10000413');
         $cat->name = 'BaconCategory';
         $cat->characteristics = [
             $char1->toArray(),
@@ -627,7 +628,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldPolymorph()
     {
         $prod1 = new _stubProduct;
-        $prod1->_id = new MongoId('123');
+        $prod1->_id = new MongoId('51e1eefc065f908c10000411');
         $prod1->name = 'Bacon';
 
         $result = $prod1->polymorph($prod1);
