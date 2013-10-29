@@ -1,5 +1,5 @@
 {
-    "name": "paulse/mongolid",
+    "name": "zizaco/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
     "keywords": ["odm","mongodb","nosql"],
     "license": "MIT",
