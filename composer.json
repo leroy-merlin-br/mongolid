@@ -1,5 +1,5 @@
 {
-    "name": "zizaco/mongolid",
+    "name": "paulse/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
     "keywords": ["odm","mongodb","nosql"],
     "license": "MIT",
@@ -7,6 +7,10 @@
         {
             "name": "Zizaco Zizuini",
             "email": "zizaco@gmail.com"
+        },
+        {
+            "name": "Paul Servino",
+            "email": "paulse@gmail.com"
         }
     ],
     "require": {
