@@ -42,6 +42,17 @@ class Model
     public $timestamps = true;
 
     /**
+     * Write concern to be used when saving model.
+     * -1 = Errors Ignored
+     * 0 = Unacknowledged
+     * 1 = Acknowledged
+     * See: http://docs.mongodb.org/manual/core/write-concern/
+     *
+     * @var integer
+     */
+    public $writeConcern = 1;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -114,7 +125,7 @@ class Model
 
         // Saves the model using the MongoClient
         $result = $this->collection()
-            ->save( $preparedAttr, array("w" => 1) );
+            ->save( $preparedAttr, array("w" => $this->writeConcern) );
 
         if (isset($result['ok']) && $result['ok'] ) {
 
