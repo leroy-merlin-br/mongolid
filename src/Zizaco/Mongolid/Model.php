@@ -42,6 +42,17 @@ class Model
     public $timestamps = true;
 
     /**
+     * Write concern to be used when saving model.
+     * -1 = Errors Ignored
+     * 0 = Unacknowledged
+     * 1 = Acknowledged
+     * See: http://docs.mongodb.org/manual/core/write-concern/
+     *
+     * @var integer
+     */
+    public $writeConcern = 1;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -79,16 +90,62 @@ class Model
      */
     public function save()
     {
+        // If the model has no collection. Aka: embeded model
         if (! $this->collection) return false;
 
+        // If the "saving" event returns false we'll bail out of the save and return
+        // false, indicating that the save failed. This gives an opportunities to
+        // listeners to cancel save operations if validations fail or whatever.
+        if ($this->fireModelEvent('saving') === false) {
+            return false;
+        }
+
+        // To this model exists and are being updated?
+        if ($this->_id) {
+
+            // If the updating event returns false, we will cancel the update operation so
+            // developers can hook Validation systems into their models and cancel this
+            // operation if the model does not pass validation. Otherwise, we update.
+            if ($this->fireModelEvent('updating') === false) {
+                return false;
+            }
+        } else {
+
+            // If the model has not an _id then fire the creating event
+            if ($this->fireModelEvent('creating') === false) {
+                return false;
+            }
+        }
+
+        // Prepare the created_at and updated_at attributes for the given model
         $this->prepareTimestamps();
+
+        // Prepare the attributes of the model
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
 
+        // Saves the model using the MongoClient
         $result = $this->collection()
-            ->save( $preparedAttr, array("w" => 1) );
+            ->save( $preparedAttr, array("w" => $this->writeConcern) );
 
-        if(isset($result['ok']) && $result['ok'] ) {
-            $this->parseDocument($this->attributes);
+        if (isset($result['ok']) && $result['ok'] ) {
+
+            if ($this->_id) {
+                // Once we have run the update operation, we will fire the "updated" event for
+                // this model instance. This will allow developers to hook into these after
+                // models are updated, giving them a chance to do any special processing.
+                $this->parseDocument($this->attributes);
+                $this->fireModelEvent('updated', false);
+            } else {
+                // the created event is fired, just in case the developer tries to update it
+                // during the event. This will allow them to do so and run an update here.
+                $this->parseDocument($this->attributes);
+                $this->fireModelEvent('created', false);
+            }
+
+            // The "saved" event will always be fired when inserting or updating an model
+            // instance.
+            $this->fireModelEvent('saved', false);
+
             return true;
         } else {
             return false;
@@ -102,12 +159,23 @@ class Model
      */
     public function delete()
     {
+        // If the "deleting" event returns false we'll bail out of the delete and return
+        // false, indicating that the delete failed. This gives an opportunities to
+        // listeners to cancel delete operations if validations fail or whatever.
+        if ($this->fireModelEvent('deleting') === false) return false;
+
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
 
         $result = $this->collection()
             ->remove( $preparedAttr );
 
         if(isset($result['ok']) && $result['ok'] ) {
+
+            // Once the model has been deleted, we will fire off the deleted event so that
+            // the developers may hook into post-delete operations. We will then return
+            // a boolean true as the delete is presumably successful on the database.
+            $this->fireModelEvent('deleted', false);
+
             return true;
         } else {
             return false;
@@ -880,5 +948,19 @@ class Model
             $this->attributes['created_at'] = new MongoDate;
         }
         $this->attributes['updated_at'] = new MongoDate;
+    }
+
+    /**
+     * This method will can be overwritten in order to fire events to the
+     * application. This gives an opportunities to implement the observer design
+     * pattern.
+     *
+     * @param  string $event
+     * @param  bool   $halt
+     * @return mixed
+     */
+    protected function fireModelEvent($event, $halt = true)
+    {
+        return true;
     }
 }
