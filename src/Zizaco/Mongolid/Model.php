@@ -206,6 +206,51 @@ class Model
     }
 
     /**
+    * Group all entries according to the given keys
+    *
+    * @param $fields array
+    * @param $initial array
+    * @param $reduce string
+    * @param $condition array
+    */
+    public static function group($fields = array(), $initial = array(), $reduce = '', $condition = array()) {
+
+        $instance = static::newInstance();
+
+        if (! $instance->collection)
+            return false;
+
+        // If fields specified then prepare Mongo's projection
+        if(! empty($fields))
+            $fields = $instance->prepareProjection($fields);
+
+        
+        if(count($initial) == 0 || count($reduce) == 0) {
+            // set intial values
+            $initial = array("count" => 0);
+
+            // JavaScript function to perform
+            $reduce = "function (obj, prev) { prev.count++; }";
+        }
+
+        // Perfodm Mongo's find and returns iterable cursor
+        if (count($condition) > 0) {
+            $cursor =  new OdmCursor(
+                $instance->collection()->group( $fields, $initial, $reduce, array('condition'=>$condition)),
+                get_class($instance)
+            );
+        } else {
+            $cursor =  new OdmCursor(
+                $instance->collection()->group($fields, $initial, $reduce, array('condition'=>$condition)),
+                get_class($instance)
+            );
+        }
+        
+
+        return $cursor;
+    }
+
+    /**
      * Find "all" documents from the collection
      *
      * @param  array  $fields
