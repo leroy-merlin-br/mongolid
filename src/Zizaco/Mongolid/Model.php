@@ -899,10 +899,12 @@ class Model
      */
     public function prepareTimestamps()
     {
-        if (! array_key_exists('created_at', $this->attributes) ) {
-            $this->attributes['created_at'] = new MongoDate;
+        if ($this->timestamps) {
+            if (! array_key_exists('created_at', $this->attributes) ) {
+                $this->attributes['created_at'] = new MongoDate;
+            }
+            $this->attributes['updated_at'] = new MongoDate;
         }
-        $this->attributes['updated_at'] = new MongoDate;
     }
 
     /**
