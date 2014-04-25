@@ -920,4 +920,54 @@ class Model
     {
         return true;
     }
+
+    /**
+     * Updates the model with only fields was changed.
+     *
+     * @return bool
+     */
+    public function update()
+    {
+        // If the model has no collection. Aka: embeded model
+        if (! $this->collection) return false;
+
+        // If the model has no _id.
+        if (! isset($this->attributes['_id'])) return false;
+
+        // Prepare the created_at and updated_at attributes for the given model
+        $this->prepareTimestamps();
+
+        // Prepare the attributes of the model
+        $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
+
+        // Get just the attributes what was changed.
+        $diffAttributes = $this->changedAttributes($preparedAttr);
+
+        // Saves the model using the MongoClient
+        $result = $this->collection()
+            ->update( [ '_id' => $preparedAttr['_id'] ], $diffAttributes , array("w" => $this->writeConcern) );
+
+        if (isset($result['ok']) && $result['ok'] ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the diff between the original field with actual attributes.
+     * @return array
+     */
+    protected function changedAttributes()
+    {
+        $changed = [];
+
+        foreach ($this->original as $originalName => $originalAttr) {
+            if (isset($this->attributes[$originalName]) && $this->attributes[$originalName] != $originalAttr) {
+                $changed[$originalName] = $this->attributes[$originalName];
+            }
+        }
+
+        return $changed;
+    }
 }

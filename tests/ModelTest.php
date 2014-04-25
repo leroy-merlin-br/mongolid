@@ -12,16 +12,16 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mongoMock = m::mock('Connection');
-        $this->productsCollection = m::mock('Collection');
+        $this->mongoMock            = m::mock('Connection');
+        $this->productsCollection   = m::mock('Collection');
         $this->categoriesCollection = m::mock('Collection');
-        $this->cursor = m::mock(new _stubCursor);
+        $this->cursor               = m::mock(new _stubCursor);
 
-        $this->mongoMock->mongolid = $this->mongoMock;
-        $this->mongoMock->test_products = $this->productsCollection;
+        $this->mongoMock->mongolid        = $this->mongoMock;
+        $this->mongoMock->test_products   = $this->productsCollection;
         $this->mongoMock->test_categories = $this->categoriesCollection;
 
-        _stubProduct::$connection = $this->mongoMock;
+        _stubProduct::$connection  = $this->mongoMock;
         _stubCategory::$connection = $this->mongoMock;
     }
 
@@ -49,6 +49,28 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn(['ok'=>1]);
 
         $this->assertTrue($prod->save());
+    }
+
+    public function testShouldUpdate()
+    {
+        $prod              = new _stubProductPersisted;
+        $prod->name        = 'Something';
+        $prod->_id         = new \MongoId;
+        $prod->original    = [ 'name' => 'dasd' ];
+
+        $prod->prepareTimestamps();
+
+        $this->productsCollection
+            ->shouldReceive('update')
+            ->with(
+                [ '_id'  => $prod->_id  ],
+                [ 'name' => 'Something' ],
+                [ 'w'    => 1           ]
+            )
+            ->once()
+            ->andReturn([ 'ok' => 1 ]);
+
+        $this->assertTrue($prod->update());
     }
 
     public function testShouldHasUpdatedAtAndCreatedAtFields()
@@ -668,6 +690,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
 class _stubProduct extends Model {
     protected $database = 'mongolid';
     protected $collection = 'test_products';
+    public function category($cached = false)
+    {
+        return $this->referencesOne('_stubCategory','category_id', $cached);
+    }
+}
+
+class _stubProductPersisted extends Model {
+    protected $database = 'mongolid';
+    protected $collection = 'test_products';
+    protected $original = ['name' => 'whatever'];
+
     public function category($cached = false)
     {
         return $this->referencesOne('_stubCategory','category_id', $cached);

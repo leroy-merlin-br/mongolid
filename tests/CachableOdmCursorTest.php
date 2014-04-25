@@ -121,7 +121,7 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
         $result = $cachableOdmCursor->toJson();
 
-        $shouldBe = json_encode(array($this->objA->attributes, $this->objB->attributes)); 
+        $shouldBe = json_encode(array($this->objA->attributes, $this->objB->attributes));
 
         $this->assertEquals($shouldBe, $result);
     }
@@ -132,7 +132,7 @@ class _stubModelForCachable extends Model {
 
     public static $returnToWhere;
 
-    public static function where() {
+    public static function where($query = array(), $fields = array(), $cachable = false) {
         return static::$returnToWhere;
     }
 }
