@@ -6,6 +6,7 @@ php:
   - 5.5
 
 before_script:
+  - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev
 
