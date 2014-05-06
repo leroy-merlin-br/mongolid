@@ -945,7 +945,7 @@ class Model
 
         // Saves the model using the MongoClient
         $result = $this->collection()
-            ->update( [ '_id' => $preparedAttr['_id'] ], $diffAttributes , array("w" => $this->writeConcern) );
+            ->update( array( '_id' => $preparedAttr['_id'] ), $diffAttributes , array("w" => $this->writeConcern) );
 
         if (isset($result['ok']) && $result['ok'] ) {
             return true;
@@ -960,7 +960,7 @@ class Model
      */
     protected function changedAttributes()
     {
-        $changed = [];
+        $changed = array();
 
         foreach ($this->original as $originalName => $originalAttr) {
             if (isset($this->attributes[$originalName]) && $this->attributes[$originalName] != $originalAttr) {
@@ -968,6 +968,6 @@ class Model
             }
         }
 
-        return $changed;
+        return array('$set' => $changed);
     }
 }

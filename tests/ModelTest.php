@@ -21,23 +21,24 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->mongoMock->test_products   = $this->productsCollection;
         $this->mongoMock->test_categories = $this->categoriesCollection;
 
-        _stubProduct::$connection  = $this->mongoMock;
-        _stubCategory::$connection = $this->mongoMock;
+        _stubProduct::$connection          = $this->mongoMock;
+        _stubProductPersisted::$connection = $this->mongoMock;
+        _stubCategory::$connection         = $this->mongoMock;
     }
 
     public function tearDown()
     {
         m::close();
 
-        _stubProduct::$connection = null;
-        _stubCategory::$connection = null;
+        _stubProduct::$connection          = null;
+        _stubProductPersisted::$connection = null;
+        _stubCategory::$connection         = null;
     }
 
     public function testShouldSave()
     {
         $prod = new _stubProduct;
         $prod->name = 'Something';
-        $prod->prepareTimestamps();
 
         $this->productsCollection
             ->shouldReceive('save')
@@ -58,13 +59,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod->_id         = new \MongoId;
         $prod->original    = [ 'name' => 'dasd' ];
 
-        $prod->prepareTimestamps();
-
         $this->productsCollection
             ->shouldReceive('update')
             ->with(
                 [ '_id'  => $prod->_id  ],
-                [ 'name' => 'Something' ],
+                [ '$set' => [ 'name' => 'Something' ]],
                 [ 'w'    => 1           ]
             )
             ->once()
