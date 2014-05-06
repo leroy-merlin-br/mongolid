@@ -56,15 +56,13 @@ class ModelTest extends PHPUnit_Framework_TestCase
     {
         $prod              = new _stubProductPersisted;
         $prod->name        = 'Something';
-        $prod->_id         = new \MongoId;
-        $prod->original    = [ 'name' => 'dasd' ];
 
         $this->productsCollection
             ->shouldReceive('update')
             ->with(
                 [ '_id'  => $prod->_id  ],
-                [ '$set' => [ 'name' => 'Something' ]],
-                [ 'w'    => 1           ]
+                [ '$set' => ['name' => 'Something', "desc" => "whatever2"]],
+                [ 'w'    => 1 ]
             )
             ->once()
             ->andReturn([ 'ok' => 1 ]);
@@ -698,12 +696,15 @@ class _stubProduct extends Model {
 class _stubProductPersisted extends Model {
     protected $database = 'mongolid';
     protected $collection = 'test_products';
-    protected $original = ['name' => 'whatever'];
+    protected $original = [ 'name' => 'whatever', '_id' =>  '12312'];
+    protected $attributes = [ 'desc' => 'whatever2', '_id' =>  '12312' ];
 
     public function category($cached = false)
     {
         return $this->referencesOne('_stubCategory','category_id', $cached);
     }
+
+    public function prepareTimestamps() {}
 }
 
 class _stubCategory extends Model {

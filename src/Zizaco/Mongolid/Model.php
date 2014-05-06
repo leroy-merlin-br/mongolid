@@ -962,9 +962,17 @@ class Model
     {
         $changed = array();
 
+        // getting changes to original values
         foreach ($this->original as $originalName => $originalAttr) {
             if (isset($this->attributes[$originalName]) && $this->attributes[$originalName] != $originalAttr) {
                 $changed[$originalName] = $this->attributes[$originalName];
+            }
+        }
+
+        // getting new attributes created
+        foreach ($this->attributes as $attrName => $attrValue) {
+            if (! isset($this->original[$attrName]) && $attrValue) {
+                $changed[$attrName] = $this->attributes[$attrName];
             }
         }
 
