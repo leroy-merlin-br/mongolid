@@ -98,6 +98,32 @@ class Model
     }
 
     /**
+     * Returns if this document already saved in DB.
+     * @return boolean
+     */
+    public function alreadyPersisted()
+    {
+        if ($this->_id)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Fire all events before trying to saving the resource.
+     * @return boolean
+     */
+    public function fireBeforePersistingEvent()
+    {
+        $event = $this->alreadyPersisted() ? 'updating' : 'creating';
+
+        if ($this->fireModelEvent($event) === false) {
+            return false;
+        }
+
+        return true;
+    }
+    /**
      * Save the model to the database.
      *
      * @return bool
@@ -108,29 +134,9 @@ class Model
         if (! $this->isPersistable())
             return null;
 
-        // If the "saving" event returns false we'll bail out of the save and return
-        // false, indicating that the save failed. This gives an opportunities to
-        // listeners to cancel save operations if validations fail or whatever.
-        if ($this->fireModelEvent('saving') === false) {
+        // Fire events that should running before save it.
+        if(! $this->fireBeforePersistingEvent())
             return false;
-        }
-
-        // To this model exists and are being updated?
-        if ($this->_id) {
-
-            // If the updating event returns false, we will cancel the update operation so
-            // developers can hook Validation systems into their models and cancel this
-            // operation if the model does not pass validation. Otherwise, we update.
-            if ($this->fireModelEvent('updating') === false) {
-                return false;
-            }
-        } else {
-
-            // If the model has not an _id then fire the creating event
-            if ($this->fireModelEvent('creating') === false) {
-                return false;
-            }
-        }
 
         // Prepare the created_at and updated_at attributes for the given model
         $this->prepareTimestamps();

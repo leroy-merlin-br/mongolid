@@ -44,6 +44,16 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($characteristic->isPersistable());
     }
 
+    public function testShouldVerifyIfAlreadyPersists()
+    {
+        $prod      = new _stubProduct;
+        $prod->_id = new MongoId;
+        $this->assertTrue($prod->alreadyPersisted());
+
+        $prod->_id = null;
+        $this->assertFalse($prod->alreadyPersisted());
+    }
+
     public function testShouldSave()
     {
         $prod = new _stubProductNoTimestamp;
