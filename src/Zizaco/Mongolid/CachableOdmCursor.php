@@ -123,7 +123,8 @@ class CachableOdmCursor implements \Iterator
      */
     public function first()
     {
-        return $this->documents[0];
+        if (isset($this->documents[0]))
+            return $this->documents[0];
     }
 
     /**
