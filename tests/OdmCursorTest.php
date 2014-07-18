@@ -59,7 +59,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(array('name'=>'bob','occupation'=>'coder'));
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
         $result = $odmCursor->current();
@@ -73,7 +73,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(array('name'=>'bob','occupation'=>'coder'));
         $this->mongoCursor
             ->shouldReceive('limit');
 
@@ -81,7 +81,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $result = $odmCursor->toArray(true, 5);
 
         $this->assertEquals(5, count($result));
-        $this->assertEquals($result[0], ['name'=>'bob','occupation'=>'coder']);
+        $this->assertEquals($result[0], array('name'=>'bob','occupation'=>'coder'));
     }
 
     public function testShouldGetFirst()
@@ -90,7 +90,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('rewind');
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(array('name'=>'bob','occupation'=>'coder'));
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
         $result = $odmCursor->current();
@@ -137,25 +137,25 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $this->mongoCursor
             ->shouldReceive('sort')
             ->once() // Should be called ONCE!
-            ->with(['name'])
+            ->with(array('name'))
             ->andReturn(5);
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $odmCursor->sort(['name']); // This sort should hit the MongoCursor
+        $odmCursor->sort(array('name')); // This sort should hit the MongoCursor
 
         // If the ammount of results that came from the actual MongoCursor
         // is zero. The sort cannot be called in the cursor.
         $this->mongoCursor
             ->shouldReceive('count')
             ->andReturn(0);
-        $odmCursor->sort(['name']); // This sort should not hit the MongoCursor, this explains that 'ONCE' above.
+        $odmCursor->sort(array('name')); // This sort should not hit the MongoCursor, this explains that 'ONCE' above.
     }
 
     public function testToJson()
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(array('name'=>'bob','occupation'=>'coder'));
         $this->mongoCursor
             ->shouldReceive('limit');
 
@@ -169,7 +169,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         '{"name":"bob","occupation":"coder"}'.
         '{"name":"bob","occupation":"coder"}'.
         '{"name":"bob","occupation":"coder"}'.
-        ']'; 
+        ']';
 
         $this->assertEquals($shouldBe, $result);
     }
