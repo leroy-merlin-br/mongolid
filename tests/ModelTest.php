@@ -205,7 +205,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn($this->cursor);
 
         $result = _stubProduct::where($query, $fields, true);
-        $this->assertInstanceOf('Zizaco\Mongolid\CachableOdmCursor', $result);
+        $this->assertInstanceOf('Zizaco\Mongolid\Cursor\CachableOdmCursor', $result);
     }
 
     public function testShouldWhere()
@@ -231,7 +231,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
             );
 
         $result = _stubProduct::where($query, $fields);
-        $this->assertInstanceOf('Zizaco\Mongolid\OdmCursor', $result);
+        $this->assertInstanceOf('Zizaco\Mongolid\Cursor\OdmCursor', $result);
     }
 
     public function testShouldParseDocument()
@@ -438,7 +438,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
             );
 
         $result = $cat->products();
-        $this->assertInstanceOf('Zizaco\Mongolid\OdmCursor', $result);
+        $this->assertInstanceOf('Zizaco\Mongolid\Cursor\OdmCursor', $result);
 
         $this->cursor
             ->shouldReceive('rewind')
@@ -446,7 +446,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn($this->cursor);
 
         $result = $cat->products(true);
-        $this->assertInstanceOf('Zizaco\Mongolid\CachableOdmCursor', $result);
+        $this->assertInstanceOf('Zizaco\Mongolid\Cursor\CachableOdmCursor', $result);
     }
 
     public function testShouldEmbedOne()

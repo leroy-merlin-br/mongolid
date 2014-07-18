@@ -1,7 +1,7 @@
 <?php
 
 use Zizaco\Mongolid\Model;
-use Zizaco\Mongolid\OdmCursor;
+use Zizaco\Mongolid\Cursor\OdmCursor;
 use Mockery as m;
 
 class OdmCursorTest extends PHPUnit_Framework_TestCase

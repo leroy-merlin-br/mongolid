@@ -1,8 +1,8 @@
 <?php
 
 use Zizaco\Mongolid\Model;
-use Zizaco\Mongolid\OdmCursor;
-use Zizaco\Mongolid\CachableOdmCursor;
+use Zizaco\Mongolid\Cursor\OdmCursor;
+use Zizaco\Mongolid\Cursor\CachableOdmCursor;
 use Mockery as m;
 
 class CachableOdmCursorTest extends PHPUnit_Framework_TestCase

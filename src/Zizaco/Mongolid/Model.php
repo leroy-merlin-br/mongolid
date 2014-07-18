@@ -2,6 +2,8 @@
 namespace Zizaco\Mongolid;
 
 use MongoClient, MongoDate;
+use Zizaco\Mongolid\Cursor\OdmCursor;
+use Zizaco\Mongolid\Cursor\CachableOdmCursor;
 
 class Model
 {

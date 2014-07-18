@@ -1,5 +1,4 @@
-<?php
-namespace Zizaco\Mongolid;
+<?php namespace Zizaco\Mongolid\Cursor;
 
 class OdmCursor implements \Iterator
 {
