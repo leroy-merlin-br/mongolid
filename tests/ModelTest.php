@@ -37,7 +37,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldSave()
     {
-        $prod = new _stubProduct;
+        $prod = new _stubProductNoTimestamp;
         $prod->name = 'Something';
 
         $this->productsCollection
@@ -682,6 +682,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         return $attr;
     }
+}
+
+class _stubProductNoTimestamp extends Model {
+    protected $database = 'mongolid';
+    protected $collection = 'test_products';
+    public function category($cached = false)
+    {
+        return $this->referencesOne('_stubCategory','category_id', $cached);
+    }
+
+    public function prepareTimestamps(){}
 }
 
 class _stubProduct extends Model {
