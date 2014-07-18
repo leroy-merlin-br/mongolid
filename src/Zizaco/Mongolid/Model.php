@@ -86,6 +86,18 @@ class Model
     public $guarded = array();
 
     /**
+     * Returns if this instance could be saved into DB.
+     * @return boolean
+     */
+    public function isPersistable()
+    {
+        if (! $this->collection)
+            return false;
+
+        return true;
+    }
+
+    /**
      * Save the model to the database.
      *
      * @return bool
@@ -93,7 +105,8 @@ class Model
     public function save()
     {
         // If the model has no collection. Aka: embeded model
-        if (! $this->collection) return false;
+        if (! $this->isPersistable())
+            return null;
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
@@ -931,7 +944,8 @@ class Model
     public function update()
     {
         // If the model has no collection. Aka: embeded model
-        if (! $this->collection) return false;
+        if (! $this->isPersistable())
+            return null;
 
         // If the model has no _id.
         if (! isset($this->attributes['_id'])) return false;

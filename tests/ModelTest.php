@@ -35,6 +35,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
         _stubCategory::$connection         = null;
     }
 
+    public function testShouldVerifyIfPersistable()
+    {
+        $prod = new _stubProduct;
+        $this->assertTrue($prod->isPersistable());
+
+        $characteristic = new _stubCharacteristic;
+        $this->assertFalse($characteristic->isPersistable());
+    }
+
     public function testShouldSave()
     {
         $prod = new _stubProductNoTimestamp;
@@ -50,6 +59,13 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn(array('ok'=>1));
 
         $this->assertTrue($prod->save());
+    }
+
+    public function testShouldReturnNullIfTryingToSaveEmbedded()
+    {
+        $prod = new _stubCharacteristic;
+
+        $this->assertNull($prod->save());
     }
 
     public function testShouldUpdate()
@@ -696,8 +712,9 @@ class _stubProductNoTimestamp extends Model {
 }
 
 class _stubProduct extends Model {
-    protected $database = 'mongolid';
+    protected $database   = 'mongolid';
     protected $collection = 'test_products';
+
     public function category($cached = false)
     {
         return $this->referencesOne('_stubCategory','category_id', $cached);
