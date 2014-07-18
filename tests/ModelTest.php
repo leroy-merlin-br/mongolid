@@ -44,10 +44,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('save')
             ->with(
                 $this->prepareMongoAttributes( $prod->attributes ),
-                ['w'=>1]
+                array('w'=>1)
             )
             ->once()
-            ->andReturn(['ok'=>1]);
+            ->andReturn(array('ok'=>1));
 
         $this->assertTrue($prod->save());
     }
@@ -60,12 +60,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->productsCollection
             ->shouldReceive('update')
             ->with(
-                [ '_id'  => $prod->_id  ],
-                [ '$set' => ['name' => 'Something', "desc" => "whatever2"]],
-                [ 'w'    => 1 ]
+                array( '_id'  => $prod->_id  ),
+                array( '$set' => array('name' => 'Something', "desc" => "whatever2")),
+                array( 'w'    => 1 )
             )
             ->once()
-            ->andReturn([ 'ok' => 1 ]);
+            ->andReturn(array( 'ok' => 1 ));
 
         $this->assertTrue($prod->update());
     }
@@ -92,25 +92,25 @@ class ModelTest extends PHPUnit_Framework_TestCase
                 $this->prepareMongoAttributes( $prod->attributes )
             )
             ->once()
-            ->andReturn(['ok'=>1]);
+            ->andReturn(array('ok'=>1));
 
         $this->assertTrue($prod->delete());
     }
 
     public function testShouldFindFirst()
     {
-        $existentProduct = [
+        $existentProduct = array(
             '_id'=>new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
-        $query = ['name'=>'Bacon'];
+        $query = array('name'=>'Bacon');
 
         $this->productsCollection
             ->shouldReceive('findOne')
             ->with(
-                $query ,[]
+                $query ,array()
             )
             ->once()
             ->andReturn(
@@ -126,33 +126,33 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->productsCollection
             ->shouldReceive('findOne')
             ->with(
-                $query ,['price'=>1]
+                $query ,array('price'=>1)
             )
             ->once()
             ->andReturn(
                 $existentProduct
             );
 
-        $result = _stubProduct::first($query,['price']);
+        $result = _stubProduct::first($query,array('price'));
         $this->assertEquals($existentProduct, $result->toArray());
     }
 
     public function testShouldFind()
     {
-        $existentProduct = [
+        $existentProduct = array(
             '_id'=>new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
-        $query = ['name'=>'Bacon'];
+        $query = array('name'=>'Bacon');
 
-        $fields = ['name','price'];
+        $fields = array('name','price');
 
         $this->productsCollection
             ->shouldReceive('find')
             ->with(
-                $query ,['name'=>1,'price'=>1]
+                $query ,array('name'=>1,'price'=>1)
             )
             ->once()
             ->andReturn(
@@ -179,20 +179,20 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldWhereAsCachable()
     {
-        $existentProduct = [
+        $existentProduct = array(
             '_id'=>new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
-        $query = ['name'=>'Bacon'];
+        $query = array('name'=>'Bacon');
 
-        $fields = ['name','price'];
+        $fields = array('name','price');
 
         $this->productsCollection
             ->shouldReceive('find')
             ->with(
-                $query , []
+                $query , array()
             )
             ->once()
             ->andReturn(
@@ -210,20 +210,20 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldWhere()
     {
-        $existentProduct = [
+        $existentProduct = array(
             '_id'=>new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
-        $query = ['name'=>'Bacon'];
+        $query = array('name'=>'Bacon');
 
-        $fields = ['name','price'];
+        $fields = array('name','price');
 
         $this->productsCollection
             ->shouldReceive('find')
             ->with(
-                $query ,['name'=>1,'price'=>1]
+                $query ,array('name'=>1,'price'=>1)
             )
             ->once()
             ->andReturn(
@@ -236,11 +236,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldParseDocument()
     {
-        $document = [
+        $document = array(
             '_id'=>new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
         $prod = new _stubProduct;
         $prod->parseDocument( $document );
@@ -265,12 +265,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod->price = 10.50;
 
         $this->assertEquals(
-            ['name'=>'Bacon','price'=>10.50],
+            array('name'=>'Bacon','price'=>10.50),
             $prod->getAttributes()
         );
 
         $this->assertEquals(
-            ['name'=>'Bacon','price'=>10.50],
+            array('name'=>'Bacon','price'=>10.50),
             $prod->attributes
         );
     }
@@ -298,11 +298,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldFill()
     {
-        $document = [
-            '_id'=>new MongoId,
+        $document = array(
+            '_id'=> new MongoId,
             'name'=>'Bacon',
             'price'=>10.50,
-        ];
+        );
 
         // Empty fillable
         $prod = new _stubProduct;
@@ -311,15 +311,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         // Defined fillable
         $prod = new _stubProduct;
-        $prod->fillable = ['name'];
+        $prod->fillable = array('name');
         $prod->fill( $document );
-        $this->assertEquals(['name'=>'Bacon'], $prod->attributes);
+        $this->assertEquals(array('name'=>'Bacon'), $prod->attributes);
 
         // Defined guarded
         $prod = new _stubProduct;
-        $prod->guarded = ['name'];
+        $prod->guarded = array('name');
         $prod->fill( $document );
-        $this->assertEquals(['_id'=>$document['_id'],'price'=>10.50], $prod->attributes);
+        $this->assertEquals(array('_id'=>$document['_id'],'price'=>10.50), $prod->attributes);
     }
 
     public function testShouldCleanAttribute()
@@ -331,7 +331,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod->cleanAttribute('name');
         unset($prod->price);
 
-        $this->assertEquals([],$prod->attributes);
+        $this->assertEquals(array(),$prod->attributes);
     }
 
     public function testShouldConvertToJson()
@@ -349,7 +349,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod->name = "Bacon";
         $prod->price = 10.50;
 
-        $this->assertEquals(['name'=>'Bacon','price'=>10.50], $prod->toArray());
+        $this->assertEquals(array('name'=>'Bacon','price'=>10.50), $prod->toArray());
     }
 
     public function testShouldReferenceOne()
@@ -359,17 +359,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod->price = 10.50;
         $prod->category_id = new MongoId('51e1eefc065f908c10000411');
 
-        $cat = [
+        $cat = array(
             '_id'=>new MongoId('51e1eefc065f908c10000411'),
             'name'=>'BaconCategory',
-        ];
+        );
 
-        $query = ['_id'=>$prod->category_id];
+        $query = array('_id'=>$prod->category_id);
 
         $this->categoriesCollection
             ->shouldReceive('findOne')
             ->with(
-                $query, []
+                $query, array()
             )
             ->twice()
             ->andReturn(
@@ -390,19 +390,19 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $prod = new _stubProduct;
         $prod->name = "Bacon";
         $prod->price = 10.50;
-        $prod->category_id = [new MongoId('51e1eefc065f908c10000411')]; // Within an array
+        $prod->category_id = array(new MongoId('51e1eefc065f908c10000411')); // Within an array
 
-        $cat = [
+        $cat = array(
             '_id'=>new MongoId('51e1eefc065f908c10000411'),
             'name'=>'BaconCategory',
-        ];
+        );
 
-        $query = ['_id'=>$prod->category_id[0]]; // Should query the first value of the array
+        $query = array('_id'=>$prod->category_id[0]); // Should query the first value of the array
 
         $this->categoriesCollection
             ->shouldReceive('findOne')
             ->with(
-                $query, []
+                $query, array()
             )
             ->twice()
             ->andReturn(
@@ -423,14 +423,14 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
-        $cat->products = [new MongoId('51e1eefc065f908c10000411'), new MongoId('51e1eefc065f908c10000412')];
+        $cat->products = array(new MongoId('51e1eefc065f908c10000411'), new MongoId('51e1eefc065f908c10000412'));
 
-        $query = ['_id'=>['$in'=>$cat->products]];
+        $query = array('_id'=>array('$in'=>$cat->products));
 
         $this->productsCollection
             ->shouldReceive('find')
             ->with(
-                $query, []
+                $query, array()
             )
             ->twice()
             ->andReturn(
@@ -451,7 +451,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldEmbedOne()
     {
-        $attr1 = ['name' => 'color'];
+        $attr1 = array('name' => 'color');
 
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000411');
@@ -462,12 +462,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('_stubCharacteristic', $result);
         $this->assertEquals('color',$result->name);
 
-        $attr1 = ['name' => 'color'];
+        $attr1 = array('name' => 'color');
 
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
-        $cat->characteristic = [$attr1];
+        $cat->characteristic = array($attr1);
 
         $result = $cat->characteristic();
         $this->assertInstanceOf('_stubCharacteristic', $result);
@@ -476,15 +476,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldEmbedMany()
     {
-        $attr1 = ['name' => 'color'];
-        $attr2 = ['name' => 'material'];
+        $attr1 = array('name' => 'color');
+        $attr2 = array('name' => 'material');
 
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000411');
         $cat->name = 'BaconCategory';
-        $cat->characteristics = [
+        $cat->characteristics = array(
             $attr1, $attr2
-        ];
+        );
 
         $result = $cat->characteristics();
         $this->assertEquals(2, count($result));
@@ -503,7 +503,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $prod1 = new _stubProduct;
         $prod1->_id = new MongoId('51e1eefc065f908c10000411');
-        $prod2 = ['_id'=>new MongoId('51e1eefc065f908c10000412')];
+        $prod2 = array('_id'=>new MongoId('51e1eefc065f908c10000412'));
         $prod3 = new MongoId('51e1eefc065f908c10000413');
 
         // Attach various "types" of products
@@ -533,15 +533,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000413');
         $cat->name = 'BaconCategory';
-        $cat->products = [
+        $cat->products = array(
             new MongoId('51e1eefc065f908c10000411'),
             new MongoId('51e1eefc065f908c10000412'),
             new MongoId('51e1eefc065f908c10000413')
-        ];
+        );
 
         $prod1 = new _stubProduct;
         $prod1->_id = $cat->products[0];
-        $prod2 = ['_id'=>$cat->products[1]];
+        $prod2 = array('_id'=>$cat->products[1]);
         $prod3 = $cat->products[2];
 
         $cat->detach('products', $prod1);
@@ -558,7 +558,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $char1 = new _stubCharacteristic;
         $char1->name = 'color';
-        $char2 = ['_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material'];
+        $char2 = array('_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material');
 
         // Embed various "attributes" for products
         $cat->embed('characteristics',$char1); // Mongolid model object
@@ -617,7 +617,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $char1 = new _stubCharacteristic;
         $char1->_id = new MongoId('51e1eefc065f908c10000411');
         $char1->name = 'color';
-        $char2 = ['_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material'];
+        $char2 = array('_id'=>new MongoId('51e1eefc065f908c10000412'), 'name'=>'material');
         $char3 = new _stubCharacteristic;
         $char3->_id = new MongoId('51e1eefc065f908c10000412');
         $char3->name = 'nopah';
@@ -625,11 +625,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $cat = new _stubCategory;
         $cat->_id = new MongoId('51e1eefc065f908c10000413');
         $cat->name = 'BaconCategory';
-        $cat->characteristics = [
+        $cat->characteristics = array(
             $char1->toArray(),
             $char2,
             $char3->toArray(),
-        ];
+        );
 
         $cat->unembed('characteristics', $char1);
         $this->assertNotContains($char1->toArray(), $cat->characteristics);
@@ -664,7 +664,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     private function prepareMongoAttributes($attr)
     {
         // Translate the primary key field into _id
-        if( isset($attr['_id']) )
+        if( isset($attr['_id'] ))
         {
             // If its a 24 digits hexadecimal, then it's a MongoId
             if ($this->isMongoId($attr['_id']))
@@ -707,8 +707,8 @@ class _stubProduct extends Model {
 class _stubProductPersisted extends Model {
     protected $database = 'mongolid';
     protected $collection = 'test_products';
-    protected $original = [ 'name' => 'whatever', '_id' =>  '12312'];
-    protected $attributes = [ 'desc' => 'whatever2', '_id' =>  '12312' ];
+    protected $original = array( 'name' => 'whatever', '_id' =>  '12312');
+    protected $attributes = array( 'desc' => 'whatever2', '_id' =>  '12312' );
 
     public function category($cached = false)
     {
