@@ -2,7 +2,7 @@
 
 use TestCase;
 use Mockery as m;
-use IOC;
+use Mongolid\Mongolid\Container\IOC;
 
 class ConnectionTest extends TestCase
 {

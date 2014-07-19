@@ -1,10 +1,11 @@
 <?php namespace Mongolid\Mongolid;
 
-use PHPUnit_Framework_TestCase;
+use TestCase;
+use Mockery as m;
+use Mongolid\Mongolid\Container\IOC;
 
-class ModelTest extends PHPUnit_Framework_TestCase
+class ModelTest extends TestCase
 {
-
     public function testTrue()
     {
         $this->assertTrue(true);

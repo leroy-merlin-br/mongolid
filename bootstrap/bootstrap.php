@@ -12,10 +12,6 @@ if ( ! extension_loaded('mongo')) {
 use Mongolid\Mongolid\Container\IOC;
 use Illuminate\Container\Container;
 
-if (! class_exists('IOC')) {
-    class_alias('Mongolid\Mongolid\Container\IOC', 'IOC');
-}
-
 $container = new Container;
 
 // Binding for all required classes
