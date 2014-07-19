@@ -1,6 +1,6 @@
 <?php namespace Mongolid\Mongolid\Container;
 
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as IlluminateContainer;
 
 /**
  * This class is a simple Facade for a Illuminate\Container\Container.
@@ -17,7 +17,7 @@ class IOC
      * Setter for static::$container.
      * @param Container $container
      */
-    public static function setContainer(Container $container)
+    public static function setContainer(IlluminateContainer $container)
     {
         static::$container = $container;
     }
