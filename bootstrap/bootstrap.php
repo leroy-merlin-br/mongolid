@@ -9,6 +9,7 @@ if ( ! extension_loaded('mongo')) {
     exit(1);
 }
 
+use Mongolid\Mongolid\Container\Ioc;
 use Illuminate\Container\Container;
 
 $container = new Container;
@@ -25,4 +26,4 @@ $requiredResources = array(
 
 $container->bind($requiredResources);
 
-\Mongolid\Mongolid\Container\IOC::setContainer($container);
+Ioc::setContainer($container);

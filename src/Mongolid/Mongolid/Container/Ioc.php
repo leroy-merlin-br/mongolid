@@ -5,7 +5,7 @@ use Illuminate\Container\Container as IlluminateContainer;
 /**
  * This class is a simple Facade for a Illuminate\Container\Container.
  */
-class IOC
+class Ioc
 {
     /**
      * Illuminate instance.

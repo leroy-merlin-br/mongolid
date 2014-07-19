@@ -1,7 +1,7 @@
 <?php namespace Mongolid\Mongolid\Connection;
 
 use MongoConnectionException;
-use Mongolid\Mongolid\Container\IOC;
+use Mongolid\Mongolid\Container\Ioc;
 
 /**
  * Responsable for creates a new or reuse a connection with DB.
@@ -28,7 +28,7 @@ class Connection
         }
 
         try {
-            $connection = IOC::make('MongoClient', [$connectionString, []]);
+            $connection = Ioc::make('MongoClient', [$connectionString, []]);
             static::$sharedConnection = $connection;
         } catch (MongoConnectionException $e) {
             throw new MongoConnectionException("Failed to connect with string: $connectionString", 1, $e);

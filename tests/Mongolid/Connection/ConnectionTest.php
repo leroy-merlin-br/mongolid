@@ -2,7 +2,7 @@
 
 use TestCase;
 use Mockery as m;
-use Mongolid\Mongolid\Container\IOC;
+use Mongolid\Mongolid\Container\Ioc;
 
 class ConnectionTest extends TestCase
 {
@@ -19,9 +19,9 @@ class ConnectionTest extends TestCase
     {
         // Arrange
         $mongoClientMock = m::mock('MongoClient');
-        $connector       = IOC::make('Mongolid\Mongolid\Connection\Connection');
+        $connector       = Ioc::make('Mongolid\Mongolid\Connection\Connection');
 
-        IOC::instance('MongoClient', $mongoClientMock);
+        Ioc::instance('MongoClient', $mongoClientMock);
 
         // Act
         $connector->createConnection();
@@ -33,7 +33,7 @@ class ConnectionTest extends TestCase
     public function testShouldNotCreateAConnectionWithAlreadyCreatedOne()
     {
         // Arrange
-        $connector = IOC::make('Mongolid\Mongolid\Connection\Connection');
+        $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
         $mock      = m::mock('MongoClient');
         $connector::$sharedConnection = $mock;
 
@@ -50,7 +50,7 @@ class ConnectionTest extends TestCase
     public function testShouldRaiseExceptionForAConnectionStringInvalid()
     {
         // Arrange
-        $connector = IOC::make('Mongolid\Mongolid\Connection\Connection');
+        $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
 
         // Act
         $connector->createConnection();
