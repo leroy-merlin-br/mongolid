@@ -24,7 +24,11 @@
     "autoload": {
         "psr-0": {
             "Mongolid\\Mongolid": "src/"
-        }
+        },
+
+        "classmap": [
+            "tests/TestCase.php"
+        ]
     },
     "minimum-stability": "dev"
 }
