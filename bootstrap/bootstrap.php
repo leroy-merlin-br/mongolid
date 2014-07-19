@@ -4,9 +4,7 @@ include 'vendor/autoload.php';
 
 // Verify if mongo.so extension was loaded.
 if ( ! extension_loaded('mongo')) {
-    echo 'MongoClient PHP extension required.'.PHP_EOL;
-
-    exit(1);
+    throw new Exception("MongoClient PHP extension required.", 1);
 }
 
 use Mongolid\Mongolid\Container\Ioc;
