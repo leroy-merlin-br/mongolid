@@ -17,6 +17,12 @@ class IocTest extends TestCase
             ->andReturn('cool');
 
         // Act
+        $result = Ioc::someMethod(1);
+        $result = Ioc::someMethod(1, 2);
+        $result = Ioc::someMethod(1, 2, 3);
+        $result = Ioc::someMethod(1, 2, 3, 4);
+        $result = Ioc::someMethod(1, 2, 3, 4, 5);
+        $result = Ioc::someMethod(1, 2, 3, 4, 5, 6);
         $result = Ioc::someMethod();
 
         // Assert
