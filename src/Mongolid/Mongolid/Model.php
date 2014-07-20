@@ -1,6 +1,7 @@
 <?php namespace Mongolid\Mongolid;
 
 use Exception;
+use Mongolid\Mongolid\Container\Ioc;
 
 class Model
 {
@@ -82,6 +83,25 @@ class Model
     public function setCollectionName($collection)
     {
         $this->collection = $collection;
+    }
+
+    /**
+     * Setter for a DB's name
+     * @param string $collection
+     */
+    public function setDatabaseName($db)
+    {
+        $this->database = $db;
+    }
+
+    /**
+     * Returns the Mongo collection object
+     *
+     * @return MongoDB collection
+     */
+    public function rawCollection()
+    {
+        return $this->collection();
     }
 
     /**
@@ -340,5 +360,30 @@ class Model
     public function toJson($options = 0)
     {
         return json_encode($this->attributes, $options);
+    }
+
+    /**
+     * Returns the Mongo collection object
+     *
+     * @return MongoDB collection
+     */
+    protected function collection()
+    {
+        $collection = $this->collection;
+        return $this->db()->{$collection};
+    }
+
+    /**
+     * Returns the database object (the connection).
+     *
+     * @return Mongolid\Mongolid\Connection\Connection
+     */
+    protected function db()
+    {
+        if (! static::$connection) {
+            $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
+            static::$connection = $connector->createConnection();
+        }
+        return static::$connection->{$this->database};
     }
 }
