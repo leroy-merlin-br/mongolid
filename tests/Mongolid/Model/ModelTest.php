@@ -221,4 +221,41 @@ class ModelTest extends TestCase
         // Assert
         $this->assertEquals('databaseobject', $result);
     }
+
+    public function testShouldPrepareAttributes()
+    {
+        // Arrange
+        $model = Ioc::make('Mongolid\Mongolid\Model');
+        $model->name = 'John';
+        $model->_id = new \MongoId;
+
+        // Act
+        $result = $this->callProtected($model, 'prepareAttributes');
+
+        $this->assertEquals('John', $result['name']);
+        $this->assertTrue($result['_id'] instanceof \MongoId);
+        $this->assertTrue($result['created_at'] instanceof \MongoDate);
+        $this->assertTrue($result['updated_at'] instanceof \MongoDate);
+
+        // With numeric
+        $model->_id = 10;
+
+        $result = $this->callProtected($model, 'prepareAttributes');
+
+        $this->assertEquals(10, $result['_id']);
+
+        // With MongoId like.
+        $model->_id = '53cb2059bffebc350d8b4569';
+
+        $result = $this->callProtected($model, 'prepareAttributes');
+
+        $this->assertEquals('53cb2059bffebc350d8b4569', $result['_id']);
+
+        // With string.
+        $model->_id = 'some id';
+
+        $result = $this->callProtected($model, 'prepareAttributes');
+
+        $this->assertEquals('some id', $result['_id']);
+    }
 }

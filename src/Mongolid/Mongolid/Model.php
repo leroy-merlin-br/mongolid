@@ -2,6 +2,7 @@
 
 use Exception;
 use Mongolid\Mongolid\Container\Ioc;
+use MongoDate;
 
 class Model
 {
@@ -32,7 +33,7 @@ class Model
      * Timestamp is active.
      * @var string
      */
-    protected $timestamp = true;
+    protected $timestamps = true;
 
     /**
      * Database for this model.
@@ -369,8 +370,7 @@ class Model
      */
     protected function collection()
     {
-        $collection = $this->collection;
-        return $this->db()->{$collection};
+        return $this->db()->{$this->collection};
     }
 
     /**
@@ -385,5 +385,61 @@ class Model
             static::$connection = $connector->createConnection();
         }
         return static::$connection->{$this->database};
+    }
+
+    /**
+     * Prepare attributes to be used in MongoDb.
+     * especially the _id.
+     *
+     * @param array $attr
+     * @return array
+     */
+    protected function prepareAttributes()
+    {
+        $attributes = $this->attributes;
+
+        // Translate the primary key field into _id
+        if (isset($attributes['_id'])) {
+            if ($this->isMongoId($attributes['_id'])) {
+                $attributes['_id'] = new \MongoId($attributes['_id']);
+            } elseif (is_numeric($attributes['_id'])) {
+                $attributes['_id'] = (int)$attributes['_id'];
+            } else {
+                $attributes['_id'] = $attributes['_id'];
+            }
+        }
+
+        $attributes = $this->prepareTimestamps($attributes);
+
+        return $attributes;
+    }
+
+    /**
+     * This method set at attributes created_at and updated_at fields.
+     *
+     * @return void
+     */
+    protected function prepareTimestamps($attr)
+    {
+        if ($this->timestamps) {
+            if (! array_key_exists('created_at', $attr)) {
+                $attr['created_at'] = new MongoDate;
+            }
+            $attr['updated_at'] = new MongoDate;
+        }
+
+        return $attr;
+    }
+
+    /**
+     * Checks if a string is a MongoID
+     *
+     * @param string $string String to be checked.
+     * @return boolean
+     */
+    protected function isMongoId($string)
+    {
+        // If its a 24 digits hexadecimal, then it's a MongoId
+        return (is_string($string) && strlen($string) == 24 && ctype_xdigit($string));
     }
 }
