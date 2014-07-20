@@ -2,7 +2,6 @@
 
 use TestCase;
 use Mockery as m;
-use Mongolid\Mongolid\Container\Ioc;
 use MongoId;
 
 class SaveMethodTest extends TestCase
@@ -91,8 +90,6 @@ class SaveMethodTest extends TestCase
 
         $methods    = implode(',', $methods);
         $model      = m::mock("Mongolid\Mongolid\Model[$methods]");
-        $collection = m::mock('collection');
-        $mongoId    = new MongoId;
 
         // Expect
         $model->shouldAllowMockingProtectedMethods();
@@ -138,7 +135,6 @@ class SaveMethodTest extends TestCase
         $methods    = implode(',', $methods);
         $model      = m::mock("Mongolid\Mongolid\Model[$methods]");
         $collection = m::mock('collection');
-        $mongoId    = new MongoId;
 
         // Expect
         $model->shouldAllowMockingProtectedMethods();
@@ -194,7 +190,6 @@ class SaveMethodTest extends TestCase
         $methods    = implode(',', $methods);
         $model      = m::mock("Mongolid\Mongolid\Model[$methods]");
         $collection = m::mock('collection');
-        $mongoId    = new MongoId;
 
         // Expect
         $model->shouldAllowMockingProtectedMethods();
@@ -245,7 +240,6 @@ class SaveMethodTest extends TestCase
         $methods    = implode(',', $methods);
         $model      = m::mock("Mongolid\Mongolid\Model[$methods]");
         $collection = m::mock('collection');
-        $mongoId    = new MongoId;
 
         // Expect
         $model->shouldAllowMockingProtectedMethods();
