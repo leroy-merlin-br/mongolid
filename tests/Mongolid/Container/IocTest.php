@@ -5,6 +5,12 @@ use Mockery as m;
 
 class IocTest extends TestCase
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
+    }
+
     public function testShouldCallStaticWithTheInstanceSetted()
     {
         // Arrange
@@ -13,7 +19,7 @@ class IocTest extends TestCase
 
         // Expect
         $instance->shouldReceive('someMethod')
-            ->once()
+            ->times(7)
             ->andReturn('cool');
 
         // Act
