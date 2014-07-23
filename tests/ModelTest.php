@@ -35,6 +35,23 @@ class ModelTest extends PHPUnit_Framework_TestCase
         _stubCategory::$connection         = null;
     }
 
+    public function testShouldInsert()
+    {
+        $prod = new _stubProduct;
+        $prod->name = 'Something';
+
+        $this->productsCollection
+            ->shouldReceive('insert')
+            ->with(
+                m::any(),
+                ['w'=>1]
+            )
+            ->once()
+            ->andReturn(['ok'=>1]);
+
+        $this->assertTrue($prod->insert());
+    }
+
     public function testShouldSave()
     {
         $prod = new _stubProduct;
@@ -43,7 +60,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->productsCollection
             ->shouldReceive('save')
             ->with(
-                $this->prepareMongoAttributes( $prod->attributes ),
+                m::any(),
                 ['w'=>1]
             )
             ->once()

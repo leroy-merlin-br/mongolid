@@ -84,6 +84,55 @@ class Model
     public $guarded = array();
 
     /**
+     * Insert the model to the database if the _id of it has not been used before
+     *
+     * @return bool
+     */
+    public function insert()
+    {
+        // If the model has no collection. Aka: embeded model
+        if (! $this->collection) return false;
+
+        // If the "saving" event returns false we'll bail out of the save and return
+        // false, indicating that the save failed. This gives an opportunities to
+        // listeners to cancel save operations if validations fail or whatever.
+        if ($this->fireModelEvent('saving') === false) {
+            return false;
+        }
+
+        // If the model has not an _id then fire the creating event
+        if ($this->fireModelEvent('creating') === false) {
+            return false;
+        }
+
+        // Prepare the created_at and updated_at attributes for the given model
+        $this->prepareTimestamps();
+
+        // Prepare the attributes of the model
+        $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
+
+        // Saves the model using the MongoClient
+        $result = $this->collection()
+            ->insert( $preparedAttr, array("w" => $this->writeConcern) );
+
+        if (isset($result['ok']) && $result['ok'] ) {
+
+            // the created event is fired, just in case the developer tries to update it
+            // during the event. This will allow them to do so and run an update here.
+            $this->parseDocument($this->attributes);
+            $this->fireModelEvent('created', false);
+
+            // The "saved" event will always be fired when inserting or updating an model
+            // instance.
+            $this->fireModelEvent('saved', false);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Save the model to the database.
      *
      * @return bool
@@ -122,6 +171,8 @@ class Model
 
         // Prepare the attributes of the model
         $preparedAttr = $this->prepareMongoAttributes( $this->attributes );
+
+        //var_dump($preparedAttr);
 
         // Saves the model using the MongoClient
         $result = $this->collection()
