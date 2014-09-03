@@ -1,13 +1,18 @@
 <?php
 
+use Mockery\Mock;
 use Zizaco\Mongolid\Model;
 use Mockery as m;
 
 class ModelTest extends PHPUnit_Framework_TestCase
 {
+    /** @var Mock */
     protected $mongoMock = null;
+    /** @var Mock */
     protected $productsCollection = null;
+    /** @var Mock */
     protected $categoriesCollection = null;
+    /** @var Mock */
     protected $cursor = null;
 
     public function setUp()
@@ -669,6 +674,39 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
         $result = $prod1->polymorph($prod1);
         $this->assertEquals($prod1, $result);
+    }
+
+    public function testAggregateReturnsNullForEmptyCollection()
+    {
+        $null = _stubCharacteristic::aggregate(array());
+        $this->assertNull($null);
+    }
+
+    public function testAggregateReturnsNullIfNotOk()
+    {
+        $this->categoriesCollection
+            ->shouldReceive('aggregate')
+            ->with(array(), array())
+            ->andReturn(array(
+                'ok' => 0
+            ));
+        $null = _stubCategory::aggregate(array());
+        $this->assertNull($null);
+    }
+
+    public function testAggregateReturnsResultKey()
+    {
+        $this->categoriesCollection
+            ->shouldReceive('aggregate')
+            ->with(array(), array())
+            ->andReturn(array(
+                'result' => array(
+                    'test' => 'value'
+                )
+            ));
+        $result = _stubCategory::aggregate(array());
+        $this->assertArrayHasKey('test', $result);
+        $this->assertEquals('value', $result['test']);
     }
 
     /**

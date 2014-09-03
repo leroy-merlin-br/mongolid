@@ -2,6 +2,7 @@
 namespace Zizaco\Mongolid;
 
 use MongoClient, MongoDate;
+use MongoCollection;
 
 class Model
 {
@@ -333,6 +334,30 @@ class Model
     public static function all( $fields = array() )
     {
         return static::where( array(), $fields );
+    }
+
+    /**
+     * Uses the aggregation framework to find results
+     *
+     * @param $pipeline
+     * @param array $ops
+     * @return null|array
+     */
+    public static function aggregate($pipeline, $ops = array())
+    {
+        /** @var Model $instance */
+        $instance = static::newInstance();
+        if(!$instance->collection) {
+            return null;
+        }
+        /** @var MongoCollection $collection */
+        $collection = $instance->collection();
+        $results = $collection->aggregate($pipeline, $ops);
+        if(isset($results['ok']) && $results['ok'] == 0) {
+            return null;
+        } else {
+            return $results['result'];
+        }
     }
 
     /**
