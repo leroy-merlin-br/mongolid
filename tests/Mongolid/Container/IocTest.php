@@ -20,7 +20,7 @@ class IocTest extends TestCase
         // Expect
         $instance->shouldReceive('someMethod')
             ->times(7)
-            ->andReturn('cool');
+            ->andReturn('value returned');
 
         // Act
         $result = Ioc::someMethod(1);
@@ -32,6 +32,6 @@ class IocTest extends TestCase
         $result = Ioc::someMethod();
 
         // Assert
-        $this->assertEquals('cool', $result);
+        $this->assertEquals('value returned', $result);
     }
 }
