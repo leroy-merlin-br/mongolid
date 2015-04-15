@@ -15,11 +15,13 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "4.2.*@dev"
+        "illuminate/container": "5.1.*@dev"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpunit": "4.6.*",
+        "squizlabs/php_codesniffer": "~2.0"
     },
     "autoload": {
         "psr-0": {

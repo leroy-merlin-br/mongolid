@@ -4,7 +4,7 @@ use MongoConnectionException;
 use Mongolid\Mongolid\Container\Ioc;
 
 /**
- * Responsable for creates a new or reuse a connection with DB.
+ * Responsable for create a new or reuse a connection with MongoDB.
  */
 class Connection
 {

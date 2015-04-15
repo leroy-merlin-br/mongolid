@@ -33,8 +33,8 @@ class ConnectionTest extends TestCase
     public function testShouldNotCreateAConnectionWithAlreadyCreatedOne()
     {
         // Arrange
-        $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
-        $mock      = m::mock('MongoClient');
+        $connector                    = Ioc::make('Mongolid\Mongolid\Connection\Connection');
+        $mock                         = m::mock('MongoClient');
         $connector::$sharedConnection = $mock;
 
         // Act
