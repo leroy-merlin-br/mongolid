@@ -1,15 +1,14 @@
 <?php
-namespace Mongolid\Mongolid;
+namespace Mongolid\Mongolid\Query;
 
 class Builder
 {
-
-    public function first()
+    public function save()
     {
         # code...
     }
 
-    public function where()
+    public function first()
     {
         # code...
     }
