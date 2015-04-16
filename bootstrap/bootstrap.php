@@ -9,12 +9,4 @@ if ( ! extension_loaded('mongo')) {
 use Mongolid\Mongolid\Container\Ioc;
 use Illuminate\Container\Container;
 
-$container = new Container;
-
-$requiredResources = [
-    'Connection' => '\Mongolid\Mongolid\Connection\Connection'
-];
-
-$container->bind($requiredResources);
-
-Ioc::setContainer($container);
+Ioc::setContainer(new Container);
