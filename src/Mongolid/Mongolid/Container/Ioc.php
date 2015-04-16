@@ -3,7 +3,8 @@
 use Illuminate\Container\Container as IlluminateContainer;
 
 /**
- * This class is a simple Facade for a Illuminate\Container\Container.
+ * This class is a simple Facade for a Illuminate\Container\Container
+ * in order to use the Container as IOC at all classes.
  */
 class Ioc
 {

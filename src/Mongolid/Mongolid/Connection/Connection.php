@@ -9,7 +9,7 @@ use Mongolid\Mongolid\Container\Ioc;
 class Connection
 {
     /**
-     * MongoClient instance.
+     * MongoClient instance shared.
      *
      * @var MongoClient
      */
@@ -31,7 +31,11 @@ class Connection
             $connection = Ioc::make('MongoClient', [$connectionString, []]);
             static::$sharedConnection = $connection;
         } catch (MongoConnectionException $e) {
-            throw new MongoConnectionException("Failed to connect with string: $connectionString", 1, $e);
+            throw new MongoConnectionException(
+                "Failed to connect with string: $connectionString",
+                1,
+                $e
+            );
         }
 
         return $connection;
