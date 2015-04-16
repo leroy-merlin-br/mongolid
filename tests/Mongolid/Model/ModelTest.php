@@ -94,4 +94,55 @@ class ModelTest extends TestCase
         $this->assertNull($model->syncOriginal());
         $this->assertEquals(['name' => 'Bob'], $model->original);
     }
+
+    public function testShouldPerformUpdate()
+    {
+        $model   = Ioc::make('Mongolid\Mongolid\Model');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $model->exists = true;
+
+        $builder->shouldReceive('update')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->update());
+    }
+
+    public function testShouldPerformSaveIfNotExistsAtDB()
+    {
+        $model   = Ioc::make('Mongolid\Mongolid\Model');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $builder->shouldReceive('save')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->update());
+    }
+
+    public function testShouldTriggerUpdateEvent()
+    {
+        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $model->exists = true;
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('updating')
+            ->once()
+            ->andReturn(true);
+
+        $builder->shouldReceive('update')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->update());
+    }
 }

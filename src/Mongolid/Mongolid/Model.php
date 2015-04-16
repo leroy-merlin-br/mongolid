@@ -78,10 +78,24 @@ class Model
         $this->original = $this->attributes;
     }
 
-    // public function update()
-    // {
-    //     # code...
-    // }
+    /**
+     * Performs a update operation.
+     * @return boolean
+     */
+    public function update()
+    {
+        $query = $this->newQueryBuilder();
+
+        if (! $this->exists) {
+            return $this->save();
+        }
+
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        return $query->update($this);
+    }
 
     // public function insert()
     // {
