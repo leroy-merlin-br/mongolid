@@ -145,4 +145,94 @@ class ModelTest extends TestCase
 
         $this->assertTrue($model->update());
     }
+
+    public function testShouldPerformInsert()
+    {
+        $model   = Ioc::make('Mongolid\Mongolid\Model');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $builder->shouldReceive('insert')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->insert());
+    }
+
+    public function testShouldTriggerInsertEvent()
+    {
+        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $model->exists = true;
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('saving')
+            ->once()
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('creating')
+            ->once()
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('saved', false)
+            ->once()
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('created', false)
+            ->once()
+            ->andReturn(true);
+
+        $builder->shouldReceive('insert')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->insert());
+    }
+
+    public function testShouldPerformDelete()
+    {
+        $model   = Ioc::make('Mongolid\Mongolid\Model');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $builder->shouldReceive('delete')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->delete());
+    }
+
+    public function testShouldTriggerDeleteEvent()
+    {
+        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+
+        $model->exists = true;
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('deleting')
+            ->once()
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->with('deleted', false)
+            ->once()
+            ->andReturn(true);
+
+        $builder->shouldReceive('delete')
+            ->once()
+            ->andReturn(true);
+
+        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+
+        $this->assertTrue($model->delete());
+    }
 }

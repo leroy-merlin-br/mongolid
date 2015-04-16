@@ -97,15 +97,51 @@ class Model
         return $query->update($this);
     }
 
-    // public function insert()
-    // {
-    //     # code...
-    // }
+    /**
+     * Performs a insert operation into MongoDB.
+     * @return boolean
+     */
+    public function insert()
+    {
+        $query = $this->newQueryBuilder();
 
-    // public function delete()
-    // {
-    //     # code...
-    // }
+        if (
+            $this->fireModelEvent('saving')   === false ||
+            $this->fireModelEvent('creating') === false
+        ) {
+            return false;
+        }
+
+        $result = $query->insert($this);
+
+        if ($result) {
+            $this->fireModelEvent('saved', false);
+            $this->fireModelEvent('created', false);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Performs a delete operation into MongoDB.
+     * @return boolean
+     */
+    public function delete()
+    {
+        $query = $this->newQueryBuilder();
+
+        if ($this->fireModelEvent('deleting') === false) {
+            return false;
+        }
+
+        $result = $query->delete($this);
+
+        if ($result) {
+            $this->fireModelEvent('deleted', false);
+        }
+
+        return $result;
+    }
 
     // public function prepareTimestamps()
     // {
