@@ -1,4 +1,5 @@
-<?php namespace Mongolid\Mongolid\Connection;
+<?php
+namespace Mongolid\Mongolid\Connection;
 
 use TestCase;
 use Mockery as m;
@@ -24,7 +25,7 @@ class ConnectionTest extends TestCase
         Ioc::instance('MongoClient', $mongoClientMock);
 
         // Act
-        $connector->createConnection();
+        $this->callProtected($connector, 'createConnection');
 
         // Assert
         $this->assertEquals($mongoClientMock, $connector::$sharedConnection);
@@ -38,7 +39,7 @@ class ConnectionTest extends TestCase
         $connector::$sharedConnection = $mock;
 
         // Act
-        $connector->createConnection();
+        $this->callProtected($connector, 'createConnection');
 
         // Assert
         $this->assertEquals($mock, $connector::$sharedConnection);
@@ -53,6 +54,18 @@ class ConnectionTest extends TestCase
         $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
 
         // Act
-        $connector->createConnection();
+        $this->callProtected($connector, 'createConnection');
+    }
+
+    public function testShouldReturnConnectionInstance()
+    {
+        // Arrange
+        $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
+        $mock                         = m::mock('MongoClient');
+        $connector::$sharedConnection = $mock;
+
+        $instance = $connector->getConnectionInstance();
+
+        $this->assertEquals($instance, $mock);
     }
 }

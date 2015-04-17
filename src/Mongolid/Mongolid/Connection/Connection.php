@@ -16,12 +16,30 @@ class Connection
     public static $sharedConnection;
 
     /**
+     * Collection's name.
+     * @var mixed
+     */
+    protected $collection = false;
+
+    /**
+     * Database's name.
+     * @var string
+     */
+    protected $database = false;
+
+    /**
+     * Write concern.
+     * @var integer
+     */
+    protected $writeConcern = 1;
+
+    /**
      * Creates a new connection with database.
      *
      * @param  string $connectionString
      * @return MongoClient
      */
-    public function createConnection($connectionString = '')
+    protected function createConnection($connectionString = '')
     {
         if (static::$sharedConnection) {
             return static::$sharedConnection;
@@ -38,6 +56,42 @@ class Connection
             );
         }
 
-        return $connection;
+        return static::$sharedConnection;
+    }
+
+    /**
+     * Getter for MongoClient instance
+     * @return MongoClient
+     */
+    public function getConnectionInstance()
+    {
+        return $this->createConnection();
+    }
+
+    /**
+     * Returns the collection's name
+     * @return mixed
+     */
+    public function setCollection($collectionName)
+    {
+        return $this->collection = $collectionName;
+    }
+
+    /**
+     * Returns the database's name
+     * @return mixed
+     */
+    public function setDatabase($databaseName)
+    {
+        return $this->database = $databaseName;
+    }
+
+    /**
+     * Returns the database's name
+     * @return mixed
+     */
+    public function setWriteConcern($w)
+    {
+        return $this->writeConcern = $w;
     }
 }
