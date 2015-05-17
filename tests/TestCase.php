@@ -34,4 +34,25 @@ class TestCase extends PHPUnit_Framework_TestCase
 
         return $methodObj->invokeArgs($obj, $args);
     }
+
+    /**
+     * Call a protected property of an object
+     *
+     * @param  mixed $obj
+     * @param  string $attribute Property name
+     * @param  mixed  $value Value to be set
+     */
+    protected function setProtected($obj, $property, $value)
+    {
+        $class = new ReflectionClass($obj);
+        $property = $class->getProperty($property);
+        $property->setAccessible(true);
+
+        if (is_string($obj)) { // static
+            $property->setValue($value);
+            return;
+        }
+
+        $property->setValue($obj, $value);
+    }
 }
