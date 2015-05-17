@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Mongolid\Container;
+namespace Mongolid\Container;
 
 use Mockery as m;
 use TestCase;
