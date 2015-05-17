@@ -1,7 +1,7 @@
 <?php
-namespace Mongolid\Mongolid;
+namespace Mongolid;
 
-use Mongolid\Mongolid\Container\Ioc;
+use Mongolid\Container\Ioc;
 
 class Model
 {
@@ -209,7 +209,7 @@ class Model
     {
 
         if (! static::$connection) {
-            $connector = Ioc::make('Mongolid\Mongolid\Connection\Connection');
+            $connector = Ioc::make('Mongolid\Connection\Connection');
 
             $connector->setDatabase($this->getDatabaseName());
             $connector->setCollection($this->getCollectionName());
@@ -229,7 +229,7 @@ class Model
     {
         $conn = $this->getConnection();
 
-        return Ioc::make('Mongolid\Mongolid\Query\Builder', [$conn]);
+        return Ioc::make('Mongolid\Query\Builder', [$conn]);
     }
 
     /**

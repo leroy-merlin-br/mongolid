@@ -1,7 +1,7 @@
-<?php namespace Mongolid\Mongolid\Connection;
+<?php namespace Mongolid\Connection;
 
 use MongoConnectionException;
-use Mongolid\Mongolid\Container\Ioc;
+use Mongolid\Container\Ioc;
 
 /**
  * Responsable for create a new or reuse a connection with MongoDB.

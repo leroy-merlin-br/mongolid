@@ -1,9 +1,9 @@
 <?php
-namespace Mongolid\Mongolid;
+namespace Mongolid;
 
 use Mockery as m;
 use TestCase;
-use Mongolid\Mongolid\Container\Ioc;
+use Mongolid\Container\Ioc;
 
 class ModelTest extends TestCase
 {
@@ -16,22 +16,22 @@ class ModelTest extends TestCase
 
     public function testShouldPerformSave()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('save')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->save());
     }
 
     public function testShouldNotPerformSaveIfSavingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->shouldReceive('fireModelEvent')
             ->once()
@@ -41,15 +41,15 @@ class ModelTest extends TestCase
         $builder->shouldReceive('save')
             ->never();
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertFalse($model->save());
     }
 
     public function testShouldPerformUpdateIfAlreadyPersisted()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -60,15 +60,15 @@ class ModelTest extends TestCase
         $builder->shouldReceive('save')
             ->never();
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->save());
     }
 
     public function testShouldTriggerSaveEvents()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent,finishSave]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent,finishSave]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->shouldReceive('fireModelEvent')
             ->with('saving')
@@ -83,14 +83,14 @@ class ModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->save());
     }
 
     public function testShouldFinishPropertlyTheSaveOperation()
     {
-        $model = m::mock('Mongolid\Mongolid\Model[syncOriginal,fireModelEvent]');
+        $model = m::mock('Mongolid\Model[syncOriginal,fireModelEvent]');
 
         $model->shouldReceive('syncOriginal')
             ->once();
@@ -104,7 +104,7 @@ class ModelTest extends TestCase
 
     public function testShouldOverwritesTheOriginalAttributesPropertly()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model');
 
         $model->attributes = ['name' => 'Bob'];
         $model->original   = ['name' => 'John'];
@@ -115,8 +115,8 @@ class ModelTest extends TestCase
 
     public function testShouldPerformUpdate()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -124,15 +124,15 @@ class ModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->update());
     }
 
     public function testShouldNotPerformUpdateIfUpdatingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -144,29 +144,29 @@ class ModelTest extends TestCase
         $builder->shouldReceive('update')
             ->never();
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertFalse($model->update());
     }
 
     public function testShouldPerformSaveIfNotExistsAtDB()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('save')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->update());
     }
 
     public function testShouldTriggerUpdateEvent()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -179,29 +179,29 @@ class ModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->update());
     }
 
     public function testShouldPerformInsert()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('insert')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->insert());
     }
 
     public function testShouldNotPerformInsertIfSavingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -213,15 +213,15 @@ class ModelTest extends TestCase
         $builder->shouldReceive('insert')
             ->never();
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertFalse($model->insert());
     }
 
     public function testShouldTriggerInsertEvent()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -249,29 +249,29 @@ class ModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->insert());
     }
 
     public function testShouldPerformDelete()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('delete')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->delete());
     }
 
     public function testShouldNotPerformDeleteIfDeletingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -283,15 +283,15 @@ class ModelTest extends TestCase
         $builder->shouldReceive('delete')
             ->never();
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertFalse($model->delete());
     }
 
     public function testShouldTriggerDeleteEvent()
     {
-        $model   = m::mock('Mongolid\Mongolid\Model[fireModelEvent]');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
 
@@ -309,36 +309,36 @@ class ModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->delete());
     }
 
     public function testShouldCallUndefinedMethodsIntoModelClassAtQueryBuilder()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('canPersistInstance')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
         $this->assertTrue($model->canPersistInstance($model));
     }
 
     public function testShouldCallStaticUndefinedMethodsIntoModelClassAtQueryBuilder()
     {
-        $model   = Ioc::make('Mongolid\Mongolid\Model');
-        $builder = m::mock('Mongolid\Mongolid\Query\Builder');
+        $model   = Ioc::make('Mongolid\Model');
+        $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('canPersistInstance')
             ->once()
             ->andReturn(true);
 
-        Ioc::instance('Mongolid\Mongolid\Query\Builder', $builder);
+        Ioc::instance('Mongolid\Query\Builder', $builder);
 
-        $this->assertTrue(\Mongolid\Mongolid\Model::canPersistInstance($model));
+        $this->assertTrue(\Mongolid\Model::canPersistInstance($model));
     }
 }

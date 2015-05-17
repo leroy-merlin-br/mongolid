@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Mongolid\Query;
+namespace Mongolid\Query;
 
 class Builder
 {
