@@ -1,97 +1,52 @@
-<?php namespace Mongolid\Connection;
+<?php
+namespace Mongolid\Connection;
 
 use MongoConnectionException;
 use Mongolid\Container\Ioc;
+use MongoClient;
 
 /**
- * Responsable for create a new or reuse a connection with MongoDB.
+ * Represents a single connection with the database
+ *
+ * @package  Mongolid
  */
 class Connection
 {
     /**
-     * MongoClient instance shared.
+     * The raw MongoClient object that represents this connection
      *
      * @var MongoClient
      */
-    public static $sharedConnection;
+    protected $rawConnection;
 
     /**
-     * Collection's name.
-     * @var mixed
-     */
-    protected $collection = false;
-
-    /**
-     * Database's name.
-     * @var string
-     */
-    protected $database = false;
-
-    /**
-     * Write concern.
-     * @var integer
-     */
-    protected $writeConcern = 1;
-
-    /**
-     * Creates a new connection with database.
+     * Constructs a new Mongolid connection. It uses the same constructor
+     * parameters as the original MongoClient constructor
      *
-     * @param  string $connectionString
-     * @return MongoClient
+     * @see   http://php.net/manual/pt_BR/mongoclient.construct.php
+     *
+     * @param string $server Connection string
+     * @param array  $options
+     * @param array  $driver_options
      */
-    protected function createConnection($connectionString = '')
-    {
-        if (static::$sharedConnection) {
-            return static::$sharedConnection;
-        }
-
-        try {
-            $connection = Ioc::make('MongoClient', [$connectionString, []]);
-            static::$sharedConnection = $connection;
-        } catch (MongoConnectionException $e) {
-            throw new MongoConnectionException(
-                "Failed to connect with string: $connectionString",
-                1,
-                $e
-            );
-        }
-
-        return static::$sharedConnection;
+    public function __construct(
+        $server = "mongodb://localhost:27017",
+        $options = ["connect" => TRUE],
+        $driver_options = []
+    ) {
+        $this->rawConnection = Ioc::make(
+            'MongoClient',
+            [$server, $options, $driver_options]
+        );
     }
 
     /**
      * Getter for MongoClient instance
+     *
      * @return MongoClient
      */
-    public function getConnectionInstance()
+    public function getRawConnection()
     {
-        return $this->createConnection();
-    }
-
-    /**
-     * Returns the collection's name
-     * @return mixed
-     */
-    public function setCollection($collectionName)
-    {
-        return $this->collection = $collectionName;
-    }
-
-    /**
-     * Returns the database's name
-     * @return mixed
-     */
-    public function setDatabase($databaseName)
-    {
-        return $this->database = $databaseName;
-    }
-
-    /**
-     * Returns the database's name
-     * @return mixed
-     */
-    public function setWriteConcern($w)
-    {
-        return $this->writeConcern = $w;
+        return $this->rawConnection;
     }
 }
