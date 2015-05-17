@@ -13,12 +13,12 @@ abstract class Schema
 {
     /**
      * The $dynamic property tells if the schema will accept additional fields
-     * that are not specified in the $schema property. This is usefull if you
+     * that are not specified in the $fields property. This is usefull if you
      * doesn't have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      * @var boolean
      */
-    protected $dynamic = false;
+    public $dynamic = false;
 
     /**
      * Tells how a document should look like. If an scalar type is used, it will
@@ -26,12 +26,12 @@ abstract class Schema
      * the name of the method to be called. See 'mongoId' method for example.
      * @var string[]
      */
-    protected $schema  = [
+    public $fields  = [
         '_id' => 'mongoId' // Means that the _id will passtrought the `mongoId` method
     ];
 
     /**
-     * Filters any field in the $schema that has it's value specified as a
+     * Filters any field in the $fields that has it's value specified as a
      * 'mongoId'. It will wraps the $value, if any, into a MongoId object
      *
      * @param  mixed $value
