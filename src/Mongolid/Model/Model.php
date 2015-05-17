@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Model;
 
 use Mongolid\Container\Ioc;
 
@@ -7,7 +7,7 @@ class Model
 {
     /**
      * Connection's object with MongoDB.
-     * @var Mongolid\Mongolid\Connection\Connection
+     * @var Mongolid\Connection\Connection
      */
     protected static $connection;
 
@@ -46,6 +46,12 @@ class Model
      * @var integer
      */
     protected $writeConcern = 1;
+
+    /**
+     * Timestamps enabled
+     * @var boolean
+     */
+    protected $timestamp = true;
 
     /**
      * Performs save action to persist into database.
@@ -162,6 +168,11 @@ class Model
         return $this->collection;
     }
 
+    public function hasTimestamp()
+    {
+        return (boolean)$this->timestamp;
+    }
+
     /**
      * Returns the database's name
      * @return mixed
@@ -169,6 +180,11 @@ class Model
     public function getDatabaseName()
     {
         return $this->database;
+    }
+
+    public function getId()
+    {
+        return $this->_id;
     }
 
     /**
@@ -203,7 +219,7 @@ class Model
 
     /**
      * Returns a new connection to MongoDB.
-     * @return Mongolid\Mongolid\Connection\Connection
+     * @return Mongolid\Connection\Connection
      */
     protected function getConnection()
     {
@@ -223,13 +239,27 @@ class Model
 
     /**
      * Instantiate a new Query Builder object.
-     * @return Mongolid\Mongolid\Query\Builder
+     * @return Mongolid\Query\Builder
      */
     protected function newQueryBuilder()
     {
         $conn = $this->getConnection();
 
         return Ioc::make('Mongolid\Query\Builder', [$conn]);
+    }
+
+    public function sanitizeAttributes()
+    {
+        $sanitizer = Ioc::make('Mongolid\Model\Sanitizer');
+
+        return $sanitizer->sanitize($this);
+    }
+
+    public function changedAttributes()
+    {
+        $diff = Ioc::make('Mongolid\Model\DiffAttributes');
+
+        return $diff->generate($this);
     }
 
     /**

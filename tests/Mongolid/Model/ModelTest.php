@@ -16,7 +16,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformSave()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('save')
@@ -30,7 +30,7 @@ class ModelTest extends TestCase
 
     public function testShouldNotPerformSaveIfSavingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->shouldReceive('fireModelEvent')
@@ -48,7 +48,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformUpdateIfAlreadyPersisted()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -67,7 +67,7 @@ class ModelTest extends TestCase
 
     public function testShouldTriggerSaveEvents()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent,finishSave]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent,finishSave]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->shouldReceive('fireModelEvent')
@@ -90,7 +90,7 @@ class ModelTest extends TestCase
 
     public function testShouldFinishPropertlyTheSaveOperation()
     {
-        $model = m::mock('Mongolid\Model[syncOriginal,fireModelEvent]');
+        $model = m::mock('Mongolid\Model\Model[syncOriginal,fireModelEvent]');
 
         $model->shouldReceive('syncOriginal')
             ->once();
@@ -104,7 +104,7 @@ class ModelTest extends TestCase
 
     public function testShouldOverwritesTheOriginalAttributesPropertly()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
 
         $model->attributes = ['name' => 'Bob'];
         $model->original   = ['name' => 'John'];
@@ -115,7 +115,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformUpdate()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -131,7 +131,7 @@ class ModelTest extends TestCase
 
     public function testShouldNotPerformUpdateIfUpdatingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -151,7 +151,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformSaveIfNotExistsAtDB()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('save')
@@ -165,7 +165,7 @@ class ModelTest extends TestCase
 
     public function testShouldTriggerUpdateEvent()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -186,7 +186,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformInsert()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('insert')
@@ -200,7 +200,7 @@ class ModelTest extends TestCase
 
     public function testShouldNotPerformInsertIfSavingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -220,7 +220,7 @@ class ModelTest extends TestCase
 
     public function testShouldTriggerInsertEvent()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -256,7 +256,7 @@ class ModelTest extends TestCase
 
     public function testShouldPerformDelete()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('delete')
@@ -270,7 +270,7 @@ class ModelTest extends TestCase
 
     public function testShouldNotPerformDeleteIfDeletingEventReturnFalse()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -290,7 +290,7 @@ class ModelTest extends TestCase
 
     public function testShouldTriggerDeleteEvent()
     {
-        $model   = m::mock('Mongolid\Model[fireModelEvent]');
+        $model   = m::mock('Mongolid\Model\Model[fireModelEvent]');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $model->exists = true;
@@ -316,7 +316,7 @@ class ModelTest extends TestCase
 
     public function testShouldCallUndefinedMethodsIntoModelClassAtQueryBuilder()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('canPersistInstance')
@@ -330,7 +330,7 @@ class ModelTest extends TestCase
 
     public function testShouldCallStaticUndefinedMethodsIntoModelClassAtQueryBuilder()
     {
-        $model   = Ioc::make('Mongolid\Model');
+        $model   = Ioc::make('Mongolid\Model\Model');
         $builder = m::mock('Mongolid\Query\Builder');
 
         $builder->shouldReceive('canPersistInstance')
@@ -339,6 +339,6 @@ class ModelTest extends TestCase
 
         Ioc::instance('Mongolid\Query\Builder', $builder);
 
-        $this->assertTrue(\Mongolid\Model::canPersistInstance($model));
+        $this->assertTrue(\Mongolid\Model\Model::canPersistInstance($model));
     }
 }

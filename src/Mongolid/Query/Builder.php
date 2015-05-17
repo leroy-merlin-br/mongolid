@@ -1,89 +1,132 @@
 <?php
 namespace Mongolid\Query;
 
+use Mongolid\Model\Model;
+use Mongolid\Connection\Connection;
+
 class Builder
 {
-    public function save()
+
+    /**
+     * MongoClient instance.
+     * @var MongoClient
+     */
+    protected $connection;
+
+    /**
+     * Constructor
+     * @param MongoConnection $connection
+     */
+    public function __construct(Connection $connection)
     {
-        # code...
+        $this->connection = $collection;
     }
 
-    public function first()
+    /**
+     * Performs the save() operation into MongoDB.
+     * @return boolean
+     */
+    public function save(Model $instance)
     {
-        # code...
+        if (! $this->canPersistInstance($instance)) {
+            return false;
+        }
+
+        $options = $this->options();
+
+        $result = $this->collection()
+            ->save($instance->sanitizeAttributes(), $options);
+
+        return $this->parseResult($result);
     }
 
-    public function where()
+    /**
+     * Performs the save() operation into MongoDB.
+     * @return boolean
+     */
+    public function update(Model $instance)
     {
-        # code...
+        if (! $this->canPersistInstance($instance)) {
+            return false;
+        }
+
+        $options = $this->options();
+
+        $result = $this->collection()
+            ->update(
+                ['_id'  => $instance->getId()],
+                ['$set' => $instance->changedAttributes()],
+                $options
+            );
+
+        return $this->parseResult($result);
     }
 
-    public function all()
+    /**
+     * Performs the save() operation into MongoDB.
+     * @return boolean
+     */
+    public function delete(Model $instance)
     {
-        # code...
+        if (! $this->canPersistInstance($instance)) {
+            return false;
+        }
+
+        $result = $this->collection()
+            ->delete(
+                ['_id'  => $instance->getId()]
+            );
+
+        return $this->parseResult($result);
     }
 
-    public function find()
+    /**
+     * Performs the save() operation into MongoDB.
+     * @return boolean
+     */
+    public function insert(Model $instance)
     {
-        # code...
+        if (! $this->canPersistInstance($instance)) {
+            return false;
+        }
+
+        $result = $this->collection()
+            ->insert($instance->sanitizeAttributes(), $options);
+
+        return $this->parseResult($result);
     }
 
-    public function aggregate()
+    /**
+     * Returns the MongoCollection object.
+     * @return MongoCollection
+     */
+    protected function collection()
     {
-        # code...
+        return $this->getConnection()
+            ->collection();
     }
 
-    public function group()
+    /**
+     * Get all options to persist anything at MongoDB.
+     * @return array
+     */
+    protected function options()
     {
-        # code...
+        return $this->getConnection()->getOptions();
     }
 
-    public function findAndModify()
+    public function parseResult(array $results)
     {
-        # code...
+        return isset($results['ok']) && $results['ok']?: false;
     }
 
-    public function prepareQuery()
+    /**
+     * Verifies if this model can be persisted.
+     * @param  Model  $instance
+     * @return boolean
+     */
+    public function canPersistInstance(Model $instance)
     {
-        # code...
-    }
-
-
-    public function prepareProjection()
-    {
-        # code...
-    }
-
-    /// Retrieve
-
-    public function parseDocument()
-    {
-        # code...
-    }
-
-    public function prepareMongoAttributes()
-    {
-        # code...
-    }
-
-    public function db()
-    {
-        # code...
-    }
-
-    public function collection()
-    {
-        # code...
-    }
-
-    public function rawCollection()
-    {
-        # code...
-    }
-
-
-    public function isMongoId()
-    {
-        # code...
+        return str_len((string)$instance->getCollectionName()) > 0;
     }
 }
