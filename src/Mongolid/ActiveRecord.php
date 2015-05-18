@@ -9,7 +9,7 @@ use Mongolid\Container\Ioc;
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
  * The Mongolid\Schema that describes the entity will be generated on the go
- * based on the properties bellow.
+ * based on the $fields.
  *
  * @package  Mongolid
  */
@@ -79,7 +79,8 @@ abstract class ActiveRecord
      */
     public function where($query)
     {
-        return $this->getDataMapper()->where($query);
+        return Ioc::make(get_called_class())
+            ->getDataMapper()->where($query);
     }
 
     /**
@@ -89,7 +90,8 @@ abstract class ActiveRecord
      */
     public function all()
     {
-        return $this->getDataMapper()->all();
+        return Ioc::make(get_called_class())
+            ->getDataMapper()->all();
     }
 
     /**
@@ -99,7 +101,8 @@ abstract class ActiveRecord
      */
     public function first($query)
     {
-        return $this->getDataMapper()->first($query);
+        return Ioc::make(get_called_class())
+            ->getDataMapper()->first($query);
     }
 
     /**
@@ -127,7 +130,7 @@ abstract class ActiveRecord
      *
      * @return DataMapper
      */
-    protected function getDataMapper()
+    public function getDataMapper()
     {
         $dataMapper = new DataMapper;
         $dataMapper->collection = $this->collection;

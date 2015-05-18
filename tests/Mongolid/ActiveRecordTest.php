@@ -31,8 +31,6 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
-
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
 
@@ -52,8 +50,6 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
-
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
 
@@ -73,8 +69,6 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
-
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
 
@@ -96,7 +90,7 @@ class ActiveRecordTest extends TestCase
         $cursor     = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
+        Ioc::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -118,7 +112,7 @@ class ActiveRecordTest extends TestCase
         $cursor     = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
+        Ioc::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -140,7 +134,7 @@ class ActiveRecordTest extends TestCase
         $cursor     = m::mock();
 
         // Act
-        $entity->shouldAllowMockingProtectedMethods();
+        Ioc::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
