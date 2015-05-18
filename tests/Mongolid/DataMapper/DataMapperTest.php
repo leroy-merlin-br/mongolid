@@ -236,6 +236,21 @@ class DataMapperTest extends TestCase
             $this->callProtected($mapper, 'parseToArray', $object)
         );
     }
+
+    public function testShouldParseToArrayGettingObjectAttributes()
+    {
+        // Arrange
+        $mapper = new DataMapper;
+        $object = m::mock();
+        $object->foo  = 'bar';
+        $object->name = 'wilson';
+
+        // Assert
+        $this->assertEquals(
+            ['foo' => 'bar', 'name' => 'wilson'],
+            $this->callProtected($mapper, 'parseToArray', $object)
+        );
+    }
 }
 
 class __entity_stub {

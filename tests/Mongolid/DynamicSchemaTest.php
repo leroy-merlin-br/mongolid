@@ -13,6 +13,15 @@ class DynamicSchemaTest extends TestCase
         m::close();
     }
 
+    public function testShouldExtendSchema()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\DynamicSchema[]');
+
+        // Assert
+        $this->assertInstanceOf('Mongolid\Schema', $schema);
+    }
+
     public function testShouldBeDynamic()
     {
         // Arrange

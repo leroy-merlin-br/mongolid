@@ -4,6 +4,14 @@ namespace Mongolid\DataMapper;
 use Mongolid\Schema;
 use Mongolid\Container\Ioc;
 
+/**
+ * The DataMapper class will abstract how an Entity is persisted and retrieved
+ * from the database.
+ * The DataMapper will always use a Schema trought the SchemaMapper to parse the
+ * document in and out of the database.
+ *
+ * @package  Mongolid
+ */
 class DataMapper
 {
     /**
