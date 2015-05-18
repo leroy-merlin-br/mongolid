@@ -31,6 +31,13 @@ abstract class Schema
     ];
 
     /**
+     * Name of the class that will be used to represent a document of this
+     * Schema when retrieve from the database.
+     * @var string
+     */
+    public $entityClass = 'stdClass';
+
+    /**
      * Filters any field in the $fields that has it's value specified as a
      * 'mongoId'. It will wraps the $value, if any, into a MongoId object
      *
