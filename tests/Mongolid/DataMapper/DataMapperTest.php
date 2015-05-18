@@ -16,7 +16,7 @@ class DataMapperTest extends TestCase
     public function testShouldSave()
     {
         // Arrange
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performCommand]');
+        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
         $object = m::mock();
         $parsedObject = m::mock();
 
@@ -28,7 +28,7 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performCommand')
+        $mapper->shouldReceive('performQuery')
             ->once()
             ->with('upsert', 'mongolid', $parsedObject)
             ->andReturn(true);
@@ -40,7 +40,7 @@ class DataMapperTest extends TestCase
     public function testShouldInsert()
     {
         // Arrange
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performCommand]');
+        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
         $object = m::mock();
         $parsedObject = m::mock();
 
@@ -52,7 +52,7 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performCommand')
+        $mapper->shouldReceive('performQuery')
             ->once()
             ->with('insert', 'mongolid', $parsedObject)
             ->andReturn(true);
@@ -64,7 +64,7 @@ class DataMapperTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrange
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performCommand]');
+        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
         $object = m::mock();
         $parsedObject = m::mock();
 
@@ -76,7 +76,7 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performCommand')
+        $mapper->shouldReceive('performQuery')
             ->once()
             ->with('update', 'mongolid', $parsedObject)
             ->andReturn(true);
@@ -88,7 +88,7 @@ class DataMapperTest extends TestCase
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,performCommand]');
+        $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,performQuery]');
         $rawCursor      = m::mock('MongoCursor');
         $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
         $schemaMapper   = m::mock();
@@ -104,7 +104,7 @@ class DataMapperTest extends TestCase
             ->once()
             ->andReturn($schemaMapper);
 
-        $mapper->shouldReceive('performCommand')
+        $mapper->shouldReceive('performQuery')
             ->once()
             ->with('where', 'mongolid', $query)
             ->andReturn($rawCursor);
@@ -249,6 +249,30 @@ class DataMapperTest extends TestCase
         $this->assertEquals(
             ['foo' => 'bar', 'name' => 'wilson'],
             $this->callProtected($mapper, 'parseToArray', $object)
+        );
+    }
+
+    public function testShouldPerformQuery()
+    {
+        // Arrange
+        $mapper     = new DataMapper;
+        $queryObj   = m::mock();
+        $collection = 'mongolid';
+        $param      = ['foo' => 'bar'];
+        $result     = 'result';
+
+        // Act
+        Ioc::instance('Mongolid\DataMapper\Query', $queryObj);
+
+        $queryObj->shouldReceive('thaCommand')
+            ->with('mongolid', $param)
+            ->once()
+            ->andReturn($result);
+
+        // Assert
+        $this->assertEquals(
+            $result,
+            $this->callProtected($mapper, 'performQuery', ['thaCommand', $collection, $param])
         );
     }
 }

@@ -41,7 +41,7 @@ class DataMapper
      */
     public function save($object)
     {
-        return $this->performCommand(
+        return $this->performQuery(
             'upsert',
             $this->collection,
             $this->parseToDocument($object)
@@ -57,7 +57,7 @@ class DataMapper
      */
     public function insert($object)
     {
-        return $this->performCommand(
+        return $this->performQuery(
             'insert',
             $this->collection,
             $this->parseToDocument($object)
@@ -73,7 +73,7 @@ class DataMapper
      */
     public function update($object)
     {
-        return $this->performCommand(
+        return $this->performQuery(
             'update',
             $this->collection,
             $this->parseToDocument($object)
@@ -90,7 +90,7 @@ class DataMapper
      */
     public function where($query = [])
     {
-        $rawCursor = $this->performCommand(
+        $rawCursor = $this->performQuery(
             'where',
             $this->collection,
             $query
@@ -173,5 +173,20 @@ class DataMapper
         }
 
         return $object;
+    }
+
+    /**
+     * Performs a query into database
+     *
+     * @param  string $command    Which command should be executed
+     * @param  string $collection Name of the collection
+     * @param  array  $param      Command parameter
+     *
+     * @return mixed
+     */
+    protected function performQuery($command, $collection, $param)
+    {
+        $query = Ioc::make('Mongolid\DataMapper\Query');
+        return $query->$command($collection, $param);
     }
 }
