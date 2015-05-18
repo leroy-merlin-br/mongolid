@@ -43,7 +43,7 @@ class SchemaMapper
      */
     public function map(array $data)
     {
-        $this->parseDynamicAttributes($data);
+        $this->clearDynamic($data);
 
         // Parse each specified field
         foreach ($this->schema->fields as $key => $fieldType) {
@@ -60,7 +60,7 @@ class SchemaMapper
      *
      * @param  array  &$data
      */
-    protected function parseDynamicAttributes(array &$data)
+    protected function clearDynamic(array &$data)
     {
         if (! $this->schema->dynamic) {
             $data = array_intersect_key($data, $this->schema->fields);
@@ -103,7 +103,7 @@ class SchemaMapper
      */
     protected function cast($value, $type)
     {
-        settype($value, $fieldType);
+        settype($value, $type);
         return $value;
     }
 
@@ -120,7 +120,7 @@ class SchemaMapper
     {
         if (is_array($value)) {
             $schema = Ioc::make($schemaClass);
-            $mapper = new SchemaMapper($schema);
+            $mapper = Ioc::make('Mongolid\DataMapper\SchemaMapper', [$schema]);
             return $mapper->map($value);
         }
 
