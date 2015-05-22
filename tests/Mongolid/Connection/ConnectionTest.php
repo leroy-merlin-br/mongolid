@@ -10,62 +10,46 @@ class ConnectionTest extends TestCase
 
     public function tearDown()
     {
-        Connection::$sharedConnection = null;
-
         parent::tearDown();
         m::close();
     }
 
-    public function testShouldCreateANewConnection()
+    public function testShouldConstructANewConnection()
     {
         // Arrange
-        $mongoClientMock = m::mock('MongoClient');
-        $connector       = Ioc::make('Mongolid\Connection\Connection');
-
-        Ioc::instance('MongoClient', $mongoClientMock);
+        $params      =  ['conn', ['options'], ['driver_opts']];
+        $mongoClient = m::mock('MongoClient');
+        $container   = m::mock('Illuminate\Container\Container');
+        Ioc::setContainer($container);
 
         // Act
-        $this->callProtected($connector, 'createConnection');
+        $container->shouldReceive('make')
+            ->once()
+            ->with('MongoClient', $params)
+            ->andReturn($mongoClient);
 
         // Assert
-        $this->assertEquals($mongoClientMock, $connector::$sharedConnection);
+        $connection = new Connection($params[0], $params[1], $params[2]);
+        $this->assertAttributeEquals($mongoClient, 'rawConnection', $connection);
     }
 
-    public function testShouldNotCreateAConnectionWithAlreadyCreatedOne()
+    public function testShouldGetRawConnection()
     {
         // Arrange
-        $connector                    = Ioc::make('Mongolid\Connection\Connection');
-        $mock                         = m::mock('MongoClient');
-        $connector::$sharedConnection = $mock;
+        $mongoClient = m::mock('MongoClient');
+        $container   = m::mock('Illuminate\Container\Container');
+        Ioc::setContainer($container);
 
         // Act
-        $this->callProtected($connector, 'createConnection');
+        $container->shouldReceive('make')
+            ->once()
+            ->andReturn($mongoClient);
 
         // Assert
-        $this->assertEquals($mock, $connector::$sharedConnection);
-    }
-
-    /**
-     * @expectedException MongoConnectionException
-     */
-    public function testShouldRaiseExceptionForAConnectionStringInvalid()
-    {
-        // Arrange
-        $connector = Ioc::make('Mongolid\Connection\Connection');
-
-        // Act
-        $this->callProtected($connector, 'createConnection');
-    }
-
-    public function testShouldReturnConnectionInstance()
-    {
-        // Arrange
-        $connector = Ioc::make('Mongolid\Connection\Connection');
-        $mock                         = m::mock('MongoClient');
-        $connector::$sharedConnection = $mock;
-
-        $instance = $connector->getConnectionInstance();
-
-        $this->assertEquals($instance, $mock);
+        $connection = new Connection();
+        $this->assertEquals(
+            $mongoClient,
+            $connection->getRawConnection()
+        );
     }
 }
