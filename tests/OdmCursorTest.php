@@ -1,8 +1,8 @@
 <?php
 
+use Mockery as m;
 use Zizaco\Mongolid\Model;
 use Zizaco\Mongolid\OdmCursor;
-use Mockery as m;
 
 class OdmCursorTest extends PHPUnit_Framework_TestCase
 {
@@ -28,23 +28,23 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $this->mongoCursor
             ->shouldReceive('randomMethod')
             ->once()
-            ->with(1,2,3)
+            ->with(1, 2, 3)
             ->andReturn(true);
 
         // If you call a method that doesn't exists in the OdmCursor it should
         // try to run the method with the same name of the real MongoCursor.
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->randomMethod(1,2,3);
+        $result    = $odmCursor->randomMethod(1, 2, 3);
 
-        $this->assertTrue( $result );
+        $this->assertTrue($result);
     }
 
     public function testShouldGetCursor()
     {
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->getCursor();
+        $result    = $odmCursor->getCursor();
 
-        $this->assertEquals( $this->mongoCursor, $result );
+        $this->assertEquals($this->mongoCursor, $result);
     }
 
     public function testShouldRewind()
@@ -59,10 +59,10 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->current();
+        $result    = $odmCursor->current();
 
         $this->assertInstanceOf('_stubModel', $result);
         $this->assertEquals('bob', $result->name);
@@ -73,15 +73,15 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
         $this->mongoCursor
             ->shouldReceive('limit');
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->toArray(true, 5);
+        $result    = $odmCursor->toArray(true, 5);
 
         $this->assertEquals(5, count($result));
-        $this->assertEquals($result[0], ['name'=>'bob','occupation'=>'coder']);
+        $this->assertEquals($result[0], ['name' => 'bob', 'occupation' => 'coder']);
     }
 
     public function testShouldGetFirst()
@@ -90,10 +90,10 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('rewind');
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->current();
+        $result    = $odmCursor->current();
 
         $this->assertInstanceOf('_stubModel', $result);
         $this->assertEquals('bob', $result->name);
@@ -108,7 +108,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $odmCursor->next();
         $odmCursor->next();
 
-        $this->assertEquals(3,$odmCursor->key());
+        $this->assertEquals(3, $odmCursor->key());
     }
 
     public function testShouldCheckIfValid()
@@ -136,7 +136,7 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $this->mongoCursor->validCount = 1;
         $this->mongoCursor
             ->shouldReceive('sort')
-            ->once() // Should be called ONCE!
+            ->once()// Should be called ONCE!
             ->with(['name'])
             ->andReturn(5);
 
@@ -151,35 +151,76 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $odmCursor->sort(['name']); // This sort should not hit the MongoCursor, this explains that 'ONCE' above.
     }
 
+    public function testShouldList()
+    {
+        $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
+
+        $this->mongoCursor
+            ->shouldReceive('current')
+            ->times(5)
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
+
+        $this->assertEquals(
+            ['bob', 'bob', 'bob', 'bob', 'bob'],
+            $odmCursor->lists('name')
+        );
+
+        $this->mongoCursor->validCount = 3;
+    }
+
+    public function testShouldListWithKey()
+    {
+
+        $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
+
+        $this->mongoCursor
+            ->shouldReceive('current')
+            ->times(5)
+            ->andReturn(
+                ['id' => 50, 'name' => 'bob', 'occupation' => 'coder'],
+                ['id' => 100, 'name' => 'john', 'occupation' => 'qa'],
+                ['id' => 200, 'name' => 'jack', 'occupation' => 'manager'],
+                ['id' => 300, 'name' => 'jane', 'occupation' => 'cto'],
+                ['id' => 999, 'name' => 'jarvis', 'occupation' => 'pc']
+            );
+
+        $this->assertEquals(
+            [50 => 'bob', 100 => 'john', 200 => 'jack', 300 => 'jane', 999 => 'jarvis'],
+            $odmCursor->lists('name', 'id')
+        );
+    }
+
     public function testToJson()
     {
         $this->mongoCursor
             ->shouldReceive('current')
-            ->andReturn(['name'=>'bob','occupation'=>'coder']);
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
         $this->mongoCursor
             ->shouldReceive('limit');
 
         $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
-        $result = $odmCursor->toJson();
+        $result    = $odmCursor->toJson();
 
         $shouldBe =
-        '['.
-        '{"name":"bob","occupation":"coder"}'.
-        '{"name":"bob","occupation":"coder"}'.
-        '{"name":"bob","occupation":"coder"}'.
-        '{"name":"bob","occupation":"coder"}'.
-        '{"name":"bob","occupation":"coder"}'.
-        ']'; 
+            '[' .
+            '{"name":"bob","occupation":"coder"}' .
+            '{"name":"bob","occupation":"coder"}' .
+            '{"name":"bob","occupation":"coder"}' .
+            '{"name":"bob","occupation":"coder"}' .
+            '{"name":"bob","occupation":"coder"}' .
+            ']';
 
         $this->assertEquals($shouldBe, $result);
     }
 }
 
-class _stubModel extends Model {
+class _stubModel extends Model
+{
     protected $collection = 'test_model';
 }
 
-class _stubMongoCursor {
+class _stubMongoCursor
+{
 
     public $validCount = 5;
 
@@ -191,14 +232,24 @@ class _stubMongoCursor {
     public function valid()
     {
         $this->validCount--;
+
         return $this->validCount >= 0;
     }
 
-    public function next() {}
+    public function next()
+    {
+    }
 
-    public function limit() {}
+    public function limit()
+    {
+    }
 
-    public function rewind() {}
+    public function rewind()
+    {
+    }
 
-    public function count() { return $this->validCount; }
+    public function count()
+    {
+        return $this->validCount;
+    }
 }

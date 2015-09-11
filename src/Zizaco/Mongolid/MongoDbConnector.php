@@ -2,6 +2,7 @@
 namespace Zizaco\Mongolid;
 
 use MongoClient;
+use MongoDB;
 
 class MongoDbConnector
 {
@@ -16,18 +17,19 @@ class MongoDbConnector
      * Returns the connection. If non existent then create it
      *
      * @var MongoDB
+     * @return MongoClient|MongoDB
      */
-    public function getConnection( $connectionString = '' )
+    public function getConnection($connectionString = '')
     {
         // If exists in $shared_connection, use it
-        if( MongoDbConnector::$shared_connection ) {
+        if (MongoDbConnector::$shared_connection) {
             $connection = MongoDbConnector::$shared_connection;
         } else {
             // Else, connect and place connection in $shared_connection
-            try{
+            try {
                 $connection = new MongoClient($connectionString);
-            } catch(\MongoConnectionException $e) {
-                trigger_error('Failed to connect with string: "'.$connectionString.'"');
+            } catch (\MongoConnectionException $e) {
+                return trigger_error('Failed to connect with string: "' . $connectionString . '"');
             }
 
             MongoDbConnector::$shared_connection = $connection;

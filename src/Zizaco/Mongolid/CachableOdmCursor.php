@@ -1,6 +1,9 @@
 <?php namespace Zizaco\Mongolid;
 
-class CachableOdmCursor implements \Iterator
+use Iterator;
+use MongoCursor;
+
+class CachableOdmCursor implements Iterator
 {
     /**
      * The Query that generated this cursor
@@ -22,9 +25,8 @@ class CachableOdmCursor implements \Iterator
      *
      * @param $query Array (The query that "Generated" this cursor )
      * @param $model string
-     * @return void
      */
-    public function __construct( $query, $model )
+    public function __construct($query, $model)
     {
         $this->query = $query;
 
@@ -32,7 +34,7 @@ class CachableOdmCursor implements \Iterator
 
         $this->position = 0;
 
-        $this->documents = $this->getOdmCursor()->toArray( false );
+        $this->documents = $this->getOdmCursor()->toArray(false);
     }
 
     /**
@@ -42,10 +44,12 @@ class CachableOdmCursor implements \Iterator
      *
      * @param $name string
      * @param $args array
+     *
+     * @return mixed
      */
     public function __call($name, $args)
     {
-        return call_user_func_array( array($this->getOdmCursor(), $name), $args);
+        return call_user_func_array([$this->getOdmCursor(), $name], $args);
     }
 
     /**
@@ -60,7 +64,7 @@ class CachableOdmCursor implements \Iterator
 
         $OdmCursor = $model::where($this->query);
 
-        if( $this->position > 0) {
+        if ($this->position > 0) {
             $OdmCursor->skip($this->position);
         }
 
@@ -81,7 +85,8 @@ class CachableOdmCursor implements \Iterator
      * Iterator interface rewind (used in foreach)
      *
      */
-    function rewind() {
+    public function rewind()
+    {
         $this->position = 0;
     }
 
@@ -91,7 +96,7 @@ class CachableOdmCursor implements \Iterator
      *
      * @return mixed
      */
-    function current()
+    public function current()
     {
         return $this->documents[$this->position];
     }
@@ -99,14 +104,17 @@ class CachableOdmCursor implements \Iterator
     /**
      * Convert the cursor instance to an array.
      *
+     * @param bool $documentsToArray
+     * @param bool $limit
+     *
      * @return array
      */
-    public function toArray( $documentsToArray = true, $limit = false )
+    public function toArray($documentsToArray = true, $limit = false)
     {
-        if( $documentsToArray ) {
-            $result = array();
+        if ($documentsToArray) {
+            $result = [];
 
-            foreach($this as $document) {
+            foreach ($this as $document) {
                 $result[] = $document->getAttributes();
             }
         } else {
@@ -119,19 +127,23 @@ class CachableOdmCursor implements \Iterator
     /**
      * Returns the first element of the cursor
      *
-     * @return mixed
+     * @return mixed|bool
      */
     public function first()
     {
-        if (isset($this->documents[0]))
+        if (isset($this->documents[0])) {
             return $this->documents[0];
+        }
+
+        return false;
     }
 
     /**
      * Iterator key method (used in foreach)
      *
      */
-    function key() {
+    public function key()
+    {
         return $this->position;
     }
 
@@ -139,7 +151,8 @@ class CachableOdmCursor implements \Iterator
      * Iterator next method (used in foreach)
      *
      */
-    function next() {
+    public function next()
+    {
         ++$this->position;
     }
 
@@ -147,13 +160,42 @@ class CachableOdmCursor implements \Iterator
      * Iterator valid method (used in foreach)
      *
      */
-    function valid() {
+    public function valid()
+    {
         return isset($this->documents[$this->position]);
     }
 
-    function sort( $fields )
+    /**
+     * @param $fields
+     *
+     * @return $this
+     */
+    public function sort($fields)
     {
-        return $this->getOdmCursor()->sort( $fields );
+        return $this->getOdmCursor()->sort($fields);
+    }
+
+    /**
+     * Retrieve a list of all documents for the given $field, optionally indexed by $key
+     *
+     * @param string $field
+     * @param string $key
+     *
+     * @return array
+     */
+    public function lists($field, $key = null)
+    {
+        $result = [];
+
+        foreach ($this->documents as $document) {
+            if ($key) {
+                $result[$document->$key] = $document->$field;
+            } else {
+                $result[] = $document->$field;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -169,17 +211,19 @@ class CachableOdmCursor implements \Iterator
     /**
      * Convert the cursor to its JSON representation.
      *
+     * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0)
     {
-        $result = array();
+        $result = [];
 
-        foreach($this->documents as $document) {
+        foreach ($this->documents as $document) {
             $result[] = $document->toJson($options);
         }
 
-        $result = '['.implode($result, ',').']';
+        $result = '[' . implode($result, ',') . ']';
 
         return $result;
     }
