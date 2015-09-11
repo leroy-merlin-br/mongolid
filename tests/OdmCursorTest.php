@@ -151,6 +151,45 @@ class OdmCursorTest extends PHPUnit_Framework_TestCase
         $odmCursor->sort(['name']); // This sort should not hit the MongoCursor, this explains that 'ONCE' above.
     }
 
+    public function testShouldList()
+    {
+        $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
+
+        $this->mongoCursor
+            ->shouldReceive('current')
+            ->times(5)
+            ->andReturn(['name' => 'bob', 'occupation' => 'coder']);
+
+        $this->assertEquals(
+            ['bob', 'bob', 'bob', 'bob', 'bob'],
+            $odmCursor->lists('name')
+        );
+
+        $this->mongoCursor->validCount = 3;
+    }
+
+    public function testShouldListWithKey()
+    {
+
+        $odmCursor = new OdmCursor($this->mongoCursor, '_stubModel');
+
+        $this->mongoCursor
+            ->shouldReceive('current')
+            ->times(5)
+            ->andReturn(
+                ['id' => 50, 'name' => 'bob', 'occupation' => 'coder'],
+                ['id' => 100, 'name' => 'john', 'occupation' => 'qa'],
+                ['id' => 200, 'name' => 'jack', 'occupation' => 'manager'],
+                ['id' => 300, 'name' => 'jane', 'occupation' => 'cto'],
+                ['id' => 999, 'name' => 'jarvis', 'occupation' => 'pc']
+            );
+
+        $this->assertEquals(
+            [50 => 'bob', 100 => 'john', 200 => 'jack', 300 => 'jane', 999 => 'jarvis'],
+            $odmCursor->lists('name', 'id')
+        );
+    }
+
     public function testToJson()
     {
         $this->mongoCursor

@@ -176,6 +176,29 @@ class CachableOdmCursor implements Iterator
     }
 
     /**
+     * Retrieve a list of all documents for the given $field, optionally indexed by $key
+     *
+     * @param string $field
+     * @param string $key
+     *
+     * @return array
+     */
+    public function lists($field, $key = null)
+    {
+        $result = [];
+
+        foreach ($this->documents as $document) {
+            if ($key) {
+                $result[$document->$key] = $document->$field;
+            } else {
+                $result[] = $document->$field;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Convert the cursor to its string representation.
      *
      * @return string

@@ -11,11 +11,15 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $this->mongoMock = m::mock('Connection');
         $this->OdmCursor = m::mock(new _stubOdmCursor);
 
-        $this->objA       = new _stubModelForCachable;
-        $this->objA->name = 'bob';
+        $this->objA             = new _stubModelForCachable;
+        $this->objA->name       = 'bob';
+        $this->objA->id         = 100;
+        $this->objA->occupation = 'coder';
 
-        $this->objB       = new _stubModelForCachable;
-        $this->objB->name = 'billy';
+        $this->objB             = new _stubModelForCachable;
+        $this->objB->name       = 'billy';
+        $this->objB->id         = 200;
+        $this->objB->occupation = 'qa';
 
         $this->OdmCursor
             ->shouldReceive('toArray')
@@ -115,6 +119,31 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
 
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
         $result            = $cachableOdmCursor->sort(['name']);
+    }
+
+    public function testShouldList()
+    {
+        $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
+
+        $this->assertEquals(
+            ['bob', 'billy'],
+            $cachableOdmCursor->lists('name')
+        );
+    }
+
+    public function testShouldListWithKey()
+    {
+        $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
+
+        $this->assertEquals(
+            [100 => 'bob', 200 => 'billy'],
+            $cachableOdmCursor->lists('name', 'id')
+        );
+
+        $this->assertEquals(
+            ['bob' => 'coder', 'billy' => 'qa'],
+            $cachableOdmCursor->lists('occupation', 'name')
+        );
     }
 
     public function testToJson()
