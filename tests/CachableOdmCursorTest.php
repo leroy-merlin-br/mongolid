@@ -1,9 +1,8 @@
 <?php
 
-use Zizaco\Mongolid\Model;
-use Zizaco\Mongolid\OdmCursor;
-use Zizaco\Mongolid\CachableOdmCursor;
 use Mockery as m;
+use Zizaco\Mongolid\CachableOdmCursor;
+use Zizaco\Mongolid\Model;
 
 class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
 {
@@ -12,21 +11,23 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $this->mongoMock = m::mock('Connection');
         $this->OdmCursor = m::mock(new _stubOdmCursor);
 
-        $this->objA = new _stubModelForCachable;
+        $this->objA       = new _stubModelForCachable;
         $this->objA->name = 'bob';
 
-        $this->objB = new _stubModelForCachable;
+        $this->objB       = new _stubModelForCachable;
         $this->objB->name = 'billy';
 
         $this->OdmCursor
             ->shouldReceive('toArray')
             ->with(false)
-            ->andReturn([
-                $this->objA,
-                $this->objB
-            ]);
+            ->andReturn(
+                [
+                    $this->objA,
+                    $this->objB,
+                ]
+            );
 
-        _stubModelForCachable::$connection = $this->mongoMock;
+        _stubModelForCachable::$connection    = $this->mongoMock;
         _stubModelForCachable::$returnToWhere = $this->OdmCursor;
     }
 
@@ -44,10 +45,10 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('theCursor');
 
-        $cachableOdmCursor = new CachableOdmCursor(['name'=>'bob'], '_stubModelForCachable');
-        $result = $cachableOdmCursor->getCursor();
+        $cachableOdmCursor = new CachableOdmCursor(['name' => 'bob'], '_stubModelForCachable');
+        $result            = $cachableOdmCursor->getCursor();
 
-        $this->assertEquals( 'theCursor', $result );
+        $this->assertEquals('theCursor', $result);
     }
 
     public function testShouldCallOdmCursorMethod()
@@ -55,19 +56,19 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $this->OdmCursor
             ->shouldReceive('randomMethod')
             ->once()
-            ->with(1,2,3)
+            ->with(1, 2, 3)
             ->andReturn(true);
 
-        $cachableOdmCursor = new CachableOdmCursor(['name'=>'bob'], '_stubModelForCachable');
-        $result = $cachableOdmCursor->randomMethod(1,2,3);
+        $cachableOdmCursor = new CachableOdmCursor(['name' => 'bob'], '_stubModelForCachable');
+        $result            = $cachableOdmCursor->randomMethod(1, 2, 3);
 
-        $this->assertTrue( $result );
+        $this->assertTrue($result);
     }
 
     public function testShouldGetCurrent()
     {
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
-        $result = $cachableOdmCursor->current();
+        $result            = $cachableOdmCursor->current();
 
         $this->assertInstanceOf('_stubModelForCachable', $result);
     }
@@ -75,8 +76,8 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
     public function testShouldConvertToArrayCurrent()
     {
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
-        $result = $cachableOdmCursor->toArray();
-        $should_be = array($this->objA->attributes,$this->objB->attributes);
+        $result            = $cachableOdmCursor->toArray();
+        $should_be         = [$this->objA->attributes, $this->objB->attributes];
 
         $this->assertEquals($should_be, $result);
     }
@@ -84,7 +85,7 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
     public function testShouldGetFirst()
     {
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
-        $result = $cachableOdmCursor->first();
+        $result            = $cachableOdmCursor->first();
 
         $this->assertEquals($this->objA, $result);
     }
@@ -105,7 +106,7 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $cachableOdmCursor->next();
         $cachableOdmCursor->next();
 
-        $this->assertEquals(3,$cachableOdmCursor->key());
+        $this->assertEquals(3, $cachableOdmCursor->key());
     }
 
     public function testShouldSort()
@@ -113,28 +114,32 @@ class CachableOdmCursorTest extends PHPUnit_Framework_TestCase
         $this->OdmCursor->shouldReceive('sort');
 
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
-        $result = $cachableOdmCursor->sort(['name']);
+        $result            = $cachableOdmCursor->sort(['name']);
     }
 
     public function testToJson()
     {
         $cachableOdmCursor = new CachableOdmCursor($this->OdmCursor, '_stubModelForCachable');
-        $result = $cachableOdmCursor->toJson();
+        $result            = $cachableOdmCursor->toJson();
 
-        $shouldBe = json_encode(array($this->objA->attributes, $this->objB->attributes));
+        $shouldBe = json_encode([$this->objA->attributes, $this->objB->attributes]);
 
         $this->assertEquals($shouldBe, $result);
     }
 }
 
-class _stubModelForCachable extends Model {
+class _stubModelForCachable extends Model
+{
     protected $collection = 'test_model';
 
     public static $returnToWhere;
 
-    public static function where($query = array(), $fields = array(), $cachable = false) {
+    public static function where($query = [], $fields = [], $cachable = false)
+    {
         return static::$returnToWhere;
     }
 }
 
-class _stubOdmCursor {}
+class _stubOdmCursor
+{
+}
