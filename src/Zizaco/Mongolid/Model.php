@@ -1067,11 +1067,7 @@ class Model
         $result = $this->collection()
             ->update(['_id' => $preparedAttr['_id']], $diffAttributes, ["w" => $this->writeConcern]);
 
-        if (isset($result['ok']) && $result['ok']) {
-            return true;
-        } else {
-            return false;
-        }
+        return isset($result['ok']) && $result['ok'];
     }
 
     /**

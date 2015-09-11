@@ -8,6 +8,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     protected $mongoMock            = null;
     protected $productsCollection   = null;
     protected $categoriesCollection = null;
+    protected $eventsCollection     = null;
     protected $cursor               = null;
 
     public function setUp()
@@ -52,6 +53,45 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($prod->insert());
     }
 
+    public function testShouldNotInsert()
+    {
+        $model =  new Model;
+        $this->assertFalse($model->insert());
+
+        $model = m::mock('_stubProduct[fireModelEvent]');
+        $model->shouldAllowMockingProtectedMethods();
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('saving')
+            ->andReturn(false);
+
+        $this->assertFalse($model->insert());
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('saving')
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('creating')
+            ->andReturn(false);
+
+        $this->assertFalse($model->insert());
+
+        $model->shouldReceive('fireModelEvent')
+            ->twice()
+            ->andReturn(true);
+
+        $this->productsCollection
+            ->shouldReceive('insert')
+            ->once()
+            ->andReturn(false);
+
+        $this->assertFalse($model->insert());
+    }
+
     public function testShouldSave()
     {
         $prod       = new _stubProduct;
@@ -67,6 +107,45 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn(['ok' => 1]);
 
         $this->assertTrue($prod->save());
+    }
+
+    public function testShouldNotSave()
+    {
+        $model =  new Model;
+        $this->assertFalse($model->save());
+
+        $model = m::mock('_stubProduct[fireModelEvent]');
+        $model->shouldAllowMockingProtectedMethods();
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('saving')
+            ->andReturn(false);
+
+        $this->assertFalse($model->save());
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('saving')
+            ->andReturn(true);
+
+        $model->shouldReceive('fireModelEvent')
+            ->once()
+            ->with('creating')
+            ->andReturn(false);
+
+        $this->assertFalse($model->save());
+
+        $model->shouldReceive('fireModelEvent')
+            ->twice()
+            ->andReturn(true);
+
+        $this->productsCollection
+            ->shouldReceive('save')
+            ->once()
+            ->andReturn(false);
+
+        $this->assertFalse($model->save());
     }
 
     public function testShouldUpdate()
@@ -85,6 +164,18 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn(['ok' => 1]);
 
         $this->assertTrue($prod->update());
+    }
+
+    /**
+     * @group test
+     */
+    public function testShouldNotUpdate()
+    {
+        $model =  new Model;
+        $this->assertFalse($model->update());
+
+        $model = m::mock('_stubProduct[]');
+        $this->assertFalse($model->update());
     }
 
     public function testShouldHasUpdatedAtAndCreatedAtFields()
@@ -112,6 +203,35 @@ class ModelTest extends PHPUnit_Framework_TestCase
             ->andReturn(['ok' => 1]);
 
         $this->assertTrue($prod->delete());
+    }
+
+    public function testShouldCastToString()
+    {
+        $model = new Model;
+
+        $this->assertEquals(
+            $model->toJson(),
+            (string) $model
+        );
+    }
+
+    public function testShouldGetAttribute()
+    {
+        $model = new Model;
+
+        $model->randomAttribute = rand();
+
+        $this->assertTrue(
+            isset($model->randomAttribute)
+        );
+    }
+
+    public function testShouldNotCallInvalid()
+    {
+        $this->setExpectedException('Exception', 'Call to undefined method invalid__', 1);
+
+        $model = new Model;
+        $model->invalid__();
     }
 
     public function testShouldFindFirst()
@@ -754,4 +874,3 @@ class _stubCursor
     {
     }
 }
-
