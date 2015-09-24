@@ -405,6 +405,8 @@ class Model
         // Prepare query array with attributes
         $query = $this->prepareMongoAttributes($id);
 
+        $query = $this->prepareInArray($query);
+
         return $query;
     }
 
@@ -429,6 +431,29 @@ class Model
         }
 
         return $attr;
+    }
+
+
+    /**
+     * Prepare query arrays that contains '$in' in order to work with MongoDB 3.0
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public function prepareInArray(array $array)
+    {
+        foreach ($array as $key => &$value) {
+            if ($key === '$in') {
+                $value = array_values($value);
+            } else {
+                if (is_array($value)) {
+                    $value = $this->prepareInArray($value);
+                }
+            }
+        }
+
+        return $array;
     }
 
     /**
