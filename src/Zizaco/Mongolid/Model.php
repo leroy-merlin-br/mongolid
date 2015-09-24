@@ -656,13 +656,13 @@ class Model
             // will be returned from cache =)
             return static::$cacheComponent->remember(
                 $cache_key, 0.1, function () use ($model, $ref_ids) {
-                return $model::where(['_id' => ['$in' => $ref_ids]], [], true);
+                return $model::where(['_id' => ['$in' => array_values($ref_ids)]], [], true);
             }
             );
         } elseif ($cachable) {
-            return $model::where(['_id' => ['$in' => $ref_ids]], [], true);
+            return $model::where(['_id' => ['$in' => array_values($ref_ids)]], [], true);
         } else {
-            return $model::where(['_id' => ['$in' => $ref_ids]]);
+            return $model::where(['_id' => ['$in' => array_values($ref_ids)]]);
         }
     }
 
