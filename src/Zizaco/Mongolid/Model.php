@@ -688,7 +688,7 @@ class Model
 
             $instance = new $modelName;
             $instance->parseDocument($document);
-            $instance = $this->polymorph($instance);
+            $instance = $instance->polymorph($instance);
         }
 
         return $instance;
@@ -710,7 +710,7 @@ class Model
             foreach ($this->$field as $document) {
                 $instance = new $model;
                 $instance->parseDocument($document);
-                $instance    = $this->polymorph($instance);
+                $instance    = $instance->polymorph($instance);
                 $documents[] = $instance;
             }
         }
