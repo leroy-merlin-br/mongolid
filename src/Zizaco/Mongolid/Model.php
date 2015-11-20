@@ -441,7 +441,6 @@ class Model
     protected function prepareProjection($fields)
     {
         // Prepare fields array for mongo query
-        $fields = array_flip($fields);
         foreach ($fields as $field => $value) {
             $fields[$field] = 1;
         }
