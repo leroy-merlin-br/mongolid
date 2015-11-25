@@ -2,14 +2,35 @@
 
 namespace Zizaco\Mongolid;
 
-class Sequence extends Model
+class Sequence
 {
     /**
-     * Sequences collection name on MongoDB
+     * Sequences collection name on MongoDB. Default 'mongolid-sequences'
      *
      * @var string
      */
-    protected $collection = 'mongolid_sequences';
+    protected $collection;
+
+    /**
+     * MongoDbConnector Instance
+     *
+     * @var MongoDbConnector
+     */
+    protected $connector;
+
+    /**
+     * MongoDB database name
+     *
+     * @var string
+     */
+    protected $database;
+
+    public function __construct(MongoDbConnector $connector, $database, $collection = 'mongolid_sequences')
+    {
+        $this->connector = $connector;
+        $this->collection = $collection;
+        $this->database = $database;
+    }
 
     /**
      * Get next value for the sequence
@@ -30,6 +51,16 @@ class Sequence extends Model
         );
 
         return $sequenceValue['seq'];
+    }
+
+    /**
+     * Get MongoCollection Object
+     *
+     * @return mixed
+     */
+    protected function collection()
+    {
+        return $this->connection->{$this->database}->{$this->collection};
     }
 
 }

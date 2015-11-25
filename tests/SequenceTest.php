@@ -5,30 +5,25 @@ use Mockery as m;
 
 class SequenceTest extends PHPUnit_Framework_TestCase
 {
-    public function testShouldHaveACollectionName()
-    {
-        // Set
-        $sequence = new Sequence();
-
-        // Expect
-        $expected = 'mongolid_sequences';
-
-        // Assert
-        $this->assertEquals($expected, $sequence->getCollectionName());
-    }
 
     public function testShouldReturnNextSequenceNumber()
     {
         // Set
-        $sequence = m::mock('Zizaco\Mongolid\Sequence' . '[collection,findAndModify]');
+        $connector = m::mock('Zizaco\Mongolid\MongoDbConnector');
+        $collection = m::mock('MongoCollection');
+
+        $sequence = m::mock('Zizaco\Mongolid\Sequence' . '[collection]', array($connector, 'database'));
         $sequence->shouldAllowMockingProtectedMethods();
-        $sequenceName = 'orderId';
 
         $sequence->shouldReceive('collection')
             ->once()
-            ->andReturnSelf();
+            ->andReturn($collection);
 
-        $sequence->shouldReceive('findAndModify')
+        $sequence->shouldAllowMockingProtectedMethods();
+
+        $sequenceName = 'orderId';
+
+        $collection->shouldReceive('findAndModify')
             ->once()
             ->with(
                 array('_id' => $sequenceName),
