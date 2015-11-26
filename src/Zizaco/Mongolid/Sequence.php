@@ -16,7 +16,7 @@ class Sequence
      *
      * @var MongoDbConnector
      */
-    protected $connector;
+    protected $connection;
 
     /**
      * MongoDB database name
@@ -27,9 +27,9 @@ class Sequence
 
     public function __construct(MongoDbConnector $connector, $database, $collection = 'mongolid_sequences')
     {
-        $this->connector = $connector;
-        $this->collection = $collection;
+        $this->connection = $connector->getConnection();
         $this->database = $database;
+        $this->collection = $collection;
     }
 
     /**
