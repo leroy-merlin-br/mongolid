@@ -21,6 +21,5 @@
         "psr-0": {
             "Zizaco\\Mongolid": "src/"
         }
-    },
-    "minimum-stability": "develop"
+    }
 }
