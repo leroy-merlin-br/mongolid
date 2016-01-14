@@ -1,12 +1,10 @@
 <?php
-namespace Zizaco\Mongolid;
 
 use Mockery as m;
-use PHPUnit_Framework_TestCase;
 
 class MongoDbConnectorTest extends PHPUnit_Framework_TestCase
 {
-    public function testShouldCreateAndRetreiveANewConnection()
+    public function testShouldCreateAndRetrieveANewConnection()
     {
         // Set
         $conector            = m::mock('Zizaco\Mongolid\MongoDbConnector[newMongoClient]');

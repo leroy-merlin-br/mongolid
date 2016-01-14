@@ -1,11 +1,10 @@
 <?php
-
 namespace Zizaco\Mongolid;
 
 class Sequence
 {
     /**
-     * Sequences collection name on MongoDB. Default 'mongolid-sequences'
+     * Sequences collection name on MongoDB. Default 'mongolid_sequences'
      *
      * @var string
      */
@@ -28,7 +27,7 @@ class Sequence
     public function __construct(MongoDbConnector $connector, $database, $collection = 'mongolid_sequences')
     {
         $this->connection = $connector->getConnection();
-        $this->database = $database;
+        $this->database   = $database;
         $this->collection = $collection;
     }
 
@@ -36,18 +35,19 @@ class Sequence
      * Get next value for the sequence
      *
      * @param string $sequenceName
+     *
      * @return int
      */
     public function getNextValue($sequenceName)
     {
         $sequenceValue = $this->collection()->findAndModify(
-            array('_id' => $sequenceName),
-            array('$inc' => array('seq' => 1)),
+            ['_id' => $sequenceName],
+            ['$inc' => ['seq' => 1]],
             null,
-            array(
-                'new' => true,
-                'upsert' => true
-            )
+            [
+                'new'    => true,
+                'upsert' => true,
+            ]
         );
 
         return $sequenceValue['seq'];

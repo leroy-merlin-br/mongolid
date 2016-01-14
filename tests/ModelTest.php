@@ -55,7 +55,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldNotInsert()
     {
-        $model =  new Model;
+        $model = new Model;
         $this->assertFalse($model->insert());
 
         $model = m::mock('_stubProduct[fireModelEvent]');
@@ -111,7 +111,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testShouldNotSave()
     {
-        $model =  new Model;
+        $model = new Model;
         $this->assertFalse($model->save());
 
         $model = m::mock('_stubProduct[fireModelEvent]');
@@ -166,12 +166,9 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($prod->update());
     }
 
-    /**
-     * @group test
-     */
     public function testShouldNotUpdate()
     {
-        $model =  new Model;
+        $model = new Model;
         $this->assertFalse($model->update());
 
         $model = m::mock('_stubProduct[]');
@@ -449,7 +446,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldCleanAttribute()
     {
         $prod        = new _stubProduct;
-        $prod->name  = "Bacon";
+        $prod->name  = 'Bacon';
         $prod->price = 10.50;
 
         $prod->cleanAttribute('name');
@@ -461,7 +458,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldConvertToJson()
     {
         $prod        = new _stubProduct;
-        $prod->name  = "Bacon";
+        $prod->name  = 'Bacon';
         $prod->price = 10.50;
 
         $this->assertEquals(json_encode($prod->attributes), $prod->toJson());
@@ -470,7 +467,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldConvertToArray()
     {
         $prod        = new _stubProduct;
-        $prod->name  = "Bacon";
+        $prod->name  = 'Bacon';
         $prod->price = 10.50;
 
         $this->assertEquals(['name' => 'Bacon', 'price' => 10.50], $prod->toArray());
@@ -479,7 +476,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldReferenceOne()
     {
         $prod              = new _stubProduct;
-        $prod->name        = "Bacon";
+        $prod->name        = 'Bacon';
         $prod->price       = 10.50;
         $prod->category_id = new MongoId('51e1eefc065f908c10000411');
 
@@ -512,7 +509,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testShouldReferenceOneEvenWhenItsAnArray()
     {
         $prod              = new _stubProduct;
-        $prod->name        = "Bacon";
+        $prod->name        = 'Bacon';
         $prod->price       = 10.50;
         $prod->category_id = [new MongoId('51e1eefc065f908c10000411')]; // Within an array
 
@@ -640,7 +637,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertContains($prod2['_id'], $cat->products);
         $this->assertContains($prod3, $cat->products);
 
-        // Now lets try with the alternate alias ;)
+        // Using an alternate alias
         unset($cat->products);
         $this->assertNull($cat->products);
 
@@ -694,7 +691,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         // Check if an _id was generated for the object
         $this->assertInstanceOf('MongoId', $char1->_id);
 
-        // Now lets try with the alternate alias ;)
+        // Using an alternate alias
         unset($cat->characteristics);
         $this->assertNull($cat->characteristics);
 
@@ -733,7 +730,6 @@ class ModelTest extends PHPUnit_Framework_TestCase
         // PHP array must have a correct sequence of keys in order to be considered
         // an array by the Mongo driver.
         $this->assertTrue(array_key_exists(0, $cat->characteristics));
-
     }
 
     public function testShouldUnembed()

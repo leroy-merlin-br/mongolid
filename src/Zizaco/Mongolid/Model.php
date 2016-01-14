@@ -93,7 +93,7 @@ class Model
      */
     public function insert()
     {
-        // If the model has no collection. Aka: embeded model
+        // If the model has no collection. Aka: embedded model
         if (! $this->collection) {
             return false;
         }
@@ -144,7 +144,7 @@ class Model
      */
     public function save()
     {
-        // If the model has no collection. Aka: embeded model
+        // If the model has no collection. Aka: embedded model
         if (! $this->collection) {
             return false;
         }
@@ -188,12 +188,14 @@ class Model
         if (isset($result['ok']) && $result['ok']) {
 
             if ($this->_id) {
+
                 // Once we have run the update operation, we will fire the "updated" event for
                 // this model instance. This will allow developers to hook into these after
                 // models are updated, giving them a chance to do any special processing.
                 $this->parseDocument($this->attributes);
                 $this->fireModelEvent('updated', false);
             } else {
+
                 // the created event is fired, just in case the developer tries to update it
                 // during the event. This will allow them to do so and run an update here.
                 $this->parseDocument($this->attributes);
@@ -266,7 +268,7 @@ class Model
             $fields = $instance->prepareProjection($fields);
         }
 
-        // Perfodm Mongo's findOne
+        // Perform Mongo's findOne
         $document = $instance->collection()->findOne($query, $fields);
 
         // If the response is correctly parsed return it
@@ -328,13 +330,15 @@ class Model
         }
 
         if ($cachable) {
-            // Perfodm Mongo's find and returns iterable cursor
+
+            // Perform Mongo's find and returns iterable cursor
             $cursor = new CachableOdmCursor(
                 $query,
                 get_class($instance)
             );
         } else {
-            // Perfodm Mongo's find and returns iterable cursor
+
+            // Perform Mongo's find and returns iterable cursor
             $cursor = new OdmCursor(
                 $instance->collection()->find($query, $fields),
                 get_class($instance)
@@ -432,7 +436,6 @@ class Model
 
         return $attr;
     }
-
 
     /**
      * Prepare query arrays that contains '$in' in order to work with MongoDB 3.0
@@ -592,9 +595,6 @@ class Model
      * Set a given attribute on the model.
      *
      * @param  string $key
-     * @param  mixed  $value
-     *
-     * @return void
      */
     public function cleanAttribute($key)
     {
@@ -625,6 +625,12 @@ class Model
 
     /**
      * Returns the referenced documents as objects
+     *
+     * @param      $model
+     * @param      $field
+     * @param bool $cachable
+     *
+     * @return
      */
     protected function referencesOne($model, $field, $cachable = true)
     {
@@ -677,7 +683,7 @@ class Model
         if ($cachable && static::$cacheComponent) {
             $cache_key = 'reference_cache_' . $model . '_' . md5(serialize($ref_ids));
 
-            // For the next 6 seconds (0.1 minute), the last retrived value
+            // For the next 6 seconds (0.1 minute), the last retrieved value
             // will be returned from cache =)
             return static::$cacheComponent->remember(
                 $cache_key, 0.1, function () use ($model, $ref_ids) {
@@ -894,7 +900,7 @@ class Model
 
     /**
      * The polymorphic method is something that may be overwritten
-     * in order to make a model polimorphic. For example: You may have three
+     * in order to make a model polymorphic. For example: You may have three
      * models with the same collection: Content, ArticleContent and VideoContent.
      * By overwriting the polymorph method is possible to make the Content
      * to become a ArticleContent or a VideoContent object by simply
@@ -1069,7 +1075,7 @@ class Model
      */
     public function update()
     {
-        // If the model has no collection. Aka: embeded model
+        // If the model has no collection. Aka: embedded model
         if (! $this->collection) {
             return false;
         }

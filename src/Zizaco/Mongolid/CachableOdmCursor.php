@@ -41,7 +41,7 @@ class CachableOdmCursor implements Iterator
     /**
      * Calls the MongoCursor method if it exists.
      * This makes possible to run methods like limit, skip,
-     * orts, and others.
+     * sorts, and others.
      *
      * @param $name string
      * @param $args array
@@ -84,7 +84,6 @@ class CachableOdmCursor implements Iterator
 
     /**
      * Iterator interface rewind (used in foreach)
-     *
      */
     public function rewind()
     {
@@ -141,7 +140,6 @@ class CachableOdmCursor implements Iterator
 
     /**
      * Iterator key method (used in foreach)
-     *
      */
     public function key()
     {
@@ -150,7 +148,6 @@ class CachableOdmCursor implements Iterator
 
     /**
      * Iterator next method (used in foreach)
-     *
      */
     public function next()
     {
@@ -159,7 +156,6 @@ class CachableOdmCursor implements Iterator
 
     /**
      * Iterator valid method (used in foreach)
-     *
      */
     public function valid()
     {

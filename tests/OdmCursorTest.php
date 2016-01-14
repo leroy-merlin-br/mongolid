@@ -221,7 +221,6 @@ class _stubModel extends Model
 
 class _stubMongoCursor
 {
-
     public $validCount = 5;
 
     public function randomMethod()

@@ -48,7 +48,8 @@ class MongoDbConnector
      *
      * @param  string $connectionString
      *
-     * @return string  The connection string that should actually be used
+     * @return string The connection string that should actually be used
+     * @throws \MongoConnectionException
      */
     protected function checkDefaultConnectionString($connectionString)
     {
