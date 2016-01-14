@@ -405,6 +405,8 @@ class Model
         // Prepare query array with attributes
         $query = $this->prepareMongoAttributes($id);
 
+        $query = $this->prepareInArray($query);
+
         return $query;
     }
 
@@ -429,6 +431,29 @@ class Model
         }
 
         return $attr;
+    }
+
+
+    /**
+     * Prepare query arrays that contains '$in' in order to work with MongoDB 3.0
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public function prepareInArray(array $array)
+    {
+        foreach ($array as $key => &$value) {
+            if ($key === '$in') {
+                $value = array_values($value);
+            } else {
+                if (is_array($value)) {
+                    $value = $this->prepareInArray($value);
+                }
+            }
+        }
+
+        return $array;
     }
 
     /**
@@ -656,13 +681,13 @@ class Model
             // will be returned from cache =)
             return static::$cacheComponent->remember(
                 $cache_key, 0.1, function () use ($model, $ref_ids) {
-                return $model::where(['_id' => ['$in' => $ref_ids]], [], true);
+                return $model::where(['_id' => ['$in' => array_values($ref_ids)]], [], true);
             }
             );
         } elseif ($cachable) {
-            return $model::where(['_id' => ['$in' => $ref_ids]], [], true);
+            return $model::where(['_id' => ['$in' => array_values($ref_ids)]], [], true);
         } else {
-            return $model::where(['_id' => ['$in' => $ref_ids]]);
+            return $model::where(['_id' => ['$in' => array_values($ref_ids)]]);
         }
     }
 

@@ -1,4 +1,5 @@
-<?php namespace Zizaco\Mongolid;
+<?php
+namespace Zizaco\Mongolid;
 
 use Iterator;
 use MongoCursor;

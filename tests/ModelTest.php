@@ -778,6 +778,101 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($prod1, $result);
     }
 
+    public function testShouldPrepareInArray()
+    {
+        $model = new Model;
+
+        $regularArray = [
+            'regular' => 'array',
+            'test'    => [
+                'other' => [
+                    'new' => ['array', 'array', 'array'],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            $regularArray,
+            $model->prepareInArray($regularArray)
+        );
+
+        $firstLevel = [
+            '$in' => [
+                3   => 'three',
+                '5' => 'five',
+            ],
+        ];
+
+        $this->assertSame(
+            ['$in' => ['three', 'five']],
+            $model->prepareInArray($firstLevel)
+        );
+
+        $thirdLevel = [
+            'regular' => 'array',
+            'fix'     => [
+                'test' => [
+                    '$in' => [
+                        '1' => 'array',
+                        '2' => 'array',
+                        3   => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            [
+                'regular' => 'array',
+                'fix'     => [
+                    'test' => [
+                        '$in' => array_values(
+                            [
+                                'array',
+                                'array',
+                                'array',
+                            ]
+                        ),
+                    ],
+                ],
+            ],
+            $model->prepareInArray($thirdLevel)
+        );
+
+        $multiLevel = [
+            '_id' => [
+                '$in' => ['key' => 'array'],
+            ],
+            'fix' => [
+                'test' => [
+                    '$in' => [
+                        '1' => 'array',
+                        '2' => 'array',
+                        3   => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            [
+                '_id' => [
+                    '$in' => ['array'],
+                ],
+                'fix' => [
+                    'test' => [
+                        '$in' => [
+                            'array',
+                            'array',
+                            'array',
+                        ],
+                    ],
+                ],
+            ],
+            $model->prepareInArray($multiLevel)
+        );
+    }
+
     /**
      * Prepare attributes to be used in MongoDb.
      * especially the _id.
