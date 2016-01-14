@@ -22,5 +22,5 @@
             "Zizaco\\Mongolid": "src/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "develop"
 }
