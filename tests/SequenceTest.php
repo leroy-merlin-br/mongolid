@@ -5,18 +5,11 @@ use Mockery as m;
 
 class SequenceTest extends PHPUnit_Framework_TestCase
 {
-
     protected $sequence;
-
-    public function setUp()
-    {
-
-    }
 
     public function tearDown()
     {
-        parent::tearDown();
-        m::close();
+         m::close();
     }
 
     public function testShouldReturnNextSequenceNumber()
