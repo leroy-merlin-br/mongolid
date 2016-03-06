@@ -2,7 +2,7 @@
 
 include 'vendor/autoload.php';
 
-if ( ! extension_loaded('mongo')) {
+if ( ! extension_loaded('mongodb')) {
     throw new Exception("MongoClient PHP extension required.", 1);
 }
 
