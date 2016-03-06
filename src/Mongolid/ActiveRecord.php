@@ -75,9 +75,11 @@ abstract class ActiveRecord
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
+     * @param  arary  $query
+     *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function where($query)
+    public function where(array $query = [])
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->where($query);

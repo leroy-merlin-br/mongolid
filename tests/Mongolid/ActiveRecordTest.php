@@ -16,7 +16,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldHaveCorrectPropertiesByDefault()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[]');
+        $entity = m::mock(ActiveRecord::class.'[]');
 
         // Assert
         $this->assertEquals('mongolid', $entity->collection);
@@ -46,7 +46,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldInsert()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $dataMapper = m::mock();
 
         // Act
@@ -65,7 +65,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $dataMapper = m::mock();
 
         // Act
@@ -84,7 +84,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetWithWhereQuery()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $query      = ['foo' => 'bar'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
@@ -107,7 +107,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetAll()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $dataMapper = m::mock();
         $cursor     = m::mock();
 
@@ -128,7 +128,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetFirstWithQuery()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $query      = ['foo' => 'bar'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
@@ -151,7 +151,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[]');
+        $entity = m::mock(ActiveRecord::class.'[]');
         $this->setProtected($entity, 'fields', 'MySchemaClass');
         $schema = m::mock();
 
@@ -165,13 +165,13 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetSchemaIfFieldsDescribesSchemaFields()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[]');
+        $entity = m::mock(ActiveRecord::class.'[]');
         $fields = ['name' => 'string', 'age' => 'int'];
         $this->setProtected($entity, 'fields', $fields);
 
         // Assert
         $result = $this->callProtected($entity, 'getSchema');
-        $this->assertInstanceOf('Mongolid\Schema', $result);
+        $this->assertInstanceOf(Schema::class, $result);
         $this->assertEquals($fields, $result->fields);
         $this->assertEquals($entity->dynamic, $result->dynamic);
         $this->assertEquals(get_class($entity), $result->entityClass);
@@ -180,7 +180,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetDataMapper()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getSchema]');
+        $entity = m::mock(ActiveRecord::class.'[getSchema]');
         $entity->collection = 'foobar';
         $schema = m::mock();
 
