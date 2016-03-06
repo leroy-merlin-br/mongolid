@@ -191,7 +191,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getSchema]');
-        $schema = m::mock();
+        $schema = m::mock('Mongolid\Schema[]');
 
         // Act
         $entity->shouldAllowMockingProtectedMethods();

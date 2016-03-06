@@ -13,6 +13,16 @@ class DataMapperTest extends TestCase
         m::close();
     }
 
+    public function testShouldBeAbleToConstructWithSchema()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\Schema[]');
+        $mapper = new DataMapper($schema);
+
+        // Assertion
+        $this->assertEquals($schema, $mapper->schema);
+    }
+
     public function testShouldSave()
     {
         // Arrange

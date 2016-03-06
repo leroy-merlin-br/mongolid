@@ -138,8 +138,7 @@ abstract class ActiveRecord
      */
     public function getDataMapper()
     {
-        $dataMapper = new DataMapper;
-        $dataMapper->schema = $this->getSchema();
+        $dataMapper = new DataMapper($this->getSchema());
 
         return $dataMapper;
     }

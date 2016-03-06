@@ -26,6 +26,11 @@ class DataMapper
      */
     public $schema;
 
+    public function __construct(Schema $schema = null)
+    {
+        $this->schema = $schema;
+    }
+
     /**
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
