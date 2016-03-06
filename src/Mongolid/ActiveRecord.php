@@ -32,7 +32,7 @@ abstract class ActiveRecord
      * @var  string|string[]
      */
     protected $fields  = [
-        '_id' => 'mongoId'
+        '_id' => 'objectId'
     ];
 
     /**

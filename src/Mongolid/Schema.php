@@ -50,11 +50,15 @@ abstract class Schema
      *
      * @param  mixed $value
      *
-     * @return ObjectID
+     * @return ObjectID|mixed
      */
     public function objectId($value = null)
     {
-        if (! $value instanceof ObjectID) {
+        if ($value === null) {
+            return new ObjectID();
+        }
+
+        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
             $value = new ObjectID($value);
         }
 

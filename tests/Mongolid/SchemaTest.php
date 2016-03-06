@@ -43,13 +43,11 @@ class SchemaTest extends TestCase
         $schema = m::mock('Mongolid\Schema[]');
         $value  = 'A random string';
 
-        // Act
-        $this->setExpectedException(
-          MongoException::class, 'Invalid BSON ID provided'
-        );
-
         // Assert
-        $schema->objectId($value);
+        $this->assertEquals(
+            $value,
+            $schema->objectId($value)
+        );
     }
 
     public function testShouldCastObjectIdStringIntoObjectId()

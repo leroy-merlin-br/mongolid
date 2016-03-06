@@ -163,8 +163,8 @@ class DataMapper
     protected function parseToArray($object)
     {
         if (! is_array($object)) {
-            if (method_exists($object, 'toArray')) {
-                return $object->toArray();
+            if (method_exists($object, 'getAttributes')) {
+                return $object->getAttributes();
             }
 
             return get_object_vars($object);

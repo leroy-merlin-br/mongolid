@@ -237,14 +237,14 @@ class DataMapperTest extends TestCase
         $this->assertEquals($schema, $result->schema);
     }
 
-    public function testShouldParseToArrayWhenToArrayMethodIsAvailable()
+    public function testShouldGetAttributesWhenGetattributesMethodIsAvailable()
     {
         // Arrange
         $mapper = new DataMapper;
         $object = m::mock(new __entity_stub);
 
         // Act
-        $object->shouldReceive('toArray')
+        $object->shouldReceive('getAttributes')
             ->once()
             ->andReturn(['foo' => 'bar']);
 
@@ -296,5 +296,5 @@ class DataMapperTest extends TestCase
 }
 
 class __entity_stub {
-    public function toArray() {}
+    public function getAttributes() {}
 }
