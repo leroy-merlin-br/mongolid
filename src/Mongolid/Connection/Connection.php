@@ -23,7 +23,7 @@ class Connection
      * Constructs a new Mongolid connection. It uses the same constructor
      * parameters as the original MongoDB\Client constructor
      *
-     * @see   http://php.net/manual/pt_BR/mongoclient.construct.php
+     * @see   http://php.net/manual/en/mongodb-driver-manager.construct.php
      *
      * @param string $server Connection string
      * @param array  $options
