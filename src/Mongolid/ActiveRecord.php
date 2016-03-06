@@ -3,6 +3,7 @@ namespace Mongolid;
 
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\Attributes;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -15,6 +16,8 @@ use Mongolid\Container\Ioc;
  */
 abstract class ActiveRecord
 {
+    use Attributes;
+
     /**
      * Name of the collection where this kind of Entity is going to be saved or
      * retrieved from

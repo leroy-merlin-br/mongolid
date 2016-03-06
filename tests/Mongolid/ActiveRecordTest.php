@@ -4,6 +4,7 @@ namespace Mongolid;
 use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\Attributes;
 
 class ActiveRecordTest extends TestCase
 {
@@ -24,10 +25,19 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->dynamic);
     }
 
+    public function testShouldImplementModelTraits()
+    {
+        // Assert
+        $this->assertEquals(
+            [Attributes::class],
+            array_keys(class_uses(ActiveRecord::class))
+        );
+    }
+
     public function testShouldSave()
     {
         // Arrage
-        $entity = m::mock('Mongolid\ActiveRecord[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $dataMapper = m::mock();
 
         // Act
