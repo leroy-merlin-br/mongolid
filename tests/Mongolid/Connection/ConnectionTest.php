@@ -4,6 +4,7 @@ namespace Mongolid\Connection;
 use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use MongoDB\Client;
 
 class ConnectionTest extends TestCase
 {
@@ -18,14 +19,14 @@ class ConnectionTest extends TestCase
     {
         // Arrange
         $params      =  ['conn', ['options'], ['driver_opts']];
-        $mongoClient = m::mock('MongoClient');
+        $mongoClient = m::mock(Client::class);
         $container   = m::mock('Illuminate\Container\Container');
         Ioc::setContainer($container);
 
         // Act
         $container->shouldReceive('make')
             ->once()
-            ->with('MongoClient', $params)
+            ->with(Client::class, $params)
             ->andReturn($mongoClient);
 
         // Assert
@@ -36,7 +37,7 @@ class ConnectionTest extends TestCase
     public function testShouldGetRawConnection()
     {
         // Arrange
-        $mongoClient = m::mock('MongoClient');
+        $mongoClient = m::mock(Client::class);
         $container   = m::mock('Illuminate\Container\Container');
         Ioc::setContainer($container);
 

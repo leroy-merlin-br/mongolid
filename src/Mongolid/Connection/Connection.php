@@ -3,7 +3,7 @@ namespace Mongolid\Connection;
 
 use MongoConnectionException;
 use Mongolid\Container\Ioc;
-use MongoClient;
+use MongoDB\Client;
 
 /**
  * Represents a single connection with the database
@@ -13,15 +13,15 @@ use MongoClient;
 class Connection
 {
     /**
-     * The raw MongoClient object that represents this connection
+     * The raw MongoDB\Client object that represents this connection
      *
-     * @var MongoClient
+     * @var Client
      */
     protected $rawConnection;
 
     /**
      * Constructs a new Mongolid connection. It uses the same constructor
-     * parameters as the original MongoClient constructor
+     * parameters as the original MongoDB\Client constructor
      *
      * @see   http://php.net/manual/pt_BR/mongoclient.construct.php
      *
@@ -35,15 +35,15 @@ class Connection
         $driver_options = []
     ) {
         $this->rawConnection = Ioc::make(
-            'MongoClient',
+            Client::class,
             [$server, $options, $driver_options]
         );
     }
 
     /**
-     * Getter for MongoClient instance
+     * Getter for Client instance
      *
-     * @return MongoClient
+     * @return Client
      */
     public function getRawConnection()
     {
