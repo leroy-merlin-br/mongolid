@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid;
 
-use MongoId;
+use MongoDB\BSON\ObjectID;
 
 /**
  * A schema maps to a MongoDB collection and defines the shape of the documents
@@ -23,11 +23,11 @@ abstract class Schema
     /**
      * Tells how a document should look like. If an scalar type is used, it will
      * perform a cast into the value. Othewise the schema will use the type as
-     * the name of the method to be called. See 'mongoId' method for example.
+     * the name of the method to be called. See 'objectId' method for example.
      * @var string[]
      */
     public $fields  = [
-        '_id' => 'mongoId' // Means that the _id will passtrought the `mongoId` method
+        '_id' => 'objectId' // Means that the _id will passtrought the `objectId` method
     ];
 
     /**
@@ -39,16 +39,16 @@ abstract class Schema
 
     /**
      * Filters any field in the $fields that has it's value specified as a
-     * 'mongoId'. It will wraps the $value, if any, into a MongoId object
+     * 'objectId'. It will wraps the $value, if any, into a ObjectID object
      *
      * @param  mixed $value
      *
-     * @return MongoId
+     * @return ObjectID
      */
-    public function mongoId($value = null)
+    public function objectId($value = null)
     {
-        if (! $value instanceof MongoId) {
-            $value = new MongoId($value);
+        if (! $value instanceof ObjectID) {
+            $value = new ObjectID($value);
         }
 
         return $value;

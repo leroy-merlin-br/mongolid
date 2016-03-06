@@ -4,6 +4,8 @@ namespace Mongolid;
 use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use MongoDB\BSON\ObjectID;
+use MongoDB\Driver\Exception\Exception as MongoException;
 
 class SchemaTest extends TestCase
 {
@@ -22,7 +24,7 @@ class SchemaTest extends TestCase
         $this->assertAttributeEquals(false, 'dynamic', $schema);
     }
 
-    public function testShouldCastNullIntoMongoId()
+    public function testShouldCastNullIntoObjectId()
     {
         // Arrange
         $schema = m::mock('Mongolid\Schema[]');
@@ -30,12 +32,12 @@ class SchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            'MongoId',
-            $schema->mongoId($value)
+            ObjectID::class,
+            $schema->objectId($value)
         );
     }
 
-    public function testShouldNotCastRandomStringIntoMongoId()
+    public function testShouldNotCastRandomStringIntoObjectId()
     {
         // Arrange
         $schema = m::mock('Mongolid\Schema[]');
@@ -43,14 +45,14 @@ class SchemaTest extends TestCase
 
         // Act
         $this->setExpectedException(
-          'MongoException', 'Invalid object ID'
+          MongoException::class, 'Invalid BSON ID provided'
         );
 
         // Assert
-        $schema->mongoId($value);
+        $schema->objectId($value);
     }
 
-    public function testShouldCastObjectIdStringIntoMongoId()
+    public function testShouldCastObjectIdStringIntoObjectId()
     {
         // Arrange
         $schema = m::mock('Mongolid\Schema[]');
@@ -58,13 +60,13 @@ class SchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            'MongoId',
-            $schema->mongoId($value)
+            ObjectID::class,
+            $schema->objectId($value)
         );
 
         $this->assertEquals(
             $value,
-            (string)$schema->mongoId($value)
+            (string)$schema->objectId($value)
         );
     }
 }
