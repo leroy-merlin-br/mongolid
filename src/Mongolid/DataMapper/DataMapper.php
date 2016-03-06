@@ -3,6 +3,7 @@ namespace Mongolid\DataMapper;
 
 use Mongolid\Schema;
 use Mongolid\Container\Ioc;
+use Mongolid\Connection\Pool;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -26,9 +27,19 @@ class DataMapper
      */
     public $schema;
 
-    public function __construct(Schema $schema = null)
+    /**
+     * Connections that are going to be used to interact with the database
+     * @var Pool
+     */
+    protected $connPool;
+
+    /**
+     * @param Pool        $connPool The connections that are going to be used to interact with the database
+     * @param Schema|null $schema   The Schema class of the model that is going go be persisted
+     */
+    public function __construct(Pool $connPool)
     {
-        $this->schema = $schema;
+        $this->connPool = $connPool;
     }
 
     /**

@@ -138,7 +138,8 @@ abstract class ActiveRecord
      */
     public function getDataMapper()
     {
-        $dataMapper = new DataMapper($this->getSchema());
+        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper->schema = $this->getSchema();
 
         return $dataMapper;
     }
