@@ -15,17 +15,10 @@ use Mongolid\Container\Ioc;
 class DataMapper
 {
     /**
-     * Name of the collection where the object is going to be saved or retrieved
-     * from
-     * @var string
-     */
-    public $collection = 'mongolid';
-
-    /**
      * Name of the schema class to be used
      * @var string
      */
-    public $schemaClass = 'Mongolid\Schema';
+    public $schemaClass = Schema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass
@@ -43,7 +36,7 @@ class DataMapper
     {
         return $this->performQuery(
             'upsert',
-            $this->collection,
+            $this->schema->collection,
             $this->parseToDocument($object)
         );
     }
@@ -59,7 +52,7 @@ class DataMapper
     {
         return $this->performQuery(
             'insert',
-            $this->collection,
+            $this->schema->collection,
             $this->parseToDocument($object)
         );
     }
@@ -75,7 +68,7 @@ class DataMapper
     {
         return $this->performQuery(
             'update',
-            $this->collection,
+            $this->schema->collection,
             $this->parseToDocument($object)
         );
     }
@@ -92,7 +85,7 @@ class DataMapper
     {
         $rawCursor = $this->performQuery(
             'where',
-            $this->collection,
+            $this->schema->collection,
             $query
         );
 

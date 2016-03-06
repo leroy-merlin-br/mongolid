@@ -20,7 +20,6 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[]');
 
         // Assert
-        $this->assertEquals('mongolid', $entity->collection);
         $this->assertAttributeEquals(['_id' => 'mongoId'], 'fields', $entity);
         $this->assertTrue($entity->dynamic);
     }
@@ -184,6 +183,7 @@ class ActiveRecordTest extends TestCase
         $this->assertInstanceOf(Schema::class, $result);
         $this->assertEquals($fields, $result->fields);
         $this->assertEquals($entity->dynamic, $result->dynamic);
+        $this->assertEquals($entity->collection, $result->collection);
         $this->assertEquals(get_class($entity), $result->entityClass);
     }
 
@@ -191,7 +191,6 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getSchema]');
-        $entity->collection = 'foobar';
         $schema = m::mock();
 
         // Act
@@ -204,7 +203,6 @@ class ActiveRecordTest extends TestCase
         // Assert
         $result = $this->callProtected($entity, 'getDataMapper');
         $this->assertInstanceOf('Mongolid\DataMapper\DataMapper', $result);
-        $this->assertEquals($entity->collection, $result->collection);
         $this->assertEquals($schema, $result->schema);
     }
 }

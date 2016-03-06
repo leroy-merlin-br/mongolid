@@ -17,8 +17,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
+        $schema = m::mock('Mongolid\Schema[]');
         $object = m::mock();
         $parsedObject = m::mock();
+        $mapper->schema = $schema;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -41,8 +43,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
+        $schema = m::mock('Mongolid\Schema[]');
         $object = m::mock();
         $parsedObject = m::mock();
+        $mapper->schema = $schema;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -65,8 +69,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]');
+        $schema = m::mock('Mongolid\Schema[]');
         $object = m::mock();
         $parsedObject = m::mock();
+        $mapper->schema = $schema;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -88,13 +94,15 @@ class DataMapperTest extends TestCase
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,performQuery]');
+        $mapper         = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,performQuery]');
         $rawCursor      = m::mock('MongoCursor');
         $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
+        $schema         = m::mock('Mongolid\Schema[]');
         $schemaMapper   = m::mock();
         $query          = ['foo' => 'bar'];
         $test           = $this;
 
+        $mapper->schema      = $schema;
         $schemaMapper->entityClass = 'stdClass';
 
         // Act
@@ -177,7 +185,7 @@ class DataMapperTest extends TestCase
         $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,parseToArray]');
         $object         = m::mock();
         $parsedDocument = ['a_field' => 123];
-        $schemaMapper   = m::mock();
+        $schemaMapper   = m::mock('Mongolid\Schema[]');
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();

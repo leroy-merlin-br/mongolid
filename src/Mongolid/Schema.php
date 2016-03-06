@@ -21,6 +21,13 @@ abstract class Schema
     public $dynamic = false;
 
     /**
+     * Name of the collection where this kind of document is going to be saved
+     * or retrieved from
+     * @var string
+     */
+    public $collection = 'mongolid';
+
+    /**
      * Tells how a document should look like. If an scalar type is used, it will
      * perform a cast into the value. Othewise the schema will use the type as
      * the name of the method to be called. See 'objectId' method for example.

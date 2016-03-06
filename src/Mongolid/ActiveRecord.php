@@ -125,6 +125,7 @@ abstract class ActiveRecord
         $schema->entityClass = get_class($this);
         $schema->fields      = $this->fields;
         $schema->dynamic     = $this->dynamic;
+        $schema->collection  = $this->collection;
 
         return $schema;
     }
@@ -138,8 +139,7 @@ abstract class ActiveRecord
     public function getDataMapper()
     {
         $dataMapper = new DataMapper;
-        $dataMapper->collection = $this->collection;
-        $dataMapper->schema     = $this->getSchema();
+        $dataMapper->schema = $this->getSchema();
 
         return $dataMapper;
     }
