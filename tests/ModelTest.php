@@ -392,7 +392,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(10.50, $prod->price);
     }
 
-    public function testGetAtributes()
+    public function testGetAndSetAttributeDotNotation()
+    {
+        $prod = new _stubProduct;
+        $prod->data = array('name' => 'Bacon');
+        $prod->setAttribute('data.price', 10.50);
+
+        $this->assertEquals('Bacon',$prod->getAttribute('data.name'));
+        $this->assertEquals(10.50,$prod->getAttribute('data.price'));
+    }
+
+    public function testGetAttributes()
     {
         $prod        = new _stubProduct;
         $prod->name  = 'Bacon';

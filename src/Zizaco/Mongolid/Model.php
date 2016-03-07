@@ -513,7 +513,7 @@ class Model
     }
 
     /**
-     * Get an attribute from the model.
+     * Get an attribute from the model. Also works with dot notation.
      *
      * @param  string $key
      *
@@ -521,14 +521,23 @@ class Model
      */
     public function getAttribute($key)
     {
-        $inAttributes = array_key_exists($key, $this->attributes);
-
-        if ($inAttributes) {
-            return $this->attributes[$key];
-        } elseif ($key == 'attributes') {
-            return $this->attributes;
+        if(strpos($key, '.') !== FALSE){
+            $loc = $this->attributes;
+            foreach(explode('.', $key) as $step)
+            {
+                $loc = &$loc[$step];
+            }
+            return $loc;
         } else {
-            return null;
+            $inAttributes = array_key_exists($key, $this->attributes);
+
+            if ($inAttributes) {
+                return $this->attributes[$key];
+            } elseif ($key == 'attributes') {
+                return $this->attributes;
+            } else {
+                return null;
+            }
         }
     }
 
@@ -563,7 +572,7 @@ class Model
     }
 
     /**
-     * Set a given attribute on the model.
+     * Set a given attribute on the model. Also works with dot notation.
      *
      * @param  string $key
      * @param  mixed  $value
@@ -572,7 +581,18 @@ class Model
      */
     public function setAttribute($key, $value)
     {
-        $this->attributes[$key] = $value;
+        if(strpos($key, '.') !== FALSE){
+
+            $loc = &$this->attributes;
+            foreach(explode('.', $key) as $step)
+            {
+                $loc = &$loc[$step];
+            }
+            $loc = $value;
+
+        } else {
+            $this->attributes[$key] = $value;
+        }
     }
 
     /**
