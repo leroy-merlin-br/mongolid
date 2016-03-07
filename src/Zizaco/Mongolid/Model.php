@@ -1094,6 +1094,11 @@ class Model
         // Get just the attributes what was changed.
         $diffAttributes = $this->changedAttributes($preparedAttr);
 
+        // Don't to update a unmodified model
+        if (empty($diffAttributes['$set'])) {
+            return true;
+        }
+        
         // Saves the model using the MongoClient
         $result = $this->collection()
             ->update(['_id' => $preparedAttr['_id']], $diffAttributes, ["w" => $this->writeConcern]);

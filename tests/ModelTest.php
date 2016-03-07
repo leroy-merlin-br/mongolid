@@ -175,6 +175,19 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testShouldUpdateUnmodifiedModel()
+    {
+        $prod       = new _stubProductPersisted;
+        $prod->name = 'whatever';
+        $prod->desc = null;
+        
+        $this->productsCollection
+            ->shouldReceive('update')
+            ->never();
+
+        $this->assertTrue($prod->update());
+    }
+
     public function testShouldHasUpdatedAtAndCreatedAtFields()
     {
         $prod       = new _stubProduct;
