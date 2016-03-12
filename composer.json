@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": ">=7.0",
+        "mongodb/mongodb": "^1.0.0",
         "illuminate/container": "^5.0"
     },
     "require-dev": {
