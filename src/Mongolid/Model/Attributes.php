@@ -20,12 +20,14 @@ trait Attributes
      * @var array
      */
     protected $attributes = [];
+    
     /**
      * The model attribute's original state.
      *
      * @var array
      */
     protected $original = [];
+    
     /**
      * Once you put at least one string in this array, only
      * the attributes especified here will be changed
@@ -34,6 +36,7 @@ trait Attributes
      * @var array
      */
     protected $fillable = [];
+
     /**
      * The attributes that aren't mass assignable. The oposite
      * to the fillable array;
@@ -41,7 +44,16 @@ trait Attributes
      * @var array
      */
     protected $guarded = [];
-
+    
+    /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is true.
+     *
+     * @var boolean
+     */
+    public $mutable = true;
+    
     /**
      * Get an attribute from the model.
      *
@@ -59,15 +71,6 @@ trait Attributes
         } else {
             return null;
         }
-    }
-    /**
-     * Get all attributes from the model.
-     *
-     * @return mixed
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
     }
 
     /**
@@ -97,6 +100,17 @@ trait Attributes
     {
         unset($this->attributes[$key]);
     }
+    
+    /**
+     * Get all attributes from the model.
+     *
+     * @return mixed
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+    
 
     /**
      * Set a given attribute on the model.
@@ -109,6 +123,29 @@ trait Attributes
     public function setAttribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
+    }
+        
+    /**
+     * Verify if model has a mutator method defined.
+     *
+     * @return boolean
+     */
+    protected function hasMutatorMethod($key, $prefix)
+    {
+        $method = $this->buildMutatorMethod($key, $prefix);
+        
+        return method_exists($this, $method);
+    }
+    
+    /**
+     * Create mutator method pattern.
+     *
+     * @return string
+     */
+    protected function buildMutatorMethod($key, $prefix)
+    {
+        return $prefix . ucfirst($key) . 'Attribute';
+        
     }
 
     /**
@@ -130,8 +167,13 @@ trait Attributes
      */
     public function __get($key)
     {
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')){
+            return $this->{$this->buildMutatorMethod($key, 'get')}();
+        }
+        
         return $this->getAttribute($key);
     }
+    
     /**
      * Dynamically set attributes on the model.
      *
@@ -142,7 +184,10 @@ trait Attributes
      */
     public function __set($key, $value)
     {
-        // Set attribute
+        if ($this->mutable && $this->hasMutatorMethod($key, 'set')){
+            $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+        
         $this->setAttribute($key, $value);
     }
 
@@ -157,6 +202,7 @@ trait Attributes
     {
         return isset($this->attributes[$key]);
     }
+    
     /**
      * Unset an attribute on the model.
      *
