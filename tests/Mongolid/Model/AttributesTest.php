@@ -17,7 +17,10 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class{ 
+            use Attributes; 
+        };
+        
         $childObj = new stdClass;
 
         // Assert
@@ -38,7 +41,10 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicGetters()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class{ 
+            use Attributes; 
+        };
+        
         $childObj = new stdClass;
         $this->setProtected(
             $model,
@@ -60,7 +66,10 @@ class AttributesTest extends TestCase
     public function testShouldCheckIfAttributeIsSet()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class{ 
+            use Attributes; 
+        };
+        
         $this->setProtected(
             $model,
             'attributes',
@@ -75,7 +84,10 @@ class AttributesTest extends TestCase
     public function testShouldUnsetAttributes()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class{ 
+            use Attributes; 
+        };
+        
         $this->setProtected(
             $model,
             'attributes',
@@ -95,6 +107,67 @@ class AttributesTest extends TestCase
             $model
         );
     }
+    
+    public function testShouldGetAttributeFromMutator()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+            
+            public function getSomeAttribute()
+            {
+                return 'something-else';
+            } 
+        };
+        
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('something-else', $model->some);
+    }
+    
+    public function testShouldIgnoreMutators()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+                                    
+            public function getSomeAttribute()
+            {
+                return 'something-else';
+            } 
+            
+            public function setSomeAttribute($value)
+            {
+                return strtoupper($value);
+            } 
+        };
+        
+        $this->setProtected($model, 'mutable', false);
+        
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('some-value', $model->some);
+    }
+    
+    public function testShouldSetAttributeFromMutator()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+            
+            public function setSomeAttribute($value)
+            {
+                return strtoupper($value);
+            } 
+        };
+        
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('SOME-VALUE', $model->some);
+    }
 
     /**
      * @dataProvider getFillableOptions
@@ -106,7 +179,10 @@ class AttributesTest extends TestCase
         $expected
     ) {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class{ 
+            use Attributes;
+        };
+        
         $this->setProtected($model, 'fillable', $fillable);
         $this->setProtected($model, 'guarded', $guarded);
 
@@ -178,8 +254,4 @@ class AttributesTest extends TestCase
             ],
         ];
     }
-}
-
-class _stubAttributes {
-    use Attributes;
 }
