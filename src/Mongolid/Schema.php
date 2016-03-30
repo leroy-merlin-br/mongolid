@@ -31,6 +31,9 @@ abstract class Schema
      * Tells how a document should look like. If an scalar type is used, it will
      * perform a cast into the value. Othewise the schema will use the type as
      * the name of the method to be called. See 'objectId' method for example.
+     * The last option is to define a field as another schema by using the
+     * syntax 'schema.<Class>' This represents an embedded document (or
+     * sub-document).
      * @var string[]
      */
     public $fields  = [

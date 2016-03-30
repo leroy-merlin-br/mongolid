@@ -24,6 +24,15 @@ class SchemaTest extends TestCase
         $this->assertAttributeEquals(false, 'dynamic', $schema);
     }
 
+    public function testMustHaveAnEntityClass()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\Schema[]');
+
+        // Assert
+        $this->assertAttributeEquals('stdClass', 'entityClass', $schema);
+    }
+
     public function testShouldCastNullIntoObjectId()
     {
         // Arrange
