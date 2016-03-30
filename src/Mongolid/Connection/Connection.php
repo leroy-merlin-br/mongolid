@@ -20,6 +20,13 @@ class Connection
     protected $rawConnection;
 
     /**
+     * The default database where mongolid will store the documents
+     *
+     * @var string
+     */
+    public $defaultDatabase = 'mongolid';
+
+    /**
      * Constructs a new Mongolid connection. It uses the same constructor
      * parameters as the original MongoDB\Client constructor
      *
@@ -31,7 +38,7 @@ class Connection
      */
     public function __construct(
         $server = "mongodb://localhost:27017",
-        $options = ["connect" => TRUE],
+        $options = ["connect" => true],
         $driver_options = []
     ) {
         $this->rawConnection = Ioc::make(
