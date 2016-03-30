@@ -4,6 +4,8 @@ namespace Mongolid\DataMapper;
 use Mongolid\Schema;
 use Mongolid\Container\Ioc;
 use Mongolid\Connection\Pool;
+use MongoDB\Collection;
+use MongoDB\BSON\ObjectID;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -50,11 +52,19 @@ class DataMapper
      */
     public function save($object)
     {
-        return $this->performQuery(
-            'upsert',
-            $this->schema->collection,
-            $this->parseToDocument($object)
+        if (! $object->_id) {
+            $object->_id = new ObjectID;
+        }
+
+        $data = $this->parseToDocument($object);
+
+        $result = $this->getCollection()->updateOne(
+            ['_id' => $data['_id']],
+            $data,
+            ['upsert' => true]
         );
+
+        return (bool) $result->getModifiedCount();
     }
 
     /**
@@ -64,13 +74,19 @@ class DataMapper
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object)
+    public function insert($object): bool
     {
-        return $this->performQuery(
-            'insert',
-            $this->schema->collection,
-            $this->parseToDocument($object)
+        if (! $object->_id) {
+            $object->_id = new ObjectID;
+        }
+
+        $data = $this->parseToDocument($object);
+
+        $result = $this->getCollection()->insertOne(
+            $data
         );
+
+        return (bool) $result->getInsertedCount();
     }
 
     /**
@@ -82,11 +98,18 @@ class DataMapper
      */
     public function update($object)
     {
-        return $this->performQuery(
-            'update',
-            $this->schema->collection,
-            $this->parseToDocument($object)
+        if (! $object->_id) {
+            $object->_id = new ObjectID;
+        }
+
+        $data = $this->parseToDocument($object);
+
+        $result = $this->getCollection()->updateOne(
+            ['_id' => $data['_id']],
+            $data
         );
+
+        return (bool) $result->getModifiedCount();
     }
 
     /**
@@ -99,16 +122,11 @@ class DataMapper
      */
     public function where($query = [])
     {
-        $rawCursor = $this->performQuery(
-            'where',
-            $this->schema->collection,
+        $rawCursor = $this->getCollection()->find(
             $query
         );
 
-        return Ioc::make(
-            'Mongolid\Cursor\Cursor',
-            [$rawCursor, $this->getSchemaMapper()->entityClass]
-        );
+        return $rawCursor;
     }
 
     /**
@@ -132,7 +150,11 @@ class DataMapper
      */
     public function first($query)
     {
-        return $this->where($query)->limit(1)->first();
+        $document = $this->getCollection()->findOne(
+            $query
+        );
+
+        return $document;
     }
 
     /**
@@ -171,7 +193,7 @@ class DataMapper
      *
      * @return array
      */
-    protected function parseToArray($object)
+    protected function parseToArray($object): array
     {
         if (! is_array($object)) {
             if (method_exists($object, 'getAttributes')) {
@@ -185,17 +207,16 @@ class DataMapper
     }
 
     /**
-     * Performs a query into database
+     * Retrieves the Collection object.
      *
-     * @param  string $command    Which command should be executed
-     * @param  string $collection Name of the collection
-     * @param  array  $param      Command parameter
-     *
-     * @return mixed
+     * @return Collection
      */
-    protected function performQuery($command, $collection, $param)
+    protected function getCollection(): Collection
     {
-        $query = Ioc::make('Mongolid\DataMapper\Query');
-        return $query->$command($collection, $param);
+        $conn       = $this->connPool->getConnection();
+        $database   = $conn->defaultDatabase;
+        $collection = $this->schema->collection;
+
+        return $conn->getRawConnection()->$database->$collection;
     }
 }
