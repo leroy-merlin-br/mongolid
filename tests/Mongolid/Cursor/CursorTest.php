@@ -192,7 +192,7 @@ class CursorTest extends TestCase
 
         // Because when creating an IteratorIterator with the driverCursor
         // this methods will be called once to initialize the iterable object.
-        $driverIterator->shouldReceive('rewind','valid','current','key')
+        $driverIterator->shouldReceive('rewind', 'valid', 'current', 'key')
             ->once()
             ->andReturn(true);
 
