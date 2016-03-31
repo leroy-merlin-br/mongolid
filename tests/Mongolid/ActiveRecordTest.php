@@ -90,6 +90,25 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->update());
     }
 
+    public function testShouldDelete()
+    {
+        // Arrage
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $dataMapper = m::mock();
+
+        // Act
+        $entity->shouldReceive('getDataMapper')
+            ->andReturn($dataMapper);
+
+        $dataMapper->shouldReceive('delete')
+            ->once()
+            ->with($entity)
+            ->andReturn(true);
+
+        // Assert
+        $this->assertTrue($entity->delete());
+    }
+
     public function testShouldGetWithWhereQuery()
     {
         // Arrage

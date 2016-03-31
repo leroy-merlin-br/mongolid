@@ -65,7 +65,7 @@ abstract class ActiveRecord
     }
 
     /**
-     * Updated this object in database
+     * Updates this object in database
      *
      * @return boolean Success
      */
@@ -75,14 +75,24 @@ abstract class ActiveRecord
     }
 
     /**
+     * Deletes this object in database
+     *
+     * @return boolean Success
+     */
+    public function delete()
+    {
+        return $this->getDataMapper()->delete($this);
+    }
+
+    /**
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
-     * @param  arary  $query
+     * @param  array  $query
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function where(array $query = [])
+    public static function where(array $query = [])
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->where($query);
@@ -93,7 +103,7 @@ abstract class ActiveRecord
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function all()
+    public static function all()
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->all();
@@ -102,12 +112,46 @@ abstract class ActiveRecord
     /**
      * Gets the first entity of this kind that matches the query
      *
+     * @param  mixed  $query
+     *
      * @return ActiveRecord
      */
-    public function first($query)
+    public static function first($query = [])
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->first($query);
+    }
+
+    /**
+     * Handle dynamic method calls into the model.
+     * @codeCoverageIgnore
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     *
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (in_array($method, ['all', 'first', 'where'])) {
+            return call_user_func_array([static::class, $method], $parameters);
+        }
+
+        return call_user_func_array([$this, $method], $parameters);
+    }
+
+    /**
+     * Returns a DataMapper configured with the Schema and collection described
+     * in this entity
+     *
+     * @return DataMapper
+     */
+    public function getDataMapper()
+    {
+        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper->schema = $this->getSchema();
+
+        return $dataMapper;
     }
 
     /**
@@ -128,19 +172,5 @@ abstract class ActiveRecord
         $schema->collection  = $this->collection;
 
         return $schema;
-    }
-
-    /**
-     * Returns a DataMapper configured with the Schema and collection described
-     * in this entity
-     *
-     * @return DataMapper
-     */
-    public function getDataMapper()
-    {
-        $dataMapper = Ioc::make(DataMapper::class);
-        $dataMapper->schema = $this->getSchema();
-
-        return $dataMapper;
     }
 }
