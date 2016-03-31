@@ -1,9 +1,13 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
-use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\Cursor\Cursor;
+use Mongolid\Schema;
+use stdClass;
+use TestCase;
 
 class DataMapperTest extends TestCase
 {
@@ -27,11 +31,14 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]', [$connPool]);
-        $schema = m::mock('Mongolid\Schema[]');
-        $object = m::mock();
-        $parsedObject = m::mock();
-        $mapper->schema = $schema;
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+
+        $object->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -41,10 +48,21 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performQuery')
+        $mapper->shouldReceive('getCollection')
             ->once()
-            ->with('upsert', 'mongolid', $parsedObject)
-            ->andReturn(true);
+            ->andReturn($collection);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                ['$set' => $parsedObject],
+                ['upsert' => true]
+            )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
+            ->once()
+            ->andReturn(1);
 
         // Assert
         $this->assertTrue($mapper->save($object));
@@ -54,11 +72,14 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]', [$connPool]);
-        $schema = m::mock('Mongolid\Schema[]');
-        $object = m::mock();
-        $parsedObject = m::mock();
-        $mapper->schema = $schema;
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+
+        $object->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -68,10 +89,18 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performQuery')
+        $mapper->shouldReceive('getCollection')
             ->once()
-            ->with('insert', 'mongolid', $parsedObject)
-            ->andReturn(true);
+            ->andReturn($collection);
+
+        $collection->shouldReceive('insertOne')
+            ->once()
+            ->with($parsedObject)
+            ->andReturn($operationResult);
+
+        $operationResult->shouldReceive('getInsertedCount')
+            ->once()
+            ->andReturn(1);
 
         // Assert
         $this->assertTrue($mapper->insert($object));
@@ -81,11 +110,14 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,performQuery]', [$connPool]);
-        $schema = m::mock('Mongolid\Schema[]');
-        $object = m::mock();
-        $parsedObject = m::mock();
-        $mapper->schema = $schema;
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+
+        $object->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -95,54 +127,97 @@ class DataMapperTest extends TestCase
             ->with($object)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('performQuery')
+        $mapper->shouldReceive('getCollection')
             ->once()
-            ->with('update', 'mongolid', $parsedObject)
-            ->andReturn(true);
+            ->andReturn($collection);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                ['$set' => $parsedObject]
+            )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('getModifiedCount')
+            ->once()
+            ->andReturn(1);
 
         // Assert
         $this->assertTrue($mapper->update($object));
+    }
+
+    public function testShouldDelete()
+    {
+        // Arrange
+        $connPool = m::mock('Mongolid\Connection\Pool');
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+
+        $object->_id = null;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($object)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('deleteOne')
+            ->once()
+            ->with(['_id' => 123])
+            ->andReturn($operationResult);
+
+        $operationResult->shouldReceive('getDeletedCount')
+            ->once()
+            ->andReturn(1);
+
+        // Assert
+        $this->assertTrue($mapper->delete($object));
     }
 
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper         = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,performQuery]', [$connPool]);
-        $rawCursor      = m::mock('MongoCursor');
-        $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
-        $schema         = m::mock('Mongolid\Schema[]');
-        $schemaMapper   = m::mock();
-        $query          = ['foo' => 'bar'];
-        $test           = $this;
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $schema   = m::mock(Schema::class);
 
-        $mapper->schema      = $schema;
-        $schemaMapper->entityClass = 'stdClass';
+        $collection      = m::mock('MongoDB\Collection');
+        $query           = 123;
+        $preparedQuery   = ['_id' => 123];
+
+        $schema->entityClass = 'stdClass';
+        $mapper->schema = $schema;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('getSchemaMapper')
+        $mapper->shouldReceive('prepareValueQuery')
             ->once()
-            ->andReturn($schemaMapper);
+            ->with($query)
+            ->andReturn($preparedQuery);
 
-        $mapper->shouldReceive('performQuery')
+        $mapper->shouldReceive('getCollection')
             ->once()
-            ->with('where', 'mongolid', $query)
-            ->andReturn($rawCursor);
-
-        // Binds a closure that will assert if the constructor params of Cursor are correct
-        Ioc::bind('Mongolid\Cursor\Cursor', function ($container, $params) use ($test, $rawCursor, $mongolidCursor) {
-            $test->assertEquals($rawCursor, $params[0]);
-            $test->assertEquals('stdClass', $params[1]);
-            return $mongolidCursor;
-        });
+            ->andReturn($collection);
 
         // Assert
-        $this->assertEquals(
-            $mongolidCursor,
-            $mapper->where($query)
-        );
+        $result = $mapper->where($query);
+
+        $this->assertInstanceOf(Cursor::class, $result);
+        $this->assertAttributeEquals('stdClass', 'entityClass', $result);
+        $this->assertAttributeEquals($collection, 'collection', $result);
+        $this->assertAttributeEquals('find', 'command', $result);
+        $this->assertAttributeEquals([$preparedQuery], 'params', $result);
     }
 
     public function testShouldGetAll()
@@ -169,30 +244,75 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper         = m::mock('Mongolid\DataMapper\DataMapper[where]', [$connPool]);
-        $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
-        $query          = ['foo' => 'bar'];
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $schema   = m::mock(Schema::class);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $query           = 123;
+        $preparedQuery   = ['_id' => 123];
+
+        $schema->entityClass = 'stdClass';
+        $mapper->schema = $schema;
 
         // Act
-        $mapper->shouldReceive('where')
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('prepareValueQuery')
             ->once()
             ->with($query)
-            ->andReturn($mongolidCursor);
+            ->andReturn($preparedQuery);
 
-        $mongolidCursor->shouldReceive('limit')
+        $mapper->shouldReceive('getCollection')
             ->once()
-            ->with(1)
-            ->andReturn($mongolidCursor);
+            ->andReturn($collection);
 
-        $mongolidCursor->shouldReceive('first')
+        $collection->shouldReceive('findOne')
             ->once()
-            ->andReturn($mongolidCursor);
+            ->with($preparedQuery)
+            ->andReturn(['name' => 'John Doe']);
 
         // Assert
-        $this->assertEquals(
-            $mongolidCursor,
-            $mapper->first($query)
-        );
+        $result = $mapper->first($query);
+
+        $this->assertInstanceOf(stdClass::class, $result);
+        $this->assertAttributeEquals('John Doe', 'name', $result);
+    }
+
+    public function testShouldGetNullIfFirstCantFindAnything()
+    {
+        // Arrange
+        $connPool = m::mock('Mongolid\Connection\Pool');
+        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $schema   = m::mock(Schema::class);
+
+        $collection      = m::mock('MongoDB\Collection');
+        $query           = 123;
+        $preparedQuery   = ['_id' => 123];
+
+        $schema->entityClass = 'stdClass';
+        $mapper->schema = $schema;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('prepareValueQuery')
+            ->once()
+            ->with($query)
+            ->andReturn($preparedQuery);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('findOne')
+            ->once()
+            ->with($preparedQuery)
+            ->andReturn(null);
+
+        // Assert
+        $result = $mapper->first($query);
+
+        $this->assertNull($result);
     }
 
     public function testShouldParseObjectToDocument()
@@ -277,31 +397,6 @@ class DataMapperTest extends TestCase
         $this->assertEquals(
             ['foo' => 'bar', 'name' => 'wilson'],
             $this->callProtected($mapper, 'parseToArray', $object)
-        );
-    }
-
-    public function testShouldPerformQuery()
-    {
-        // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper     = new DataMapper($connPool);
-        $queryObj   = m::mock();
-        $collection = 'mongolid';
-        $param      = ['foo' => 'bar'];
-        $result     = 'result';
-
-        // Act
-        Ioc::instance('Mongolid\DataMapper\Query', $queryObj);
-
-        $queryObj->shouldReceive('thaCommand')
-            ->with('mongolid', $param)
-            ->once()
-            ->andReturn($result);
-
-        // Assert
-        $this->assertEquals(
-            $result,
-            $this->callProtected($mapper, 'performQuery', ['thaCommand', $collection, $param])
         );
     }
 }

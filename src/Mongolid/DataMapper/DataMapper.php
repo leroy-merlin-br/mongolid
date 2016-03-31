@@ -4,6 +4,7 @@ namespace Mongolid\DataMapper;
 use Mongolid\Schema;
 use Mongolid\Container\Ioc;
 use Mongolid\Connection\Pool;
+use Mongolid\Cursor\Cursor;
 use MongoDB\Collection;
 use MongoDB\BSON\ObjectID;
 
@@ -60,11 +61,11 @@ class DataMapper
 
         $result = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
-            $data,
+            ['$set' => $data],
             ['upsert' => true]
         );
 
-        return (bool) $result->getModifiedCount();
+        return (bool) ($result->getModifiedCount() + $result->getUpsertedCount());
     }
 
     /**
@@ -106,10 +107,30 @@ class DataMapper
 
         $result = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
-            $data
+            ['$set' => $data]
         );
 
         return (bool) $result->getModifiedCount();
+    }
+
+    /**
+     * Removes the given document from the collection.
+     *
+     * @return boolean Success (but always false if write concern is Unacknowledged)
+     */
+    public function delete($object)
+    {
+        if (! $object->_id) {
+            $object->_id = new ObjectID;
+        }
+
+        $data = $this->parseToDocument($object);
+
+        $result = $this->getCollection()->deleteOne(
+            ['_id' => $data['_id']]
+        );
+
+        return (bool) $result->getDeletedCount();
     }
 
     /**
@@ -120,13 +141,16 @@ class DataMapper
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function where($query = [])
+    public function where($query = []): Cursor
     {
-        $rawCursor = $this->getCollection()->find(
-            $query
+        $cursor = new Cursor(
+            $this->schema->entityClass,
+            $this->getCollection(),
+            'find',
+            [$this->prepareValueQuery($query)]
         );
 
-        return $rawCursor;
+        return $cursor;
     }
 
     /**
@@ -135,7 +159,7 @@ class DataMapper
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function all()
+    public function all(): Cursor
     {
         return $this->where([]);
     }
@@ -151,10 +175,20 @@ class DataMapper
     public function first($query)
     {
         $document = $this->getCollection()->findOne(
-            $query
+            $this->prepareValueQuery($query)
         );
 
-        return $document;
+        if (! $document) {
+            return null;
+        }
+
+        $model = new $this->schema->entityClass;
+
+        foreach ($document as $key => $value) {
+            $model->$key = $value;
+        }
+
+        return $model;
     }
 
     /**
@@ -218,5 +252,27 @@ class DataMapper
         $collection = $this->schema->collection;
 
         return $conn->getRawConnection()->$database->$collection;
+    }
+
+    /**
+     * Transforms a value that is not an array into an MongoDB query (array).
+     * This method will take care of converting a single value into a query for
+     * an _id, including when a objectId is passed as a string.
+     *
+     * @param  mixed  $value _id of the document
+     *
+     * @return array  Query for the given _id
+     */
+    protected function prepareValueQuery($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
+            $value = new ObjectID($value);
+        }
+
+        return ['_id' => $value];
     }
 }
