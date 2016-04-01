@@ -41,6 +41,8 @@ class Connection
         $options = ["connect" => true],
         $driver_options = []
     ) {
+        $driver_options['typeMap'] = ['array' => 'array'];
+
         $this->rawConnection = Ioc::make(
             Client::class,
             [$server, $options, $driver_options]

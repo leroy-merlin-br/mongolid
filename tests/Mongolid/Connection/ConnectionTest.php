@@ -24,9 +24,12 @@ class ConnectionTest extends TestCase
         Ioc::setContainer($container);
 
         // Act
+        $expectedParams = $params;
+        $expectedParams[2]['typeMap'] = ['array' => 'array'];
+
         $container->shouldReceive('make')
             ->once()
-            ->with(Client::class, $params)
+            ->with(Client::class, $expectedParams)
             ->andReturn($mongoClient);
 
         // Assert
