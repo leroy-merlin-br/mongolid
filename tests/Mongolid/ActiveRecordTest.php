@@ -5,6 +5,7 @@ use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
+use Mongolid\Model\Relations;
 
 class ActiveRecordTest extends TestCase
 {
@@ -28,7 +29,7 @@ class ActiveRecordTest extends TestCase
     {
         // Assert
         $this->assertEquals(
-            [Attributes::class],
+            [Attributes::class, Relations::class],
             array_keys(class_uses(ActiveRecord::class))
         );
     }
