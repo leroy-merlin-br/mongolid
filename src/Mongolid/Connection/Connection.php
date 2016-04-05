@@ -41,7 +41,8 @@ class Connection
         $options = ["connect" => true],
         $driver_options = []
     ) {
-        $driver_options['typeMap'] = ['array' => 'array'];
+        // In order to work with PHP arrays instead of with objects
+        $driver_options['typeMap'] = ['array' => 'array', 'document' => 'array'];
 
         $this->rawConnection = Ioc::make(
             Client::class,

@@ -25,7 +25,10 @@ class ConnectionTest extends TestCase
 
         // Act
         $expectedParams = $params;
-        $expectedParams[2]['typeMap'] = ['array' => 'array'];
+        $expectedParams[2]['typeMap'] = [
+            'array' => 'array',
+            'document' => 'array'
+        ];
 
         $container->shouldReceive('make')
             ->once()
