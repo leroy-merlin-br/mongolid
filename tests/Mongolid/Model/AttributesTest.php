@@ -115,6 +115,20 @@ class AttributesTest extends TestCase
         $this->assertAttributeEquals($expected, 'attributes', $model);
     }
 
+    public function testShouldBeCastableToArray()
+    {
+        // Arrange
+        $model = new _stubAttributes;
+        $model->name = 'John';
+        $model->age = 25;
+
+        // Assert
+        $this->assertEquals(
+            ['name' => 'John', 'age' => 25],
+            $model->toArray()
+        );
+    }
+
     public function getFillableOptions()
     {
         return [

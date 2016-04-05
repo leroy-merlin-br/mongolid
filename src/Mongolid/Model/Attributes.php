@@ -110,6 +110,16 @@ trait Attributes
     }
 
     /**
+     * Returns the model instance as an Array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param  string $key
