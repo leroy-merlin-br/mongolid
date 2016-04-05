@@ -80,7 +80,7 @@ trait Attributes
     public function fill($input)
     {
         foreach ($input as $key => $value) {
-            if ((empty($this->fillable) or in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
+            if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
                 $this->setAttribute($key, $value);
             }
         }

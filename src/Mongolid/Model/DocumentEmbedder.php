@@ -16,7 +16,7 @@ class DocumentEmbedder
      * consider the _id of the $entity in order to update it if it is already
      * present in $field.
      *
-     * @param  object       $parent   The object where the $entity will be embedded
+     * @param  mixed        $parent   The object where the $entity will be embedded
      * @param  string       $field    Name of the field of the object where the document will be embedded
      * @param  mixed        $entity   Entity that will be embedded within $parent
      *
@@ -38,7 +38,7 @@ class DocumentEmbedder
      * Removes the given $entity from $field of $parent. This method will
      * consider the _id of the $entity in order to remove it
      *
-     * @param  object       $parent   The object where the $entity will be removed
+     * @param  mixed        $parent   The object where the $entity will be removed
      * @param  string       $field    Name of the field of the object where the document is
      * @param  mixed        $entity   Entity that will be removed from $parent
      *
@@ -63,7 +63,7 @@ class DocumentEmbedder
     /**
      * Attach a new _id reference into $field of $parent
      *
-     * @param  object $parent  The object where $entity will be referenced
+     * @param  mixed  $parent  The object where $entity will be referenced
      * @param  string $field   The field where the _id reference of $entity will be stored
      * @param  object|array &$entity
      *
@@ -89,7 +89,7 @@ class DocumentEmbedder
     /**
      * Removes an _id reference from $field of $parent
      *
-     * @param  object $parent  The object where $entity reference will be removed
+     * @param  mixed  $parent  The object where $entity reference will be removed
      * @param  string $field   The field where the _id reference of $entity is stored
      * @param  object|array &$entity
      *
@@ -140,7 +140,7 @@ class DocumentEmbedder
      * Will transform the given $field of the $object into an array in order
      * to be able to place new objects within it.
      *
-     * @param  object $object
+     * @param  mixed  $object
      * @param  string $field  Field name
      *
      * @return array

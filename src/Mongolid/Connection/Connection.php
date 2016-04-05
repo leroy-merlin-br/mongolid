@@ -1,7 +1,6 @@
 <?php
 namespace Mongolid\Connection;
 
-use MongoConnectionException;
 use Mongolid\Container\Ioc;
 use MongoDB\Client;
 
