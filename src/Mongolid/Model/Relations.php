@@ -37,7 +37,7 @@ trait Relations
             return $dataMapper->first(['_id' => $referenced_id]);
         }
 
-        return $entity::first(['_id' => $referenced_id]);
+        return Ioc::make($entity)->first(['_id' => $referenced_id]);
     }
     /**
      * Returns the cursor for the referenced documents as objects
@@ -50,19 +50,16 @@ trait Relations
      */
     protected function referencesMany($entity, $field, $cachable = true)
     {
-        $referenced_id = $this->$field;
-
-        if (is_array($referenced_id) && isset($referenced_id[0])) {
-            $referenced_id = $referenced_id[0];
-        }
+        $referencedIds = $this->$field;
+        $query = ['_id' => ['$in' => $referencedIds]];
 
         if (is_subclass_of($entity, Schema::class)) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->schema = new $entity;
-            return $dataMapper->where(['_id' => $referenced_id]);
+            return $dataMapper->where($query);
         }
 
-        return $entity::where(['_id' => $referenced_id]);
+        return $entity::where($query);
     }
 
     /**
@@ -79,7 +76,7 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return (new EmbeddedCursor($entity, [$this->$field]))->first();
+        return (new EmbeddedCursor($entity, (array)$this->$field))->first();
     }
 
     /**
@@ -97,5 +94,65 @@ trait Relations
         }
 
         return new EmbeddedCursor($entity, $this->$field);
+    }
+
+    /**
+     * Embed a new document to an attribute. It will also generate an
+     * _id for the document if it's not present.
+     *
+     * @param string $field
+     * @param mixed  $obj   document or model instance
+     *
+     * @return void
+     */
+    public function embed($field, &$obj)
+    {
+        $embeder = new DocumentEmbedder;
+        $embeder->embed($this, $field, $obj);
+    }
+
+    /**
+     * Removes an embedded document from the given field. It does that by using
+     * the _id of the given $obj.
+     *
+     * @param string $field
+     * @param mixed  $obj   document or model instance
+     *
+     * @return void
+     */
+    public function unembed($field, &$obj)
+    {
+        $embeder = new DocumentEmbedder;
+        $embeder->unembed($this, $field, $obj);
+    }
+
+    /**
+     * Attach document _id reference to an attribute. It will also generate an
+     * _id for the document if it's not present.
+     *
+     * @param string $field
+     * @param mixed  $obj   document or model instance to be referenced
+     *
+     * @return void
+     */
+    public function attach($field, &$obj)
+    {
+        $embeder = new DocumentEmbedder;
+        $embeder->attach($this, $field, $obj);
+    }
+
+    /**
+     * Removes a document _id reference from an attribute. It will remove the
+     * _id of the given $obj from inside the given $field.
+     *
+     * @param string $field
+     * @param mixed  $obj   document or model instance that have been referenced by $field
+     *
+     * @return void
+     */
+    public function detach($field, &$obj)
+    {
+        $embeder = new DocumentEmbedder;
+        $embeder->detach($this, $field, $obj);
     }
 }
