@@ -200,6 +200,23 @@ class DocumentEmbedderTest extends TestCase
             ],
 
             // ------------------------------
+            'attaching object with _id that is already attached' => [
+                'originalField' => [
+                    (new ObjectID('507f191e810c19729de860ea')),
+                    (new ObjectID('507f191e810c19729de86011'))
+                ],
+                'entity' => (object)[
+                    '_id' => (new ObjectID('507f191e810c19729de860ea')),
+                    'name' => 'John Doe'
+                ],
+                'method' => 'attach',
+                'expectation' => [
+                    (new ObjectID('507f191e810c19729de860ea')),
+                    (new ObjectID('507f191e810c19729de86011'))
+                ]
+            ],
+
+            // ------------------------------
             'attaching object without _id' => [
                 'originalField' => null,
                 'entity' => (object)[
@@ -208,6 +225,45 @@ class DocumentEmbedderTest extends TestCase
                 'method' => 'attach',
                 'expectation' => [
                     (new ObjectID)
+                ]
+            ],
+
+            // ------------------------------
+            'detaching an object by its _id' => [
+                'originalField' => [
+                    (new ObjectID('507f191e810c19729de860ea')),
+                    (new ObjectID('507f191e810c19729de86011'))
+                ],
+                'entity' => (object)[
+                    '_id' => (new ObjectID('507f191e810c19729de860ea')),
+                    'name' => 'John Doe'
+                ],
+                'method' => 'detach',
+                'expectation' => [
+                    (new ObjectID('507f191e810c19729de86011'))
+                ]
+            ],
+
+            // ------------------------------
+            'attaching an _id' => [
+                'originalField' => null,
+                'entity' => new ObjectID('507f191e810c19729de860ea'),
+                'method' => 'attach',
+                'expectation' => [
+                    (new ObjectID('507f191e810c19729de860ea'))
+                ]
+            ],
+
+            // ------------------------------
+            'detaching an object using only the _id when it is an integer' => [
+                'originalField' => [
+                    6,
+                    7
+                ],
+                'entity' => 6,
+                'method' => 'detach',
+                'expectation' => [
+                    7
                 ]
             ],
 
