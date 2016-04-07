@@ -3,11 +3,15 @@
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
+use MongoDB\Collection;
+use Mongolid\Connection\Connection;
+use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Schema;
-use stdClass;
+use MongoDB\BSON\ObjectID;
 use TestCase;
+use stdClass;
 
 class DataMapperTest extends TestCase
 {
@@ -315,13 +319,13 @@ class DataMapperTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldParseObjectToDocument()
+    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
     {
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
         $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,parseToArray]', [$connPool]);
         $object         = m::mock();
-        $parsedDocument = ['a_field' => 123];
+        $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
         $schemaMapper   = m::mock('Mongolid\Schema[]');
 
         // Act
@@ -334,17 +338,22 @@ class DataMapperTest extends TestCase
         $mapper->shouldReceive('parseToArray')
             ->once()
             ->with($object)
-            ->andReturn(['a_field' => '123']);
+            ->andReturn(['a_field' => '123', '_id' => 'bacon']);
 
         $schemaMapper->shouldReceive('map')
             ->once()
-            ->with(['a_field' => '123'])
+            ->with(['a_field' => '123', '_id' => 'bacon'])
             ->andReturn($parsedDocument);
 
         // Assert
         $this->assertEquals(
             $parsedDocument,
             $this->callProtected($mapper, 'parseToDocument', $object)
+        );
+
+        $this->assertEquals(
+            'bacon', // Since this was the parsedDocument _id
+            $object->_id
         );
     }
 
@@ -380,7 +389,7 @@ class DataMapperTest extends TestCase
         // Assert
         $this->assertEquals(
             ['foo' => 'bar'],
-            $this->callProtected($mapper, 'parseToArray', $object)
+            $this->callProtected($mapper, 'parseToArray', [$object])
         );
     }
 
@@ -389,15 +398,92 @@ class DataMapperTest extends TestCase
         // Arrange
         $connPool = m::mock('Mongolid\Connection\Pool');
         $mapper = new DataMapper($connPool);
-        $object = m::mock();
-        $object->foo  = 'bar';
-        $object->name = 'wilson';
+        $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
         // Assert
         $this->assertEquals(
             ['foo' => 'bar', 'name' => 'wilson'],
-            $this->callProtected($mapper, 'parseToArray', $object)
+            $this->callProtected($mapper, 'parseToArray', [$object])
         );
+    }
+
+    public function testShouldParseToArrayIfIsAnArray()
+    {
+        // Arrange
+        $connPool = m::mock('Mongolid\Connection\Pool');
+        $mapper = new DataMapper($connPool);
+        $object = ['age' => 25];
+
+        // Assert
+        $this->assertEquals(
+            $object,
+            $this->callProtected($mapper, 'parseToArray', [$object])
+        );
+    }
+
+    public function testShouldGetRawCollection()
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper = new DataMapper($connPool);
+        $connection = m::mock(Connection::class);
+        $collection = m::mock(Collection::class);
+
+        $mapper->schema = (object) ['collection' => 'foobar'];
+        $connection->defaultDatabase = 'grimory';
+        $connection->grimory = (object) ['foobar' => $collection];
+
+        // Act
+        $connPool->shouldReceive('getConnection')
+            ->once()
+            ->andReturn($connection);
+
+        $connection->shouldReceive('getRawConnection')
+            ->andReturn($connection);
+
+        // Assertion
+        $this->assertEquals(
+            $collection,
+            $this->callProtected($mapper, 'getCollection')
+        );
+    }
+
+    /**
+     * @dataProvider queryValueScenarios
+     */
+    public function testShouldPrepareQueryValue($value, $expectation)
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper = new DataMapper($connPool);
+
+        $result = $this->callProtected($mapper, 'prepareValueQuery', [$value]);
+
+        // Assertion
+        $this->assertEquals(
+            $expectation,
+            $this->callProtected($mapper, 'prepareValueQuery', [$value])
+        );
+    }
+
+    public function queryValueScenarios()
+    {
+        return [
+            'An array' => [
+                'value' => ['age' => ['$gt' => 25]],
+                'expectation' => ['age' => ['$gt' => 25]],
+            ],
+            // ------------------------
+            'An ObjectId string' => [
+                'value' => '507f1f77bcf86cd799439011',
+                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
+            ],
+            // ------------------------
+            'Other type of _id, sequence for example' => [
+                'value' => 7,
+                'expectation' => ['_id' => 7],
+            ],
+        ];
     }
 }
 
