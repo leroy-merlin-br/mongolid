@@ -4,7 +4,7 @@ php:
   - 7.0
 
 before_script:
-  - pecl install mongodb
+  - pecl -q install mongodb
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install
 
