@@ -46,7 +46,7 @@ class DocumentEmbedder
      */
     public function unembed($parent, string $field, &$entity): bool
     {
-        $fieldValue = $this->prepareField($parent, $field);
+        $fieldValue = (array) $parent->$field;
         $id = $this->getId($entity);
 
         foreach ($fieldValue as $key => $document) {
@@ -71,7 +71,7 @@ class DocumentEmbedder
      */
     public function attach($parent, string $field, &$entity): bool
     {
-        $fieldValue = $this->prepareField($parent, $field);
+        $fieldValue = (array) $parent->$field;
         $newId = $this->getId($entity);
 
         foreach ($fieldValue as $id) {
@@ -97,7 +97,7 @@ class DocumentEmbedder
      */
     public function detach($parent, string $field, &$entity): bool
     {
-        $fieldValue = $this->prepareField($parent, $field);
+        $fieldValue = (array) $parent->$field;
         $newId = $this->getId($entity);
 
         foreach ($fieldValue as $key => $id) {
@@ -136,19 +136,5 @@ class DocumentEmbedder
         }
 
         return $object;
-    }
-
-    /**
-     * Will transform the given $field of the $object into an array in order
-     * to be able to place new objects within it.
-     *
-     * @param  mixed  $object
-     * @param  string $field  Field name
-     *
-     * @return array
-     */
-    protected function prepareField($object, string $field): array
-    {
-        return (array)$object->$field;
     }
 }
