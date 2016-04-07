@@ -116,7 +116,7 @@ trait Attributes
      */
     public function toArray()
     {
-        return $this->attributes;
+        return $this->getAttributes();
     }
 
     /**
