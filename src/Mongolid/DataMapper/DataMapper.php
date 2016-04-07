@@ -53,10 +53,6 @@ class DataMapper
      */
     public function save($object)
     {
-        if (! $object->_id) {
-            $object->_id = new ObjectID;
-        }
-
         $data = $this->parseToDocument($object);
 
         $result = $this->getCollection()->updateOne(
@@ -200,10 +196,16 @@ class DataMapper
      */
     protected function parseToDocument($object)
     {
-        $schemaMapper = $this->getSchemaMapper();
-        $object       = $this->parseToArray($object);
+        $schemaMapper     = $this->getSchemaMapper();
+        $objectAttributes = $this->parseToArray($object);
 
-        return $schemaMapper->map($object);
+        $parsedDocument = $schemaMapper->map($objectAttributes);
+
+        if (isset($parsedDocument['_id']) && is_object($object)) {
+            $object->_id = $parsedDocument['_id'];
+        }
+
+        return $parsedDocument;
     }
 
     /**

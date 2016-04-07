@@ -47,9 +47,7 @@ class SchemaMapper
 
         // Parse each specified field
         foreach ($this->schema->fields as $key => $fieldType) {
-            if (isset($data[$key])) {
-                $data[$key] = $this->parseField($data[$key], $fieldType);
-            }
+            $data[$key] = $this->parseField($data[$key] ?? null, $fieldType);
         }
 
         return $data;
