@@ -89,7 +89,7 @@ abstract class ActiveRecord
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
-     * @param  array  $query
+     * @param  array $query MongoDB selection criteria.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -113,11 +113,11 @@ abstract class ActiveRecord
     /**
      * Gets the first entity of this kind that matches the query
      *
-     * @param  mixed  $query
+     * @param  array $query MongoDB selection criteria.
      *
      * @return ActiveRecord
      */
-    public static function first($query = [])
+    public static function first(array $query = [])
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->first($query);
@@ -127,8 +127,8 @@ abstract class ActiveRecord
      * Handle dynamic method calls into the model.
      * @codeCoverageIgnore
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param  mixed $method     Name of the method that is being called.
+     * @param  mixed $parameters Parameters of $method.
      *
      * @return mixed
      */

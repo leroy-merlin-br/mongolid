@@ -5,6 +5,8 @@ use Illuminate\Container\Container as IlluminateContainer;
 /**
  * This class is a simple Facade for a Illuminate\Container\Container
  * in order to use the Container as IOC at all classes.
+ *
+ * @package Mongolid
  */
 class Ioc
 {
@@ -16,7 +18,10 @@ class Ioc
 
     /**
      * Setter for static::$container.
-     * @param Container $container
+     *
+     * @param IlluminateContainer $container The IoC container that will be used by mongolid.
+     *
+     * @return void
      */
     public static function setContainer(IlluminateContainer $container)
     {
@@ -26,11 +31,11 @@ class Ioc
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param  string  $method
-     * @param  array   $args
+     * @param  string $method Method that is being called.
+     * @param  array  $args   Method arguments.
      * @return mixed
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string $method, array $args)
     {
         $instance = static::$container;
 

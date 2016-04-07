@@ -17,8 +17,8 @@ trait Relations
     /**
      * Returns the referenced documents as objects
      *
-     * @param  string $entity  Class of the entity or of the schema of the entity
-     * @param  string $field
+     * @param  string $entity Class of the entity or of the schema of the entity.
+     * @param  string $field  The field where the _id is stored.
      *
      * @return mixed
      */
@@ -41,8 +41,8 @@ trait Relations
     /**
      * Returns the cursor for the referenced documents as objects
      *
-     * @param string $entity Class of the entity or of the schema of the entity
-     * @param string $field
+     * @param string $entity Class of the entity or of the schema of the entity.
+     * @param string $field  The field where the _ids are stored.
      *
      * @return array
      */
@@ -63,8 +63,8 @@ trait Relations
     /**
      * Return a embedded documents as object
      *
-     * @param string $entity Class of the entity or of the schema of the entity
-     * @param string $field
+     * @param string $entity Class of the entity or of the schema of the entity.
+     * @param string $field  Field where the embeded document is stored.
      *
      * @return Model|null
      */
@@ -80,8 +80,8 @@ trait Relations
     /**
      * Return array of embedded documents as objects
      *
-     * @param string $entity Class of the entity or of the schema of the entity
-     * @param string $field
+     * @param string $entity Class of the entity or of the schema of the entity.
+     * @param string $field  Field where the embedded documents are stored.
      *
      * @return array Array with the embedded documents
      */
@@ -98,12 +98,12 @@ trait Relations
      * Embed a new document to an attribute. It will also generate an
      * _id for the document if it's not present.
      *
-     * @param string $field
-     * @param mixed  $obj   document or model instance
+     * @param string $field Field to where the $obj will be embedded.
+     * @param mixed  $obj   Document or model instance.
      *
      * @return void
      */
-    public function embed($field, &$obj)
+    public function embed(string $field, &$obj)
     {
         $embeder = new DocumentEmbedder;
         $embeder->embed($this, $field, $obj);
@@ -113,12 +113,12 @@ trait Relations
      * Removes an embedded document from the given field. It does that by using
      * the _id of the given $obj.
      *
-     * @param string $field
-     * @param mixed  $obj   document or model instance
+     * @param string $field Name of the field where the $obj is embeded.
+     * @param mixed  $obj   Document, model instance or _id.
      *
      * @return void
      */
-    public function unembed($field, &$obj)
+    public function unembed(string $field, &$obj)
     {
         $embeder = new DocumentEmbedder;
         $embeder->unembed($this, $field, $obj);
@@ -128,12 +128,12 @@ trait Relations
      * Attach document _id reference to an attribute. It will also generate an
      * _id for the document if it's not present.
      *
-     * @param string $field
-     * @param mixed  $obj   document or model instance to be referenced
+     * @param string $field Name of the field where the reference will be stored.
+     * @param mixed  $obj   Document, model instance or _id to be referenced.
      *
      * @return void
      */
-    public function attach($field, &$obj)
+    public function attach(string $field, &$obj)
     {
         $embeder = new DocumentEmbedder;
         $embeder->attach($this, $field, $obj);
@@ -143,12 +143,12 @@ trait Relations
      * Removes a document _id reference from an attribute. It will remove the
      * _id of the given $obj from inside the given $field.
      *
-     * @param string $field
-     * @param mixed  $obj   document or model instance that have been referenced by $field
+     * @param string $field Field where the reference is stored.
+     * @param mixed  $obj   Document, model instance or _id that have been referenced by $field.
      *
      * @return void
      */
-    public function detach($field, &$obj)
+    public function detach(string $field, &$obj)
     {
         $embeder = new DocumentEmbedder;
         $embeder->detach($this, $field, $obj);

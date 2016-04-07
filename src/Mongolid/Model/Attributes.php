@@ -45,11 +45,11 @@ trait Attributes
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key
+     * @param  string $key The attribute to be accessed.
      *
      * @return mixed
      */
-    public function getAttribute($key)
+    public function getAttribute(string $key)
     {
         $inAttributes = array_key_exists($key, $this->attributes);
         if ($inAttributes) {
@@ -73,11 +73,11 @@ trait Attributes
     /**
      * Set the model attributes using an array
      *
-     * @param  array $input
+     * @param  array $input The data that will be used to fill the attributes.
      *
      * @return void
      */
-    public function fill($input)
+    public function fill(array $input)
     {
         foreach ($input as $key => $value) {
             if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
@@ -89,9 +89,11 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key
+     * @param  string $key Name of the attribute to be unset.
+     *
+     * @return void
      */
-    public function cleanAttribute($key)
+    public function cleanAttribute(string $key)
     {
         unset($this->attributes[$key]);
     }
@@ -99,12 +101,12 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key
-     * @param  mixed  $value
+     * @param  string $key   Name of the atribute to be set.
+     * @param  mixed  $value Value to be set.
      *
      * @return void
      */
-    public function setAttribute($key, $value)
+    public function setAttribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
     }
@@ -122,7 +124,7 @@ trait Attributes
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param  string $key
+     * @param  mixed $key Name of the attribute.
      *
      * @return mixed
      */
@@ -133,8 +135,8 @@ trait Attributes
     /**
      * Dynamically set attributes on the model.
      *
-     * @param  string $key
-     * @param  mixed  $value
+     * @param  mixed $key   Attribute name.
+     * @param  mixed $value Value to be set.
      *
      * @return void
      */
@@ -147,9 +149,9 @@ trait Attributes
     /**
      * Determine if an attribute exists on the model.
      *
-     * @param  string $key
+     * @param  mixed $key Attribute name.
      *
-     * @return bool
+     * @return boolean
      */
     public function __isset($key)
     {
@@ -158,7 +160,7 @@ trait Attributes
     /**
      * Unset an attribute on the model.
      *
-     * @param  string $key
+     * @param  mixed $key Attribute name.
      *
      * @return void
      */

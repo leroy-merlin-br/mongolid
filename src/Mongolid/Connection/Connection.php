@@ -31,14 +31,14 @@ class Connection
      *
      * @see   http://php.net/manual/en/mongodb-driver-manager.construct.php
      *
-     * @param string $server Connection string
-     * @param array  $options
-     * @param array  $driver_options
+     * @param string $server         The specified connection string.
+     * @param array  $options        The mongodb client options.
+     * @param array  $driver_options The mongodb driver options when openning a connection.
      */
     public function __construct(
-        $server = "mongodb://localhost:27017",
-        $options = ["connect" => true],
-        $driver_options = []
+        string $server = "mongodb://localhost:27017",
+        array $options = ["connect" => true],
+        array $driver_options = []
     ) {
         // In order to work with PHP arrays instead of with objects
         $driver_options['typeMap'] = ['array' => 'array', 'document' => 'array'];

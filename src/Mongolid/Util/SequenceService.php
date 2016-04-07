@@ -5,6 +5,13 @@ namespace Mongolid\Util;
 use MongoDB\Collection;
 use Mongolid\Connection\Pool;
 
+/**
+ * Sequence service will manage and provide auto-increment sequences to be used
+ * by the models. It can be useful for objects which the _id must be an integer
+ * sequence.
+ *
+ * @package Mongolid
+ */
 class SequenceService
 {
     /**
@@ -22,10 +29,10 @@ class SequenceService
     protected $connPool;
 
     /**
-     * @param Pool        $connPool The connections that are going to be used to interact with the database
-     * @param string      $collection The colection where the sequences will be stored.
+     * @param Pool   $connPool   The connections that are going to be used to interact with the database.
+     * @param string $collection The colection where the sequences will be stored.
      */
-    public function __construct(Pool $connPool, $collection = 'mongolid_sequences')
+    public function __construct(Pool $connPool, string $collection = 'mongolid_sequences')
     {
         $this->connPool   = $connPool;
         $this->collection = $collection;
@@ -34,11 +41,11 @@ class SequenceService
     /**
      * Get next value for the sequence
      *
-     * @param string $sequenceName
+     * @param string $sequenceName Sequence identifier string.
      *
-     * @return int
+     * @return integer
      */
-    public function getNextValue($sequenceName): int
+    public function getNextValue(string $sequenceName): int
     {
         $sequenceValue = $this->rawCollection()->findOneAndUpdate(
             ['_id' => $sequenceName],

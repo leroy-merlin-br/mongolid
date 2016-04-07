@@ -6,6 +6,14 @@ use MongoDB\Collection;
 use IteratorIterator;
 use Iterator;
 
+/**
+ * This class wraps the query execution and the actuall creation of the driver
+ * cursor. By doing this we can, call 'sort', 'skip', 'limit' and others after
+ * calling 'where'. Because the mongodb library's MongoDB\Cursor is much more
+ * limited (in that regard) than the old driver MongoCursor.
+ *
+ * @package Mongolid
+ */
 class Cursor implements Iterator
 {
     /**
@@ -20,8 +28,16 @@ class Cursor implements Iterator
      */
     protected $collection;
 
+    /**
+     * The command that is being called in the $collection.
+     * @var string
+     */
     protected $command;
 
+    /**
+     * The parameters of the $command.
+     * @var array
+     */
     protected $params;
 
     /**
@@ -38,6 +54,12 @@ class Cursor implements Iterator
      */
     protected $position = 0;
 
+    /**
+     * @param string     $entityClass Class of the objects that will be retrieved by the cursor.
+     * @param Collection $collection  The raw collection object that will be used to retrieve the documents.
+     * @param string     $command     The command that is being called in the $collection.
+     * @param array      $params      The parameters of the $command.
+     */
     public function __construct(
         string $entityClass,
         Collection $collection,
@@ -51,28 +73,54 @@ class Cursor implements Iterator
         $this->params      = $params;
     }
 
-    public function limit($amount)
+    /**
+     * Limits the number of results returned
+     *
+     * @param  integer $amount The number of results to return.
+     *
+     * @return Cursor Returns this cursor.
+     */
+    public function limit(int $amount)
     {
         $this->params[1]['limit'] = $amount;
 
         return $this;
     }
 
-    public function sort($rules)
+    /**
+     * Sorts the results by given fields
+     *
+     * @param  array $fields An array of fields by which to sort. Each element in the array has as key the field name, and as value either 1 for ascending sort, or -1 for descending sort.
+     *
+     * @return Cursor Returns this cursor.
+     */
+    public function sort(array $fields)
     {
-        $this->params[1]['sort'] = $rules;
+        $this->params[1]['sort'] = $fields;
 
         return $this;
     }
 
-    public function skip($amount)
+    /**
+     * Skips a number of results
+     *
+     * @param  integer $amount The number of results to skip.
+     *
+     * @return Cursor Returns this cursor.
+     */
+    public function skip(int $amount)
     {
         $this->params[1]['skip'] = $amount;
 
         return $this;
     }
 
-    public function count()
+    /**
+     * Counts the number of results for this cursor
+     *
+     * @return integer The number of documents returned by this cursor's query.
+     */
+    public function count(): int
     {
         $this->command = 'count';
         return call_user_func_array([$this->collection, $this->command], $this->params);
@@ -81,6 +129,7 @@ class Cursor implements Iterator
     /**
      * Iterator interface rewind (used in foreach)
      *
+     * @return void
      */
     public function rewind()
     {
@@ -129,6 +178,8 @@ class Cursor implements Iterator
     }
     /**
      * Iterator key method (used in foreach)
+     *
+     * @return integer
      */
     public function key()
     {
@@ -136,6 +187,8 @@ class Cursor implements Iterator
     }
     /**
      * Iterator next method (used in foreach)
+     *
+     * @return void
      */
     public function next()
     {
@@ -144,6 +197,8 @@ class Cursor implements Iterator
     }
     /**
      * Iterator valid method (used in foreach)
+     *
+     * @return boolean
      */
     public function valid()
     {

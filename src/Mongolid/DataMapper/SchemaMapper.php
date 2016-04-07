@@ -27,7 +27,7 @@ class SchemaMapper
     protected $castableTypes = ['int','integer','bool','boolean','float','double','real','string'];
 
     /**
-     * @param Schema $schema
+     * @param Schema $schema Schema that will be used to map each field.
      */
     public function __construct(Schema $schema)
     {
@@ -37,7 +37,7 @@ class SchemaMapper
     /**
      * Maps the input $data to the schema specified in the $schema property
      *
-     * @param  array  $data
+     * @param  array $data Array of field that should be mapped to $this->schema specifications.
      *
      * @return array
      */
@@ -56,7 +56,9 @@ class SchemaMapper
     /**
      * If the schema is not dynamic, remove all non specified fields
      *
-     * @param  array  &$data
+     * @param array $data Reference of the fields. The passed array will be modified.
+     *
+     * @return  void
      */
     protected function clearDynamic(array &$data)
     {
@@ -68,12 +70,12 @@ class SchemaMapper
     /**
      * Parse a value based on a field yype of the schema
      *
-     * @param  mixed  $value Value to be parsed
-     * @param  string $fieldType  Description of how the field should be treated
+     * @param  mixed  $value     Value to be parsed.
+     * @param  string $fieldType Description of how the field should be treated.
      *
      * @return mixed  $value Value parsed to match $type
      */
-    public function parseField($value, $fieldType)
+    public function parseField($value, string $fieldType)
     {
         // If fieldType is castable (Ex: 'int')
         if (in_array($fieldType, $this->castableTypes)) {
@@ -94,12 +96,12 @@ class SchemaMapper
      *
      * @see http://php.net/manual/pt_BR/function.settype.php
      *
-     * @param  mixed  $value
-     * @param  string $type
+     * @param  mixed  $value Value to be casted.
+     * @param  string $type  Type to which the $value should be casted to.
      *
      * @return mixed
      */
-    protected function cast($value, $type)
+    protected function cast($value, string $type)
     {
         settype($value, $type);
         return $value;
@@ -109,12 +111,12 @@ class SchemaMapper
      * Instantiate another SchemaMapper with the given $schemaClass and maps
      * the given $value
      *
-     * @param  mixed $value
-     * @param  string $schemaClass Class that will be passed to the new SchemaMapper constructor
+     * @param mixed  $value       Value that will be mapped.
+     * @param string $schemaClass Class that will be passed to the new SchemaMapper constructor.
      *
      * @return mixed
      */
-    protected function mapToSchema($value, $schemaClass)
+    protected function mapToSchema($value, string $schemaClass)
     {
         if (is_array($value)) {
             $schema = Ioc::make($schemaClass);

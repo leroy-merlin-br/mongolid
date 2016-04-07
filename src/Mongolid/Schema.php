@@ -54,7 +54,7 @@ abstract class Schema
      * Filters any field in the $fields that has it's value specified as a
      * 'objectId'. It will wraps the $value, if any, into a ObjectID object
      *
-     * @param  mixed $value
+     * @param  mixed $value Value that may be converted to ObjectID.
      *
      * @return ObjectID|mixed
      */
@@ -76,9 +76,9 @@ abstract class Schema
      * a new auto-increment number will be "generated" for the collection of
      * the schema. The sequence generation is done by the SequenceService.
      *
-     * @param  int|null $value
+     * @param  integer|null $value Value that will be evaluated.
      *
-     * @return int
+     * @return integer
      */
     public function sequence(int $value = null)
     {

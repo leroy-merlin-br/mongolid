@@ -37,8 +37,7 @@ class DataMapper
     protected $connPool;
 
     /**
-     * @param Pool        $connPool The connections that are going to be used to interact with the database
-     * @param Schema|null $schema   The Schema class of the model that is going go be persisted
+     * @param Pool $connPool The connections that are going to be used to interact with the database.
      */
     public function __construct(Pool $connPool)
     {
@@ -48,6 +47,8 @@ class DataMapper
     /**
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
+     *
+     * @param  mixed $object The object used in the operation.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
@@ -68,6 +69,8 @@ class DataMapper
      * Inserts the given object into database. Returns success if write concern
      * is acknowledged. Since it's an insert, it will fail if the _id already
      * exists.
+     *
+     * @param  mixed $object The object used in the operation.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
@@ -91,6 +94,8 @@ class DataMapper
      * is acknowledged. Since it's an update, it will fail if the document with
      * the given _id didn't exists.
      *
+     * @param  mixed $object The object used in the operation.
+     *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
     public function update($object)
@@ -111,6 +116,8 @@ class DataMapper
 
     /**
      * Removes the given document from the collection.
+     *
+     * @param  mixed $object The object used in the operation.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
@@ -133,7 +140,7 @@ class DataMapper
      * Retrieve a database cursor that will return $this->schema->entityClass
      * objects that upon iteration
      *
-     * @param  array $query MongoDB query to retrieve documents
+     * @param  mixed $query MongoDB query to retrieve documents.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -164,7 +171,7 @@ class DataMapper
      * Retrieve one $this->schema->entityClass objects that matches the given
      * query
      *
-     * @param  array $query MongoDB query to retrieve the document
+     * @param  mixed $query MongoDB query to retrieve the document.
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -190,7 +197,7 @@ class DataMapper
     /**
      * Parses an object with SchemaMapper and the given Schema
      *
-     * @param  mixed  $object
+     * @param  mixed $object The object to be parsed.
      *
      * @return array  Document
      */
@@ -225,7 +232,7 @@ class DataMapper
     /**
      * Parses an object to an array before sending it to the SchemaMapper
      *
-     * @param  mixed $object
+     * @param  mixed $object The object that will be transformed into an array.
      *
      * @return array
      */
@@ -261,9 +268,9 @@ class DataMapper
      * This method will take care of converting a single value into a query for
      * an _id, including when a objectId is passed as a string.
      *
-     * @param  mixed  $value _id of the document
+     * @param  mixed $value The _id of the document.
      *
-     * @return array  Query for the given _id
+     * @return array Query for the given _id
      */
     protected function prepareValueQuery($value): array
     {
