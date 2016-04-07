@@ -1,5 +1,5 @@
 sniff:
-	vendor/bin/phpcs ./src --standard='./coding_standard.xml'
+	vendor/bin/phpcs ./src --standard='./coding_standard.xml' -n
 
 phpunit:
 	vendor/bin/phpunit
