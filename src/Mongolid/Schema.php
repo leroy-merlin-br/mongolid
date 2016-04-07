@@ -2,6 +2,8 @@
 namespace Mongolid;
 
 use MongoDB\BSON\ObjectID;
+use Mongolid\Container\Ioc;
+use Mongolid\Util\SequenceService;
 
 /**
  * A schema maps to a MongoDB collection and defines the shape of the documents
@@ -34,6 +36,7 @@ abstract class Schema
      * The last option is to define a field as another schema by using the
      * syntax 'schema.<Class>' This represents an embedded document (or
      * sub-document).
+     *
      * @var string[]
      */
     public $fields  = [
@@ -66,5 +69,24 @@ abstract class Schema
         }
 
         return $value;
+    }
+
+    /**
+     * Prepares the field to have a sequence. If $value is zero or not defined
+     * a new auto-increment number will be "generated" for the collection of
+     * the schema. The sequence generation is done by the SequenceService.
+     *
+     * @param  int|null $value
+     *
+     * @return int
+     */
+    public function sequence(int $value = null)
+    {
+        if ($value) {
+            return $value;
+        }
+
+        return Ioc::make(SequenceService::class)
+            ->getNextValue($this->collection);
     }
 }

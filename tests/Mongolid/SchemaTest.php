@@ -1,11 +1,12 @@
 <?php
 namespace Mongolid;
 
-use TestCase;
 use Mockery as m;
-use Mongolid\Container\Ioc;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\Exception\Exception as MongoException;
+use Mongolid\Container\Ioc;
+use Mongolid\Util\SequenceService;
+use TestCase;
 
 class SchemaTest extends TestCase
 {
@@ -75,5 +76,42 @@ class SchemaTest extends TestCase
             $value,
             (string)$schema->objectId($value)
         );
+    }
+
+    public function testShouldCastNullIntoAutoIncrementSequence()
+    {
+        // Arrange
+        $schema          = m::mock('Mongolid\Schema[]');
+        $sequenceService = m::mock(SequenceService::class);
+        $value           = null;
+
+        // Act
+        Ioc::instance(SequenceService::class, $sequenceService);
+
+        $sequenceService->shouldReceive('getNextValue')
+            ->with('mongolid')
+            ->once()
+            ->andReturn(7);
+
+        // Assertion
+        $this->assertEquals(7, $schema->sequence($value));
+    }
+
+    public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
+    {
+        $schema          = m::mock('Mongolid\Schema[]');
+        $sequenceService = m::mock(SequenceService::class);
+        $value           = 3;
+
+        // Act
+        Ioc::instance(SequenceService::class, $sequenceService);
+
+        $sequenceService->shouldReceive('getNextValue')
+            ->with('mongolid')
+            ->never()
+            ->andReturn(7); // Should never be returned
+
+        // Assertion
+        $this->assertEquals(3, $schema->sequence($value));
     }
 }
