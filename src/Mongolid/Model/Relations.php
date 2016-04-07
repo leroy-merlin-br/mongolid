@@ -19,11 +19,10 @@ trait Relations
      *
      * @param  string $entity  Class of the entity or of the schema of the entity
      * @param  string $field
-     * @param  bool   $cachable
      *
      * @return mixed
      */
-    protected function referencesOne($entity, $field, $cachable = true)
+    protected function referencesOne(string $entity, string $field)
     {
         $referenced_id = $this->$field;
 
@@ -42,13 +41,12 @@ trait Relations
     /**
      * Returns the cursor for the referenced documents as objects
      *
-     * @param Model  $entity
+     * @param string $entity Class of the entity or of the schema of the entity
      * @param string $field
-     * @param bool   $cachable
      *
      * @return array
      */
-    protected function referencesMany($entity, $field, $cachable = true)
+    protected function referencesMany(string $entity, string $field)
     {
         $referencedIds = $this->$field;
         $query = ['_id' => ['$in' => $referencedIds]];
@@ -65,12 +63,12 @@ trait Relations
     /**
      * Return a embedded documents as object
      *
-     * @param string $entityName
+     * @param string $entity Class of the entity or of the schema of the entity
      * @param string $field
      *
      * @return Model|null
      */
-    protected function embedsOne($entity, $field)
+    protected function embedsOne(string $entity, string $field)
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity)->entityClass;
@@ -82,12 +80,12 @@ trait Relations
     /**
      * Return array of embedded documents as objects
      *
-     * @param string $entity
+     * @param string $entity Class of the entity or of the schema of the entity
      * @param string $field
      *
      * @return array Array with the embedded documents
      */
-    protected function embedsMany($entity, $field)
+    protected function embedsMany(string $entity, string $field)
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity)->entityClass;
