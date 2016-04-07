@@ -1,6 +1,5 @@
 sniff:
-	vendor/bin/phpcs ./src --standard=PSR2 && \
-	vendor/bin/phpcs ./src --standard=Squiz --sniffs=Squiz.Commenting.FunctionComment,Squiz.Commenting.FunctionCommentThrowTag,Squiz.Commenting.ClassComment,Squiz.Commenting.VariableComment
+	vendor/bin/phpcs ./src --standard='./coding_standard.xml'
 
 phpunit:
 	vendor/bin/phpunit
