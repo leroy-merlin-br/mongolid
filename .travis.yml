@@ -13,6 +13,4 @@ script:
   - phpunit -c phpunit.xml.dist
 
 after_script:
-  - echo $TRAVIS
-  - echo $TRAVIS_JOB_ID
   - php vendor/bin/coveralls -v
