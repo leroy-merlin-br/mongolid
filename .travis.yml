@@ -5,13 +5,14 @@ php:
 
 before_script:
   - pecl install mongodb
-  - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev
+  - php composer.phar install
 
 script:
   - mkdir -p build/logs
   - phpunit -c phpunit.xml.dist
 
 after_script:
+  - echo $TRAVIS
+  - echo $TRAVIS_JOB_ID
   - php vendor/bin/coveralls -v
