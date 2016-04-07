@@ -110,7 +110,7 @@ class SchemaMapper
      * the given $value
      *
      * @param  mixed $value
-     * @param  string $schemaClass Name of the class that will be instantiated and passed to the new SchemaMapper constructor
+     * @param  string $schemaClass Class that will be passed to the new SchemaMapper constructor
      *
      * @return mixed
      */

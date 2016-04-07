@@ -34,8 +34,7 @@ class Ioc
     {
         $instance = static::$container;
 
-        switch (count($args))
-        {
+        switch (count($args)) {
             case 0:
                 return $instance->$method();
 

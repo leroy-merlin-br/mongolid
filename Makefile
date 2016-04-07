@@ -5,4 +5,4 @@ phpunit:
 	vendor/bin/phpunit
 
 coverage:
-	phpunit --coverage-html ./cover ./src
+	vendor/bin/phpunit --coverage-html ./.coverage
