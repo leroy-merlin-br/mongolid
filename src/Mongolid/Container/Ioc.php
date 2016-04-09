@@ -1,6 +1,6 @@
 <?php namespace Mongolid\Container;
 
-use Illuminate\Container\Container as IlluminateContainer;
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 
 /**
  * This class is a simple Facade for a Illuminate\Container\Container
