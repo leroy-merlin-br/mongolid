@@ -132,8 +132,8 @@ class AttributesTest extends TestCase
     public function getFillableOptions()
     {
         return [
-            // $fillable = []; $guarded = []
-            'all empty' => [
+            // -----------------------------
+            '$fillable = []; $guarded = []' => [
                 'fillable' => [],
                 'guarded' => [],
                 'input' => [
@@ -148,8 +148,8 @@ class AttributesTest extends TestCase
                 ],
             ],
 
-            // $fillable = ['name']; $guarded = []
-            'with fillable' => [
+            // -----------------------------
+            '$fillable = ["name"]; $guarded = []' => [
                 'fillable' => ['name'],
                 'guarded' => [],
                 'input' => [
@@ -162,8 +162,8 @@ class AttributesTest extends TestCase
                 ],
             ],
 
-            // $fillable = []; $guarded = []
-            'with guarded' => [
+            // -----------------------------
+            '$fillable = []; $guarded = []' => [
                 'fillable' => [],
                 'guarded' => ['sex'],
                 'input' => [
@@ -177,8 +177,8 @@ class AttributesTest extends TestCase
                 ],
             ],
 
-            // $fillable = ['name', 'sex']; $guarded = ['sex']
-            'with both' => [
+            // -----------------------------
+            '$fillable = ["name", "sex"]; $guarded = ["sex"]' => [
                 'fillable' => ['name', 'sex'],
                 'guarded' => ['sex'],
                 'input' => [
