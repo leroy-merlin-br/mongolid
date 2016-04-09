@@ -33,14 +33,14 @@ trait Attributes
      *
      * @var array
      */
-    public $fillable = [];
+    protected $fillable = [];
     /**
      * The attributes that aren't mass assignable. The oposite
      * to the fillable array;
      *
      * @var array
      */
-    public $guarded = [];
+    protected $guarded = [];
 
     /**
      * Get an attribute from the model.
