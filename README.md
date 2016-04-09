@@ -216,7 +216,7 @@ To delete a model, simply call the `delete` method on the instance:
 <a name="mass-assignment"></a>
 ## Mass Assignment
 
-If you are extending `Mongolid\ActiveRecord` you can set an array of attributes to the model constructor. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
+If you are extending `Mongolid\ActiveRecord` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
 
 `Mongolid\ActiveRecord` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
 
@@ -251,10 +251,6 @@ In the example above, the `id` and `votes` attributes may **not** be mass assign
 You can mass assign attributes using the `fill` method:
 
 ```php
-    $post = new Post(['title' => 'Bacon']);
-
-    // or
-
     $post = new Post;
     $post->fill(['title' => 'Bacon']);
 ```
