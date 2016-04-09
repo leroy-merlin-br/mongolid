@@ -32,10 +32,11 @@ You can install library through Composer:
 $ composer require leroy-merlin-br/mongolid
 ```
 
-<a name="basic-usage"></a>
-## Basic Usage
+<a name="setup"></a>
+## Setup
 
-First of all you should initialize the Mongolid connection pool. The minimalistic way of doing it is to use `Mongolid\Manager`:
+If you are not using Laravel, you should initialize the Mongolid connection pool and container manually.
+The minimalistic way of doing it is to use `Mongolid\Manager`:
 
 ```php
 <?php
@@ -47,7 +48,12 @@ use Mongolid\Connection;
 $manager = new Manager(new Connection('mongodb://localhost:27017'));
 ```
 
-Now you are ready to create your own models. Let's begin with the **ActiveRecord** pattern:
+Now you are ready to create your own models :smile:
+
+<a name="basic-usage"></a>
+## Basic Usage
+
+Let's begin with the **ActiveRecord** pattern:
 
 ```php
 class Post extends Mongolid\ActiveRecord {}
