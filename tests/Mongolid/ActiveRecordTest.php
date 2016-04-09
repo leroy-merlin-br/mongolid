@@ -191,7 +191,7 @@ class ActiveRecordTest extends TestCase
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[]');
         $this->setProtected($entity, 'fields', 'MySchemaClass');
-        $schema = m::mock();
+        $schema = m::mock(Schema::class);
 
         // Act
         Ioc::instance('MySchemaClass', $schema);

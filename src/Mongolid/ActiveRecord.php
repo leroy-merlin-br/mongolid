@@ -1,10 +1,11 @@
 <?php
 namespace Mongolid;
 
-use Mongolid\DataMapper\DataMapper;
 use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
+use Mongolid\Schema;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -176,10 +177,10 @@ abstract class ActiveRecord
      *
      * @return Schema
      */
-    protected function getSchema()
+    protected function getSchema(): Schema
     {
-        if (is_string($this->fields)) {
-            return Ioc::make($this->fields);
+        if ($schema = $this->instantiateSchemaInFields()) {
+            return $schema;
         }
 
         $schema = new DynamicSchema;
@@ -189,5 +190,20 @@ abstract class ActiveRecord
         $schema->collection  = $this->collection;
 
         return $schema;
+    }
+
+    /**
+     * Will check if the current value of $fields property is the name of a
+     * Schema class and instantiate it if possible.
+     *
+     * @return Schema|null
+     */
+    protected function instantiateSchemaInFields()
+    {
+        if (is_string($this->fields)) {
+            if (is_subclass_of($instance = Ioc::make($this->fields), Schema::class)) {
+                return $instance;
+            }
+        }
     }
 }
