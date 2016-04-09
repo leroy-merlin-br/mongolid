@@ -5,6 +5,7 @@ use Mongolid\Schema;
 use Mongolid\Container\Ioc;
 use Mongolid\Connection\Pool;
 use Mongolid\Cursor\Cursor;
+use Mongolid\Event\EventTriggerService;
 use MongoDB\Collection;
 use MongoDB\BSON\ObjectID;
 
@@ -37,6 +38,12 @@ class DataMapper
     protected $connPool;
 
     /**
+     * In order to dispatch events when necessary
+     * @var EventTriggerService
+     */
+    protected $eventService;
+
+    /**
      * @param Pool $connPool The connections that are going to be used to interact with the database.
      */
     public function __construct(Pool $connPool)
@@ -54,6 +61,13 @@ class DataMapper
      */
     public function save($object)
     {
+        // If the "saving" event returns false we'll bail out of the save and return
+        // false, indicating that the save failed. This gives an opportunities to
+        // listeners to cancel save operations if validations fail or whatever.
+        if ($this->fireEvent('saving', $object, true) === false) {
+            return false;
+        }
+
         $data = $this->parseToDocument($object);
 
         $result = $this->getCollection()->updateOne(
@@ -62,7 +76,13 @@ class DataMapper
             ['upsert' => true]
         );
 
-        return (bool) ($result->getModifiedCount() + $result->getUpsertedCount());
+        $result = (bool) ($result->getModifiedCount() + $result->getUpsertedCount());
+
+        if ($result) {
+            $this->fireEvent('saved', $object);
+        }
+
+        return $result;
     }
 
     /**
@@ -76,8 +96,8 @@ class DataMapper
      */
     public function insert($object): bool
     {
-        if (! $object->_id) {
-            $object->_id = new ObjectID;
+        if ($this->fireEvent('inserting', $object, true) === false) {
+            return false;
         }
 
         $data = $this->parseToDocument($object);
@@ -86,7 +106,13 @@ class DataMapper
             $data
         );
 
-        return (bool) $result->getInsertedCount();
+        $result = (bool) $result->getInsertedCount();
+
+        if ($result) {
+            $this->fireEvent('inserted', $object);
+        }
+
+        return $result;
     }
 
     /**
@@ -100,8 +126,8 @@ class DataMapper
      */
     public function update($object)
     {
-        if (! $object->_id) {
-            $object->_id = new ObjectID;
+        if ($this->fireEvent('updating', $object, true) === false) {
+            return false;
         }
 
         $data = $this->parseToDocument($object);
@@ -111,7 +137,13 @@ class DataMapper
             ['$set' => $data]
         );
 
-        return (bool) $result->getModifiedCount();
+        $result = (bool) $result->getModifiedCount();
+
+        if ($result) {
+            $this->fireEvent('updated', $object);
+        }
+
+        return $result;
     }
 
     /**
@@ -123,8 +155,8 @@ class DataMapper
      */
     public function delete($object)
     {
-        if (! $object->_id) {
-            $object->_id = new ObjectID;
+        if ($this->fireEvent('deleting', $object, true) === false) {
+            return false;
         }
 
         $data = $this->parseToDocument($object);
@@ -133,7 +165,13 @@ class DataMapper
             ['_id' => $data['_id']]
         );
 
-        return (bool) $result->getDeletedCount();
+        $result = (bool) $result->getDeletedCount();
+
+        if ($result) {
+            $this->fireEvent('deleted', $object);
+        }
+
+        return $result;
     }
 
     /**
@@ -283,5 +321,22 @@ class DataMapper
         }
 
         return ['_id' => $value];
+    }
+
+    /**
+     * Triggers an event. May return if that event had success.
+     *
+     * @param  string  $event  Identification of the event.
+     * @param  mixed   $entity Event payload.
+     * @param  boolean $halt   True if the return of the event handler will be used in a coditional.
+     *
+     * @return mixed            Event handler return.
+     */
+    protected function fireEvent(string $event, $entity, bool $halt = false)
+    {
+        $event = "mongolid.{$event}." . get_class($entity);
+
+        return ($this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class))
+            ->fire($event, $entity, $halt);
     }
 }

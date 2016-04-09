@@ -9,6 +9,7 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Schema;
+use Mongolid\Event\EventTriggerService;
 use MongoDB\BSON\ObjectID;
 use TestCase;
 use stdClass;
@@ -17,6 +18,7 @@ class DataMapperTest extends TestCase
 {
     public function tearDown()
     {
+        $this->eventService = null;
         parent::tearDown();
         m::close();
     }
@@ -68,6 +70,9 @@ class DataMapperTest extends TestCase
             ->once()
             ->andReturn(1);
 
+        $this->expectEvent('saving', $object, true);
+        $this->expectEvent('saved', $object, false);
+
         // Assert
         $this->assertTrue($mapper->save($object));
     }
@@ -105,6 +110,9 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->once()
             ->andReturn(1);
+
+        $this->expectEvent('inserting', $object, true);
+        $this->expectEvent('inserted', $object, false);
 
         // Assert
         $this->assertTrue($mapper->insert($object));
@@ -146,6 +154,9 @@ class DataMapperTest extends TestCase
             ->once()
             ->andReturn(1);
 
+        $this->expectEvent('updating', $object, true);
+        $this->expectEvent('updated', $object, false);
+
         // Assert
         $this->assertTrue($mapper->update($object));
     }
@@ -183,6 +194,9 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getDeletedCount')
             ->once()
             ->andReturn(1);
+
+        $this->expectEvent('deleting', $object, true);
+        $this->expectEvent('deleted', $object, false);
 
         // Assert
         $this->assertTrue($mapper->delete($object));
@@ -464,6 +478,21 @@ class DataMapperTest extends TestCase
             $expectation,
             $this->callProtected($mapper, 'prepareValueQuery', [$value])
         );
+    }
+
+    protected function expectEvent($event, $entity, bool $halt, $return = true)
+    {
+        if (! ($this->eventService ?? false)) {
+            $this->eventService = m::mock(EventTriggerService::class);
+            Ioc::instance(EventTriggerService::class, $this->eventService);
+        }
+
+        $event = 'mongolid.'.$event.'.'.get_class($entity);
+
+        $this->eventService->shouldReceive('fire')
+            ->with($event, $entity, $halt)
+            ->atLeast()->once()
+            ->andReturn($return);
     }
 
     public function queryValueScenarios()
