@@ -387,7 +387,7 @@ An example of a Embeds Many relation is a blog post that "has many" comments. We
     }
 
     // models/Comment.php
-    class Comment extends Mongolid{
+    class Comment extends ActiveRecord {
 
         // This model will be embedded only
         protected $collection = null;
@@ -466,7 +466,7 @@ In general, use references when embedding would result in duplication of data an
     }
 
     // models/User.php
-    class User extends Mongolid{
+    class User extends ActiveRecord {
 
         protected $collection = 'users';
 
@@ -525,7 +525,7 @@ In general, use references when embedding would result in duplication of data an
 
 ```php
     // models/User.php
-    class User extends Mongolid{
+    class User extends ActiveRecord {
 
         protected $collection = 'users';
 
