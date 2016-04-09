@@ -140,6 +140,20 @@ abstract class ActiveRecord
             return call_user_func_array([static::class, $method], $parameters);
         }
 
+        $value = $parameters[0] ?? null;
+
+        // Alias to attach
+        if ('attachTo' == substr($method, 0, 8)) {
+            $field = strtolower(substr($method, 8));
+            return $this->attach($field, $value);
+        }
+
+        // Alias to embed
+        if ('embedTo' == substr($method, 0, 7)) {
+            $field = strtolower(substr($method, 7));
+            return $this->embed($field, $value);
+        }
+
         return call_user_func_array([$this, $method], $parameters);
     }
 
