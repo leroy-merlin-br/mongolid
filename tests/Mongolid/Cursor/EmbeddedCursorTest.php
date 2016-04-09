@@ -37,7 +37,27 @@ class EmbeddedCursorTest extends TestCase
 
     public function testShouldSortDocuments()
     {
-        $this->markTestSkipped();
+        // Arrange
+        $items = [
+            ['age' => 26, 'name' => 'Abe'],
+            ['age' => 25],
+            (object)['age' => 24],
+            ['age' => 26, 'name' => 'Zizaco'],
+        ];
+        $cursor = $this->getCursor('stdClass', $items);
+
+        // Assert
+        $cursor->sort(['age' => 1, 'name' -1]);
+        $this->assertAttributeEquals(
+            [
+                (object)['age' => 24],
+                ['age' => 25],
+                ['age' => 26, 'name' => 'Zizaco'],
+                ['age' => 26, 'name' => 'Abe'],
+            ],
+            'items',
+            $cursor
+        );
     }
 
     public function testShouldSkipDocuments()
