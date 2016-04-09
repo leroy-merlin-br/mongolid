@@ -21,7 +21,15 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[]');
 
         // Assert
-        $this->assertAttributeEquals(['_id' => 'objectId'], 'fields', $entity);
+        $this->assertAttributeEquals(
+            [
+                '_id' => 'objectId',
+                'created_at' => 'createdAtTimestamp',
+                'updated_at' => 'updatedAtTimestamp'
+            ],
+            'fields',
+            $entity
+        );
         $this->assertTrue($entity->dynamic);
     }
 

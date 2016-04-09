@@ -246,8 +246,10 @@ class DataMapper
 
         $parsedDocument = $schemaMapper->map($objectAttributes);
 
-        if (isset($parsedDocument['_id']) && is_object($object)) {
-            $object->_id = $parsedDocument['_id'];
+        if (is_object($object)) {
+            foreach ($parsedDocument as $field => $value) {
+                $object->$field = $value;
+            }
         }
 
         return $parsedDocument;

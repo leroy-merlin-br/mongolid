@@ -3,6 +3,7 @@ namespace Mongolid;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\Exception\Exception as MongoException;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\SequenceService;
@@ -113,5 +114,39 @@ class SchemaTest extends TestCase
 
         // Assertion
         $this->assertEquals(3, $schema->sequence($value));
+    }
+
+    public function testShouldCastDocumentTimestamps()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\Schema[]');
+        $value  = null;
+
+        // Assertion
+        $this->assertInstanceOf(UTCDateTime::class, $schema->createdAtTimestamp($value));
+    }
+
+    public function testShouldRefreshUpdatedAtTimestamps()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\Schema[]');
+        $value  = (new UTCDateTime(25));
+
+        // Assertion
+        $result = $schema->updatedAtTimestamp($value);
+        $this->assertInstanceOf(UTCDateTime::class, $result);
+        $this->assertNotEquals(25, (string) $result);
+    }
+
+    public function testShouldNotRefreshCreatedAtTimestamps()
+    {
+        // Arrange
+        $schema = m::mock('Mongolid\Schema[]');
+        $value  = (new UTCDateTime(25));
+
+        // Assertion
+        $result = $schema->createdAtTimestamp($value);
+        $this->assertInstanceOf(UTCDateTime::class, $result);
+        $this->assertEquals(25, (string) $result);
     }
 }

@@ -2,6 +2,7 @@
 namespace Mongolid;
 
 use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\SequenceService;
 
@@ -40,7 +41,9 @@ abstract class Schema
      * @var string[]
      */
     public $fields  = [
-        '_id' => 'objectId' // Means that the _id will passtrought the `objectId` method
+        '_id' => 'objectId', // Means that the _id will passtrought the `objectId` method
+        'created_at' => 'createdAtTimestamp', // Generates an automatic timestamp
+        'updated_at' => 'updatedAtTimestamp'
     ];
 
     /**
@@ -88,5 +91,33 @@ abstract class Schema
 
         return Ioc::make(SequenceService::class)
             ->getNextValue($this->collection);
+    }
+
+    /**
+     * Prepares the field to be the datetime that the document has been created
+     *
+     * @param  mixed|null $value Value that will be evaluated.
+     *
+     * @return UTCDateTime
+     */
+    public function createdAtTimestamp($value)
+    {
+        if ($value instanceof UTCDateTime) {
+            return $value;
+        }
+
+        return $this->updatedAtTimestamp(null);
+    }
+
+    /**
+     * Prepares the field to be now
+     *
+     * @param  mixed|null $value Value that will be evaluated.
+     *
+     * @return UTCDateTime
+     */
+    public function updatedAtTimestamp($value)
+    {
+        return new UTCDateTime(floor(microtime(true) * 1000));
     }
 }

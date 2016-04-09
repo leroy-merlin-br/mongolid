@@ -33,7 +33,9 @@ abstract class ActiveRecord
      * @var  string|string[]
      */
     protected $fields  = [
-        '_id' => 'objectId'
+        '_id' => 'objectId',
+        'created_at' => 'createdAtTimestamp',
+        'updated_at' => 'updatedAtTimestamp'
     ];
 
     /**
