@@ -18,7 +18,7 @@ class ConnectionTest extends TestCase
     public function testShouldConstructANewConnection()
     {
         // Arrange
-        $params      =  ['conn', ['options'], ['driver_opts']];
+        $params      =  ['conn/my_db', ['options'], ['driver_opts']];
         $mongoClient = m::mock(Client::class);
         $container   = m::mock('Illuminate\Container\Container');
         Ioc::setContainer($container);
@@ -38,6 +38,7 @@ class ConnectionTest extends TestCase
         // Assert
         $connection = new Connection($params[0], $params[1], $params[2]);
         $this->assertAttributeEquals($mongoClient, 'rawConnection', $connection);
+        $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
     }
 
     public function testShouldGetRawConnection()

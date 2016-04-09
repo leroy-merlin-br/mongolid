@@ -43,10 +43,28 @@ class Connection
         // In order to work with PHP arrays instead of with objects
         $driver_options['typeMap'] = ['array' => 'array', 'document' => 'array'];
 
+        $this->findDefaultDatabase($server);
+
         $this->rawConnection = Ioc::make(
             Client::class,
             [$server, $options, $driver_options]
         );
+    }
+
+    /**
+     * Find and stores the default database in the connection string
+     *
+     * @param  string $connectionString MongoDB connection string.
+     *
+     * @return void
+     */
+    protected function findDefaultDatabase(string $connectionString)
+    {
+        preg_match("/\\S+\\/(\\w*)/", $connectionString, $matches);
+
+        if ($matches[1] ?? null) {
+            $this->defaultDatabase = $matches[1];
+        }
     }
 
     /**
