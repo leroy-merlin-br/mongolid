@@ -1,10 +1,11 @@
 <?php
 namespace Mongolid\Connection;
 
-use TestCase;
+use Illuminate\Container\Container;
 use Mockery as m;
-use Mongolid\Container\Ioc;
 use MongoDB\Client;
+use Mongolid\Container\Ioc;
+use TestCase;
 
 class ConnectionTest extends TestCase
 {
@@ -20,7 +21,7 @@ class ConnectionTest extends TestCase
         // Arrange
         $params      =  ['conn/my_db', ['options'], ['driver_opts']];
         $mongoClient = m::mock(Client::class);
-        $container   = m::mock('Illuminate\Container\Container');
+        $container   = m::mock(Container::class);
         Ioc::setContainer($container);
 
         // Act
@@ -45,7 +46,7 @@ class ConnectionTest extends TestCase
     {
         // Arrange
         $mongoClient = m::mock(Client::class);
-        $container   = m::mock('Illuminate\Container\Container');
+        $container   = m::mock(Container::class);
         Ioc::setContainer($container);
 
         // Act

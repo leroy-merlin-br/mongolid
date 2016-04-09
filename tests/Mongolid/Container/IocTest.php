@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Container;
 
+use Illuminate\Container\Container;
 use Mockery as m;
 use TestCase;
 
@@ -15,7 +16,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithNoArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()
@@ -29,7 +30,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithOneArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()
@@ -43,7 +44,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithTwoArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()
@@ -57,7 +58,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithThreeArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()
@@ -71,7 +72,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithFourArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()
@@ -85,7 +86,7 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsPropertlywithFiveOrMoreArgument()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
 
         $container->shouldReceive('method')
             ->once()

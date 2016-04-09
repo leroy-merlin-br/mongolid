@@ -3,14 +3,15 @@
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
+use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
-use Mongolid\Schema;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerService;
-use MongoDB\BSON\ObjectID;
+use Mongolid\Schema;
 use TestCase;
 use stdClass;
 
@@ -26,7 +27,7 @@ class DataMapperTest extends TestCase
     public function testShouldBeAbleToConstructWithSchema()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
+        $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
 
         // Assertion
@@ -36,10 +37,10 @@ class DataMapperTest extends TestCase
     public function testShouldSave()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
@@ -80,10 +81,10 @@ class DataMapperTest extends TestCase
     public function testShouldInsert()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
@@ -121,10 +122,10 @@ class DataMapperTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
@@ -164,10 +165,10 @@ class DataMapperTest extends TestCase
     public function testShouldDelete()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
@@ -208,9 +209,9 @@ class DataMapperTest extends TestCase
     public function testDatabaseOperationsShouldBailOutIfTheEventHandlerReturnsFalse($operation, $dbOperation, $eventName)
     {
         // Arrange
-        $connPool   = m::mock('Mongolid\Connection\Pool');
-        $mapper     = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
-        $collection = m::mock('MongoDB\Collection');
+        $connPool   = m::mock(Pool::class);
+        $mapper     = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $collection = m::mock(Collection::class);
         $object     = m::mock();
 
         // Act
@@ -236,11 +237,11 @@ class DataMapperTest extends TestCase
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
         $schema   = m::mock(Schema::class);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $query           = 123;
         $preparedQuery   = ['_id' => 123];
 
@@ -272,8 +273,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetAll()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper         = m::mock('Mongolid\DataMapper\DataMapper[where]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper         = m::mock(DataMapper::class.'[where]', [$connPool]);
         $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
 
         // Act
@@ -292,11 +293,11 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstWithQuery()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
         $schema   = m::mock(Schema::class);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $query           = 123;
         $preparedQuery   = ['_id' => 123];
 
@@ -330,11 +331,11 @@ class DataMapperTest extends TestCase
     public function testShouldGetNullIfFirstCantFindAnything()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper   = m::mock('Mongolid\DataMapper\DataMapper[prepareValueQuery,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
         $schema   = m::mock(Schema::class);
 
-        $collection      = m::mock('MongoDB\Collection');
+        $collection      = m::mock(Collection::class);
         $query           = 123;
         $preparedQuery   = ['_id' => 123];
 
@@ -367,8 +368,8 @@ class DataMapperTest extends TestCase
     public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
-        $mapper = m::mock('Mongolid\DataMapper\DataMapper[getSchemaMapper,parseToArray]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[getSchemaMapper,parseToArray]', [$connPool]);
         $object         = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
         $schemaMapper   = m::mock('Mongolid\Schema[]');
@@ -405,7 +406,7 @@ class DataMapperTest extends TestCase
     public function testShouldGetSchemaMapper()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
+        $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $mapper->schemaClass = 'MySchema';
         $schema = m::mock('Mongolid\Schema');
@@ -422,7 +423,7 @@ class DataMapperTest extends TestCase
     public function testShouldGetAttributesWhenGetattributesMethodIsAvailable()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
+        $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $object = m::mock(new __entity_stub);
 
@@ -441,7 +442,7 @@ class DataMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
+        $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
@@ -455,7 +456,7 @@ class DataMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $connPool = m::mock('Mongolid\Connection\Pool');
+        $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $object = ['age' => 25];
 

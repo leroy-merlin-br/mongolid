@@ -1,9 +1,10 @@
 <?php
 namespace Mongolid\Connection;
 
-use TestCase;
 use Mockery as m;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
+use TestCase;
 
 class PoolTest extends TestCase
 {
@@ -18,7 +19,7 @@ class PoolTest extends TestCase
         // Arrange
         $pool       = new Pool;
         $connQueue  = m::mock();
-        $connection = m::mock('Mongolid\Connection\Connection');
+        $connection = m::mock(Connection::class);
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act
@@ -58,7 +59,7 @@ class PoolTest extends TestCase
         // Arrange
         $pool       = new Pool;
         $connQueue  = m::mock();
-        $connection = m::mock('Mongolid\Connection\Connection');
+        $connection = m::mock(Connection::class);
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act

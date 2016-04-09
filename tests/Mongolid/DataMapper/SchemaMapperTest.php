@@ -1,9 +1,11 @@
 <?php
 namespace Mongolid\DataMapper;
 
-use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\SchemaMapper;
+use Mongolid\Schema;
+use TestCase;
 
 class SchemaMapperTest extends TestCase
 {
@@ -16,7 +18,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class);
         $schema->fields = [
             'name'  => 'string',
             'age'   => 'int',
@@ -60,7 +62,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldClearDynamicFieldsIfSchemaIsNotDynamic()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class);
         $schema->dynamic = false;
         $schema->fields = [
             'name'  => 'string',
@@ -87,7 +89,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldNotClearDynamicFieldsIfSchemaIsDynamic()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class);
         $schema->dynamic = true;
         $schema->fields = [
             'name'  => 'string',
@@ -115,7 +117,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoCastableType()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
 
         // Assert
@@ -133,7 +135,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoAnotherMappedSchemaIfTypeBeginsWithSchema()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class);
         $schemaMapper = m::mock(
             'Mongolid\DataMapper\SchemaMapper'.
             '[mapToSchema]',
@@ -176,8 +178,8 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapAnArrayValueToAnotherSchemaSchema()
     {
         // Arrange
-        $schema        = m::mock('Mongolid\Schema[]');
-        $mySchema      = m::mock('Mongolid\Schema[]');
+        $schema        = m::mock(Schema::class);
+        $mySchema      = m::mock(Schema::class);
         $schemaMapper  = new SchemaMapper($schema);
         $value         = ['foo' => 'bar'];
         $test          = $this;
@@ -186,12 +188,12 @@ class SchemaMapperTest extends TestCase
         Ioc::instance('Xd\MySchema', $mySchema); // Register MySchema in Ioc
 
         // When instantiating the SchemaMapper with the specified $param as dependency
-        Ioc::bind('Mongolid\DataMapper\SchemaMapper', function ($container, $params) use ($value, $mySchema, $test) {
+        Ioc::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
             // Check if mySchema has been injected correctly
             $test->assertSame($mySchema, $params[0]);
 
             // Instantiate a SchemaMapper with mySchema
-            $anotherSchemaMapper = m::mock('Mongolid\DataMapper\SchemaMapper', [$params[0]]);
+            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params[0]]);
 
             // Set expectation to receiva a map call
             $anotherSchemaMapper->shouldReceive('map')
@@ -212,7 +214,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapNonArrayToNullWhenMappingToSchema()
     {
         // Arrange
-        $schema        = m::mock('Mongolid\Schema[]');
+        $schema        = m::mock(Schema::class);
         $schemaMapper  = new SchemaMapper($schema);
         $value         = 4;
 

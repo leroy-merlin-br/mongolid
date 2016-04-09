@@ -6,6 +6,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\Exception\Exception as MongoException;
 use Mongolid\Container\Ioc;
+use Mongolid\Schema;
 use Mongolid\Util\SequenceService;
 use TestCase;
 
@@ -20,7 +21,7 @@ class SchemaTest extends TestCase
     public function testShouldNotBeDynamicByDefault()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
 
         // Assert
         $this->assertAttributeEquals(false, 'dynamic', $schema);
@@ -29,7 +30,7 @@ class SchemaTest extends TestCase
     public function testMustHaveAnEntityClass()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
 
         // Assert
         $this->assertAttributeEquals('stdClass', 'entityClass', $schema);
@@ -38,7 +39,7 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoObjectId()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = null;
 
         // Assert
@@ -51,7 +52,7 @@ class SchemaTest extends TestCase
     public function testShouldNotCastRandomStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = 'A random string';
 
         // Assert
@@ -64,7 +65,7 @@ class SchemaTest extends TestCase
     public function testShouldCastObjectIdStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = '507f1f77bcf86cd799439011';
 
         // Assert
@@ -82,7 +83,7 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoAutoIncrementSequence()
     {
         // Arrange
-        $schema          = m::mock('Mongolid\Schema[]');
+        $schema          = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
         $value           = null;
 
@@ -100,7 +101,7 @@ class SchemaTest extends TestCase
 
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
-        $schema          = m::mock('Mongolid\Schema[]');
+        $schema          = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
         $value           = 3;
 
@@ -119,7 +120,7 @@ class SchemaTest extends TestCase
     public function testShouldCastDocumentTimestamps()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = null;
 
         // Assertion
@@ -129,7 +130,7 @@ class SchemaTest extends TestCase
     public function testShouldRefreshUpdatedAtTimestamps()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = (new UTCDateTime(25));
 
         // Assertion
@@ -141,7 +142,7 @@ class SchemaTest extends TestCase
     public function testShouldNotRefreshCreatedAtTimestamps()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
         $value  = (new UTCDateTime(25));
 
         // Assertion

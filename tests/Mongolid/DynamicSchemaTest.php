@@ -1,9 +1,11 @@
 <?php
 namespace Mongolid;
 
-use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\DynamicSchema;
+use Mongolid\Schema;
+use TestCase;
 
 class DynamicSchemaTest extends TestCase
 {
@@ -16,10 +18,10 @@ class DynamicSchemaTest extends TestCase
     public function testShouldExtendSchema()
     {
         // Arrange
-        $schema = m::mock('Mongolid\DynamicSchema[]');
+        $schema = m::mock(DynamicSchema::class.'[]');
 
         // Assert
-        $this->assertInstanceOf('Mongolid\Schema', $schema);
+        $this->assertInstanceOf(Schema::class, $schema);
     }
 
     public function testShouldBeDynamic()

@@ -1,11 +1,12 @@
 <?php
 namespace Mongolid;
 
-use TestCase;
 use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
+use Mongolid\Schema;
+use TestCase;
 
 class ActiveRecordTest extends TestCase
 {
@@ -219,7 +220,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getSchema]');
-        $schema = m::mock('Mongolid\Schema[]');
+        $schema = m::mock(Schema::class.'[]');
 
         // Act
         $entity->shouldAllowMockingProtectedMethods();

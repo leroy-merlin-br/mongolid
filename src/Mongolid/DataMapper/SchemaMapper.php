@@ -120,7 +120,7 @@ class SchemaMapper
     {
         if (is_array($value)) {
             $schema = Ioc::make($schemaClass);
-            $mapper = Ioc::make('Mongolid\DataMapper\SchemaMapper', [$schema]);
+            $mapper = Ioc::make(SchemaMapper::class, [$schema]);
             return $mapper->map($value);
         }
 

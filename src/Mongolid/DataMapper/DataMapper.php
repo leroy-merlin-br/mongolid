@@ -1,13 +1,14 @@
 <?php
 namespace Mongolid\DataMapper;
 
-use Mongolid\Schema;
-use Mongolid\Container\Ioc;
-use Mongolid\Connection\Pool;
-use Mongolid\Cursor\Cursor;
-use Mongolid\Event\EventTriggerService;
-use MongoDB\Collection;
 use MongoDB\BSON\ObjectID;
+use MongoDB\Collection;
+use Mongolid\Connection\Pool;
+use Mongolid\Container\Ioc;
+use Mongolid\Cursor\Cursor;
+use Mongolid\DataMapper\SchemaMapper;
+use Mongolid\Event\EventTriggerService;
+use Mongolid\Schema;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -266,7 +267,7 @@ class DataMapper
             $this->schema = Ioc::make($this->schemaClass);
         }
 
-        return Ioc::make('Mongolid\DataMapper\SchemaMapper', [$this->schema]);
+        return Ioc::make(SchemaMapper::class, [$this->schema]);
     }
 
     /**
