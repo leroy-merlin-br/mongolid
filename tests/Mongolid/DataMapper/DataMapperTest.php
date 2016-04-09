@@ -202,6 +202,37 @@ class DataMapperTest extends TestCase
         $this->assertTrue($mapper->delete($object));
     }
 
+    /**
+     * @dataProvider eventsToBailOperations
+     */
+    public function testDatabaseOperationsShouldBailOutIfTheEventHandlerReturnsFalse($operation, $dbOperation, $eventName)
+    {
+        // Arrange
+        $connPool   = m::mock('Mongolid\Connection\Pool');
+        $mapper     = m::mock('Mongolid\DataMapper\DataMapper[parseToDocument,getCollection]', [$connPool]);
+        $collection = m::mock('MongoDB\Collection');
+        $object     = m::mock();
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->with($object)
+            ->never();
+
+        $mapper->shouldReceive('getCollection')
+            ->andReturn($collection);
+
+        $collection->shouldReceive($dbOperation)
+            ->never();
+
+        /* "Mocks" the fireEvent to return false and bail the operation */
+        $this->expectEvent($eventName, $object, true, false);
+
+        // Assert
+        $this->assertFalse($mapper->$operation($object));
+    }
+
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
@@ -493,6 +524,35 @@ class DataMapperTest extends TestCase
             ->with($event, $entity, $halt)
             ->atLeast()->once()
             ->andReturn($return);
+    }
+
+    public function eventsToBailOperations()
+    {
+        return [
+            'Saving event' => [
+                'operation' => 'save',
+                'dbOperation' => 'updateOne',
+                'eventName' => 'saving'
+            ],
+            // ------------------------
+            'Inserting event' => [
+                'operation' => 'insert',
+                'dbOperation' => 'insertOne',
+                'eventName' => 'inserting'
+            ],
+            // ------------------------
+            'Updating event' => [
+                'operation' => 'update',
+                'dbOperation' => 'updateOne',
+                'eventName' => 'updating'
+            ],
+            // ------------------------
+            'Deleting event' => [
+                'operation' => 'delete',
+                'dbOperation' => 'deleteOne',
+                'eventName' => 'deleting'
+            ],
+        ];
     }
 
     public function queryValueScenarios()
