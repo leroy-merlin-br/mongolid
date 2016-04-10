@@ -14,3 +14,10 @@ ifndef MKDOCS
 	pip install mkdocs
 endif
 	mkdocs build --clean
+
+SAMI := $(shell sami -V)
+
+mkapi:
+ifdef SAMI
+	sami update sami.php; exit 0
+endif
