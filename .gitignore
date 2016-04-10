@@ -1,4 +1,5 @@
 /vendor
 /.coverage
 /build
+/site
 composer.lock
