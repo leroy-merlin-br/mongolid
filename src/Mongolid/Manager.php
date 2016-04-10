@@ -114,9 +114,9 @@ class Manager
      *
      * @param  string $entityClass Class of the entity that needs to be mapped.
      *
-     * @return DataMapper          DataMapper configured for the $entityClass.
+     * @return DataMapper|null     DataMapper configured for the $entityClass.
      */
-    public function getMapper(string $entityClass): DataMapper
+    public function getMapper(string $entityClass)
     {
         if (isset($this->schemas[$entityClass])) {
             $dataMapper = Ioc::make(DataMapper::class);
