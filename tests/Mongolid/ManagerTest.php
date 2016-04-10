@@ -1,14 +1,16 @@
 <?php
 namespace Mongolid;
 
-use Mockery as m;
-use Mongolid\Container\Ioc;
-use Mongolid\Event\EventTriggerService;
-use Mongolid\Event\EventTriggerInterface;
 use Illuminate\Container\Container;
+use Mockery as m;
+use MongoDB\Client;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use MongoDB\Client;
+use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\DataMapper;
+use Mongolid\Event\EventTriggerInterface;
+use Mongolid\Event\EventTriggerService;
+use Mongolid\Schema;
 use TestCase;
 
 class ManagerTest extends TestCase
@@ -56,6 +58,52 @@ class ManagerTest extends TestCase
 
         // Assert
         $manager->setEventTrigger($eventTrigger);
+    }
+
+    public function testShouldRegisterSchema()
+    {
+        // Arrange
+        $manager = new Manager;
+        $schema = m::mock(Schema::class);
+        $schema->entityClass = 'Bacon';
+
+        // Assert
+        $manager->registerSchema($schema);
+        $this->assertAttributeEquals(
+            ['Bacon' => $schema],
+            'schemas',
+            $manager
+        );
+    }
+
+    public function testShouldGetDataMapperForEntitiesWithRegisteredSchemas()
+    {
+        // Arrange
+        $manager = new Manager;
+        $schema = m::mock(Schema::class);
+        $dataMapper = m::mock(DataMapper::class);
+
+        $schema->entityClass = 'Bacon';
+
+        // Act
+        Ioc::instance(DataMapper::class, $dataMapper);
+
+        // Assert
+        $manager->registerSchema($schema);
+        $result = $manager->getMapper('Bacon');
+
+        $this->assertEquals($dataMapper, $result);
+        $this->assertAttributeEquals($schema, 'schema', $result);
+    }
+
+    public function testShouldNotGetDataMapperForUnknownEntities()
+    {
+        // Arrange
+        $manager = new Manager;
+
+        // Assert
+        $result = $manager->getMapper('Unknow');
+        $this->assertNull($result);
     }
 
     public function testShouldInitializeOnce()

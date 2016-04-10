@@ -6,8 +6,10 @@ use Illuminate\Container\Container;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Schema;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -41,6 +43,13 @@ class Manager
      * @var Pool
      */
     public $connectionPool;
+
+    /**
+     * Stores the schemas that have been registered for later use. This may be
+     * useful when using Mongolid DataMapper pattern
+     * @var array
+     */
+    protected $schemas = [];
 
     /**
      * Main entry point to openning a connection and start using Mongolid in
@@ -84,6 +93,39 @@ class Manager
         $eventService->registerEventDispatcher($eventTrigger);
 
         $this->container->instance(EventTriggerService::class, $eventService);
+    }
+
+    /**
+     * Allow document Schemas to be registered for later use
+     *
+     * @param  Schema $schema Schema being registered.
+     *
+     * @return void
+     */
+    public function registerSchema(Schema $schema)
+    {
+        $this->schemas[$schema->entityClass] = $schema;
+    }
+
+    /**
+     * Retrieves a DataMapper for the given $entityClass. This can only be done
+     * if the Schema for that entity has been previously registered with
+     * registerSchema() method.
+     *
+     * @param  string $entityClass Class of the entity that needs to be mapped.
+     *
+     * @return DataMapper          DataMapper configured for the $entityClass.
+     */
+    public function getMapper(string $entityClass): DataMapper
+    {
+        if (isset($this->schemas[$entityClass])) {
+            $dataMapper = Ioc::make(DataMapper::class);
+            $dataMapper->schema = $this->schemas[$entityClass] ?? null;
+
+            return $dataMapper;
+        }
+
+        return null;
     }
 
     /**
