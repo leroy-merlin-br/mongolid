@@ -11,6 +11,8 @@ $ composer require leroy-merlin-br/mongolid
 - PHP**7**
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 
+> **Note:** If you are looking for the old PHP 5.x version, head to the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
+
 ## Setup
 
 If you are not using Laravel, you should initialize the Mongolid connection pool and container manually.

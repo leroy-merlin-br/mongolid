@@ -8,7 +8,7 @@
 Mongolid supports both **ActiveRecord** and **DataMapper** patterns. **You choose! (:**
 
 [![Build Status](https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master)](https://travis-ci.org/leroy-merlin-br/mongolid)
-[![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=v2.0.0)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=v2.0.0)
+[![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/zizaco/mongolid/v/stable.png)](https://packagist.org/packages/zizaco/mongolid)
 [![Total Downloads](https://poser.pugx.org/zizaco/mongolid/downloads.png)](https://packagist.org/packages/zizaco/mongolid)
 [![Latest Unstable Version](https://poser.pugx.org/zizaco/mongolid/v/unstable.png)](https://packagist.org/packages/zizaco/mongolid)
@@ -31,6 +31,13 @@ You can install library through Composer:
 ```
 $ composer require leroy-merlin-br/mongolid
 ```
+
+### Requirements
+
+- PHP**7**
+- [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
+
+> **Note:** If you are looking for the old PHP 5.x version, head to the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
 
 <a name="setup"></a>
 ## Setup
@@ -621,6 +628,10 @@ $ php -i | grep 'mongo'
 mongodb support => enabled
 mongodb version => 1.1.3
 ```
+
+**"This package requires php >=7.0 but your PHP version (X.X.X) does not satisfy that requirement."**
+
+The new (and improved) version 2.0 of Mongolid requires php7. If you are looking for the old PHP 5.x version, head to the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
 
 <a name="license"></a>
 ## License
