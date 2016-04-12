@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use MongoDB\BSON\ObjectID;
@@ -317,7 +318,8 @@ class DataMapper
     {
         $event = "mongolid.{$event}." . get_class($entity);
 
-        return ($this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class))
-            ->fire($event, $entity, $halt);
+        $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
+
+        return $this->eventService->fire($event, $entity, $halt);
     }
 }
