@@ -1,5 +1,5 @@
 {
-    "name": "zizaco/mongolid",
+    "name": "leroy-merlin-br/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
     "keywords": ["odm","mongodb","nosql"],
     "license": "MIT",
@@ -7,19 +7,36 @@
         {
             "name": "Zizaco Zizuini",
             "email": "zizaco@gmail.com"
+        },
+        {
+            "name": "Guilherme Guitte",
+            "email": "guilherme.guitte@gmail.com"
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=7.0",
+        "mongodb/mongodb": "^1.0.0",
+        "illuminate/container": "^5.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8",
-        "mockery/mockery": "^0.9",
-        "satooshi/php-coveralls": "^1.0"
+        "mockery/mockery": "dev-master",
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpunit": "^4.0",
+        "squizlabs/php_codesniffer": "^2.0"
     },
     "autoload": {
-        "psr-0": {
-            "Zizaco\\Mongolid": "src/"
+        "psr-4": {
+            "Mongolid\\": "src/Mongolid"
+        },
+
+        "classmap": [
+            "tests/TestCase.php"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "v2.0-dev"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
