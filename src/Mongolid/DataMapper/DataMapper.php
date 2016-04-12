@@ -214,7 +214,7 @@ class DataMapper
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
-    public function first($query)
+    public function first($query = [])
     {
         $document = $this->getCollection()->findOne(
             $this->prepareValueQuery($query)
@@ -242,10 +242,8 @@ class DataMapper
      */
     protected function parseToDocument($object)
     {
-        $schemaMapper     = $this->getSchemaMapper();
-        $objectAttributes = $this->parseToArray($object);
-
-        $parsedDocument = $schemaMapper->map($objectAttributes);
+        $schemaMapper   = $this->getSchemaMapper();
+        $parsedDocument = $schemaMapper->map($object);
 
         if (is_object($object)) {
             foreach ($parsedDocument as $field => $value) {
@@ -268,26 +266,6 @@ class DataMapper
         }
 
         return Ioc::make(SchemaMapper::class, [$this->schema]);
-    }
-
-    /**
-     * Parses an object to an array before sending it to the SchemaMapper
-     *
-     * @param  mixed $object The object that will be transformed into an array.
-     *
-     * @return array
-     */
-    protected function parseToArray($object): array
-    {
-        if (! is_array($object)) {
-            if (method_exists($object, 'getAttributes')) {
-                return $object->getAttributes();
-            }
-
-            return get_object_vars($object);
-        }
-
-        return $object;
     }
 
     /**

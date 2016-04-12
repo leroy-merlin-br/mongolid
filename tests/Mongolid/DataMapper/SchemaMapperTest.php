@@ -206,22 +206,57 @@ class SchemaMapperTest extends TestCase
 
         //Assert
         $this->assertEquals(
-            ['foo' => 'PARSED'],
+            [
+                ['foo' => 'PARSED']
+            ],
             $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema'])
         );
     }
 
-    public function testShouldMapNonArrayToNullWhenMappingToSchema()
+    public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema        = m::mock(Schema::class);
-        $schemaMapper  = new SchemaMapper($schema);
-        $value         = 4;
+        $schema       = m::mock(Schema::class);
+        $schemaMapper = new SchemaMapper($schema);
+        $object       = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
-        //Assert
+        // Assert
         $this->assertEquals(
-            null,
-            $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema'])
+            ['foo' => 'bar', 'name' => 'wilson'],
+            $this->callProtected($schemaMapper, 'parseToArray', [$object])
+        );
+    }
+
+    public function testShouldParseToArrayIfIsAnArray()
+    {
+        // Arrange
+        $schema       = m::mock(Schema::class);
+        $schemaMapper = new SchemaMapper($schema);
+        $object       = ['age' => 25];
+
+        // Assert
+        $this->assertEquals(
+            $object,
+            $this->callProtected($schemaMapper, 'parseToArray', [$object])
+        );
+    }
+
+    public function testShouldGetAttributesWhenGetattributesMethodIsAvailable()
+    {
+        // Arrange
+        $schema       = m::mock(Schema::class);
+        $schemaMapper = new SchemaMapper($schema);
+        $object       = m::mock(new __entity_stub);
+
+        // Act
+        $object->shouldReceive('getAttributes')
+            ->once()
+            ->andReturn(['foo' => 'bar']);
+
+        // Assert
+        $this->assertEquals(
+            ['foo' => 'bar'],
+            $this->callProtected($schemaMapper, 'parseToArray', [$object])
         );
     }
 }

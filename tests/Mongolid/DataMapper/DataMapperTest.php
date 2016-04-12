@@ -369,7 +369,7 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[getSchemaMapper,parseToArray]', [$connPool]);
+        $mapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connPool]);
         $object         = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
         $schemaMapper   = m::mock('Mongolid\Schema[]');
@@ -381,14 +381,9 @@ class DataMapperTest extends TestCase
             ->once()
             ->andReturn($schemaMapper);
 
-        $mapper->shouldReceive('parseToArray')
-            ->once()
-            ->with($object)
-            ->andReturn(['a_field' => '123', '_id' => 'bacon']);
-
         $schemaMapper->shouldReceive('map')
             ->once()
-            ->with(['a_field' => '123', '_id' => 'bacon'])
+            ->with($object)
             ->andReturn($parsedDocument);
 
         // Assert
@@ -418,53 +413,6 @@ class DataMapperTest extends TestCase
         $result = $this->callProtected($mapper, 'getSchemaMapper');
         $this->assertInstanceOf('Mongolid\DataMapper\SchemaMapper', $result);
         $this->assertEquals($schema, $result->schema);
-    }
-
-    public function testShouldGetAttributesWhenGetattributesMethodIsAvailable()
-    {
-        // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
-        $object = m::mock(new __entity_stub);
-
-        // Act
-        $object->shouldReceive('getAttributes')
-            ->once()
-            ->andReturn(['foo' => 'bar']);
-
-        // Assert
-        $this->assertEquals(
-            ['foo' => 'bar'],
-            $this->callProtected($mapper, 'parseToArray', [$object])
-        );
-    }
-
-    public function testShouldParseToArrayGettingObjectAttributes()
-    {
-        // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
-        $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
-
-        // Assert
-        $this->assertEquals(
-            ['foo' => 'bar', 'name' => 'wilson'],
-            $this->callProtected($mapper, 'parseToArray', [$object])
-        );
-    }
-
-    public function testShouldParseToArrayIfIsAnArray()
-    {
-        // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
-        $object = ['age' => 25];
-
-        // Assert
-        $this->assertEquals(
-            $object,
-            $this->callProtected($mapper, 'parseToArray', [$object])
-        );
     }
 
     public function testShouldGetRawCollection()

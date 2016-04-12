@@ -5,9 +5,12 @@ use Mongolid\Schema;
 use Mongolid\Container\Ioc;
 
 /**
- * The SchemaMapper will map an array of data to an Schema object. When
- * instantiating a SchemaMapper you should provide a Schema. When calling 'map'
- * the Schema provided will be used to format the data to the correct format.
+ * The SchemaMapper will map an object or an array of data to an Schema object.
+ * When instantiating a SchemaMapper you should provide a Schema. When calling
+ * 'map' the Schema provided will be used to format the data to the correct
+ * format.
+ *
+ * This class is meant to do the oposite of the EntityAssembler
  *
  * @package  Mongolid
  */
@@ -37,12 +40,13 @@ class SchemaMapper
     /**
      * Maps the input $data to the schema specified in the $schema property
      *
-     * @param  array $data Array of field that should be mapped to $this->schema specifications.
+     * @param  array|object $data Array or object with the fields that should be mapped to $this->schema specifications.
      *
      * @return array
      */
-    public function map(array $data)
+    public function map($data)
     {
+        $data = $this->parseToArray($data);
         $this->clearDynamic($data);
 
         // Parse each specified field
@@ -118,12 +122,38 @@ class SchemaMapper
      */
     protected function mapToSchema($value, string $schemaClass)
     {
-        if (is_array($value)) {
-            $schema = Ioc::make($schemaClass);
-            $mapper = Ioc::make(SchemaMapper::class, [$schema]);
-            return $mapper->map($value);
+        $value  = (array)$value;
+        $schema = Ioc::make($schemaClass);
+        $mapper = Ioc::make(SchemaMapper::class, [$schema]);
+
+        if (! isset($value[0])) {
+            $value = [$value];
         }
 
-        return null;
+        foreach ($value as $key => $subValue) {
+            $value[$key] = $mapper->map($subValue);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Parses an object to an array before sending it to the SchemaMapper
+     *
+     * @param  mixed $object The object that will be transformed into an array.
+     *
+     * @return array
+     */
+    protected function parseToArray($object): array
+    {
+        if (! is_array($object)) {
+            if (method_exists($object, 'getAttributes')) {
+                return $object->getAttributes();
+            }
+
+            return get_object_vars($object);
+        }
+
+        return $object;
     }
 }
