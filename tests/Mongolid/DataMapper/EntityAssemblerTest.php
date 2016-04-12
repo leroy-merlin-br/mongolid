@@ -115,8 +115,8 @@ class EntityAssemblerTest extends TestCase
 
             //---------------------------
 
-            'A schema containing an embeded schema with a document directly into the field' => [
-                'inputValue' => [ // Data that will be used to assembly the entity
+            'A stdClass with a schema containing an embeded schema with a document directly into the field' => [
+                'inputValue' => (object)[ // Data that will be used to assembly the entity
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age'  => 25,

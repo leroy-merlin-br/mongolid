@@ -2,11 +2,12 @@
 
 namespace Mongolid\Cursor;
 
-use Mockery as m;
-use TestCase;
 use IteratorIterator;
+use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
+use Mongolid\Schema;
+use TestCase;
 
 class CursorTest extends TestCase
 {
@@ -202,14 +203,14 @@ class CursorTest extends TestCase
     }
 
     protected function getCursor(
-        $entityClass = null,
+        $entitySchema = null,
         $collection = null,
         $command = 'find',
         $params = [[]],
         $driverCursor = null
     ) {
-        if (! $entityClass) {
-            $entityClass = 'stdClass';
+        if (! $entitySchema) {
+            $entitySchema = m::mock(Schema::class.'[]');
         }
 
         if (! $collection) {
@@ -217,12 +218,12 @@ class CursorTest extends TestCase
         }
 
         if (! $driverCursor) {
-            return new Cursor($entityClass, $collection, $command, $params);
+            return new Cursor($entitySchema, $collection, $command, $params);
         }
 
         $mock = m::mock(
             Cursor::class.'[getCursor]',
-            [$entityClass, $collection, $command, $params]
+            [$entitySchema, $collection, $command, $params]
         );
 
         $mock->shouldAllowMockingProtectedMethods();

@@ -7,6 +7,7 @@ use MongoDB\Collection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
+use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
@@ -40,6 +41,12 @@ class DataMapper
     protected $connPool;
 
     /**
+     * Have the responsability of assembling the data coming from the database into actual entities.
+     * @var EntityAssembler
+     */
+    protected $assembler;
+
+    /**
      * In order to dispatch events when necessary
      * @var EventTriggerService
      */
@@ -50,7 +57,7 @@ class DataMapper
      */
     public function __construct(Pool $connPool)
     {
-        $this->connPool = $connPool;
+        $this->connPool  = $connPool;
     }
 
     /**
@@ -187,7 +194,7 @@ class DataMapper
     public function where($query = []): Cursor
     {
         $cursor = new Cursor(
-            $this->schema->entityClass,
+            $this->schema,
             $this->getCollection(),
             'find',
             [$this->prepareValueQuery($query)]
@@ -225,11 +232,7 @@ class DataMapper
             return null;
         }
 
-        $model = new $this->schema->entityClass;
-
-        foreach ($document as $key => $value) {
-            $model->$key = $value;
-        }
+        $model = $this->getAssembler()->assemble($document, $this->schema);
 
         return $model;
     }
@@ -303,6 +306,20 @@ class DataMapper
         }
 
         return ['_id' => $value];
+    }
+
+    /**
+     * Retrieves an EntityAssembler instance
+     *
+     * @return EntityAssembler
+     */
+    protected function getAssembler()
+    {
+        if (! $this->assembler) {
+            $this->assembler = Ioc::make(EntityAssembler::class);
+        }
+
+        return $this->assembler;
     }
 
     /**

@@ -264,7 +264,7 @@ class DataMapperTest extends TestCase
         $result = $mapper->where($query);
 
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertAttributeEquals('stdClass', 'entityClass', $result);
+        $this->assertAttributeEquals($schema, 'entitySchema', $result);
         $this->assertAttributeEquals($collection, 'collection', $result);
         $this->assertAttributeEquals('find', 'command', $result);
         $this->assertAttributeEquals([$preparedQuery], 'params', $result);

@@ -22,12 +22,12 @@ class EntityAssembler
     /**
      * Builds an object from the provided data
      *
-     * @param array  $document The attributes that will be used to compose the entity.
-     * @param Schema $schema   Schema that will be used to map each field.
+     * @param array|object $document The attributes that will be used to compose the entity.
+     * @param Schema       $schema   Schema that will be used to map each field.
      *
      * @return mixed
      */
-    public function assemble(array $document, Schema $schema)
+    public function assemble($document, Schema $schema)
     {
         $entityClass = $schema->entityClass;
         $model       = Ioc::make($entityClass);

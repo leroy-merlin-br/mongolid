@@ -1,10 +1,13 @@
 <?php
 namespace Mongolid\Cursor;
 
-use MongoDB\Driver\Cursor as DriverCursor;
-use MongoDB\Collection;
-use IteratorIterator;
 use Iterator;
+use IteratorIterator;
+use MongoDB\Collection;
+use MongoDB\Driver\Cursor as DriverCursor;
+use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\EntityAssembler;
+use Mongolid\Schema;
 
 /**
  * This class wraps the query execution and the actuall creation of the driver
@@ -17,11 +20,11 @@ use Iterator;
 class Cursor implements Iterator
 {
     /**
-     * ENtity class that will be returned while iterating
+     * Schema that describes the entity that will be retrieved when iterating trought the cursor.
      *
      * @var string
      */
-    public $entityClass;
+    public $entitySchema;
 
     /**
      * @var Collection
@@ -55,22 +58,28 @@ class Cursor implements Iterator
     protected $position = 0;
 
     /**
-     * @param string     $entityClass Class of the objects that will be retrieved by the cursor.
-     * @param Collection $collection  The raw collection object that will be used to retrieve the documents.
-     * @param string     $command     The command that is being called in the $collection.
-     * @param array      $params      The parameters of the $command.
+     * Have the responsability of assembling the data coming from the database into actual entities.
+     * @var EntityAssembler
+     */
+    protected $assembler;
+
+    /**
+     * @param Schema     $entitySchema Schema that describes the entity that will be retrieved from the database.
+     * @param Collection $collection   The raw collection object that will be used to retrieve the documents.
+     * @param string     $command      The command that is being called in the $collection.
+     * @param array      $params       The parameters of the $command.
      */
     public function __construct(
-        string $entityClass,
+        Schema $entitySchema,
         Collection $collection,
         string $command,
         array $params
     ) {
-        $this->cursor      = null;
-        $this->entityClass = $entityClass;
-        $this->collection  = $collection;
-        $this->command     = $command;
-        $this->params      = $params;
+        $this->cursor       = null;
+        $this->entitySchema = $entitySchema;
+        $this->collection   = $collection;
+        $this->command      = $command;
+        $this->params       = $params;
     }
 
     /**
@@ -144,14 +153,9 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        $model = new $this->entityClass;
         $document = $this->getCursor()->current();
 
-        foreach ($document as $key => $value) {
-            $model->$key = $value;
-        }
-
-        return $model;
+        return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
 
     /**
@@ -168,13 +172,7 @@ class Cursor implements Iterator
             return null;
         }
 
-        $model = new $this->entityClass;
-
-        foreach ($document as $key => $value) {
-            $model->$key = $value;
-        }
-
-        return $model;
+        return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
     /**
      * Iterator key method (used in foreach)
@@ -221,5 +219,19 @@ class Cursor implements Iterator
         }
 
         return $this->cursor;
+    }
+
+    /**
+     * Retrieves an EntityAssembler instance
+     *
+     * @return EntityAssembler
+     */
+    protected function getAssembler()
+    {
+        if (! $this->assembler) {
+            $this->assembler = Ioc::make(EntityAssembler::class);
+        }
+
+        return $this->assembler;
     }
 }
