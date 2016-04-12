@@ -32,10 +32,10 @@ class ArticleSchema extends Mongolid\Schema {
 }
 ```
 
-Then you should register your schema into the `Mongolid\Manager`:
+Then you should register an instance of the schema into the `Mongolid\Manager`:
 
 ```php
-$manager->registerSchema(ArticleSchema::class);
+$manager->registerSchema(new ArticleSchema);
 ```
 
 Now you just have to create your own Domain Entity (:
@@ -145,7 +145,7 @@ class PostSchema extends Mongolid\Schema
     ];
 }
 
-class PostSchema extends Mongolid\Schema
+class CommentSchema extends Mongolid\Schema
 {
     public $entityClass = 'Comment';
     public $collection = null; // Optional since all comments will be embedded
