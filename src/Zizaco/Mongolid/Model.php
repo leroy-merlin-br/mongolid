@@ -636,12 +636,12 @@ class Model
     {
         $referenced_id = $this->$field;
 
-        if (is_array($referenced_id) && count($referenced_id) == 1 && isset($referenced_id[0])) {
+        if (is_array($referenced_id) && count($referenced_id) > 0 && isset($referenced_id[0])) {
             $referenced_id = $referenced_id[0];
         }
 
         if ($cachable && static::$cacheComponent) {
-            $cache_key = 'reference_cache_' . $model . '_' . $this->$field;
+            $cache_key = 'reference_cache_' . $model . '_' . $referenced_id;
 
             // For the next 30 seconds (0.5 minutes), the last retrieved value (for that Collection and ID)
             // will be returned from cache =)
