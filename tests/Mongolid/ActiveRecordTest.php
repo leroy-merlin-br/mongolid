@@ -231,7 +231,7 @@ class ActiveRecordTest extends TestCase
 
         // Assert
         $result = $this->callProtected($entity, 'getDataMapper');
-        $this->assertInstanceOf('Mongolid\DataMapper\DataMapper', $result);
+        $this->assertInstanceOf(DataMapper\DataMapper::class, $result);
         $this->assertEquals($schema, $result->schema);
     }
 }

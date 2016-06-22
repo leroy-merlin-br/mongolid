@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid;
 
+use BadMethodCallException;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Attributes;
@@ -155,7 +156,11 @@ abstract class ActiveRecord
             return $this->embed($field, $value);
         }
 
-        return call_user_func_array([$this, $method], $parameters);
+        throw new BadMethodCallException(sprintf(
+            'The following method does not exists: %s@%s',
+            get_class($this),
+            $method
+        ));
     }
 
     /**
