@@ -5,6 +5,7 @@ namespace Mongolid\DataMapper;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema;
 use TestCase;
 
@@ -226,6 +227,34 @@ class EntityAssemblerTest extends TestCase
             ],
 
             //---------------------------
+
+            'A simple schema with a polymorphable interface' => [
+                'inputValue' => [ // Data that will be used to assembly the entity
+                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    'name' => 'John Doe',
+                    'age'  => 25,
+                    'grade' => 7.25
+                ],
+                'availableSchmas' => [ // Schemas that will exist in the test context
+                    'studentSchema' => [
+                        'entityClass' => _polymorphableStudent::class,
+                        'fields' => [
+                            '_id'        => 'objectId',
+                            'name'       => 'string',
+                            'age'        => 'integer',
+                            'grade'      => 'float',
+                            'finalGrade' => 'float',
+                        ]
+                    ]
+                ],
+                'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                'expectedOutput' => new _stubStudent([ // Expected output
+                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    'name' => 'John Doe',
+                    'age'  => 25,
+                    'grade' => 7.25
+                ])
+            ],
         ];
     }
 }
@@ -243,5 +272,16 @@ class _stubTestGrade extends \stdClass {
         foreach ($attr as $key => $value) {
             $this->$key = $value;
         }
+    }
+}
+
+class _polymorphableStudent extends \stdClass implements PolymorphableInterface {
+    public function __construct($attr = []) {
+        foreach ($attr as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+    public function polymorph() {
+        return new _stubStudent((array) $this);
     }
 }

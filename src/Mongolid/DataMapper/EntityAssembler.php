@@ -3,6 +3,7 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
+use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema;
 
 /**
@@ -42,7 +43,25 @@ class EntityAssembler
             $model->$field = $value;
         }
 
-        return $model;
+        return $this->morphinTime($model);
+    }
+
+    /**
+     * Returns the return of polymorph method of the given entity if available
+     *
+     * @see Mongolid\Model\PolymorphableInterface::polymorph
+     * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
+     *
+     * @param  mixed $entity The entity that may or may not have a polymorph method.
+     * @return mixed         The result of $entity->polymorph or the $entity itself.
+     */
+    protected function morphinTime($entity)
+    {
+        if ($entity instanceof PolymorphableInterface) {
+            return $entity->polymorph();
+        }
+
+        return $entity;
     }
 
     /**
