@@ -524,7 +524,3 @@ class DataMapperTest extends TestCase
         ];
     }
 }
-
-class __entity_stub {
-    public function getAttributes() {}
-}

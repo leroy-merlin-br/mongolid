@@ -241,17 +241,16 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldGetAttributesWhenGetattributesMethodIsAvailable()
+    public function testShouldGetAttributesWhenGetAttributesMethodIsAvailable()
     {
         // Arrange
         $schema       = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = m::mock(new __entity_stub);
-
-        // Act
-        $object->shouldReceive('getAttributes')
-            ->once()
-            ->andReturn(['foo' => 'bar']);
+        $object       = new class {
+            public function getAttributes() {
+                return ['foo' => 'bar'];
+            }    
+        };
 
         // Assert
         $this->assertEquals(
