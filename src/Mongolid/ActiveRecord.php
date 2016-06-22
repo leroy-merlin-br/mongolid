@@ -116,11 +116,11 @@ abstract class ActiveRecord
     /**
      * Gets the first entity of this kind that matches the query
      *
-     * @param  array $query MongoDB selection criteria.
+     * @param  mixed $query MongoDB selection criteria.
      *
      * @return ActiveRecord
      */
-    public static function first(array $query = [])
+    public static function first($query = [])
     {
         return Ioc::make(get_called_class())
             ->getDataMapper()->first($query);
