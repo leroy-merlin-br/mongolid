@@ -107,6 +107,67 @@ class AttributesTest extends TestCase
             $model
         );
     }
+    
+    public function testShouldGetAttributeFromMutator()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+            
+            public function getSomeAttribute()
+            {
+                return 'something-else';
+            } 
+        };
+        
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('something-else', $model->some);
+    }
+    
+    public function testShouldIgnoreMutators()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+                                    
+            public function getSomeAttribute()
+            {
+                return 'something-else';
+            } 
+            
+            public function setSomeAttribute($value)
+            {
+                return strtoupper($value);
+            } 
+        };
+        
+        /* Disable mutator methods */
+        $model->mutable = false;
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('some-value', $model->some);
+    }
+    
+    public function testShouldSetAttributeFromMutator()
+    {
+        // Arrange
+        $model = new class{ 
+            use Attributes;
+            
+            public function setSomeAttribute($value)
+            {
+                return strtoupper($value);
+            } 
+        };
+        
+        $model->some = 'some-value';
+        
+        // Assert        
+        $this->assertEquals('SOME-VALUE', $model->some);
+    }
 
     /**
      * @dataProvider getFillableOptions
