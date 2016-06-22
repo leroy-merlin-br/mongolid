@@ -128,6 +128,9 @@ trait Attributes
     /**
      * Verify if model has a mutator method defined.
      *
+     * @param  mixed $key    Attribute name.
+     * @param  mixed $prefix Method prefix to be used.
+     *
      * @return boolean
      */
     protected function hasMutatorMethod($key, $prefix)
@@ -139,6 +142,9 @@ trait Attributes
     
     /**
      * Create mutator method pattern.
+     *
+     * @param  mixed $key    Attribute name.
+     * @param  mixed $prefix Method prefix to be used.
      *
      * @return string
      */
@@ -167,7 +173,7 @@ trait Attributes
      */
     public function __get($key)
     {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'get')){
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             return $this->{$this->buildMutatorMethod($key, 'get')}();
         }
         
@@ -184,7 +190,7 @@ trait Attributes
      */
     public function __set($key, $value)
     {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'set')){
+        if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
         
