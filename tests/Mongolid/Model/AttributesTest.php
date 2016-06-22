@@ -17,7 +17,10 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $childObj = new stdClass;
 
         // Assert
@@ -38,7 +41,10 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicGetters()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $childObj = new stdClass;
         $this->setProtected(
             $model,
@@ -60,7 +66,10 @@ class AttributesTest extends TestCase
     public function testShouldCheckIfAttributeIsSet()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $this->setProtected(
             $model,
             'attributes',
@@ -75,7 +84,10 @@ class AttributesTest extends TestCase
     public function testShouldUnsetAttributes()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $this->setProtected(
             $model,
             'attributes',
@@ -106,7 +118,10 @@ class AttributesTest extends TestCase
         $expected
     ) {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $this->setProtected($model, 'fillable', $fillable);
         $this->setProtected($model, 'guarded', $guarded);
 
@@ -118,7 +133,10 @@ class AttributesTest extends TestCase
     public function testShouldBeCastableToArray()
     {
         // Arrange
-        $model = new _stubAttributes;
+        $model = new class {
+            use Attributes;
+        };
+
         $model->name = 'John';
         $model->age = 25;
 
@@ -192,8 +210,4 @@ class AttributesTest extends TestCase
             ],
         ];
     }
-}
-
-class _stubAttributes {
-    use Attributes;
 }
