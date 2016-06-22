@@ -2,14 +2,13 @@
 
 class TestCase extends PHPUnit_Framework_TestCase
 {
-
     /**
      * Setup.
      * @return  false
      */
     public function setUp()
     {
-        require __DIR__.'/../bootstrap/bootstrap.php';
+        require __DIR__ . '/../bootstrap/bootstrap.php';
 
         return false;
     }
@@ -38,9 +37,9 @@ class TestCase extends PHPUnit_Framework_TestCase
     /**
      * Call a protected property of an object
      *
-     * @param  mixed $obj
-     * @param  string $attribute Property name
-     * @param  mixed  $value Value to be set
+     * @param  mixed  $obj      Object Instance
+     * @param  string $property Property name
+     * @param  mixed  $value    Value to be set
      */
     protected function setProtected($obj, $property, $value)
     {

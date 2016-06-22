@@ -59,6 +59,7 @@ class Cursor implements Iterator
 
     /**
      * Have the responsability of assembling the data coming from the database into actual entities.
+     *
      * @var EntityAssembler
      */
     protected $assembler;
@@ -233,5 +234,37 @@ class Cursor implements Iterator
         }
 
         return $this->assembler;
+    }
+
+    /**
+     * Convert the cursor instance to an array of Objects.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $result = [];
+
+        foreach ($this as $document) {
+            $result[] = $document;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Convert the cursor instance to a full associative array.
+     *
+     * @return array
+     */
+    public function toJson(): array
+    {
+        $result = [];
+
+        foreach ($this->getCursor() as $document) {
+            $result[] = $document;
+        }
+
+        return $result;
     }
 }

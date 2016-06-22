@@ -25,7 +25,7 @@ class CursorTest extends TestCase
         // Assert
         $cursor->limit(10);
         $this->assertAttributeEquals(
-            [[],['limit' => 10]],
+            [[], ['limit' => 10]],
             'params',
             $cursor
         );
@@ -39,7 +39,7 @@ class CursorTest extends TestCase
         // Assert
         $cursor->sort(['name' => 1]);
         $this->assertAttributeEquals(
-            [[],['sort' => ['name' => 1]]],
+            [[], ['sort' => ['name' => 1]]],
             'params',
             $cursor
         );
@@ -53,7 +53,7 @@ class CursorTest extends TestCase
         // Assert
         $cursor->skip(5);
         $this->assertAttributeEquals(
-            [[],['skip' => 5]],
+            [[], ['skip' => 5]],
             'params',
             $cursor
         );
@@ -63,7 +63,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $cursor = $this->getCursor(null, $collection);
+        $cursor     = $this->getCursor(null, $collection);
 
         // Act
         $collection->shouldReceive('count')
@@ -78,9 +78,9 @@ class CursorTest extends TestCase
     public function testShouldRewind()
     {
         // Arrange
-        $collection = m::mock(Collection::class);
+        $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('rewind')
@@ -94,9 +94,9 @@ class CursorTest extends TestCase
     public function testShouldGetCurrent()
     {
         // Arrange
-        $collection = m::mock(Collection::class);
+        $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('current')
@@ -112,9 +112,9 @@ class CursorTest extends TestCase
     public function testShouldGetFirst()
     {
         // Arrange
-        $collection = m::mock(Collection::class);
+        $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('rewind')
@@ -144,9 +144,9 @@ class CursorTest extends TestCase
     public function testShouldImplementNextMethodFromIterator()
     {
         // Arrange
-        $collection = m::mock(Collection::class);
+        $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
 
@@ -162,9 +162,9 @@ class CursorTest extends TestCase
     public function testShouldImplementValidMethodFromIterator()
     {
         // Arrange
-        $collection = m::mock(Collection::class);
+        $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('valid')
@@ -202,6 +202,72 @@ class CursorTest extends TestCase
         $this->assertInstanceOf(IteratorIterator::class, $result);
     }
 
+    public function testShouldReturnResultsToArray()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        // Act
+        $driverCursor->shouldReceive('rewind', 'valid', 'key')
+            ->andReturn(true, true, false);
+
+        $driverCursor->shouldReceive('next')
+            ->andReturn(true, false);
+
+        $driverCursor->shouldReceive('current')
+            ->twice()
+            ->andReturn(
+                ['name' => 'bob', 'occupation' => 'coder'],
+                ['name' => 'jef', 'occupation' => 'tester']
+            );
+
+        $result = $cursor->toArray();
+
+        // Assert
+        $this->assertEquals(
+            [
+                (object) ['name' => 'bob', 'occupation' => 'coder'],
+                (object) ['name' => 'jef', 'occupation' => 'tester'],
+            ],
+            $result
+        );
+    }
+
+    public function testShouldReturnResultsToJson()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        // Act
+        $driverCursor->shouldReceive('rewind', 'valid', 'key')
+            ->andReturn(true, true, false);
+
+        $driverCursor->shouldReceive('next')
+            ->andReturn(true, false);
+
+        $driverCursor->shouldReceive('current')
+            ->twice()
+            ->andReturn(
+                ['name' => 'bob', 'occupation' => 'coder'],
+                ['name' => 'jef', 'occupation' => 'tester']
+            );
+
+        $result = $cursor->toJson();
+
+        // Assert
+        $this->assertEquals(
+            [
+                ['name' => 'bob', 'occupation' => 'coder'],
+                ['name' => 'jef', 'occupation' => 'tester'],
+            ],
+            $result
+        );
+    }
+
     protected function getCursor(
         $entitySchema = null,
         $collection = null,
@@ -210,7 +276,7 @@ class CursorTest extends TestCase
         $driverCursor = null
     ) {
         if (! $entitySchema) {
-            $entitySchema = m::mock(Schema::class.'[]');
+            $entitySchema = m::mock(Schema::class . '[]');
         }
 
         if (! $collection) {
@@ -222,7 +288,7 @@ class CursorTest extends TestCase
         }
 
         $mock = m::mock(
-            Cursor::class.'[getCursor]',
+            Cursor::class . '[getCursor]',
             [$entitySchema, $collection, $command, $params]
         );
 
