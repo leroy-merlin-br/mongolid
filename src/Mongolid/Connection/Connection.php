@@ -33,7 +33,7 @@ class Connection
      *
      * @param string $server         The specified connection string.
      * @param array  $options        The mongodb client options.
-     * @param array  $driver_options The mongodb driver options when openning a connection.
+     * @param array  $driver_options The mongodb driver options when opening a connection.
      */
     public function __construct(
         string $server = "mongodb://localhost:27017",

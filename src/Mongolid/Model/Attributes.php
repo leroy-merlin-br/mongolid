@@ -3,12 +3,12 @@
 namespace Mongolid\Model;
 
 /**
- * This trait adds attribute getter, setters and also a usefull
+ * This trait adds attribute getter, setters and also a useful
  * `fill` method that can be used with $fillable and $guarded
  * properties to make sure that only the correct attributes
  * will be set.
  *
- * It is supossed to be used in model classes in general
+ * It is supposed to be used in model classes in general
  *
  * @package  Mongolid
  */
@@ -20,22 +20,25 @@ trait Attributes
      * @var array
      */
     protected $attributes = [];
+
     /**
      * The model attribute's original state.
      *
      * @var array
      */
     protected $original = [];
+
     /**
      * Once you put at least one string in this array, only
-     * the attributes especified here will be changed
+     * the attributes specified here will be changed
      * with the setAttributes method.
      *
      * @var array
      */
     protected $fillable = [];
+
     /**
-     * The attributes that aren't mass assignable. The oposite
+     * The attributes that are not mass assignable. The opposite
      * to the fillable array;
      *
      * @var array
@@ -60,6 +63,7 @@ trait Attributes
             return null;
         }
     }
+
     /**
      * Get all attributes from the model.
      *
@@ -101,7 +105,7 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key   Name of the atribute to be set.
+     * @param  string $key   Name of the attribute to be set.
      * @param  mixed  $value Value to be set.
      *
      * @return void
@@ -132,6 +136,7 @@ trait Attributes
     {
         return $this->getAttribute($key);
     }
+
     /**
      * Dynamically set attributes on the model.
      *
@@ -157,6 +162,7 @@ trait Attributes
     {
         return isset($this->attributes[$key]);
     }
+
     /**
      * Unset an attribute on the model.
      *

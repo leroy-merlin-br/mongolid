@@ -15,7 +15,7 @@ use Mongolid\Schema;
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
  * from the database.
- * The DataMapper will always use a Schema trought the SchemaMapper to parse the
+ * The DataMapper will always use a Schema trough the SchemaMapper to parse the
  * document in and out of the database.
  *
  * @package  Mongolid
@@ -24,30 +24,35 @@ class DataMapper
 {
     /**
      * Name of the schema class to be used
+     *
      * @var string
      */
     public $schemaClass = Schema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass
+     *
      * @var Schema
      */
     public $schema;
 
     /**
      * Connections that are going to be used to interact with the database
+     *
      * @var Pool
      */
     protected $connPool;
 
     /**
-     * Have the responsability of assembling the data coming from the database into actual entities.
+     * Have the responsibility of assembling the data coming from the database into actual entities.
+     *
      * @var EntityAssembler
      */
     protected $assembler;
 
     /**
      * In order to dispatch events when necessary
+     *
      * @var EventTriggerService
      */
     protected $eventService;
@@ -327,7 +332,7 @@ class DataMapper
      *
      * @param  string  $event  Identification of the event.
      * @param  mixed   $entity Event payload.
-     * @param  boolean $halt   True if the return of the event handler will be used in a coditional.
+     * @param  boolean $halt   True if the return of the event handler will be used in a conditional.
      *
      * @return mixed            Event handler return.
      */

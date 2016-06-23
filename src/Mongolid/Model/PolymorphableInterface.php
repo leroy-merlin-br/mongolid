@@ -7,7 +7,7 @@ namespace Mongolid\Model;
  * entity is being "recovered" from the database, it will call the polymorph
  * method and retrieve the object returned from it.
  *
- * The the docblock of the `polymorph` method for more details.
+ * See the docblock of the `polymorph` method for more details.
  *
  * @see Mongolid\DataMapper\EntityAssembler
  */

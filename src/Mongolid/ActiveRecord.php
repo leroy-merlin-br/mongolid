@@ -24,6 +24,7 @@ abstract class ActiveRecord
     /**
      * Name of the collection where this kind of Entity is going to be saved or
      * retrieved from
+     *
      * @var string
      */
     public $collection = 'mongolid';
@@ -31,6 +32,7 @@ abstract class ActiveRecord
     /**
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
+     *
      * @see  Mongolid\Schema::$fields
      * @var  string|string[]
      */
@@ -42,9 +44,10 @@ abstract class ActiveRecord
 
     /**
      * The $dynamic property tells if the object will accept additional fields
-     * that are not specified in the $fields property. This is usefull if you
-     * doesn't have a strict document format or if you want to take full
+     * that are not specified in the $fields property. This is useful if you
+     * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
+     *
      * @var boolean
      */
     public $dynamic = true;
@@ -134,16 +137,12 @@ abstract class ActiveRecord
      * @param  mixed $method     Name of the method that is being called.
      * @param  mixed $parameters Parameters of $method.
      *
-     * @throws BadMethodCallException
+     * @throws BadMethodCallException In case of invalid methods be called.
      *
      * @return mixed
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['all', 'first', 'where'])) {
-            return call_user_func_array([static::class, $method], $parameters);
-        }
-
         $value = $parameters[0] ?? null;
 
         // Alias to attach

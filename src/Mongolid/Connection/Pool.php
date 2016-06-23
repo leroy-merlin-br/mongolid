@@ -13,13 +13,14 @@ use Mongolid\Container\Ioc;
 class Pool
 {
     /**
-     * Openned connections
+     * Opened connections
+     *
      * @var SplQueue
      */
     protected $connections;
 
     /**
-     * Contructs a connection pool
+     * Constructs a connection pool
      */
     public function __construct()
     {
@@ -27,7 +28,7 @@ class Pool
     }
 
     /**
-     * Gets a connection from the pool. It will cicle trought the existent
+     * Gets a connection from the pool. It will cycle through the existent
      * connections.
      *
      * @return Connection

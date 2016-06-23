@@ -30,7 +30,7 @@ class SequenceService
 
     /**
      * @param Pool   $connPool   The connections that are going to be used to interact with the database.
-     * @param string $collection The colection where the sequences will be stored.
+     * @param string $collection The collection where the sequences will be stored.
      */
     public function __construct(Pool $connPool, string $collection = 'mongolid_sequences')
     {

@@ -16,7 +16,7 @@ class EventTriggerService
     protected $dispatcher;
 
     /**
-     * Registers a object that will have the responsability of firing events to
+     * Registers a object that will have the responsibility of firing events to
      * the rest of the application.
      *
      * @param  EventTriggerInterface $dispatcher Event trigger object.
@@ -29,12 +29,12 @@ class EventTriggerService
     }
 
     /**
-     * Triggers / Dispatchs a new event to the registered event handlers if
+     * Triggers / Dispatches a new event to the registered event handlers if
      * they have been registered.
      *
      * @param  string  $event   Identification of the event.
      * @param  mixed   $payload Data that is going to be sent to the event handler.
-     * @param  boolean $halt    The output of the event handler will be used in a coditional inside the context of
+     * @param  boolean $halt    The output of the event handler will be used in a conditional inside the context of
      *                          where the event is being fired. This means that, if the event handler returns false,
      *                          it will probably stop the action being executed, for example, "saving".
      *

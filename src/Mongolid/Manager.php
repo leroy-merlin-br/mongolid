@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid;
 
 use Illuminate\Container\Container;
@@ -9,7 +8,6 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -28,13 +26,14 @@ class Manager
 {
     /**
      * Singleton instance of the manager
+     *
      * @var Manager
      */
     protected static $singleton;
 
     /**
      * Container being used by Mongolid
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container
      */
     public $container;
 

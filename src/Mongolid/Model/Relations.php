@@ -8,7 +8,7 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\Cursor\EmbeddedCursor;
 
 /**
- * It is supossed to be used in model classes in general
+ * It is supposed to be used in model classes in general
  *
  * @package  Mongolid
  */
@@ -38,6 +38,7 @@ trait Relations
 
         return Ioc::make($entity)->first(['_id' => $referenced_id]);
     }
+
     /**
      * Returns the cursor for the referenced documents as objects
      *
@@ -64,7 +65,7 @@ trait Relations
      * Return a embedded documents as object
      *
      * @param string $entity Class of the entity or of the schema of the entity.
-     * @param string $field  Field where the embeded document is stored.
+     * @param string $field  Field where the embedded document is stored.
      *
      * @return Model|null
      */

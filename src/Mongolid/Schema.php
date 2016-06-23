@@ -16,8 +16,8 @@ abstract class Schema
 {
     /**
      * The $dynamic property tells if the schema will accept additional fields
-     * that are not specified in the $fields property. This is usefull if you
-     * doesn't have a strict document format or if you want to take full
+     * that are not specified in the $fields property. This is useful if you
+     * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      * @var boolean
      */
@@ -32,7 +32,7 @@ abstract class Schema
 
     /**
      * Tells how a document should look like. If an scalar type is used, it will
-     * perform a cast into the value. Othewise the schema will use the type as
+     * perform a cast into the value. Otherwise the schema will use the type as
      * the name of the method to be called. See 'objectId' method for example.
      * The last option is to define a field as another schema by using the
      * syntax 'schema.<Class>' This represents an embedded document (or
@@ -41,7 +41,7 @@ abstract class Schema
      * @var string[]
      */
     public $fields  = [
-        '_id' => 'objectId', // Means that the _id will passtrought the `objectId` method
+        '_id' => 'objectId', // Means that the _id will pass trough the `objectId` method
         'created_at' => 'createdAtTimestamp', // Generates an automatic timestamp
         'updated_at' => 'updatedAtTimestamp'
     ];

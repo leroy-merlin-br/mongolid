@@ -7,13 +7,13 @@ use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema;
 
 /**
- * EntityAssembler have the responsability of assembling the data coming from
+ * EntityAssembler have the responsibility of assembling the data coming from
  * the database into actual entities. Since the entities need to be assembled
  * whenever they are being built with data from the database, from a cursor or
  * from an embeded field, this service is a reusable tool to turn field array of
  * attributes into the actual Entity.
  *
- * This class is meant to do the oposite of the SchemaMapper.
+ * This class is meant to do the opposite of the SchemaMapper.
  *
  * @see http://martinfowler.com/eaaCatalog/dataTransferObject.html
  * @package Mongolid
@@ -37,7 +37,7 @@ class EntityAssembler
             $fieldType = $schema->fields[$field] ?? null;
 
             if ($fieldType && substr($fieldType, 0, 7) == 'schema.') {
-                $value = $this->assembleDocumentsRecursivelly($value, substr($fieldType, 7));
+                $value = $this->assembleDocumentsRecursively($value, substr($fieldType, 7));
             }
 
             $model->$field = $value;
@@ -65,14 +65,14 @@ class EntityAssembler
     }
 
     /**
-     * Assembly multiple documents for the given $schemaClass recursivelly
+     * Assembly multiple documents for the given $schemaClass recursively
      *
      * @param  mixed  $value       A value of an embeded field containing entity data to be assembled.
      * @param  string $schemaClass The schemaClass to be used when assembling the entities within $value.
      *
      * @return mixed
      */
-    protected function assembleDocumentsRecursivelly($value, string $schemaClass)
+    protected function assembleDocumentsRecursively($value, string $schemaClass)
     {
         $value = (array)$value;
 

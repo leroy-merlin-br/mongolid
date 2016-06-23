@@ -10,7 +10,7 @@ use Mongolid\Container\Ioc;
  * 'map' the Schema provided will be used to format the data to the correct
  * format.
  *
- * This class is meant to do the oposite of the EntityAssembler
+ * This class is meant to do the opposite of the EntityAssembler
  *
  * @package  Mongolid
  */
@@ -18,12 +18,14 @@ class SchemaMapper
 {
     /**
      * The actual schema to maps the data
+     *
      * @var Schema
      */
     public $schema;
 
     /**
      * Types that can be casted
+     *
      * @see http://php.net/manual/en/language.types.type-juggling.php
      * @var string[]
      */
@@ -40,7 +42,8 @@ class SchemaMapper
     /**
      * Maps the input $data to the schema specified in the $schema property
      *
-     * @param  array|object $data Array or object with the fields that should be mapped to $this->schema specifications.
+     * @param  array|object $data Array or object with the fields that should
+     *                            be mapped to $this->schema specifications.
      *
      * @return array
      */

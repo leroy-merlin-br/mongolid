@@ -28,7 +28,6 @@
         "psr-4": {
             "Mongolid\\": "src/Mongolid"
         },
-
         "classmap": [
             "tests/TestCase.php"
         ]
