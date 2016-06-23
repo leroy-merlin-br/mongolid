@@ -134,6 +134,8 @@ abstract class ActiveRecord
      * @param  mixed $method     Name of the method that is being called.
      * @param  mixed $parameters Parameters of $method.
      *
+     * @throws BadMethodCallException
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -157,7 +159,7 @@ abstract class ActiveRecord
         }
 
         throw new BadMethodCallException(sprintf(
-            'The following method does not exists: %s@%s',
+            'The following method can not be reached or does not exist: %s@%s',
             get_class($this),
             $method
         ));
