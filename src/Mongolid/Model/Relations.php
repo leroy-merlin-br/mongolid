@@ -50,7 +50,7 @@ trait Relations
     protected function referencesMany(string $entity, string $field)
     {
         $referencedIds = $this->$field;
-        $query = ['_id' => ['$in' => $referencedIds]];
+        $query = ['_id' => ['$in' => (array) $referencedIds]];
 
         if (is_subclass_of($entity, Schema::class)) {
             $dataMapper = Ioc::make(DataMapper::class);
