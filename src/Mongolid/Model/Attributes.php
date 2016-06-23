@@ -77,14 +77,19 @@ trait Attributes
     /**
      * Set the model attributes using an array
      *
-     * @param  array $input The data that will be used to fill the attributes.
+     * @param array   $input The data that will be used to fill the attributes.
+     * @param boolean $force Force fill.
      *
      * @return void
      */
     public function fill(array $input, bool $force = false)
     {
         foreach ($input as $key => $value) {
-            if ($force || (empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
+            if ($force) {
+                $this->setAttribute($key, $value);
+            }
+
+            if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
                 $this->setAttribute($key, $value);
             }
         }
@@ -95,6 +100,7 @@ trait Attributes
      *
      * @param string $key Name of the attribute to be unset.
      *
+     * @return void
      */
     public function cleanAttribute(string $key)
     {
