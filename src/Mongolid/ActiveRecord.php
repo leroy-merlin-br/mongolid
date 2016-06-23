@@ -216,11 +216,11 @@ abstract class ActiveRecord
     /**
      * Performs the given action into database
      *
-     * @param  string $action
+     * @param  string $action Datamapper function to execute.
      *
      * @return boolean
      */
-    protected function execute($action)
+    protected function execute(string $action)
     {
         if (! $this->collection) {
             return false;
