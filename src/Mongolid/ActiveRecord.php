@@ -59,7 +59,7 @@ abstract class ActiveRecord
      */
     public function save()
     {
-        return $this->getDataMapper()->save($this);
+        return $this->execute('save');
     }
 
     /**
@@ -69,7 +69,7 @@ abstract class ActiveRecord
      */
     public function insert()
     {
-        return $this->getDataMapper()->insert($this);
+        return $this->execute('insert');
     }
 
     /**
@@ -79,7 +79,7 @@ abstract class ActiveRecord
      */
     public function update()
     {
-        return $this->getDataMapper()->update($this);
+        return $this->execute('update');
     }
 
     /**
@@ -89,7 +89,7 @@ abstract class ActiveRecord
      */
     public function delete()
     {
-        return $this->getDataMapper()->delete($this);
+        return $this->execute('delete');
     }
 
     /**
@@ -211,5 +211,21 @@ abstract class ActiveRecord
                 return $instance;
             }
         }
+    }
+
+    /**
+     * Performs the given action into database
+     *
+     * @param  string $action
+     *
+     * @return boolean
+     */
+    protected function execute($action)
+    {
+        if (! $this->collection) {
+            return false;
+        }
+
+        return $this->getDataMapper()->$action($this);
     }
 }

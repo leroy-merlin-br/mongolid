@@ -119,6 +119,34 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->delete());
     }
 
+    public function testSaveShouldReturnFalseIfCollectionIsNull()
+    {
+        $entity = m::mock(ActiveRecord::class)->makePartial();
+        $entity->collection = null;
+        $this->assertFalse($entity->save());
+    }
+
+    public function testUpdateShouldReturnFalseIfCollectionIsNull()
+    {
+        $entity = m::mock(ActiveRecord::class)->makePartial();
+        $entity->collection = null;
+        $this->assertFalse($entity->update());
+    }
+
+    public function testInsertShouldReturnFalseIfCollectionIsNull()
+    {
+        $entity = m::mock(ActiveRecord::class)->makePartial();
+        $entity->collection = null;
+        $this->assertFalse($entity->insert());
+    }
+
+    public function testDeleteShouldReturnFalseIfCollectionIsNull()
+    {
+        $entity = m::mock(ActiveRecord::class)->makePartial();
+        $entity->collection = null;
+        $this->assertFalse($entity->delete());
+    }
+
     public function testShouldGetWithWhereQuery()
     {
         // Arrage
