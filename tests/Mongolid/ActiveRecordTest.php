@@ -46,12 +46,15 @@ class ActiveRecordTest extends TestCase
     public function testShouldSave()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
         $dataMapper = m::mock();
 
         // Act
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
+
+        $entity->shouldReceive('getCollectionName')
+            ->andReturn('mongolid');
 
         $dataMapper->shouldReceive('save')
             ->once()
@@ -65,12 +68,15 @@ class ActiveRecordTest extends TestCase
     public function testShouldInsert()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
         $dataMapper = m::mock();
 
         // Act
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
+
+        $entity->shouldReceive('getCollectionName')
+            ->andReturn('mongolid');
 
         $dataMapper->shouldReceive('insert')
             ->once()
@@ -84,12 +90,15 @@ class ActiveRecordTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
         $dataMapper = m::mock();
 
         // Act
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
+
+        $entity->shouldReceive('getCollectionName')
+            ->andReturn('mongolid');
 
         $dataMapper->shouldReceive('update')
             ->once()
@@ -103,12 +112,15 @@ class ActiveRecordTest extends TestCase
     public function testShouldDelete()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
         $dataMapper = m::mock();
 
         // Act
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
+
+        $entity->shouldReceive('getCollectionName')
+            ->andReturn('mongolid');
 
         $dataMapper->shouldReceive('delete')
             ->once()
@@ -122,28 +134,24 @@ class ActiveRecordTest extends TestCase
     public function testSaveShouldReturnFalseIfCollectionIsNull()
     {
         $entity = m::mock(ActiveRecord::class)->makePartial();
-        $entity->collection = null;
         $this->assertFalse($entity->save());
     }
 
     public function testUpdateShouldReturnFalseIfCollectionIsNull()
     {
         $entity = m::mock(ActiveRecord::class)->makePartial();
-        $entity->collection = null;
         $this->assertFalse($entity->update());
     }
 
     public function testInsertShouldReturnFalseIfCollectionIsNull()
     {
         $entity = m::mock(ActiveRecord::class)->makePartial();
-        $entity->collection = null;
         $this->assertFalse($entity->insert());
     }
 
     public function testDeleteShouldReturnFalseIfCollectionIsNull()
     {
         $entity = m::mock(ActiveRecord::class)->makePartial();
-        $entity->collection = null;
         $this->assertFalse($entity->delete());
     }
 
@@ -240,7 +248,7 @@ class ActiveRecordTest extends TestCase
         $this->assertInstanceOf(Schema::class, $result);
         $this->assertEquals($fields, $result->fields);
         $this->assertEquals($entity->dynamic, $result->dynamic);
-        $this->assertEquals($entity->collection, $result->collection);
+        $this->assertEquals($entity->getCollectionName(), $result->collection);
         $this->assertEquals(get_class($entity), $result->entityClass);
     }
 
@@ -266,7 +274,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetCollectionName()
     {
         $entity = new class extends ActiveRecord {
-            public $collection = 'collection_name';
+            protected $collection = 'collection_name';
         };
 
         $this->assertEquals($entity->getCollectionName(), 'collection_name');
