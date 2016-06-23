@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use Mockery as m;
+use stdClass;
 use TestCase;
 
 class EmbeddedCursorTest extends TestCase
@@ -139,6 +140,52 @@ class EmbeddedCursorTest extends TestCase
         $entity = $cursor->first();
         $this->assertInstanceOf('stdClass', $entity);
         $this->assertAttributeEquals('A', 'name', $entity);
+    }
+
+
+    public function testShouldGetAllItems()
+    {
+        // Arrange
+        $items = [
+            ['name' => 'A'],
+            ['name' => 'B'],
+        ];
+        $cursor = $this->getCursor('stdClass', $items);
+
+        $this->setProtected($cursor, 'position', 1);
+
+        $entityA = new stdClass;
+        $entityA->name = 'A';
+
+        $entityB = new stdClass;
+        $entityB->name = 'B';
+
+        $expected = [
+            $entityA,
+            $entityB,
+        ];
+
+        // Assert
+        $result = $cursor->all();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testShouldGetAllInArrayFormat()
+    {
+        // Arrange
+        $items = [
+            ['name' => 'A'],
+            ['name' => 'B'],
+            ['name' => 'C'],
+        ];
+        $cursor = $this->getCursor('stdClass', $items);
+
+        $this->setProtected($cursor, 'position', 1);
+
+        // Assert
+        $result = $cursor->toArray();
+        $this->assertEquals($items, $result);
     }
 
     public function testShouldImplementKeyMethodFromIterator()

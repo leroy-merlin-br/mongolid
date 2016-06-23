@@ -193,4 +193,29 @@ class EmbeddedCursor implements Iterator
     {
         return isset($this->items[$this->position]);
     }
+
+
+    /**
+     * Convert the cursor instance to an array of Items.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        foreach ($this as $item) {
+            $results[] = $item;
+        }
+
+        return $results ?? [];
+    }
+
+    /**
+     * Return the raw cursor items
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->items;
+    }
 }
