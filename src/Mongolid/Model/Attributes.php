@@ -87,6 +87,7 @@ trait Attributes
         foreach ($input as $key => $value) {
             if ($force) {
                 $this->setAttribute($key, $value);
+                continue;
             }
 
             if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
