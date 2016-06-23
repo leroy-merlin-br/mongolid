@@ -5,7 +5,6 @@ namespace Mongolid\Cursor;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
-use MongoDB\Driver\Cursor as DriverCursor;
 use Mongolid\Schema;
 use TestCase;
 
@@ -202,6 +201,39 @@ class CursorTest extends TestCase
         $this->assertInstanceOf(IteratorIterator::class, $result);
     }
 
+    public function testShouldReturnAllResults()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        // Act
+        $driverCursor->shouldReceive('rewind', 'valid', 'key')
+            ->andReturn(true, true, false);
+
+        $driverCursor->shouldReceive('next')
+            ->andReturn(true, false);
+
+        $driverCursor->shouldReceive('current')
+            ->twice()
+            ->andReturn(
+                ['name' => 'bob', 'occupation' => 'coder'],
+                ['name' => 'jef', 'occupation' => 'tester']
+            );
+
+        $result = $cursor->all();
+
+        // Assert
+        $this->assertEquals(
+            [
+                (object) ['name' => 'bob', 'occupation' => 'coder'],
+                (object) ['name' => 'jef', 'occupation' => 'tester'],
+            ],
+            $result
+        );
+    }
+
     public function testShouldReturnResultsToArray()
     {
         // Arrange
@@ -224,39 +256,6 @@ class CursorTest extends TestCase
             );
 
         $result = $cursor->toArray();
-
-        // Assert
-        $this->assertEquals(
-            [
-                (object) ['name' => 'bob', 'occupation' => 'coder'],
-                (object) ['name' => 'jef', 'occupation' => 'tester'],
-            ],
-            $result
-        );
-    }
-
-    public function testShouldReturnResultsToJson()
-    {
-        // Arrange
-        $collection   = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
-
-        // Act
-        $driverCursor->shouldReceive('rewind', 'valid', 'key')
-            ->andReturn(true, true, false);
-
-        $driverCursor->shouldReceive('next')
-            ->andReturn(true, false);
-
-        $driverCursor->shouldReceive('current')
-            ->twice()
-            ->andReturn(
-                ['name' => 'bob', 'occupation' => 'coder'],
-                ['name' => 'jef', 'occupation' => 'tester']
-            );
-
-        $result = $cursor->toJson();
 
         // Assert
         $this->assertEquals(

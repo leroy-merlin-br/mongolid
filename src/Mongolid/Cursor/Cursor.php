@@ -203,9 +203,37 @@ class Cursor implements Iterator
      *
      * @return boolean
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->getCursor()->valid();
+    }
+
+    /**
+     * Convert the cursor instance to an array of Objects.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        foreach ($this as $document) {
+            $result[] = $document;
+        }
+
+        return $result ?? [];
+    }
+
+    /**
+     * Convert the cursor instance to a full associative array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        foreach ($this->getCursor() as $document) {
+            $result[] = $document;
+        }
+
+        return $result ?? [];
     }
 
     /**
@@ -238,37 +266,5 @@ class Cursor implements Iterator
         }
 
         return $this->assembler;
-    }
-
-    /**
-     * Convert the cursor instance to an array of Objects.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        $result = [];
-
-        foreach ($this as $document) {
-            $result[] = $document;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Convert the cursor instance to a full associative array.
-     *
-     * @return array
-     */
-    public function toJson(): array
-    {
-        $result = [];
-
-        foreach ($this->getCursor() as $document) {
-            $result[] = $document;
-        }
-
-        return $result;
     }
 }
