@@ -81,10 +81,10 @@ trait Attributes
      *
      * @return void
      */
-    public function fill(array $input)
+    public function fill(array $input, bool $force = false)
     {
         foreach ($input as $key => $value) {
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
+            if ($force || (empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
                 $this->setAttribute($key, $value);
             }
         }
@@ -93,9 +93,8 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key Name of the attribute to be unset.
+     * @param string $key Name of the attribute to be unset.
      *
-     * @return void
      */
     public function cleanAttribute(string $key)
     {
