@@ -262,4 +262,13 @@ class ActiveRecordTest extends TestCase
         $this->assertInstanceOf(DataMapper\DataMapper::class, $result);
         $this->assertEquals($schema, $result->schema);
     }
+
+    public function testShouldGetCollectionName()
+    {
+        $entity = new class extends ActiveRecord {
+            public $collection = 'collection_name';
+        };
+
+        $this->assertEquals($entity->getCollectionName(), 'collection_name');
+    }
 }
