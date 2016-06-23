@@ -130,6 +130,25 @@ class AttributesTest extends TestCase
         $this->assertAttributeEquals($expected, 'attributes', $model);
     }
 
+    public function testShouldForceFillAttributes()
+    {
+        // Arrange
+        $model = new class {
+            use Attributes;
+        };
+
+        $input = [
+            'name'                => 'Josh',
+            'notAllowedAttribute' => true
+        ];
+
+        // Act
+        $model->fill($input, true);
+
+        // Assert
+        $this->assertTrue($model->notAllowedAttribute);
+    }
+
     public function testShouldBeCastableToArray()
     {
         // Arrange

@@ -27,7 +27,7 @@ abstract class ActiveRecord
      *
      * @var string
      */
-    public $collection = 'mongolid';
+    protected $collection = null;
 
     /**
      * Describes the Schema fields of the model. Optionally you can set it to
@@ -193,7 +193,7 @@ abstract class ActiveRecord
         $schema->entityClass = get_class($this);
         $schema->fields      = $this->fields;
         $schema->dynamic     = $this->dynamic;
-        $schema->collection  = $this->collection;
+        $schema->collection  = $this->getCollectionName();
 
         return $schema;
     }
@@ -222,10 +222,20 @@ abstract class ActiveRecord
      */
     protected function execute(string $action)
     {
-        if (! $this->collection) {
+        if (! $this->getCollectionName()) {
             return false;
         }
 
         return $this->getDataMapper()->$action($this);
+    }
+
+    /**
+     * Getter for the $collection attribute.
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
     }
 }
