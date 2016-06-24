@@ -179,6 +179,16 @@ abstract class ActiveRecord
     }
 
     /**
+     * Getter for the $collection attribute.
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
+    }
+
+    /**
      * Returns a Schema object that describes this Entity in MongoDB
      *
      * @return Schema
@@ -227,15 +237,5 @@ abstract class ActiveRecord
         }
 
         return $this->getDataMapper()->$action($this);
-    }
-
-    /**
-     * Getter for the $collection attribute.
-     *
-     * @return string
-     */
-    public function getCollectionName()
-    {
-        return $this->collection;
     }
 }
