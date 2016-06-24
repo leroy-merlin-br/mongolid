@@ -3,6 +3,7 @@ namespace Mongolid\Cursor;
 
 use Iterator;
 use IteratorIterator;
+use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use Mongolid\Container\Ioc;
@@ -237,13 +238,13 @@ class Cursor implements Iterator
     }
 
     /**
-     * Actually returns the IteratorIterator object with the DriverCursor within.
+     * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
      * $params given
      *
-     * @return IteratorIterator
+     * @return Traversable
      */
-    protected function getCursor(): IteratorIterator
+    protected function getCursor(): Traversable
     {
         if (! $this->cursor) {
             $driverCursor = call_user_func_array([$this->collection, $this->command], $this->params);
