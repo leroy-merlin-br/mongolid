@@ -46,6 +46,15 @@ trait Attributes
     protected $guarded = [];
 
     /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is true.
+     *
+     * @var boolean
+     */
+    public $mutable = true;
+
+    /**
      * Get an attribute from the model.
      *
      * @param  string $key The attribute to be accessed.
@@ -122,6 +131,34 @@ trait Attributes
     }
 
     /**
+     * Verify if model has a mutator method defined.
+     *
+     * @param  mixed $key    Attribute name.
+     * @param  mixed $prefix Method prefix to be used.
+     *
+     * @return boolean
+     */
+    protected function hasMutatorMethod($key, $prefix)
+    {
+        $method = $this->buildMutatorMethod($key, $prefix);
+        
+        return method_exists($this, $method);
+    }
+
+    /**
+     * Create mutator method pattern.
+     *
+     * @param  mixed $key    Attribute name.
+     * @param  mixed $prefix Method prefix to be used.
+     *
+     * @return string
+     */
+    protected function buildMutatorMethod($key, $prefix)
+    {
+        return $prefix . ucfirst($key) . 'Attribute';
+    }
+
+    /**
      * Returns the model instance as an Array.
      *
      * @return array
@@ -140,6 +177,10 @@ trait Attributes
      */
     public function __get($key)
     {
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
+            return $this->{$this->buildMutatorMethod($key, 'get')}();
+        }
+        
         return $this->getAttribute($key);
     }
 
@@ -153,7 +194,10 @@ trait Attributes
      */
     public function __set($key, $value)
     {
-        // Set attribute
+        if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
+            $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+        
         $this->setAttribute($key, $value);
     }
 
