@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Serializer;
 
 /**
  * This class is responsible to serialize ActiveRecord classes. It's necessary
