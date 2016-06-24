@@ -7,6 +7,7 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema;
+use Serializable;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -17,7 +18,7 @@ use Mongolid\Schema;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord
+abstract class ActiveRecord implements Serializable
 {
     use Attributes, Relations;
 
@@ -186,6 +187,22 @@ abstract class ActiveRecord
     public function getCollectionName()
     {
         return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return Ioc::make(Serializer::class)->serialize($this->getAttributes());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($data)
+    {
+        return Ioc::make(Serializer::class)->unserialize($data);
     }
 
     /**
