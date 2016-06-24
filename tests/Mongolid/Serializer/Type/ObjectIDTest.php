@@ -55,7 +55,7 @@ class ObjectIDTest extends TestCase
         );
     }
 
-    public function testSerializeShouldConvertObjectIDToString()
+    public function testUnserializeShouldKeepStringId()
     {
         $objectId = unserialize(serialize(new ObjectID($this->mongoId)));
 
