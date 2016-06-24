@@ -84,7 +84,7 @@ trait Relations
      * @param string $entity Class of the entity or of the schema of the entity.
      * @param string $field  Field where the embedded documents are stored.
      *
-     * @return array Array with the embedded documents
+     * @return EmbeddedCursor Array with the embedded documents
      */
     protected function embedsMany(string $entity, string $field)
     {
