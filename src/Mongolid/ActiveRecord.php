@@ -4,6 +4,7 @@ namespace Mongolid;
 use BadMethodCallException;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
+use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema;
@@ -102,8 +103,13 @@ abstract class ActiveRecord
      */
     public static function where(array $query = [])
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->where($query);
+        $instance = Ioc::make(get_called_class());
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return $instance->getDataMapper()->where($query);
     }
 
     /**
@@ -113,8 +119,13 @@ abstract class ActiveRecord
      */
     public static function all()
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->all();
+        $instance = Ioc::make(get_called_class());
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return $instance->getDataMapper()->all();
     }
 
     /**
@@ -126,8 +137,13 @@ abstract class ActiveRecord
      */
     public static function first($query = [])
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->first($query);
+        $instance = Ioc::make(get_called_class());
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return $instance->getDataMapper()->first($query);
     }
 
     /**
