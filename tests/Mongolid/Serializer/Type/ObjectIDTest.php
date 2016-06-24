@@ -25,6 +25,7 @@ class ObjectIDTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $this->mongoId = new MongoObjectID($this->stringId);
     }
 

@@ -26,6 +26,7 @@ class UTCDateTimeTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $now = DateTime::createFromFormat('Y-m-d H:i:s', $this->formatedDate);
         $this->mongoDate = new MongoUTCDateTime($now->getTimestamp()*1000);
     }
