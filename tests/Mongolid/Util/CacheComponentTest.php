@@ -18,7 +18,7 @@ class CacheComponentTest extends TestCase
         m::close();
     }
 
-    public function testShouldPutAndRetrieve()
+    public function testShouldPutAndRetrieveValues()
     {
         // Arrange
         $cacheComponent = $this->getCacheComponent();
@@ -30,7 +30,7 @@ class CacheComponentTest extends TestCase
         $this->assertEquals('bacon', $cacheComponent->get('saveThe'));
     }
 
-    public function testShouldExpireCachedValues()
+    public function testShouldExpireValues()
     {
         // Arrange
         $cacheComponent = $this->getCacheComponent();
