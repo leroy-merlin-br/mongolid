@@ -17,7 +17,7 @@ class ObjectID implements SerializableTypeInterface
     /**
      * Constructor
      *
-     * @param MongoObjectID $mongoId MongoDB ObjectID to serialize
+     * @param MongoObjectID $mongoId MongoDB ObjectID to serialize.
      */
     public function __construct(MongoObjectID $mongoId)
     {
@@ -25,7 +25,9 @@ class ObjectID implements SerializableTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Serialies string of ObjectID
+     *
+     * @return string Serialized id
      */
     public function serialize()
     {
@@ -33,7 +35,11 @@ class ObjectID implements SerializableTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Unserializes the object id string
+     *
+     * @param  string $data Serialized object id.
+     *
+     * @return void
      */
     public function unserialize($data)
     {

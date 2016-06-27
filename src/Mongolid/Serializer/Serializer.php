@@ -38,9 +38,9 @@ class Serializer
 
     /**
      * Walk into an array to get not serializable objects and replace it by a
-     * serializable one
+     * serializable one.
      *
-     * @param  array $attributes ActiveRecord attributes to be serialized
+     * @param  array $attributes ActiveRecord attributes to be serialized.
      *
      * @return string
      */
@@ -57,9 +57,9 @@ class Serializer
     }
 
     /**
-     * Unserializes the given string and turn it back to specific objects
+     * Unserializes the given string and turn it back to specific objects.
      *
-     * @param  string $data Serialized string to be converted
+     * @param  string $data Serialized string to be converted.
      *
      * @return array
      */
@@ -76,9 +76,9 @@ class Serializer
     }
 
     /**
-     * Checks if the given parameter is a mapped type and return its index
+     * Checks if the given parameter is a mapped type and return its index.
      *
-     * @param  mixed $value Value of array to check
+     * @param  mixed $value Value of array to check.
      *
      * @return boolean|integer
      */

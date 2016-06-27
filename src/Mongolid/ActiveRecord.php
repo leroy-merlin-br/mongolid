@@ -191,7 +191,9 @@ abstract class ActiveRecord implements Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * Serializes this object using custom Serializer class.
+     *
+     * @return string Serialized object.
      */
     public function serialize()
     {
@@ -199,7 +201,12 @@ abstract class ActiveRecord implements Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * Unserializes the given string and transform it to a filled ActiveRecord
+     * implementation.
+     *
+     * @param  string $data String with serialized object.
+     *
+     * @return ActiveRecord Unserialized object.
      */
     public function unserialize($data)
     {

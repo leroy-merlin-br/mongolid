@@ -15,13 +15,20 @@ class UTCDateTime implements SerializableTypeInterface
      */
     protected $date;
 
+    /**
+     * Constructor
+     *
+     * @param MongoUTCDateTime $mongoDate Object to convert
+     */
     public function __construct(MongoUTCDateTime $mongoDate)
     {
         $this->date = $mongoDate->toDateTime()->format('Y-m-d H:i:s');
     }
 
     /**
-     * {@inheritdoc}
+     * Serializes converted date.
+     *
+     * @return string
      */
     public function serialize()
     {
@@ -29,7 +36,11 @@ class UTCDateTime implements SerializableTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Unserializes the given data
+     *
+     * @param string $data Converted string date
+     *
+     * @return void
      */
     public function unserialize($data)
     {
