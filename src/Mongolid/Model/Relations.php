@@ -75,7 +75,7 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return (new EmbeddedCursor($entity, (array)$this->$field))->first();
+        return (new EmbeddedCursor($entity, (array) $this->$field))->first();
     }
 
     /**
@@ -92,7 +92,7 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return new EmbeddedCursor($entity, $this->$field);
+        return new EmbeddedCursor($entity, (array) $this->$field);
     }
 
     /**
