@@ -203,7 +203,7 @@ abstract class ActiveRecord implements Serializable
      */
     public function unserialize($data)
     {
-        return Ioc::make(Serializer::class)->unserialize($data);
+        $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
     }
 
     /**

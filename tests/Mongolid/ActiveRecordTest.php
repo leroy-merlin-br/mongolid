@@ -319,10 +319,10 @@ class ActiveRecordTest extends TestCase
         );
     }
 
-    public function testUnderializeShouldCallSerializerAndReturnAnArray()
+    public function testUnderializeShouldCallSerializerAndFillObjectSuccessfully()
     {
         $serializer = m::mock(Serializer::class);
-        $attributes = ['some', 'attributes'];
+        $attributes = ['some' => 'attributes'];
 
         $serializer->shouldReceive('unserialize')
             ->with('some-serialized-string')
@@ -331,9 +331,8 @@ class ActiveRecordTest extends TestCase
 
         Ioc::instance(Serializer::class, $serializer);
 
-        $this->assertEquals(
-            $attributes,
-            $this->entity->unserialize('some-serialized-string')
-        );
+        $this->entity->unserialize('some-serialized-string');
+
+        $this->assertEquals($attributes, $this->entity->getAttributes());
     }
 }
