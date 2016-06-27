@@ -10,7 +10,7 @@ use Mongolid\Schema;
 use Mongolid\Util\CacheComponent;
 use TestCase;
 
-class CachableCursorTest extends TestCase
+class CacheableCursorTest extends TestCase
 {
     public function tearDown()
     {
@@ -115,7 +115,7 @@ class CachableCursorTest extends TestCase
         }
 
         $mock = m::mock(
-            CachableCursor::class . '[generateCacheKey]',
+            CacheableCursor::class . '[generateCacheKey]',
             [$entitySchema, $collection, $command, $params]
         );
         $mock->shouldAllowMockingProtectedMethods();
