@@ -18,7 +18,7 @@ class UTCDateTime implements SerializableTypeInterface
     /**
      * Constructor
      *
-     * @param MongoUTCDateTime $mongoDate Object to convert
+     * @param MongoUTCDateTime $mongoDate Object to convert.
      */
     public function __construct(MongoUTCDateTime $mongoDate)
     {
@@ -26,7 +26,7 @@ class UTCDateTime implements SerializableTypeInterface
     }
 
     /**
-     * Serializes converted date.
+     * {@inheritdoc}
      *
      * @return string
      */
@@ -36,9 +36,9 @@ class UTCDateTime implements SerializableTypeInterface
     }
 
     /**
-     * Unserializes the given data
+     * {@inheritdoc}
      *
-     * @param string $data Converted string date
+     * @param mixed $data Serialized string to parse.
      *
      * @return void
      */
@@ -49,6 +49,8 @@ class UTCDateTime implements SerializableTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return MongoUTCDateTime
      */
     public function convert()
     {

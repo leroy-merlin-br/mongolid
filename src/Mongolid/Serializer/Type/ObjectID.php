@@ -25,9 +25,9 @@ class ObjectID implements SerializableTypeInterface
     }
 
     /**
-     * Serialies string of ObjectID
+     * {@inheritdoc}
      *
-     * @return string Serialized id
+     * @return string
      */
     public function serialize()
     {
@@ -35,9 +35,9 @@ class ObjectID implements SerializableTypeInterface
     }
 
     /**
-     * Unserializes the object id string
+     * {@inheritdoc}
      *
-     * @param  string $data Serialized object id.
+     * @param mixed $data Serialized string to parse.
      *
      * @return void
      */
@@ -48,6 +48,8 @@ class ObjectID implements SerializableTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return MongoObjectID
      */
     public function convert()
     {
