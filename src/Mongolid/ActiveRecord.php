@@ -236,6 +236,7 @@ abstract class ActiveRecord implements Serializable
      * Setter for $writeConcern variable
      *
      * @param mixed $writeConcern Level of write concern to the transation.
+     *
      * @return void
      */
     public function setWriteConcern($writeConcern)
