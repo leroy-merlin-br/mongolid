@@ -133,6 +133,26 @@ class CursorTest extends TestCase
         $this->assertAttributeEquals('John Doe', 'name', $entity);
     }
 
+    public function testShouldGetFirstWhenEmpty()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        // Act
+        $driverCursor->shouldReceive('rewind')
+            ->once();
+
+        $driverCursor->shouldReceive('current')
+            ->once()
+            ->andReturn(null);
+
+        // Assert
+        $result = $cursor->first();
+        $this->assertNull($result);
+    }
+
     public function testShouldRefreshTheCursor()
     {
         // Arrange
