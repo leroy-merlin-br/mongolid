@@ -41,7 +41,7 @@ class UTCDateTimeTest extends TestCase
         unset($this->mongoDate);
     }
 
-    public function testUTCDateTimeShouldBeSerializable()
+    public function testUtcDateTimeShouldBeSerializable()
     {
         $this->assertInstanceOf(
             SerializableTypeInterface::class,
@@ -49,7 +49,7 @@ class UTCDateTimeTest extends TestCase
         );
     }
 
-    public function testConstructorShouldCastMongoDBUTCDateTimeToString()
+    public function testConstructorShouldCastMongodbUtcDateTimeToString()
     {
         $this->assertAttributeEquals(
             $this->formatedDate,
@@ -65,7 +65,7 @@ class UTCDateTimeTest extends TestCase
         $this->assertAttributeEquals($this->formatedDate, 'date', $date);
     }
 
-    public function testConvertShouldRetrieveMongoDBUTCDateTime()
+    public function testConvertShouldRetrieveMongodbUtcDateTime()
     {
         $date = new UTCDateTime($this->mongoDate);
         $this->assertEquals($this->mongoDate, $date->convert());

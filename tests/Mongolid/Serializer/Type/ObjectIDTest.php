@@ -39,7 +39,7 @@ class ObjectIDTest extends TestCase
         unset($this->mongoId);
     }
 
-    public function testObjectIDShouldBeSerializable()
+    public function testObjectIdShouldBeSerializable()
     {
         $this->assertInstanceOf(
             SerializableTypeInterface::class,
@@ -47,7 +47,7 @@ class ObjectIDTest extends TestCase
         );
     }
 
-    public function testConstructorShouldCastMongoDBObjectIDToString()
+    public function testConstructorShouldCastMongodbObjectIdToString()
     {
         $this->assertAttributeEquals(
             $this->stringId,
@@ -63,7 +63,7 @@ class ObjectIDTest extends TestCase
         $this->assertAttributeEquals($this->stringId, 'id', $objectId);
     }
 
-    public function testConvertShouldRetrieveMongoDBObjectID()
+    public function testConvertShouldRetrieveMongodbObjectId()
     {
         $objectId = new ObjectID($this->mongoId);
         $this->assertEquals($this->mongoId, $objectId->convert());
