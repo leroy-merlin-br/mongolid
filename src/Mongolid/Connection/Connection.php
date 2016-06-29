@@ -60,7 +60,7 @@ class Connection
      */
     protected function findDefaultDatabase(string $connectionString)
     {
-        preg_match("/\\S+\\/(\\w*)/", $connectionString, $matches);
+        preg_match('/\S+\/(\w*)/', $connectionString, $matches);
 
         if ($matches[1] ?? null) {
             $this->defaultDatabase = $matches[1];
