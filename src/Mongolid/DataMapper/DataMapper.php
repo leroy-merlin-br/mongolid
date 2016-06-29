@@ -6,6 +6,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
+use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
@@ -192,13 +193,16 @@ class DataMapper
      * Retrieve a database cursor that will return $this->schema->entityClass
      * objects that upon iteration
      *
-     * @param  mixed $query MongoDB query to retrieve documents.
+     * @param  mixed   $query     MongoDB query to retrieve documents.
+     * @param  boolean $cacheable Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function where($query = []): Cursor
+    public function where($query = [], bool $cacheable = false): Cursor
     {
-        $cursor = new Cursor(
+        $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
+
+        $cursor = new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
@@ -223,12 +227,17 @@ class DataMapper
      * Retrieve one $this->schema->entityClass objects that matches the given
      * query
      *
-     * @param  mixed $query MongoDB query to retrieve the document.
+     * @param  mixed   $query     MongoDB query to retrieve the document.
+     * @param  boolean $cacheable Retrieves the first trought a CacheableCursor.
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
-    public function first($query = [])
+    public function first($query = [], bool $cacheable = false)
     {
+        if ($cacheable) {
+            return $this->where($query, true)->first();
+        }
+
         $document = $this->getCollection()->findOne(
             $this->prepareValueQuery($query)
         );
