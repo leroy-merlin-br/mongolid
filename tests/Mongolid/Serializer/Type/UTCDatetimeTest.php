@@ -49,11 +49,11 @@ class UTCDateTimeTest extends TestCase
         );
     }
 
-    public function testConstructorShouldCastMongodbUtcDateTimeToString()
+    public function testConstructorShouldSetMongoDate()
     {
         $this->assertAttributeEquals(
-            $this->formatedDate,
-            'date',
+            $this->mongoDate,
+            'mongoDate',
             new UTCDateTime($this->mongoDate)
         );
     }
@@ -62,7 +62,7 @@ class UTCDateTimeTest extends TestCase
     {
         $date = unserialize(serialize(new UTCDateTime($this->mongoDate)));
 
-        $this->assertAttributeEquals($this->formatedDate, 'date', $date);
+        $this->assertAttributeEquals($this->mongoDate, 'mongoDate', $date);
     }
 
     public function testConvertShouldRetrieveMongodbUtcDateTime()

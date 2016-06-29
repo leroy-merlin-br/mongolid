@@ -11,9 +11,9 @@ use Mongolid\Serializer\SerializableTypeInterface;
 class UTCDateTime implements SerializableTypeInterface
 {
     /**
-     * @var string
+     * @var MongoUTCDateTime
      */
-    protected $date;
+    protected $mongoDate;
 
     /**
      * Constructor
@@ -22,7 +22,7 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function __construct(MongoUTCDateTime $mongoDate)
     {
-        $this->date = $mongoDate->toDateTime()->format('Y-m-d H:i:s');
+        $this->mongoDate = $mongoDate;
     }
 
     /**
@@ -32,7 +32,7 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function serialize()
     {
-        return serialize($this->date);
+        return serialize($this->getFormattedDate());
     }
 
     /**
@@ -44,7 +44,11 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function unserialize($data)
     {
-        $this->date = unserialize($data);
+        $date = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            unserialize($data)
+        );
+        $this->mongoDate = new MongoUTCDateTime($date->getTimestamp()*1000);
     }
 
     /**
@@ -54,8 +58,16 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function convert()
     {
-        $date = DateTime::createFromFormat('Y-m-d H:i:s', $this->date);
+        return $this->mongoDate;
+    }
 
-        return new MongoUTCDateTime($date->getTimestamp()*1000);
+    /**
+     * Retrieves formated date string
+     *
+     * @return string
+     */
+    protected function getFormattedDate()
+    {
+        return $this->mongoDate->toDateTime()->format('Y-m-d H:i:s');
     }
 }
