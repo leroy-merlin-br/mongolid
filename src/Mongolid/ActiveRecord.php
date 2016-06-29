@@ -290,6 +290,10 @@ abstract class ActiveRecord implements Serializable
             return false;
         }
 
-        return $this->getDataMapper()->$action($this);
+        $options = [
+            'writeConcern' => $this->getWriteConcern(),
+        ];
+
+        return $this->getDataMapper()->$action($this, $options);
     }
 }

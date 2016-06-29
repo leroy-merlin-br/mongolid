@@ -81,7 +81,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('save')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => 1])
             ->andReturn(true);
 
         // Assert
@@ -103,7 +103,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('insert')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => 1])
             ->andReturn(true);
 
         // Assert
@@ -125,7 +125,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('update')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => 1])
             ->andReturn(true);
 
         // Assert
@@ -147,7 +147,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('delete')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => 1])
             ->andReturn(true);
 
         // Assert
@@ -338,6 +338,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldGetSetWriteConcernInActiveRecordClass()
     {
+        $this->assertEquals(1, $this->entity->getWriteConcern());
         $this->assertEquals(1, $this->entity->getWriteConcern());
         $this->entity->setWriteConcern(0);
         $this->assertEquals(0, $this->entity->getWriteConcern());
