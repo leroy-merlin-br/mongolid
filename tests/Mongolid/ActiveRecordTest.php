@@ -5,10 +5,10 @@ use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
-use Mongolid\Schema;
 use Mongolid\Serializer\Serializer;
 use Serializable;
 use TestCase;
+use MongoDB\Driver\WriteConcern;
 
 class ActiveRecordTest extends TestCase
 {
@@ -81,7 +81,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('save')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -103,7 +103,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('insert')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -125,7 +125,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('update')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -147,7 +147,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('delete')
             ->once()
-            ->with($entity)
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -334,5 +334,13 @@ class ActiveRecordTest extends TestCase
         $this->entity->unserialize('some-serialized-string');
 
         $this->assertEquals($attributes, $this->entity->getAttributes());
+    }
+
+    public function testShouldGetSetWriteConcernInActiveRecordClass()
+    {
+        $this->assertEquals(1, $this->entity->getWriteConcern());
+        $this->assertEquals(1, $this->entity->getWriteConcern());
+        $this->entity->setWriteConcern(0);
+        $this->assertEquals(0, $this->entity->getWriteConcern());
     }
 }
