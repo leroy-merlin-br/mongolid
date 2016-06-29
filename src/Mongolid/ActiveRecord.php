@@ -31,14 +31,20 @@ abstract class ActiveRecord implements Serializable
     protected $collection = null;
 
     /**
+     * @see https://docs.mongodb.com/manual/reference/write-concern/
+     * @var integer
+     */
+    protected $writeConcern = 1;
+
+    /**
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
      * @see  Mongolid\Schema::$fields
      * @var  string|string[]
      */
-    protected $fields  = [
-        '_id' => 'objectId',
+    protected $fields = [
+        '_id'        => 'objectId',
         'created_at' => 'createdAtTimestamp',
         'updated_at' => 'updatedAtTimestamp'
     ];
@@ -133,6 +139,7 @@ abstract class ActiveRecord implements Serializable
 
     /**
      * Handle dynamic method calls into the model.
+     *
      * @codeCoverageIgnore
      *
      * @param  mixed $method     Name of the method that is being called.
@@ -149,20 +156,24 @@ abstract class ActiveRecord implements Serializable
         // Alias to attach
         if ('attachTo' == substr($method, 0, 8)) {
             $field = strtolower(substr($method, 8));
+
             return $this->attach($field, $value);
         }
 
         // Alias to embed
         if ('embedTo' == substr($method, 0, 7)) {
             $field = strtolower(substr($method, 7));
+
             return $this->embed($field, $value);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'The following method can not be reached or does not exist: %s@%s',
-            get_class($this),
-            $method
-        ));
+        throw new BadMethodCallException(
+            sprintf(
+                'The following method can not be reached or does not exist: %s@%s',
+                get_class($this),
+                $method
+            )
+        );
     }
 
     /**
@@ -173,7 +184,7 @@ abstract class ActiveRecord implements Serializable
      */
     public function getDataMapper()
     {
-        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper         = Ioc::make(DataMapper::class);
         $dataMapper->schema = $this->getSchema();
 
         return $dataMapper;
@@ -209,6 +220,26 @@ abstract class ActiveRecord implements Serializable
     public function unserialize($data)
     {
         $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
+    }
+
+    /**
+     * Getter for $writeConcern variable
+     *
+     * @return mixed
+     */
+    public function getWriteConcern(): int
+    {
+        return $this->writeConcern;
+    }
+
+    /**
+     * Setter for $writeConcern variable
+     *
+     * @param int $writeConcern
+     */
+    public function setWriteConcern(int $writeConcern)
+    {
+        $this->writeConcern = $writeConcern;
     }
 
     /**

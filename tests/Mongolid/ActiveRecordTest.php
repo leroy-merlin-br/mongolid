@@ -335,4 +335,11 @@ class ActiveRecordTest extends TestCase
 
         $this->assertEquals($attributes, $this->entity->getAttributes());
     }
+
+    public function testShouldGetSetWriteConcernInActiveRecordClass()
+    {
+        $this->assertEquals(1, $this->entity->getWriteConcern());
+        $this->entity->setWriteConcern(0);
+        $this->assertEquals(0, $this->entity->getWriteConcern());
+    }
 }
