@@ -72,6 +72,22 @@ class UTCDateTimeTest extends TestCase
         );
     }
 
+    public function testConstructorUsingNullShouldSetMongoDateAndTimestamp()
+    {
+        $this->assertAttributeEquals(
+            $this->timestamp*1000,
+            'timestamp',
+            new UTCDatetime(),
+            null,
+            1
+        );
+        $this->assertAttributeEquals(
+            $this->mongoDate,
+            'mongoDate',
+            new UTCDatetime()
+        );
+    }
+
     public function testConstructorUsingMongoDateShouldSetMongoDateAndTimestamp()
     {
         $this->assertAttributeEquals(

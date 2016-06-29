@@ -24,14 +24,17 @@ class UTCDateTime implements SerializableTypeInterface
     /**
      * Constructor
      *
-     * @param integer|MongoUTCDateTime $datetime Timestamp or MongoUTCDateTime
-     *                                           to wrap.
+     * @param integer|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
+     *                                                current timestamp
      *
-     * @throws InvalidArgumentException $datetime accepts only integer or
-     *                                  MongoUTCDateTime.
+     * @throws InvalidArgumentException $datetime accepts only integer, null or MongoUTCDateTime.
      */
-    public function __construct($datetime)
+    public function __construct($datetime = null)
     {
+        if (is_null($datetime)) {
+            $datetime = time();
+        }
+
         if (is_integer($datetime)) {
             $this->timestamp = $datetime * 1000;
             $this->mongoDate = new MongoUTCDateTime($this->timestamp);
@@ -47,8 +50,8 @@ class UTCDateTime implements SerializableTypeInterface
         }
 
         throw new InvalidArgumentException(
-            'Invalid argument type given. Constructor allows only integer or '.
-            'MongoDB\BSON\UTCDateTime'
+            'Invalid argument type given. Constructor allows only integer, '.
+            'null or MongoDB\BSON\UTCDateTime'
         );
     }
 
