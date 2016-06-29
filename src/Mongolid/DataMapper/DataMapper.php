@@ -71,9 +71,11 @@ class DataMapper
      *
      * @param  mixed $object The object used in the operation.
      *
-     * @return boolean Success (but always false if write concern is Unacknowledged)
+     * @param array  $options
+     *
+     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($object)
+    public function save($object, array $options = [])
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
@@ -87,7 +89,7 @@ class DataMapper
         $result = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
             ['$set' => $data],
-            ['upsert' => true]
+            $this->mergeOptions($options, ['upsert' => true])
         );
 
         $result = (bool) ($result->getModifiedCount() + $result->getUpsertedCount());
@@ -106,9 +108,11 @@ class DataMapper
      *
      * @param  mixed $object The object used in the operation.
      *
-     * @return boolean Success (but always false if write concern is Unacknowledged)
+     * @param array  $options
+     *
+     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object): bool
+    public function insert($object, array $options = []): bool
     {
         if ($this->fireEvent('inserting', $object, true) === false) {
             return false;
@@ -117,7 +121,8 @@ class DataMapper
         $data = $this->parseToDocument($object);
 
         $result = $this->getCollection()->insertOne(
-            $data
+            $data,
+            $this->mergeOptions($options)
         );
 
         $result = (bool) $result->getInsertedCount();
@@ -136,9 +141,11 @@ class DataMapper
      *
      * @param  mixed $object The object used in the operation.
      *
-     * @return boolean Success (but always false if write concern is Unacknowledged)
+     * @param array  $options
+     *
+     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function update($object)
+    public function update($object, array $options = [])
     {
         if ($this->fireEvent('updating', $object, true) === false) {
             return false;
@@ -148,7 +155,8 @@ class DataMapper
 
         $result = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
-            ['$set' => $data]
+            ['$set' => $data],
+            $this->mergeOptions($options)
         );
 
         $result = (bool) $result->getModifiedCount();
@@ -167,7 +175,7 @@ class DataMapper
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
-    public function delete($object)
+    public function delete($object, array $options = [])
     {
         if ($this->fireEvent('deleting', $object, true) === false) {
             return false;
@@ -176,7 +184,8 @@ class DataMapper
         $data = $this->parseToDocument($object);
 
         $result = $this->getCollection()->deleteOne(
-            ['_id' => $data['_id']]
+            ['_id' => $data['_id']],
+            $this->mergeOptions($options)
         );
 
         $result = (bool) $result->getDeletedCount();
@@ -343,5 +352,18 @@ class DataMapper
         $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
 
         return $this->eventService->fire($event, $entity, $halt);
+    }
+
+    /**
+     * Merge all options.
+     *
+     * @param array $defaultOptions
+     * @param array $toMergeOptions
+     *
+     * @return array
+     */
+    private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = [])
+    {
+        return array_merge($defaultOptions, $toMergeOptions);
     }
 }
