@@ -8,6 +8,7 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Serializer\Serializer;
 use Serializable;
+use MongoDB\Driver\WriteConcern;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -293,7 +294,7 @@ abstract class ActiveRecord implements Serializable
         }
 
         $options = [
-            'writeConcern' => $this->getWriteConcern(),
+            'writeConcern' => new WriteConcern($this->getWriteConcern()),
         ];
 
         return $this->getDataMapper()->$action($this, $options);

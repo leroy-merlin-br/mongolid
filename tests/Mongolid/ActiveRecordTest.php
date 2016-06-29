@@ -5,10 +5,10 @@ use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
-use Mongolid\Schema;
 use Mongolid\Serializer\Serializer;
 use Serializable;
 use TestCase;
+use MongoDB\Driver\WriteConcern;
 
 class ActiveRecordTest extends TestCase
 {
@@ -81,7 +81,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('save')
             ->once()
-            ->with($entity, ['writeConcern' => 1])
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -103,7 +103,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('insert')
             ->once()
-            ->with($entity, ['writeConcern' => 1])
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -125,7 +125,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('update')
             ->once()
-            ->with($entity, ['writeConcern' => 1])
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -147,7 +147,7 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('delete')
             ->once()
-            ->with($entity, ['writeConcern' => 1])
+            ->with($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
