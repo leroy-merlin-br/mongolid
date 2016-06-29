@@ -48,9 +48,10 @@ class SerializerTest extends TestCase
     public function testSerializerShouldSerializeReplacingMongoDBObjects()
     {
         $mongoId   = new MongoObjectID();
-        $mongoDate = new MongoUTCDateTime(time()*1000);
+        $timestamp = time();
+        $mongoDate = new MongoUTCDateTime($timestamp*1000);
         $id        = new ObjectID($mongoId);
-        $date      = new UTCDateTime($mongoDate);
+        $date      = new UTCDateTime($timestamp);
 
         $attributes = [
             '_id' => $mongoId,

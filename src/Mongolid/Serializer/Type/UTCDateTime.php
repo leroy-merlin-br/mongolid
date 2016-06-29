@@ -2,6 +2,7 @@
 namespace Mongolid\Serializer\Type;
 
 use DateTime;
+use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
 
@@ -16,13 +17,39 @@ class UTCDateTime implements SerializableTypeInterface
     protected $mongoDate;
 
     /**
+     * @var integer
+     */
+    protected $timestamp;
+
+    /**
      * Constructor
      *
-     * @param MongoUTCDateTime $mongoDate Object to convert.
+     * @param integer|MongoUTCDateTime $datetime Timestamp or MongoUTCDateTime
+     *                                           to wrap.
+     *
+     * @throws InvalidArgumentException $datetime accepts only integer or
+     *                                  MongoUTCDateTime.
      */
-    public function __construct(MongoUTCDateTime $mongoDate)
+    public function __construct($datetime)
     {
-        $this->mongoDate = $mongoDate;
+        if (is_integer($datetime)) {
+            $this->timestamp = $datetime * 1000;
+            $this->mongoDate = new MongoUTCDateTime($this->timestamp);
+
+            return;
+        }
+
+        if ($datetime instanceof MongoUTCDateTime) {
+            $this->mongoDate = $datetime;
+            $this->timestamp = $datetime->toDateTime()->getTimestamp() * 1000;
+
+            return;
+        }
+
+        throw new InvalidArgumentException(
+            'Invalid argument type given. Constructor allows only integer or '.
+            'MongoDB\BSON\UTCDateTime'
+        );
     }
 
     /**
@@ -32,7 +59,7 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function serialize()
     {
-        return serialize($this->getFormattedDate());
+        return serialize($this->timestamp);
     }
 
     /**
@@ -44,11 +71,8 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function unserialize($data)
     {
-        $date = DateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            unserialize($data)
-        );
-        $this->mongoDate = new MongoUTCDateTime($date->getTimestamp()*1000);
+        $this->timestamp = unserialize($data);
+        $this->mongoDate = new MongoUTCDateTime($this->timestamp);
     }
 
     /**
@@ -62,12 +86,15 @@ class UTCDateTime implements SerializableTypeInterface
     }
 
     /**
-     * Retrieves formated date string
+     * A wrapper to use this class as MongoUTCDateTime
      *
-     * @return string
+     * @param  string $method Method of MongoUTCDateTime to call.
+     * @param  array  $args   Arguments to pass.
+     *
+     * @return mixed
      */
-    protected function getFormattedDate()
+    public function __call($method, array $args = [])
     {
-        return $this->mongoDate->toDateTime()->format('Y-m-d H:i:s');
+        return call_user_func_array([$this->mongoDate, $method], $args);
     }
 }

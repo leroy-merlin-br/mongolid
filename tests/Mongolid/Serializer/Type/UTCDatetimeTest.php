@@ -2,6 +2,7 @@
 namespace Mongolid\Serializer\Type;
 
 use DateTime;
+use Mockery as m;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
 use PHPUnit_Framework_TestCase as TestCase;
@@ -14,7 +15,12 @@ class UTCDateTimeTest extends TestCase
     /**
      * @var string
      */
-    protected $formatedDate = '1990-02-20 21:45:00';
+    protected $formattedDate = '1990-02-20 21:45:00';
+
+    /**
+     * @var integer
+     */
+    protected $timestamp;
 
     /**
      * @var MongoUTCDateTime
@@ -27,8 +33,9 @@ class UTCDateTimeTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $now = DateTime::createFromFormat('Y-m-d H:i:s', $this->formatedDate);
-        $this->mongoDate = new MongoUTCDateTime($now->getTimestamp()*1000);
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $this->formattedDate);
+        $this->timestamp = $date->getTimestamp();
+        $this->mongoDate = new MongoUTCDateTime($this->timestamp*1000);
     }
 
     /**
@@ -36,8 +43,9 @@ class UTCDateTimeTest extends TestCase
      */
     public function tearDown()
     {
+        m::close();
         parent::tearDown();
-        unset($this->formatedDate);
+        unset($this->formattedDate);
         unset($this->mongoDate);
     }
 
@@ -45,12 +53,31 @@ class UTCDateTimeTest extends TestCase
     {
         $this->assertInstanceOf(
             SerializableTypeInterface::class,
-            new UTCDateTime($this->mongoDate)
+            new UTCDateTime($this->timestamp)
         );
     }
 
-    public function testConstructorShouldSetMongoDate()
+    public function testConstructorUsingTimestampShouldSetMongoDateAndTimestamp()
     {
+        $this->assertAttributeEquals(
+            $this->timestamp*1000,
+            'timestamp',
+            new UTCDateTime($this->timestamp)
+        );
+        $this->assertAttributeEquals(
+            $this->mongoDate,
+            'mongoDate',
+            new UTCDateTime($this->timestamp)
+        );
+    }
+
+    public function testConstructorUsingMongoDateShouldSetMongoDateAndTimestamp()
+    {
+        $this->assertAttributeEquals(
+            $this->timestamp*1000,
+            'timestamp',
+            new UTCDateTime($this->mongoDate)
+        );
         $this->assertAttributeEquals(
             $this->mongoDate,
             'mongoDate',
@@ -58,16 +85,35 @@ class UTCDateTimeTest extends TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid argument type given. Constructor allows
+     *                           only integer or MongoDB\BSON\UTCDateTime
+     */
+    public function testConstrucorWithInvalidParameterShouldThrowException()
+    {
+        new UTCDateTime('invalid-parameter');
+    }
+
     public function testUnserializeShouldKeepFormatedDate()
     {
-        $date = unserialize(serialize(new UTCDateTime($this->mongoDate)));
+        $date = unserialize(serialize(new UTCDateTime($this->timestamp)));
 
         $this->assertAttributeEquals($this->mongoDate, 'mongoDate', $date);
     }
 
     public function testConvertShouldRetrieveMongodbUtcDateTime()
     {
-        $date = new UTCDateTime($this->mongoDate);
+        $date = new UTCDateTime($this->timestamp);
         $this->assertEquals($this->mongoDate, $date->convert());
+    }
+
+    public function testCallUndefinedMethodOfUtcDateTimeShouldCallMongoUtcDateTime()
+    {
+        $date      = new DateTime();
+        $timestamp = $date->getTimestamp();
+        $mongoDate = new MongoUTCDateTime($timestamp*1000);
+
+        $this->assertEquals($date, (new UTCDateTime($timestamp))->toDateTime());
     }
 }
