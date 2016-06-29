@@ -6,7 +6,6 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
-use Mongolid\Schema;
 use Mongolid\Serializer\Serializer;
 use Serializable;
 
