@@ -190,11 +190,11 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('where')
             ->once()
-            ->with($query)
+            ->with($query, true)
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->where($query));
+        $this->assertEquals($cursor, $entity->where($query, true));
     }
 
     public function testShouldGetAll()
@@ -234,11 +234,11 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('first')
             ->once()
-            ->with($query)
+            ->with($query, true)
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->first($query));
+        $this->assertEquals($cursor, $entity->first($query, true));
     }
 
     public function testShouldGetSchemaIfFieldsIsTheClassName()
