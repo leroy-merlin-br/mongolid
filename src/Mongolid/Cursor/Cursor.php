@@ -11,7 +11,6 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
 use Serializable;
-use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
