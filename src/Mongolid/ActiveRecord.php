@@ -227,7 +227,7 @@ abstract class ActiveRecord implements Serializable
      *
      * @return mixed
      */
-    public function getWriteConcern(): int
+    public function getWriteConcern()
     {
         return $this->writeConcern;
     }
@@ -235,9 +235,10 @@ abstract class ActiveRecord implements Serializable
     /**
      * Setter for $writeConcern variable
      *
-     * @param int $writeConcern
+     * @param mixed $writeConcern Level of write concern to the transation.
+     * @return void
      */
-    public function setWriteConcern(int $writeConcern)
+    public function setWriteConcern($writeConcern)
     {
         $this->writeConcern = $writeConcern;
     }

@@ -69,9 +69,9 @@ class DataMapper
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
      *
-     * @param  mixed $object The object used in the operation.
+     * @param  mixed $object  The object used in the operation.
      *
-     * @param array  $options
+     * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -106,9 +106,9 @@ class DataMapper
      * is acknowledged. Since it's an insert, it will fail if the _id already
      * exists.
      *
-     * @param  mixed $object The object used in the operation.
+     * @param  mixed $object  The object used in the operation.
      *
-     * @param array  $options
+     * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -139,9 +139,9 @@ class DataMapper
      * is acknowledged. Since it's an update, it will fail if the document with
      * the given _id didn't exists.
      *
-     * @param  mixed $object The object used in the operation.
+     * @param  mixed $object  The object used in the operation.
      *
-     * @param array  $options
+     * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -171,7 +171,8 @@ class DataMapper
     /**
      * Removes the given document from the collection.
      *
-     * @param  mixed $object The object used in the operation.
+     * @param  mixed $object  The object used in the operation.
+     * @param  array $options Possible options to send to mongo driver.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
@@ -357,8 +358,8 @@ class DataMapper
     /**
      * Merge all options.
      *
-     * @param array $defaultOptions
-     * @param array $toMergeOptions
+     * @param array $defaultOptions Default options array.
+     * @param array $toMergeOptions To merge options array.
      *
      * @return array
      */
