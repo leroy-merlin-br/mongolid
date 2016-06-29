@@ -5,6 +5,10 @@ namespace Mongolid\Cursor;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
+use Mongolid\Connection\Connection;
+use Mongolid\Connection\Pool;
+use Mongolid\Container\Ioc;
+use Mongolid\DynamicSchema;
 use Mongolid\Schema;
 use TestCase;
 
@@ -127,6 +131,18 @@ class CursorTest extends TestCase
         $entity = $cursor->first();
         $this->assertInstanceOf('stdClass', $entity);
         $this->assertAttributeEquals('John Doe', 'name', $entity);
+    }
+
+    public function testShouldRefreshTheCursor()
+    {
+        // Arrange
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor();
+        $this->setProtected($cursor, 'cursor', $driverCursor);
+
+        // Assert
+        $cursor->fresh();
+        $this->assertAttributeEquals(null, 'cursor', $cursor);
     }
 
     public function testShouldImplementKeyMethodFromIterator()
@@ -267,6 +283,35 @@ class CursorTest extends TestCase
         );
     }
 
+    public function testShouldSerializeAnActiveCursor()
+    {
+        // Arrange
+        $pool             = m::mock(Pool::class);
+        $conn             = m::mock(Connection::class);
+        $schema           = new DynamicSchema;
+        $cursor           = $this->getCursor($schema, null, 'find', [[]]);
+        $driverCollection = $this->getDriverCollection();
+
+        $this->setProtected($cursor, 'collection', $driverCollection);
+
+        // Act
+        Ioc::instance(Pool::class, $pool);
+
+        $pool->shouldReceive('getConnection')
+            ->andReturn($conn);
+
+        $conn->shouldReceive('getRawConnection')
+            ->andReturn($conn);
+
+        $conn->defaultDatabase = 'db';
+        $conn->db              = $conn;
+        $conn->my_collection   = $driverCollection; // Return the same driver Collection
+
+        // Assert
+        $result = unserialize(serialize($cursor));
+        $this->assertEquals($cursor, $result);
+    }
+
     protected function getCursor(
         $entitySchema = null,
         $collection = null,
@@ -296,5 +341,25 @@ class CursorTest extends TestCase
             ->andReturn($driverCursor);
 
         return $mock;
+    }
+
+    /**
+     * Since the MongoDB\Collection is not serializable. This method will
+     * emulate an unserializable collection from mongoDb driver.
+     */
+    protected function getDriverCollection()
+    {
+        /**
+         * Emulates a MongoDB\Collection non serializable behavior.
+         */
+        return new class implements \Serializable {
+            public function serialize() {
+                throw new Exception("Unable to serialize", 1);
+            }
+            public function unserialize($serialized) {}
+            public function getCollectionName() {
+                return 'my_collection';
+            }
+        };
     }
 }

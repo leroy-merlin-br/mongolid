@@ -7,6 +7,8 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema;
+use Mongolid\Serializer\Serializer;
+use Serializable;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -17,7 +19,7 @@ use Mongolid\Schema;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord
+abstract class ActiveRecord implements Serializable
 {
     use Attributes, Relations;
 
@@ -179,6 +181,38 @@ abstract class ActiveRecord
     }
 
     /**
+     * Getter for the $collection attribute.
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        return Ioc::make(Serializer::class)->serialize($this->getAttributes());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $data Serialized string to parse.
+     *
+     * @return void
+     */
+    public function unserialize($data)
+    {
+        $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
+    }
+
+    /**
      * Returns a Schema object that describes this Entity in MongoDB
      *
      * @return Schema
@@ -227,15 +261,5 @@ abstract class ActiveRecord
         }
 
         return $this->getDataMapper()->$action($this);
-    }
-
-    /**
-     * Getter for the $collection attribute.
-     *
-     * @return string
-     */
-    public function getCollectionName()
-    {
-        return $this->collection;
     }
 }

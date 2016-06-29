@@ -6,21 +6,44 @@ use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema;
+use Mongolid\Serializer\Serializer;
+use Serializable;
 use TestCase;
 
 class ActiveRecordTest extends TestCase
 {
+    /**
+     * @var ActiveRecord
+     */
+    protected $entity;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp()
+    {
+        parent::setUp();
+        $this->entity = new class extends ActiveRecord {
+        };
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function tearDown()
     {
         parent::tearDown();
         m::close();
+        unset($this->entity);
+    }
+
+    public function testActiveRecordShouldBeSerializable()
+    {
+        $this->assertInstanceOf(Serializable::class, $this->entity);
     }
 
     public function testShouldHaveCorrectPropertiesByDefault()
     {
-        // Arrage
-        $entity = m::mock(ActiveRecord::class.'[]');
-
         // Assert
         $this->assertAttributeEquals(
             [
@@ -29,9 +52,9 @@ class ActiveRecordTest extends TestCase
                 'updated_at' => 'updatedAtTimestamp'
             ],
             'fields',
-            $entity
+            $this->entity
         );
-        $this->assertTrue($entity->dynamic);
+        $this->assertTrue($this->entity->dynamic);
     }
 
     public function testShouldImplementModelTraits()
@@ -133,26 +156,22 @@ class ActiveRecordTest extends TestCase
 
     public function testSaveShouldReturnFalseIfCollectionIsNull()
     {
-        $entity = m::mock(ActiveRecord::class)->makePartial();
-        $this->assertFalse($entity->save());
+        $this->assertFalse($this->entity->save());
     }
 
     public function testUpdateShouldReturnFalseIfCollectionIsNull()
     {
-        $entity = m::mock(ActiveRecord::class)->makePartial();
-        $this->assertFalse($entity->update());
+        $this->assertFalse($this->entity->update());
     }
 
     public function testInsertShouldReturnFalseIfCollectionIsNull()
     {
-        $entity = m::mock(ActiveRecord::class)->makePartial();
-        $this->assertFalse($entity->insert());
+        $this->assertFalse($this->entity->insert());
     }
 
     public function testDeleteShouldReturnFalseIfCollectionIsNull()
     {
-        $entity = m::mock(ActiveRecord::class)->makePartial();
-        $this->assertFalse($entity->delete());
+        $this->assertFalse($this->entity->delete());
     }
 
     public function testShouldGetWithWhereQuery()
@@ -225,31 +244,32 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[]');
-        $this->setProtected($entity, 'fields', 'MySchemaClass');
+        $this->setProtected($this->entity, 'fields', 'MySchemaClass');
         $schema = m::mock(Schema::class);
 
         // Act
         Ioc::instance('MySchemaClass', $schema);
 
         // Assert
-        $this->assertEquals($schema, $this->callProtected($entity, 'getSchema'));
+        $this->assertEquals(
+            $schema,
+            $this->callProtected($this->entity, 'getSchema')
+        );
     }
 
     public function testShouldGetSchemaIfFieldsDescribesSchemaFields()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[]');
         $fields = ['name' => 'string', 'age' => 'int'];
-        $this->setProtected($entity, 'fields', $fields);
+        $this->setProtected($this->entity, 'fields', $fields);
 
         // Assert
-        $result = $this->callProtected($entity, 'getSchema');
+        $result = $this->callProtected($this->entity, 'getSchema');
         $this->assertInstanceOf(Schema::class, $result);
         $this->assertEquals($fields, $result->fields);
-        $this->assertEquals($entity->dynamic, $result->dynamic);
-        $this->assertEquals($entity->getCollectionName(), $result->collection);
-        $this->assertEquals(get_class($entity), $result->entityClass);
+        $this->assertEquals($this->entity->dynamic, $result->dynamic);
+        $this->assertEquals($this->entity->getCollectionName(), $result->collection);
+        $this->assertEquals(get_class($this->entity), $result->entityClass);
     }
 
     public function testShouldGetDataMapper()
@@ -278,5 +298,41 @@ class ActiveRecordTest extends TestCase
         };
 
         $this->assertEquals($entity->getCollectionName(), 'collection_name');
+    }
+
+    public function testSerializeShouldCallSerializerAndReturnString()
+    {
+        $serializer = m::mock(Serializer::class);
+        $attributes = ['some', 'attributes'];
+        $this->entity->fill($attributes);
+
+        $serializer->shouldReceive('serialize')
+            ->with($attributes)
+            ->once()
+            ->andReturn('some-serialized-string');
+
+        Ioc::instance(Serializer::class, $serializer);
+
+        $this->assertEquals(
+            'some-serialized-string',
+            $this->entity->serialize()
+        );
+    }
+
+    public function testUnderializeShouldCallSerializerAndFillObjectSuccessfully()
+    {
+        $serializer = m::mock(Serializer::class);
+        $attributes = ['some' => 'attributes'];
+
+        $serializer->shouldReceive('unserialize')
+            ->with('some-serialized-string')
+            ->once()
+            ->andReturn($attributes);
+
+        Ioc::instance(Serializer::class, $serializer);
+
+        $this->entity->unserialize('some-serialized-string');
+
+        $this->assertEquals($attributes, $this->entity->getAttributes());
     }
 }

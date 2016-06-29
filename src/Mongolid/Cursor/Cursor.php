@@ -6,9 +6,12 @@ use IteratorIterator;
 use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
+use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
+use Serializable;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -18,7 +21,7 @@ use Mongolid\Schema;
  *
  * @package Mongolid
  */
-class Cursor implements Iterator
+class Cursor implements Iterator, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
@@ -180,6 +183,19 @@ class Cursor implements Iterator
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
+
+    /**
+     * Refresh the cursor in order to be able to perform a rewind and iterate
+     * trought it again. A new request to the database will be made in the next
+     * iteration.
+     *
+     * @return void
+     */
+    public function fresh()
+    {
+        $this->cursor = null;
+    }
+
     /**
      * Iterator key method (used in foreach)
      *
@@ -267,5 +283,40 @@ class Cursor implements Iterator
         }
 
         return $this->assembler;
+    }
+
+    /**
+     * Serializes this object storing the collection name instead of the actual
+     * MongoDb\Collection (which is unserializable)
+     *
+     * @return string Serialized object.
+     */
+    public function serialize()
+    {
+        $properties = get_object_vars($this);
+        $properties['collection'] = $this->collection->getCollectionName();
+
+        return serialize($properties);
+    }
+
+    /**
+     * Unserializes this object. Re-creating the database connection.
+     *
+     * @param  mixed $serialized Serialized cursor.
+     *
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $attr = unserialize($serialized);
+
+        $conn             = Ioc::make(Pool::class)->getConnection();
+        $db               = $conn->defaultDatabase;
+        $collectionObject = $conn->getRawConnection()->$db->{$attr['collection']};
+
+        $this->entitySchema = $attr['entitySchema'];
+        $this->collection   = $collectionObject;
+        $this->command      = $attr['command'];
+        $this->params       = $attr['params'];
     }
 }
