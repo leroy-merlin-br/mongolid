@@ -285,7 +285,8 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Serializes this object using custom Serializer class.
+     * Serializes this object storing the collection name instead of the actual
+     * MongoDb\Collection (which is unserializable)
      *
      * @return string Serialized object.
      */
@@ -297,6 +298,13 @@ class Cursor implements Iterator, Serializable
         return serialize($properties);
     }
 
+    /**
+     * Unserializes this object. Re-creating the database connection.
+     *
+     * @param  mixed $serialized Serialized cursor.
+     *
+     * @return void
+     */
     public function unserialize($serialized)
     {
         $attr = unserialize($serialized);
