@@ -99,6 +99,30 @@ class CacheableCursorTest extends TestCase
         );
     }
 
+    public function testShouldGenerateUniqueCacheKey()
+    {
+        // Arrange
+        $cursor = $this->getCachableCursor(null, null, 'find', [['color' => 'red']]);
+
+        // Act
+        $cursor->shouldReceive('generateCacheKey')
+            ->passthru();
+
+        $expectedCacheKey = sprintf(
+            '%s:%s:%s',
+            'find',
+            'my_db.my_collection',
+            md5(serialize([['color' => 'red']]))
+        );
+
+        // Assert
+
+        $this->assertEquals(
+            $expectedCacheKey,
+            $cursor->generateCacheKey()
+        );
+    }
+
     protected function getCachableCursor(
         $entitySchema = null,
         $collection = null,
@@ -112,6 +136,8 @@ class CacheableCursorTest extends TestCase
 
         if (! $collection) {
             $collection = m::mock(Collection::class);
+            $collection->shouldReceive('getNamespace')
+                ->andReturn('my_db.my_collection');
         }
 
         $mock = m::mock(

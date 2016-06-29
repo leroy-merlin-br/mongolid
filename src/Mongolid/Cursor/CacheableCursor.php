@@ -71,7 +71,7 @@ class CacheableCursor extends Cursor
         return sprintf(
             '%s:%s:%s',
             $this->command,
-            $this->collection,
+            $this->collection->getNamespace(),
             md5(serialize($this->params))
         );
     }
