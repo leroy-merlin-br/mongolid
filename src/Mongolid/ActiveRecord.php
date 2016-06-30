@@ -246,12 +246,12 @@ abstract class ActiveRecord
      */
     private static function getDataMapperInstance()
     {
-        $instance = self::getCalledInstance();
+        $instance = Ioc::make(get_called_class());
 
         if (! $instance->getCollectionName()) {
             throw new NoCollectionNameException;
         }
 
-        return Ioc::make(get_called_class())->getMapper();
+        return $instance->getDataMapper();
     }
 }
