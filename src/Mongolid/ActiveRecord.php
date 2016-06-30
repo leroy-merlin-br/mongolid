@@ -123,7 +123,7 @@ abstract class ActiveRecord
      */
     public static function all()
     {
-        $instance = Ioc::make(get_called_class());
+        $instance = self::getCalledInstance();
 
         if (! $instance->getCollectionName()) {
             throw new NoCollectionNameException;
@@ -143,7 +143,7 @@ abstract class ActiveRecord
      */
     public static function first($query = [])
     {
-        $instance = Ioc::make(get_called_class());
+        $instance = self::getCalledInstance();
 
         if (! $instance->getCollectionName()) {
             throw new NoCollectionNameException;
