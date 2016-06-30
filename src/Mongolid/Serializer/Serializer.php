@@ -21,19 +21,18 @@ use Mongolid\Serializer\Type\UTCDateTime;
 class Serializer implements ConvertableInterface
 {
     /**
-     * @var string[]
+     * @var Converter
      */
-    protected $mappedTypes = [];
+    protected $converter;
 
     /**
      * Constructor
+     *
+     * @param ConvertableInterface $converter Class responsible to convert objects.
      */
-    public function __construct()
+    public function __construct(ConvertableInterface $converter)
     {
-        $this->mappedTypes = [
-            ObjectID::class    => MongoObjectID::class,
-            UTCDateTime::class => MongoUTCDateTime::class,
-        ];
+        $this->converter = $converter;
     }
 
     /**
@@ -46,14 +45,7 @@ class Serializer implements ConvertableInterface
      */
     public function serialize(array $attributes): string
     {
-        array_walk_recursive($attributes, function (&$value) {
-            $className = $this->getReflectionClass($value);
-            if (class_exists($className)) {
-                return $value = new $className($value);
-            }
-        });
-
-        return serialize($attributes);
+        return serialize($this->convert($attributes));
     }
 
     /**
@@ -65,45 +57,22 @@ class Serializer implements ConvertableInterface
      */
     public function unserialize(string $data): array
     {
-        $attributes = unserialize($data);
-        array_walk_recursive($attributes, function (&$value, $key) {
-            if ($value instanceof SerializableTypeInterface) {
-                $value = $value->convert();
-            }
-        });
-
-        return $attributes;
+        return $this->unconvert(unserialize($data));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convert(array $data)
+    public function convert(array $attributes)
     {
-        return [];
+        return $this->converter->convert($attributes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unconvert(array $data)
+    public function unconvert(array $attributes)
     {
-        return [];
-    }
-
-    /**
-     * Checks if the given parameter is a mapped type and return its index.
-     *
-     * @param  mixed $value Value of array to check.
-     *
-     * @return boolean|integer
-     */
-    protected function getReflectionClass($value)
-    {
-        if (false === is_object($value)) {
-            return false;
-        }
-
-        return array_search(get_class($value), $this->mappedTypes);
+        return $this->converter->unconvert($attributes);
     }
 }

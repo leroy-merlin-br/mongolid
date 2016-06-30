@@ -1,10 +1,9 @@
 <?php
 namespace Mongolid\Serializer;
 
-use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
+use Mockery as m;
 use MongoDB\BSON\ObjectID as MongoObjectID;
-use Mongolid\Serializer\Type\ObjectID;
-use Mongolid\Serializer\Type\UTCDateTime;
+use Mongolid\Serializer\Type\Converter;
 use PHPUnit_Framework_TestCase as TestCase;
 
 /**
@@ -13,23 +12,12 @@ use PHPUnit_Framework_TestCase as TestCase;
 class SerializerTest extends TestCase
 {
     /**
-     * @var Serializer
-     */
-    protected $serializer;
-
-    /**
      * {@inheritdoc}
      */
-    public function setUp()
-    {
-        parent::setUp();
-        $this->serializer = new Serializer();
-    }
-
     public function tearDown()
     {
         parent::tearDown();
-        unset($this->serializer);
+        m::close();
     }
 
     /**
@@ -47,142 +35,79 @@ class SerializerTest extends TestCase
 
     public function testSerializerShouldBeAnInstanceOfConvertableInterface()
     {
-        $this->assertInstanceOf(ConvertableInterface::class, $this->serializer);
-    }
-
-    public function testSerializerShouldSerializeReplacingMongoDBObjects()
-    {
-        $mongoId   = new MongoObjectID();
-        $timestamp = time();
-        $mongoDate = new MongoUTCDateTime($timestamp*1000);
-        $id        = new ObjectID($mongoId);
-        $date      = new UTCDateTime($timestamp);
-
-        $attributes = [
-            '_id' => $mongoId,
-            'created_at' => $mongoDate,
-            'parents' => [$mongoId, $mongoId, $mongoId],
-            'comments' => [
-                [
-                    'author' => 'Jhon',
-                    'date' => $mongoDate,
-                ],
-                [
-                    'author' => 'Doe',
-                    'date' => $mongoDate,
-                    'versions' => [
-                        [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
-                            'content' => 'Awsome',
-                        ],
-                        [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
-                            'content' => 'Great',
-                        ],
-                    ]
-                ],
-            ]
-        ];
-
-        $expected = [
-            '_id' => $id,
-            'created_at' => $date,
-            'parents' => [$id, $id, $id],
-            'comments' => [
-                [
-                    'author' => 'Jhon',
-                    'date' => $date,
-                ],
-                [
-                    'author' => 'Doe',
-                    'date' => $date,
-                    'versions' => [
-                        [
-                            '_id' => $id,
-                            'date' => $date,
-                            'content' => 'Awsome',
-                        ],
-                        [
-                            '_id' => $id,
-                            'date' => $date,
-                            'content' => 'Great',
-                        ],
-                    ]
-                ],
-            ]
-        ];
-
-        $this->assertEquals(
-            $expected,
-            unserialize($this->serializer->serialize($attributes))
+        $this->assertInstanceOf(
+            ConvertableInterface::class,
+            new Serializer(new Converter())
         );
     }
 
-    public function testUnserializeShouldConvertStringToMongoDBObjects()
+    public function testSerializeShouldCallConvertAndReturnStringSuccessfully()
     {
-        $mongoId   = new MongoObjectID();
-        $mongoDate = new MongoUTCDateTime(time()*1000);
-        $id        = new ObjectID($mongoId);
-        $date      = new UTCDateTime($mongoDate);
+        $converter  = m::mock(Converter::class);
+        $serializer = new Serializer($converter);
 
-        $data = serialize([
-            '_id' => $id,
-            'created_at' => $date,
-            'parents' => [$id, $id, $id],
-            'comments' => [
-                [
-                    'author' => 'Jhon',
-                    'date' => $date,
-                ],
-                [
-                    'author' => 'Doe',
-                    'date' => $date,
-                    'versions' => [
-                        [
-                            '_id' => $id,
-                            'date' => $date,
-                            'content' => 'Awsome',
-                        ],
-                        [
-                            '_id' => $id,
-                            'date' => $date,
-                            'content' => 'Great',
-                        ],
-                    ]
-                ],
-            ]
-        ]);
+        $attributes = ['some', 'attributes'];
+        $replaced   = ['awsome', 'attrs'];
 
-        $expected = [
-            '_id' => $mongoId,
-            'created_at' => $mongoDate,
-            'parents' => [$mongoId, $mongoId, $mongoId],
-            'comments' => [
-                [
-                    'author' => 'Jhon',
-                    'date' => $mongoDate,
-                ],
-                [
-                    'author' => 'Doe',
-                    'date' => $mongoDate,
-                    'versions' => [
-                        [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
-                            'content' => 'Awsome',
-                        ],
-                        [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
-                            'content' => 'Great',
-                        ],
-                    ]
-                ],
-            ]
-        ];
+        $converter->shouldReceive('convert')
+            ->with($attributes)
+            ->once()
+            ->andReturn($replaced);
 
-        $this->assertEquals($expected, $this->serializer->unserialize($data));
+        $this->assertEquals(
+            serialize($replaced),
+            $serializer->serialize($attributes)
+        );
+    }
+
+    public function testUnserializeShouldParseStringAndCallConverterSuccessfully()
+    {
+        $converter  = m::mock(Converter::class);
+        $serializer = new Serializer($converter);
+
+        $attributes = ['some', 'attributes'];
+        $replaced   = ['awsome', 'attrs'];
+
+        $converter->shouldReceive('unconvert')
+            ->with($attributes)
+            ->once()
+            ->andReturn($replaced);
+
+        $this->assertEquals(
+            $replaced,
+            $serializer->unserialize(serialize($attributes))
+        );
+    }
+
+    public function testConvertShouldCallConverter()
+    {
+        $converter  = m::mock(Converter::class);
+        $serializer = new Serializer($converter);
+
+        $attributes = ['some', 'attributes'];
+        $replaced   = ['awsome', 'attrs'];
+
+        $converter->shouldReceive('convert')
+            ->with($attributes)
+            ->once()
+            ->andReturn($replaced);
+
+        $this->assertEquals($replaced, $serializer->convert($attributes));
+    }
+
+    public function testUnconvertShouldCallConverter()
+    {
+        $converter  = m::mock(Converter::class);
+        $serializer = new Serializer($converter);
+
+        $attributes = ['awsome', 'attrs'];
+        $replaced   = ['some', 'attributes'];
+
+        $converter->shouldReceive('unconvert')
+            ->with($attributes)
+            ->once()
+            ->andReturn($replaced);
+
+        $this->assertEquals($replaced, $serializer->unconvert($attributes));
     }
 }
