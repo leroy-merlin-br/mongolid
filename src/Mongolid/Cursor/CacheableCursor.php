@@ -1,10 +1,11 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Traversable;
-use ArrayObject;
+use ArrayIterator;
 use Mongolid\Container\Ioc;
+use Mongolid\Serializer\Serializer;
 use Mongolid\Util\CacheComponent;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver
@@ -36,14 +37,14 @@ class CacheableCursor extends Cursor
     protected function getCursor(): Traversable
     {
         if ($this->documents) {
-            return new ArrayObject($this->documents);
+            return $this->documents;
         }
 
         $cacheComponent = Ioc::make(CacheComponent::class);
         $cacheKey       = $this->generateCacheKey();
 
         if ($this->documents = $cacheComponent->get($cacheKey, null)) {
-            return new ArrayObject($this->documents);
+            return $this->documents = new ArrayIterator($this->documents);
         }
 
         // Stores the documents within the object.
@@ -58,7 +59,7 @@ class CacheableCursor extends Cursor
         // CacheableCursor object serializable.
         unset($this->cursor);
 
-        return new ArrayObject($this->documents);
+        return $this->documents = new ArrayIterator($this->documents);
     }
 
     /**
@@ -68,11 +69,13 @@ class CacheableCursor extends Cursor
      */
     protected function generateCacheKey(): string
     {
+        $serializer = Ioc::make(Serializer::class);
+
         return sprintf(
             '%s:%s:%s',
             $this->command,
-            $this->collection,
-            md5(serialize($this->params))
+            $this->collection->getNamespace(),
+            md5($serializer->serialize($this->params))
         );
     }
 }

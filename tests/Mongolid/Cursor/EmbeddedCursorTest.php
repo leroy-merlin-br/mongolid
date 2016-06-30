@@ -22,7 +22,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
         $cursor->limit(2);
@@ -45,10 +45,10 @@ class EmbeddedCursorTest extends TestCase
             (object)['age' => 24],
             ['age' => 26, 'name' => 'Zizaco'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
-        $cursor->sort(['age' => 1, 'name' -1]);
+        $cursor->sort(['age' => 1, 'name' - 1]);
         $this->assertAttributeEquals(
             [
                 (object)['age' => 24],
@@ -69,7 +69,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
         $cursor->skip(2);
@@ -90,7 +90,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
         $this->assertEquals(3, $cursor->count());
@@ -114,14 +114,43 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
         // Assert
         $entity = $cursor->current();
-        $this->assertInstanceOf('stdClass', $entity);
+        $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('B', 'name', $entity);
+    }
+
+    public function testShouldNotGetCurrentWhenCursorIsInvalid()
+    {
+        // Arrange
+        $items = [];
+        $cursor = $this->getCursor(stdClass::class, $items);
+
+        $this->setProtected($cursor, 'position', 1);
+
+        // Assert
+        $entity = $cursor->current();
+        $this->assertNull($entity);
+    }
+
+    public function testShouldGetCurrentUsingEntityClass()
+    {
+        // Arrange
+        $object = new stdClass();
+        $object->name = 'A';
+        $items = [$object];
+        $cursor = $this->getCursor(stdClass::class, $items);
+
+        $this->setProtected($cursor, 'position', 0);
+
+        // Assert
+        $entity = $cursor->current();
+        $this->assertInstanceOf(stdClass::class, $entity);
+        $this->assertAttributeEquals('A', 'name', $entity);
     }
 
     public function testShouldGetFirst()
@@ -132,16 +161,15 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
         // Assert
         $entity = $cursor->first();
-        $this->assertInstanceOf('stdClass', $entity);
+        $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('A', 'name', $entity);
     }
-
 
     public function testShouldGetAllItems()
     {
@@ -150,7 +178,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'A'],
             ['name' => 'B'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
@@ -179,7 +207,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
@@ -219,7 +247,7 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor('stdClass', $items);
+        $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
         $this->assertTrue($cursor->valid());
@@ -228,7 +256,7 @@ class EmbeddedCursorTest extends TestCase
     }
 
     protected function getCursor(
-        $entityClass = 'stdClass',
+        $entityClass = stdClass::class,
         $items = []
     ) {
         return new EmbeddedCursor($entityClass, $items);

@@ -4,9 +4,12 @@ namespace Mongolid;
 use BadMethodCallException;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
+use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
-use Mongolid\Schema;
+use Mongolid\Serializer\Serializer;
+use Serializable;
+use MongoDB\Driver\WriteConcern;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -17,7 +20,7 @@ use Mongolid\Schema;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord
+abstract class ActiveRecord implements Serializable
 {
     use Attributes, Relations;
 
@@ -30,14 +33,20 @@ abstract class ActiveRecord
     protected $collection = null;
 
     /**
+     * @see https://docs.mongodb.com/manual/reference/write-concern/
+     * @var integer
+     */
+    protected $writeConcern = 1;
+
+    /**
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
      * @see  Mongolid\Schema::$fields
      * @var  string|string[]
      */
-    protected $fields  = [
-        '_id' => 'objectId',
+    protected $fields = [
+        '_id'        => 'objectId',
         'created_at' => 'createdAtTimestamp',
         'updated_at' => 'updatedAtTimestamp'
     ];
@@ -96,14 +105,14 @@ abstract class ActiveRecord
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
-     * @param  array $query MongoDB selection criteria.
+     * @param  array   $query    MongoDB selection criteria.
+     * @param  boolean $useCache Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public static function where(array $query = [])
+    public static function where(array $query = [], bool $useCache = false)
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->where($query);
+        return self::getDataMapperInstance()->where($query, $useCache);
     }
 
     /**
@@ -113,25 +122,25 @@ abstract class ActiveRecord
      */
     public static function all()
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->all();
+        return self::getDataMapperInstance()->all();
     }
 
     /**
      * Gets the first entity of this kind that matches the query
      *
-     * @param  mixed $query MongoDB selection criteria.
+     * @param  mixed   $query    MongoDB selection criteria.
+     * @param  boolean $useCache Retrieves the entity trought a CacheableCursor.
      *
      * @return ActiveRecord
      */
-    public static function first($query = [])
+    public static function first($query = [], bool $useCache = false)
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->first($query);
+        return self::getDataMapperInstance()->first($query, $useCache);
     }
 
     /**
      * Handle dynamic method calls into the model.
+     *
      * @codeCoverageIgnore
      *
      * @param  mixed $method     Name of the method that is being called.
@@ -148,20 +157,24 @@ abstract class ActiveRecord
         // Alias to attach
         if ('attachTo' == substr($method, 0, 8)) {
             $field = strtolower(substr($method, 8));
+
             return $this->attach($field, $value);
         }
 
         // Alias to embed
         if ('embedTo' == substr($method, 0, 7)) {
             $field = strtolower(substr($method, 7));
+
             return $this->embed($field, $value);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'The following method can not be reached or does not exist: %s@%s',
-            get_class($this),
-            $method
-        ));
+        throw new BadMethodCallException(
+            sprintf(
+                'The following method can not be reached or does not exist: %s@%s',
+                get_class($this),
+                $method
+            )
+        );
     }
 
     /**
@@ -172,10 +185,64 @@ abstract class ActiveRecord
      */
     public function getDataMapper()
     {
-        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper         = Ioc::make(DataMapper::class);
         $dataMapper->schema = $this->getSchema();
 
         return $dataMapper;
+    }
+
+    /**
+     * Getter for the $collection attribute.
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        return Ioc::make(Serializer::class)->serialize($this->getAttributes());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $data Serialized string to parse.
+     *
+     * @return void
+     */
+    public function unserialize($data)
+    {
+        $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
+    }
+
+    /**
+     * Getter for $writeConcern variable
+     *
+     * @return mixed
+     */
+    public function getWriteConcern()
+    {
+        return $this->writeConcern;
+    }
+
+    /**
+     * Setter for $writeConcern variable
+     *
+     * @param mixed $writeConcern Level of write concern to the transation.
+     *
+     * @return void
+     */
+    public function setWriteConcern($writeConcern)
+    {
+        $this->writeConcern = $writeConcern;
     }
 
     /**
@@ -226,16 +293,28 @@ abstract class ActiveRecord
             return false;
         }
 
-        return $this->getDataMapper()->$action($this);
+        $options = [
+            'writeConcern' => new WriteConcern($this->getWriteConcern()),
+        ];
+
+        return $this->getDataMapper()->$action($this, $options);
     }
 
-    /**
-     * Getter for the $collection attribute.
+        /**
+     * Returns the a valid instance from Ioc.
      *
-     * @return string
+     * @return mixed
+     *
+     * @throws NoCollectionNameException Throws exception when has no collection filled.
      */
-    public function getCollectionName()
+    private static function getDataMapperInstance()
     {
-        return $this->collection;
+        $instance = Ioc::make(get_called_class());
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return $instance->getDataMapper();
     }
 }
