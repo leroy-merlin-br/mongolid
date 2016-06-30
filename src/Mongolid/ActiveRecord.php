@@ -97,45 +97,27 @@ abstract class ActiveRecord
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
-     * @throws NoCollectionNameException When has no collection.
-     *
      * @param  array $query MongoDB selection criteria.
      *
      * @return \Mongolid\Cursor\Cursor
      */
     public static function where(array $query = [])
     {
-        $instance = self::getCalledInstance();
-
-        if (! $instance->getCollectionName()) {
-            throw new NoCollectionNameException;
-        }
-
-        return $instance->getDataMapper()->where($query);
+        return self::getDataMapperInstance()->where($query);
     }
 
     /**
      * Gets a cursor of this kind of entities from the database
      *
-     * @throws NoCollectionNameException When has no collection.
-     *
      * @return \Mongolid\Cursor\Cursor
      */
     public static function all()
     {
-        $instance = self::getCalledInstance();
-
-        if (! $instance->getCollectionName()) {
-            throw new NoCollectionNameException;
-        }
-
-        return $instance->getDataMapper()->all();
+        return self::getDataMapperInstance()->all();
     }
 
     /**
      * Gets the first entity of this kind that matches the query
-     *
-     * @throws NoCollectionNameException When has no collection.
      *
      * @param  mixed $query MongoDB selection criteria.
      *
@@ -143,13 +125,7 @@ abstract class ActiveRecord
      */
     public static function first($query = [])
     {
-        $instance = self::getCalledInstance();
-
-        if (! $instance->getCollectionName()) {
-            throw new NoCollectionNameException;
-        }
-
-        return $instance->getDataMapper()->first($query);
+        return self::getDataMapperInstance()->first($query);
     }
 
     /**
@@ -198,6 +174,16 @@ abstract class ActiveRecord
         $dataMapper->schema = $this->getSchema();
 
         return $dataMapper;
+    }
+
+    /**
+     * Getter for the $collection attribute.
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collection;
     }
 
     /**
@@ -252,22 +238,20 @@ abstract class ActiveRecord
     }
 
     /**
-     * Getter for the $collection attribute.
-     *
-     * @return string
-     */
-    public function getCollectionName()
-    {
-        return $this->collection;
-    }
-
-    /**
      * Returns the a valid instance from Ioc.
      *
      * @return mixed
+     *
+     * @throws NoCollectionNameException Throws exception when has no collection filled.
      */
-    private static function getCalledInstance()
+    private static function getDataMapperInstance()
     {
-        return Ioc::make(get_called_class());
+        $instance = self::getCalledInstance();
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return Ioc::make(get_called_class())->getMapper();
     }
 }
