@@ -97,6 +97,8 @@ abstract class ActiveRecord
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
+     * @throws NoCollectionNameException When has no collection.
+     *
      * @param  array $query MongoDB selection criteria.
      *
      * @return \Mongolid\Cursor\Cursor
@@ -115,6 +117,8 @@ abstract class ActiveRecord
     /**
      * Gets a cursor of this kind of entities from the database
      *
+     * @throws NoCollectionNameException When has no collection.
+     *
      * @return \Mongolid\Cursor\Cursor
      */
     public static function all()
@@ -130,6 +134,8 @@ abstract class ActiveRecord
 
     /**
      * Gets the first entity of this kind that matches the query
+     *
+     * @throws NoCollectionNameException When has no collection.
      *
      * @param  mixed $query MongoDB selection criteria.
      *
