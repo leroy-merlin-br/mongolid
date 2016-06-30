@@ -1,10 +1,11 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Traversable;
 use ArrayIterator;
 use Mongolid\Container\Ioc;
+use Mongolid\Serializer\Serializer;
 use Mongolid\Util\CacheComponent;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver
@@ -68,11 +69,13 @@ class CacheableCursor extends Cursor
      */
     protected function generateCacheKey(): string
     {
+        $serializer = Ioc::make(Serializer::class);
+
         return sprintf(
             '%s:%s:%s',
             $this->command,
             $this->collection->getNamespace(),
-            md5(serialize($this->params))
+            md5($serializer->serialize($this->params))
         );
     }
 }
