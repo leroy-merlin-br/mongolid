@@ -18,7 +18,7 @@ use Mongolid\Serializer\Type\UTCDateTime;
  *
  * @see https://jira.mongodb.org/browse/PHPC-460
  */
-class Serializer
+class Serializer implements ConvertableInterface
 {
     /**
      * @var string[]
@@ -73,6 +73,22 @@ class Serializer
         });
 
         return $attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convert(array $data)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unconvert(array $data)
+    {
+        return [];
     }
 
     /**
