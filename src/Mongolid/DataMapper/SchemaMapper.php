@@ -1,8 +1,9 @@
 <?php
 namespace Mongolid\DataMapper;
 
-use Mongolid\Schema;
 use Mongolid\Container\Ioc;
+use Mongolid\Schema;
+use Mongolid\Serializer\Type\Converter;
 
 /**
  * The SchemaMapper will map an object or an array of data to an Schema object.
@@ -51,6 +52,8 @@ class SchemaMapper
     {
         $data = $this->parseToArray($data);
         $this->clearDynamic($data);
+
+        $data = Ioc::make(Converter::class)->convert($data);
 
         // Parse each specified field
         foreach ($this->schema->fields as $key => $fieldType) {
@@ -150,11 +153,11 @@ class SchemaMapper
     protected function parseToArray($object): array
     {
         if (! is_array($object)) {
-            if (method_exists($object, 'getAttributes')) {
-                return $object->getAttributes();
-            }
+            $attributes = method_exists($object, 'getAttributes')
+                ? $object->getAttributes()
+                : get_object_vars($object);
 
-            return get_object_vars($object);
+            return $attributes;
         }
 
         return $object;
