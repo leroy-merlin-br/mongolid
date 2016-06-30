@@ -4,6 +4,7 @@ namespace Mongolid;
 use BadMethodCallException;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
+use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Serializer\Serializer;
@@ -111,8 +112,7 @@ abstract class ActiveRecord implements Serializable
      */
     public static function where(array $query = [], bool $useCache = false)
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->where($query, $useCache);
+        return self::getDataMapperInstance()->where($query, $useCache);
     }
 
     /**
@@ -122,8 +122,7 @@ abstract class ActiveRecord implements Serializable
      */
     public static function all()
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->all();
+        return self::getDataMapperInstance()->all();
     }
 
     /**
@@ -136,8 +135,7 @@ abstract class ActiveRecord implements Serializable
      */
     public static function first($query = [], bool $useCache = false)
     {
-        return Ioc::make(get_called_class())
-            ->getDataMapper()->first($query, $useCache);
+        return self::getDataMapperInstance()->first($query, $useCache);
     }
 
     /**
@@ -300,5 +298,23 @@ abstract class ActiveRecord implements Serializable
         ];
 
         return $this->getDataMapper()->$action($this, $options);
+    }
+
+        /**
+     * Returns the a valid instance from Ioc.
+     *
+     * @return mixed
+     *
+     * @throws NoCollectionNameException Throws exception when has no collection filled.
+     */
+    private static function getDataMapperInstance()
+    {
+        $instance = Ioc::make(get_called_class());
+
+        if (! $instance->getCollectionName()) {
+            throw new NoCollectionNameException;
+        }
+
+        return $instance->getDataMapper();
     }
 }

@@ -178,6 +178,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
         $query      = ['foo' => 'bar'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
@@ -201,6 +202,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
         $dataMapper = m::mock();
         $cursor     = m::mock();
 
@@ -222,6 +224,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
         $query      = ['foo' => 'bar'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
@@ -289,6 +292,42 @@ class ActiveRecordTest extends TestCase
         $result = $this->callProtected($entity, 'getDataMapper');
         $this->assertInstanceOf(DataMapper\DataMapper::class, $result);
         $this->assertEquals($schema, $result->schema);
+    }
+
+    /**
+     * @expectedException \Mongolid\Exception\NoCollectionNameException
+     */
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
+    {
+        $entity = new class extends ActiveRecord {};
+
+        $this->assertNull($entity->getCollectionName());
+
+        $entity->all();
+    }
+
+    /**
+     * @expectedException \Mongolid\Exception\NoCollectionNameException
+     */
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
+    {
+        $entity = new class extends ActiveRecord {};
+
+        $this->assertNull($entity->getCollectionName());
+
+        $entity->first();
+    }
+
+    /**
+     * @expectedException \Mongolid\Exception\NoCollectionNameException
+     */
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
+    {
+        $entity = new class extends ActiveRecord {};
+
+        $this->assertNull($entity->getCollectionName());
+
+        $entity->where();
     }
 
     public function testShouldGetCollectionName()
