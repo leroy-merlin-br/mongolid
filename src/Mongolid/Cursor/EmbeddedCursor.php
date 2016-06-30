@@ -129,6 +129,7 @@ class EmbeddedCursor implements Iterator
     {
         $this->position = 0;
     }
+
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach)
@@ -137,6 +138,10 @@ class EmbeddedCursor implements Iterator
      */
     public function current()
     {
+        if (! $this->valid()) {
+            return null;
+        }
+
         $document = $this->items[$this->position];
 
         if ($document instanceof $this->entityClass) {
@@ -193,7 +198,6 @@ class EmbeddedCursor implements Iterator
     {
         return isset($this->items[$this->position]);
     }
-
 
     /**
      * Convert the cursor instance to an array of Items.

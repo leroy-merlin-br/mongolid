@@ -75,7 +75,7 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return (new EmbeddedCursor($entity, (array)$this->$field))->first();
+        return (new EmbeddedCursor($entity, (array) $this->$field))->first();
     }
 
     /**
@@ -84,7 +84,7 @@ trait Relations
      * @param string $entity Class of the entity or of the schema of the entity.
      * @param string $field  Field where the embedded documents are stored.
      *
-     * @return array Array with the embedded documents
+     * @return EmbeddedCursor Array with the embedded documents
      */
     protected function embedsMany(string $entity, string $field)
     {
@@ -92,7 +92,7 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return new EmbeddedCursor($entity, $this->$field);
+        return new EmbeddedCursor($entity, (array) $this->$field);
     }
 
     /**

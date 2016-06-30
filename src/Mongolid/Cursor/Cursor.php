@@ -3,11 +3,14 @@ namespace Mongolid\Cursor;
 
 use Iterator;
 use IteratorIterator;
+use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
+use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
+use Serializable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -17,7 +20,7 @@ use Mongolid\Schema;
  *
  * @package Mongolid
  */
-class Cursor implements Iterator
+class Cursor implements Iterator, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
@@ -150,6 +153,7 @@ class Cursor implements Iterator
         $this->getCursor()->rewind();
         $this->position = 0;
     }
+
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach)
@@ -179,6 +183,19 @@ class Cursor implements Iterator
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
+
+    /**
+     * Refresh the cursor in order to be able to perform a rewind and iterate
+     * trought it again. A new request to the database will be made in the next
+     * iteration.
+     *
+     * @return void
+     */
+    public function fresh()
+    {
+        $this->cursor = null;
+    }
+
     /**
      * Iterator key method (used in foreach)
      *
@@ -237,13 +254,13 @@ class Cursor implements Iterator
     }
 
     /**
-     * Actually returns the IteratorIterator object with the DriverCursor within.
+     * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
      * $params given
      *
-     * @return IteratorIterator
+     * @return Traversable
      */
-    protected function getCursor(): IteratorIterator
+    protected function getCursor(): Traversable
     {
         if (! $this->cursor) {
             $driverCursor = call_user_func_array([$this->collection, $this->command], $this->params);
@@ -266,5 +283,40 @@ class Cursor implements Iterator
         }
 
         return $this->assembler;
+    }
+
+    /**
+     * Serializes this object storing the collection name instead of the actual
+     * MongoDb\Collection (which is unserializable)
+     *
+     * @return string Serialized object.
+     */
+    public function serialize()
+    {
+        $properties = get_object_vars($this);
+        $properties['collection'] = $this->collection->getCollectionName();
+
+        return serialize($properties);
+    }
+
+    /**
+     * Unserializes this object. Re-creating the database connection.
+     *
+     * @param  mixed $serialized Serialized cursor.
+     *
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $attr = unserialize($serialized);
+
+        $conn             = Ioc::make(Pool::class)->getConnection();
+        $db               = $conn->defaultDatabase;
+        $collectionObject = $conn->getRawConnection()->$db->{$attr['collection']};
+
+        $this->entitySchema = $attr['entitySchema'];
+        $this->collection   = $collectionObject;
+        $this->command      = $attr['command'];
+        $this->params       = $attr['params'];
     }
 }
