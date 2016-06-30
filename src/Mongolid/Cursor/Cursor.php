@@ -137,8 +137,7 @@ class Cursor implements Iterator
      */
     public function count(): int
     {
-        $this->command = 'count';
-        return call_user_func_array([$this->collection, $this->command], $this->params);
+        return $this->collection->count(...$this->params);
     }
 
     /**
@@ -247,7 +246,7 @@ class Cursor implements Iterator
     protected function getCursor(): Traversable
     {
         if (! $this->cursor) {
-            $driverCursor = call_user_func_array([$this->collection, $this->command], $this->params);
+            $driverCursor = $this->collection->{$this->command}(...$this->params);
             $this->cursor = new IteratorIterator($driverCursor);
             $this->cursor->rewind();
         }
