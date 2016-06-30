@@ -25,7 +25,7 @@ class UTCDateTime implements SerializableTypeInterface
      * Constructor
      *
      * @param integer|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
-     *                                                current timestamp
+     *                                                current timestamp.
      *
      * @throws InvalidArgumentException $datetime accepts only integer, null or MongoUTCDateTime.
      */
@@ -96,7 +96,7 @@ class UTCDateTime implements SerializableTypeInterface
      *
      * @return mixed
      */
-    public function __call($method, array $args = [])
+    public function __call(string $method, array $args = [])
     {
         return call_user_func_array([$this->mongoDate, $method], $args);
     }
