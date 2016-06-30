@@ -213,7 +213,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection     = m::mock(Collection::class);
-        $cursor         = $this->getCursor(null, $collection, 'find', ['bacon' => true]);
+        $cursor         = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
         $driverCursor   = m::mock('Traversable');
         $driverIterator = m::mock('Iterator');
 
