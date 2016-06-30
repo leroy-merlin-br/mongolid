@@ -5,6 +5,7 @@ use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Schema;
+use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 class SchemaMapperTest extends TestCase
@@ -18,7 +19,8 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema         = m::mock(Schema::class);
+        $converter      = m::mock(Converter::class);
         $schema->fields = [
             'name'  => 'string',
             'age'   => 'int',
@@ -30,23 +32,35 @@ class SchemaMapperTest extends TestCase
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
+        $oldData = [
+            'name'  => 'John',
+            'age'   => 23,
+            'stuff' => 'value-to-be-replaced',
+        ];
         $data = [
             'name'  => 'John',
             'age'   => 23,
-            'stuff' => 'fooBar'
+            'stuff' => 'fooBar',
         ];
+
+        $converter->shouldReceive('convert')
+            ->with($oldData)
+            ->once()
+            ->andReturn($data);
 
         // Act
         $schemaMapper->shouldReceive('clearDynamic')
             ->once()
-            ->with($data);
+            ->with($oldData);
 
-        foreach($schema->fields as $key => $value) {
+        foreach ($schema->fields as $key => $value) {
             $schemaMapper->shouldReceive('parseField')
                 ->once()
                 ->with($data[$key], $value)
                 ->andReturn($data[$key].'.PARSED');
         }
+
+        Ioc::instance(Converter::class, $converter);
 
         // Assert
         $this->assertEquals(
@@ -55,7 +69,7 @@ class SchemaMapperTest extends TestCase
                 'age'   => '23.PARSED',
                 'stuff' => 'fooBar.PARSED'
             ],
-            $schemaMapper->map($data)
+            $schemaMapper->map($oldData)
         );
     }
 
@@ -247,9 +261,10 @@ class SchemaMapperTest extends TestCase
         $schema       = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
         $object       = new class {
-            public function getAttributes() {
+            public function getAttributes()
+            {
                 return ['foo' => 'bar'];
-            }    
+            }
         };
 
         // Assert
