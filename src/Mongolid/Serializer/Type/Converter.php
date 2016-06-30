@@ -28,7 +28,7 @@ class Converter
     }
 
     /**
-     * Converts recursively the given data to persistible objects into database.
+     * Converts recursively the given data to persistable objects into database.
      * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
      *
      * @param  array $data Array to convert.
@@ -47,7 +47,7 @@ class Converter
     }
 
     /**
-     * Unconverts recursively the given objects (probaly retrieved from MongoDB)
+     * Unconverts recursively the given objects (probably retrieved from MongoDB)
      * to our specific types.
      *
      * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
