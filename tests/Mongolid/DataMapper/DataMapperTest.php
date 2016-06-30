@@ -8,6 +8,7 @@ use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
+use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
@@ -259,22 +260,26 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('prepareValueQuery')
-            ->once()
             ->with($query)
             ->andReturn($preparedQuery);
 
         $mapper->shouldReceive('getCollection')
-            ->once()
             ->andReturn($collection);
 
         // Assert
         $result = $mapper->where($query);
 
         $this->assertInstanceOf(Cursor::class, $result);
+        $this->assertNotInstanceOf(CacheableCursor::class, $result);
         $this->assertAttributeEquals($schema, 'entitySchema', $result);
         $this->assertAttributeEquals($collection, 'collection', $result);
         $this->assertAttributeEquals('find', 'command', $result);
         $this->assertAttributeEquals([$preparedQuery], 'params', $result);
+
+        $cacheableResult = $mapper->where($query, true);
+        $this->assertInstanceOf(CacheableCursor::class, $cacheableResult);
+        $this->assertAttributeEquals($schema, 'entitySchema', $cacheableResult);
+        $this->assertAttributeEquals($collection, 'collection', $cacheableResult);
     }
 
     public function testShouldGetAll()
@@ -370,6 +375,32 @@ class DataMapperTest extends TestCase
         $result = $mapper->first($query);
 
         $this->assertNull($result);
+    }
+
+    public function testShouldGetFirstTroughACacheableCursor()
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $query    = 123;
+        $entity   = new stdClass;
+        $cursor   = m::mock(CacheableCursor::class);
+
+        // Act
+        $mapper->shouldReceive('where')
+            ->once()
+            ->with($query, true)
+            ->andReturn($cursor);
+
+        $cursor->shouldReceive('first')
+            ->once()
+            ->andReturn($entity);
+
+        // Assert
+        $this->assertEquals(
+            $entity,
+            $mapper->first($query, true)
+        );
     }
 
     public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()

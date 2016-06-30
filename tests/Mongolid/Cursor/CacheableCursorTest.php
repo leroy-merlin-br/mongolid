@@ -2,7 +2,7 @@
 
 namespace Mongolid\Cursor;
 
-use ArrayObject;
+use ArrayIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Container\Ioc;
@@ -21,7 +21,7 @@ class CacheableCursorTest extends TestCase
     public function testShouldGetCursorFromPreviousIteration()
     {
         // Arrange
-        $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
+        $documentsFromDb = new ArrayIterator([['name' => 'joe'], ['name' => 'doe']]);
         $cursor          = $this->getCachableCursor();
         $this->setProtected(
             $cursor,
@@ -31,7 +31,7 @@ class CacheableCursorTest extends TestCase
 
         // Assert
         $this->assertEquals(
-            new ArrayObject($documentsFromDb),
+            new ArrayIterator($documentsFromDb),
             $this->callProtected($cursor, 'getCursor')
         );
     }
@@ -56,7 +56,7 @@ class CacheableCursorTest extends TestCase
 
         // Assert
         $this->assertEquals(
-            new ArrayObject($documentsFromCache),
+            new ArrayIterator($documentsFromCache),
             $this->callProtected($cursor, 'getCursor')
         );
     }
@@ -86,7 +86,7 @@ class CacheableCursorTest extends TestCase
             ->andReturn(null);
 
         $rawCollection->shouldReceive('find')
-            ->andReturn(new ArrayObject($documentsFromDb));
+            ->andReturn(new ArrayIterator($documentsFromDb));
 
         $cacheComponent->shouldReceive('put')
             ->once()
@@ -94,7 +94,7 @@ class CacheableCursorTest extends TestCase
 
         // Assert
         $this->assertEquals(
-            new ArrayObject($documentsFromDb),
+            new ArrayIterator($documentsFromDb),
             $this->callProtected($cursor, 'getCursor')
         );
     }

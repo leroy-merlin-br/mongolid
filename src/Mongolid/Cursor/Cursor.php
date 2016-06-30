@@ -153,6 +153,7 @@ class Cursor implements Iterator, Serializable
         $this->getCursor()->rewind();
         $this->position = 0;
     }
+
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach)
