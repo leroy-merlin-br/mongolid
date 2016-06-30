@@ -31,28 +31,12 @@ class UTCDateTime implements SerializableTypeInterface
      */
     public function __construct($datetime = null)
     {
-        if (is_null($datetime)) {
-            $datetime = time();
+        if (false === $this->init($datetime)) {
+            throw new InvalidArgumentException(
+                'Invalid argument type given. Constructor allows only integer, '.
+                'null or MongoDB\BSON\UTCDateTime'
+            );
         }
-
-        if (is_integer($datetime)) {
-            $this->timestamp = $datetime * 1000;
-            $this->mongoDate = new MongoUTCDateTime($this->timestamp);
-
-            return;
-        }
-
-        if ($datetime instanceof MongoUTCDateTime) {
-            $this->mongoDate = $datetime;
-            $this->timestamp = $datetime->toDateTime()->getTimestamp() * 1000;
-
-            return;
-        }
-
-        throw new InvalidArgumentException(
-            'Invalid argument type given. Constructor allows only integer, '.
-            'null or MongoDB\BSON\UTCDateTime'
-        );
     }
 
     /**
@@ -99,5 +83,36 @@ class UTCDateTime implements SerializableTypeInterface
     public function __call(string $method, array $args = [])
     {
         return call_user_func_array([$this->mongoDate, $method], $args);
+    }
+
+    /**
+     * Initializes timestamp and mongoDate variables
+     *
+     * @param integer|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
+     *                                                current timestamp.
+     *
+     * @return boolean
+     */
+    protected function init($datetime)
+    {
+        if (is_null($datetime)) {
+            $datetime = time();
+        }
+
+        if (is_integer($datetime)) {
+            $this->timestamp = $datetime * 1000;
+            $this->mongoDate = new MongoUTCDateTime($this->timestamp);
+
+            return true;
+        }
+
+        if ($datetime instanceof MongoUTCDateTime) {
+            $this->mongoDate = $datetime;
+            $this->timestamp = $datetime->toDateTime()->getTimestamp() * 1000;
+
+            return true;
+        }
+
+        return false;
     }
 }
