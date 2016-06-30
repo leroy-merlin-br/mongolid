@@ -105,7 +105,7 @@ abstract class ActiveRecord
      */
     public static function where(array $query = [])
     {
-        $instance = Ioc::make(get_called_class());
+        $instance = self::getCalledInstance();
 
         if (! $instance->getCollectionName()) {
             throw new NoCollectionNameException;
@@ -259,5 +259,15 @@ abstract class ActiveRecord
     public function getCollectionName()
     {
         return $this->collection;
+    }
+
+    /**
+     * Returns the a valid instance from Ioc.
+     *
+     * @return mixed
+     */
+    private static function getCalledInstance()
+    {
+        return Ioc::make(get_called_class());
     }
 }
