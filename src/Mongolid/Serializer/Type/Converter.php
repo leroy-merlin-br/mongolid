@@ -3,14 +3,13 @@ namespace Mongolid\Serializer\Type;
 
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
-use Mongolid\Serializer\ConvertableInterface;
 use Mongolid\Serializer\SerializableTypeInterface;
 
 /**
  * This class is responsible to convert MongoDB objects to types of our domain
  * and vice-versa.
  */
-class Converter implements ConvertableInterface
+class Converter
 {
     /**
      * @var string[]
@@ -29,7 +28,12 @@ class Converter implements ConvertableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Converts recursively the given data to persistible objects into database.
+     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
+     *
+     * @param  array $data Array to convert.
+     *
+     * @return array
      */
     public function convert(array $data)
     {
@@ -43,7 +47,14 @@ class Converter implements ConvertableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Unconverts recursively the given objects (probaly retrieved from MongoDB)
+     * to our specific types.
+     *
+     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
+     *
+     * @param  array $data Array to convert.
+     *
+     * @return array
      */
     public function unconvert(array $data)
     {

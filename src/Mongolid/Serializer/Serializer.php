@@ -4,6 +4,7 @@ namespace Mongolid\Serializer;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
+use Mongolid\Serializer\Type\Converter;
 use Mongolid\Serializer\Type\ObjectID;
 use Mongolid\Serializer\Type\UTCDateTime;
 
@@ -18,7 +19,7 @@ use Mongolid\Serializer\Type\UTCDateTime;
  *
  * @see https://jira.mongodb.org/browse/PHPC-460
  */
-class Serializer implements ConvertableInterface
+class Serializer
 {
     /**
      * @var Converter
@@ -28,9 +29,9 @@ class Serializer implements ConvertableInterface
     /**
      * Constructor
      *
-     * @param ConvertableInterface $converter Class responsible to convert objects.
+     * @param Converter $converter Class responsible to convert objects.
      */
-    public function __construct(ConvertableInterface $converter)
+    public function __construct(Converter $converter)
     {
         $this->converter = $converter;
     }
@@ -61,7 +62,12 @@ class Serializer implements ConvertableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Converts recursively the given data to persistible objects into database.
+     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
+     *
+     * @param  array $data Array to convert.
+     *
+     * @return array
      */
     public function convert(array $attributes)
     {
@@ -69,7 +75,14 @@ class Serializer implements ConvertableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Unconverts recursively the given objects (probaly retrieved from MongoDB)
+     * to our specific types.
+     *
+     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
+     *
+     * @param  array $data Array to convert.
+     *
+     * @return array
      */
     public function unconvert(array $attributes)
     {

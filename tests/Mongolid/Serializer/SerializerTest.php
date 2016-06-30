@@ -33,14 +33,6 @@ class SerializerTest extends TestCase
         serialize(['id' => new MongoObjectID()]);
     }
 
-    public function testSerializerShouldBeAnInstanceOfConvertableInterface()
-    {
-        $this->assertInstanceOf(
-            ConvertableInterface::class,
-            new Serializer(new Converter())
-        );
-    }
-
     public function testSerializeShouldCallConvertAndReturnStringSuccessfully()
     {
         $converter  = m::mock(Converter::class);

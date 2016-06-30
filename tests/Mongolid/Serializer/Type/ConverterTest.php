@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
-use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use MongoDB\BSON\ObjectID as MongoObjectID;
-use Mongolid\Serializer\ConvertableInterface;
+use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
+use Mongolid\Serializer\Type\Converter;
 use PHPUnit_Framework_TestCase as TestCase;
 
 /**
@@ -34,9 +34,9 @@ class ConvererTest extends TestCase
         unset($this->converter);
     }
 
-    public function testConverterShouldBeAnInstanceOfConvertableInterface()
+    public function testConverterShouldBeAnInstanceOfConverter()
     {
-        $this->assertInstanceOf(ConvertableInterface::class, $this->converter);
+        $this->assertInstanceOf(Converter::class, $this->converter);
     }
 
     public function testConvertShouldReplaceAllMongoObjectsToOurObjects()
