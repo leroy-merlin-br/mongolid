@@ -41,7 +41,7 @@ class SerializerTest extends TestCase
         $attributes = ['some', 'attributes'];
         $replaced   = ['awsome', 'attrs'];
 
-        $converter->shouldReceive('convert')
+        $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
             ->once()
             ->andReturn($replaced);
@@ -60,7 +60,7 @@ class SerializerTest extends TestCase
         $attributes = ['some', 'attributes'];
         $replaced   = ['awsome', 'attrs'];
 
-        $converter->shouldReceive('unconvert')
+        $converter->shouldReceive('toMongoTypes')
             ->with($attributes)
             ->once()
             ->andReturn($replaced);
@@ -71,7 +71,7 @@ class SerializerTest extends TestCase
         );
     }
 
-    public function testConvertShouldCallConverter()
+    public function testConvertShouldConvertObjectsToDomainTypes()
     {
         $converter  = m::mock(Converter::class);
         $serializer = new Serializer($converter);
@@ -79,7 +79,7 @@ class SerializerTest extends TestCase
         $attributes = ['some', 'attributes'];
         $replaced   = ['awsome', 'attrs'];
 
-        $converter->shouldReceive('convert')
+        $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
             ->once()
             ->andReturn($replaced);
@@ -87,7 +87,7 @@ class SerializerTest extends TestCase
         $this->assertEquals($replaced, $serializer->convert($attributes));
     }
 
-    public function testUnconvertShouldCallConverter()
+    public function testUnconvertShouldConvertObjectsToMongoTypes()
     {
         $converter  = m::mock(Converter::class);
         $serializer = new Serializer($converter);
@@ -95,7 +95,7 @@ class SerializerTest extends TestCase
         $attributes = ['awsome', 'attrs'];
         $replaced   = ['some', 'attributes'];
 
-        $converter->shouldReceive('unconvert')
+        $converter->shouldReceive('toMongoTypes')
             ->with($attributes)
             ->once()
             ->andReturn($replaced);

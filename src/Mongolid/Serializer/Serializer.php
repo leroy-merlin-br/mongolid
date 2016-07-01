@@ -66,7 +66,7 @@ class Serializer
      */
     public function convert(array $attributes)
     {
-        return $this->converter->convert($attributes);
+        return $this->converter->toDomainTypes($attributes);
     }
 
     /**
@@ -81,6 +81,6 @@ class Serializer
      */
     public function unconvert(array $attributes)
     {
-        return $this->converter->unconvert($attributes);
+        return $this->converter->toMongoTypes($attributes);
     }
 }
