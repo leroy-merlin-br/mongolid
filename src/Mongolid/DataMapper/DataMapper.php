@@ -207,20 +207,27 @@ class DataMapper
      * Retrieve a database cursor that will return $this->schema->entityClass
      * objects that upon iteration
      *
-     * @param  mixed   $query     MongoDB query to retrieve documents.
-     * @param  boolean $cacheable Retrieves a CacheableCursor instead.
+     * @param  mixed   $query      MongoDB query to retrieve documents.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $cacheable  Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public function where($query = [], bool $cacheable = false): Cursor
-    {
+    public function where(
+        $query = [],
+        array $projection = [],
+        bool $cacheable = false
+    ): Cursor {
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         $cursor = new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
-            [$this->prepareValueQuery($query)]
+            [
+                $this->prepareValueQuery($query),
+                ['projection' => $this->prepareProjection($projection)]
+            ]
         );
 
         return $cursor;
@@ -241,19 +248,24 @@ class DataMapper
      * Retrieve one $this->schema->entityClass objects that matches the given
      * query
      *
-     * @param  mixed   $query     MongoDB query to retrieve the document.
-     * @param  boolean $cacheable Retrieves the first through a CacheableCursor.
+     * @param  mixed   $query      MongoDB query to retrieve the document.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $cacheable  Retrieves the first through a CacheableCursor.
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
-    public function first($query = [], bool $cacheable = false)
-    {
+    public function first(
+        $query = [],
+        array $projection = [],
+        bool $cacheable = false
+    ) {
         if ($cacheable) {
-            return $this->where($query, true)->first();
+            return $this->where($query, $projection, true)->first();
         }
 
         $document = $this->getCollection()->findOne(
-            $this->prepareValueQuery($query)
+            $this->prepareValueQuery($query),
+            ['projection' => $this->prepareProjection($projection)]
         );
 
         if (! $document) {
