@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
@@ -427,6 +426,44 @@ class DataMapperTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testShouldGetFirstProjectingFields()
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
+        $schema   = m::mock(Schema::class);
+
+        $collection    = m::mock(Collection::class);
+        $query         = 123;
+        $preparedQuery = ['_id' => 123];
+
+        $schema->entityClass = 'stdClass';
+        $mapper->schema      = $schema;
+
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        // Expect
+        $mapper->shouldReceive('prepareValueQuery')
+            ->once()
+            ->with($query)
+            ->andReturn($preparedQuery);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('findOne')
+            ->once()
+            ->with($preparedQuery)
+            ->andReturn(null);
+
+        // Act
+        $result = $mapper->first($query);
+
+        // Assert
+        $this->assertNull($result);
+    }
+
     public function testShouldGetFirstTroughACacheableCursor()
     {
         // Arrange
@@ -546,6 +583,37 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expectation, $result);
     }
 
+    /**
+     * @dataProvider getProjections
+     */
+    public function testPrepareProjectionShouldConvertArray($data, $expectation)
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = new DataMapper($connPool);
+
+        // Act
+        $result = $this->callProtected($mapper, 'prepareProjection', [$data]);
+
+        // Assert
+        $this->assertEquals($expectation, $result);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid projection: 'invalid-key' => 'invalid-value'
+     */
+    public function testPrepareProjectionShouldThrownAnException()
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = new DataMapper($connPool);
+        $data     = ['valid' => true, 'invalid-key' => 'invalid-value'];
+
+        // Act
+        $this->callProtected($mapper, 'prepareProjection', [$data]);
+    }
+
     protected function getEventService()
     {
         if (! ($this->eventService ?? false)) {
@@ -637,6 +705,31 @@ class DataMapperTest extends TestCase
                 'writeConcern'         => 0,
                 'shouldFireEventAfter' => false,
                 'expected'             => false,
+            ],
+        ];
+    }
+
+    /**
+     * Retrieves projections that should be replaced by mapper
+     */
+    public function getProjections()
+    {
+        return [
+            'Should return self array' => [
+                'projection' => ['some' => true, 'fields' => false],
+                'expected'   => ['some' => true, 'fields' => false],
+            ],
+            'Should convert number' => [
+                'projection' => ['some' => 1, 'fields' => -1],
+                'expected'   => ['some' => true, 'fields' => false],
+            ],
+            'Should add true in fields' => [
+                'projection' => ['some', 'fields'],
+                'expected'   => ['some' => true, 'fields' => true],
+            ],
+            'Should add boolean values according to key value' => [
+                'projection' => ['-some', 'fields'],
+                'expected'   => ['some' => false, 'fields' => true],
             ],
         ];
     }

@@ -1,7 +1,7 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
 use MongoDB\DeleteResult;
@@ -366,6 +366,65 @@ class DataMapper
         $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
 
         return $this->eventService->fire($event, $entity, $halt);
+    }
+
+    /**
+     * Converts the given projection fields to Mongo driver format
+     *
+     * How to use:
+     *     As Mongo projection using boolean values:
+     *         From: ['name' => true, '_id' => false]
+     *         To:   ['name' => true, '_id' => false]
+     *     As Mongo projection using integer values
+     *         From: ['name' => 1, '_id' => -1]
+     *         To:   ['name' => true, '_id' => false]
+     *     As an array of string:
+     *         From: ['name', '_id']
+     *         To:   ['name' => true, '_id' => true]
+     *     As an array of string to exclude some fields:
+     *         From: ['name', '-_id']
+     *         To:   ['name' => true, '_id' => false]
+     *
+     * @param  array  $fields Fields to project.
+     *
+     * @return array
+     */
+    protected function prepareProjection(array $fields)
+    {
+        $projection = [];
+        foreach ($fields as $key => $value) {
+            if (is_string($key)) {
+                if (is_bool($value)) {
+                    $projection[$key] = $value;
+                    continue;
+                }
+                if (is_integer($value)) {
+                    $projection[$key] = ($value >= 1);
+                    continue;
+                }
+            }
+
+            if (is_integer($key) && is_string($value)) {
+                $key = $value;
+                if (strpos($value, '-') === 0) {
+                    $key = substr($key, 1);
+                    $value = false;
+                } else {
+                    $value = true;
+                }
+
+                $projection[$key] = $value;
+                continue;
+            }
+
+            throw new InvalidArgumentException(sprintf(
+                "Invalid projection: '%s' => '%s'",
+                $key,
+                $value
+            ));
+        }
+
+        return $projection;
     }
 
     /**
