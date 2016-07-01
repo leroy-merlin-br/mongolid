@@ -30,7 +30,7 @@ class DataMapperTest extends TestCase
         m::close();
     }
 
-    public function testShouldBeAbleToConstructedWithSchema()
+    public function testShouldBeAbleToConstructWithSchema()
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -42,13 +42,15 @@ class DataMapperTest extends TestCase
         $this->assertAttributeEquals($connPool, 'connPool', $mapper);
     }
 
-    public function testShouldSave()
+    /**
+     * @dataProvider getWriteConcernVariations
+     */
+    public function testShouldSave($writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool     = m::mock(Pool::class);
-        $mapper       = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $writeConcern = new WriteConcern(2);
-        $options      = ['writeConcern' => $writeConcern];
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection      = m::mock(Collection::class);
         $operationResult = m::mock();
@@ -73,21 +75,25 @@ class DataMapperTest extends TestCase
             ->with(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                ['upsert' => true, 'writeConcern' => $writeConcern]
+                array_merge(['upsert' => true], $options)
             )->andReturn($operationResult);
 
-        $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
+        $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn(1);
+            ->andReturn($expected);
 
         $this->expectEventToBeFired('saving', $object, true);
-        $this->expectEventToBeFired('saved', $object, false);
+        if ($shouldFireEventAfter) {
+            $this->expectEventToBeFired('saved', $object, false);
+        } else {
+            $this->expectEventNotToBeFired('saved', $object);
+        }
 
         // Act
         $result = $mapper->save($object, $options);
 
         // Assert
-        $this->assertTrue($result);
+        $this->assertEquals($expected, $result);
     }
 
     /**

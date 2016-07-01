@@ -4,6 +4,9 @@ namespace Mongolid\DataMapper;
 
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
+use MongoDB\DeleteResult;
+use MongoDB\InsertOneResult;
+use MongoDB\UpdateResult;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
@@ -67,11 +70,31 @@ class DataMapper
     }
 
     /**
+     * If $queryResult is acknowledged, then fire given event.
+     *
+     * @see $this->fire()
+     *
+     * @param InsertOneResult|UpdateResult|DeleteResult $queryResult
+     * @param array                                     $fireArguments
+     *
+     * @return bool whether or not result was acknowledged
+     */
+    protected function fireEventIfAcknowledged($queryResult, ...$fireArguments)
+    {
+        if ($result = $queryResult->isAcknowledged()) {
+            $this->fireEvent(...$fireArguments);
+        }
+
+        return $result;
+    }
+
+    /**
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
      *
-     * @param  mixed $object  The object used in the operation.
+     * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      *
+     * @param  mixed $object  The object used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
@@ -87,19 +110,13 @@ class DataMapper
 
         $data = $this->parseToDocument($object);
 
-        $result = $this->getCollection()->updateOne(
+        $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
             ['$set' => $data],
             $this->mergeOptions($options, ['upsert' => true])
         );
 
-        $result = (bool) ($result->getModifiedCount() + $result->getUpsertedCount());
-
-        if ($result) {
-            $this->fireEvent('saved', $object);
-        }
-
-        return $result;
+        return $this->fireEventIfAcknowledged($queryResult, 'saved', $object);
     }
 
     /**
@@ -128,17 +145,13 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent('inserted', $object);
-        }
-
-        return $result;
+        return $this->fireEventIfAcknowledged($queryResult, 'inserted', $object);
     }
 
     /**
      * Updates the given object into database. Returns success if write concern
      * is acknowledged. Since it's an update, it will fail if the document with
-     * the given _id didn't exists.
+     * the given _id did not exists.
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      *
@@ -161,11 +174,7 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent('updated', $object);
-        }
-
-        return $result;
+        return $this->fireEventIfAcknowledged($queryResult, 'updated', $object);
     }
 
     /**
@@ -191,11 +200,7 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent('deleted', $object);
-        }
-
-        return $result;
+        return $this->fireEventIfAcknowledged($queryResult, 'deleted', $object);
     }
 
     /**
@@ -237,7 +242,7 @@ class DataMapper
      * query
      *
      * @param  mixed   $query     MongoDB query to retrieve the document.
-     * @param  boolean $cacheable Retrieves the first trought a CacheableCursor.
+     * @param  boolean $cacheable Retrieves the first through a CacheableCursor.
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
