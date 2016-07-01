@@ -180,6 +180,7 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $query      = ['foo' => 'bar'];
+        $projection = ['some', 'fields'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
 
@@ -191,11 +192,11 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('where')
             ->once()
-            ->with($query, true)
+            ->with($query, $projection, true)
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->where($query, true));
+        $this->assertEquals($cursor, $entity->where($query, $projection, true));
     }
 
     public function testShouldGetAll()
@@ -226,6 +227,7 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $query      = ['foo' => 'bar'];
+        $projection = ['some', 'fields'];
         $dataMapper = m::mock();
         $cursor     = m::mock();
 
@@ -237,11 +239,11 @@ class ActiveRecordTest extends TestCase
 
         $dataMapper->shouldReceive('first')
             ->once()
-            ->with($query, true)
+            ->with($query, $projection, true)
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->first($query, true));
+        $this->assertEquals($cursor, $entity->first($query, $projection, true));
     }
 
     public function testShouldGetSchemaIfFieldsIsTheClassName()

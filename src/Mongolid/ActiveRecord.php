@@ -105,14 +105,22 @@ abstract class ActiveRecord implements Serializable
      * Gets a cursor of this kind of entities that matches the query from the
      * database
      *
-     * @param  array   $query    MongoDB selection criteria.
-     * @param  boolean $useCache Retrieves a CacheableCursor instead.
+     * @param  array   $query      MongoDB selection criteria.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $useCache   Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
-    public static function where(array $query = [], bool $useCache = false)
-    {
-        return self::getDataMapperInstance()->where($query, $useCache);
+    public static function where(
+        array $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->where(
+            $query,
+            $projection,
+            $useCache
+        );
     }
 
     /**
@@ -128,14 +136,22 @@ abstract class ActiveRecord implements Serializable
     /**
      * Gets the first entity of this kind that matches the query
      *
-     * @param  mixed   $query    MongoDB selection criteria.
-     * @param  boolean $useCache Retrieves the entity trought a CacheableCursor.
+     * @param  mixed   $query      MongoDB selection criteria.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $useCache   Retrieves the entity trought a CacheableCursor.
      *
      * @return ActiveRecord
      */
-    public static function first($query = [], bool $useCache = false)
-    {
-        return self::getDataMapperInstance()->first($query, $useCache);
+    public static function first(
+        $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->first(
+            $query,
+            $projection,
+            $useCache
+        );
     }
 
     /**
