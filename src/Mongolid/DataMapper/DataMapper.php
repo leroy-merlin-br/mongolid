@@ -63,7 +63,7 @@ class DataMapper
      */
     public function __construct(Pool $connPool)
     {
-        $this->connPool  = $connPool;
+        $this->connPool = $connPool;
     }
 
     /**
@@ -107,6 +107,8 @@ class DataMapper
      * is acknowledged. Since it's an insert, it will fail if the _id already
      * exists.
      *
+     * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
+     *
      * @param  mixed $object  The object used in the operation.
      *
      * @param  array $options Possible options to send to mongo driver.
@@ -121,14 +123,12 @@ class DataMapper
 
         $data = $this->parseToDocument($object);
 
-        $result = $this->getCollection()->insertOne(
+        $queryResult = $this->getCollection()->insertOne(
             $data,
             $this->mergeOptions($options)
         );
 
-        $result = (bool) $result->getInsertedCount();
-
-        if ($result) {
+        if ($result = $queryResult->isAcknowledged()) {
             $this->fireEvent('inserted', $object);
         }
 
@@ -140,13 +140,14 @@ class DataMapper
      * is acknowledged. Since it's an update, it will fail if the document with
      * the given _id didn't exists.
      *
-     * @param  mixed $object  The object used in the operation.
+     * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      *
+     * @param  mixed $object  The object used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function update($object, array $options = [])
+    public function update($object, array $options = []): bool
     {
         if ($this->fireEvent('updating', $object, true) === false) {
             return false;
@@ -154,15 +155,13 @@ class DataMapper
 
         $data = $this->parseToDocument($object);
 
-        $result = $this->getCollection()->updateOne(
+        $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
             ['$set' => $data],
             $this->mergeOptions($options)
         );
 
-        $result = (bool) $result->getModifiedCount();
-
-        if ($result) {
+        if ($result = $queryResult->isAcknowledged()) {
             $this->fireEvent('updated', $object);
         }
 
@@ -172,12 +171,14 @@ class DataMapper
     /**
      * Removes the given document from the collection.
      *
+     * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
+     *
      * @param  mixed $object  The object used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
-    public function delete($object, array $options = [])
+    public function delete($object, array $options = []): bool
     {
         if ($this->fireEvent('deleting', $object, true) === false) {
             return false;
@@ -185,14 +186,12 @@ class DataMapper
 
         $data = $this->parseToDocument($object);
 
-        $result = $this->getCollection()->deleteOne(
+        $queryResult = $this->getCollection()->deleteOne(
             ['_id' => $data['_id']],
             $this->mergeOptions($options)
         );
 
-        $result = (bool) $result->getDeletedCount();
-
-        if ($result) {
+        if ($result = $queryResult->isAcknowledged()) {
             $this->fireEvent('deleted', $object);
         }
 
