@@ -2,6 +2,7 @@ language: php
 
 php:
   - 7.0
+  - hhvm
 
 before_script:
   - pecl -q install mongodb
