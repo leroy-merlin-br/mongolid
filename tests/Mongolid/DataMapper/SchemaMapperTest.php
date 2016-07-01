@@ -43,7 +43,7 @@ class SchemaMapperTest extends TestCase
             'stuff' => 'fooBar',
         ];
 
-        $converter->shouldReceive('convert')
+        $converter->shouldReceive('toMongoTypes')
             ->with($oldData)
             ->once()
             ->andReturn($data);
