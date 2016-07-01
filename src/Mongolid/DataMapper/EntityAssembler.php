@@ -3,6 +3,7 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema;
 
@@ -43,7 +44,9 @@ class EntityAssembler
             $model->$field = $value;
         }
 
-        return $this->morphinTime($model);
+        $entity = $this->morphinTime($model);
+
+        return $this->prepareOriginalAttributes($entity);
     }
 
     /**
@@ -53,12 +56,29 @@ class EntityAssembler
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
      * @param  mixed $entity The entity that may or may not have a polymorph method.
-     * @return mixed         The result of $entity->polymorph or the $entity itself.
+     *
+     * @return mixed The result of $entity->polymorph or the $entity itself.
      */
     protected function morphinTime($entity)
     {
         if ($entity instanceof PolymorphableInterface) {
             return $entity->polymorph();
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Stores original attributes from Entity if needed.
+     *
+     * @param mixed $entity The entity that may have the attributes stored.
+     *
+     * @return mixed The entity with original attributes.
+     */
+    protected function prepareOriginalAttributes($entity)
+    {
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->storeOriginalAttributes();
         }
 
         return $entity;
