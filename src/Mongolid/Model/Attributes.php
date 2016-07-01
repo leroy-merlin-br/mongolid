@@ -131,6 +131,22 @@ trait Attributes
     }
 
     /**
+     * Stores original attributes from actual data from attributes
+     * to be used in future comparisons about changes.
+     *
+     * Ideally should be called once right after retrieving data from
+     * the database.
+     *
+     * @return void
+     */
+    public function storeOriginalAttributes()
+    {
+        if (empty($this->original)) {
+            $this->original = $this->attributes;
+        }
+    }
+
+    /**
      * Verify if model has a mutator method defined.
      *
      * @param  mixed $key    Attribute name.

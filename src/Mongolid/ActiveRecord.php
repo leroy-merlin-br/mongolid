@@ -6,6 +6,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
 use Mongolid\Serializer\Serializer;
 use Serializable;
@@ -20,7 +21,7 @@ use MongoDB\Driver\WriteConcern;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord implements Serializable
+abstract class ActiveRecord implements Serializable, AttributesAccessInterface
 {
     use Attributes, Relations;
 

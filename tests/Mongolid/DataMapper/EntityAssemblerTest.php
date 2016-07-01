@@ -5,6 +5,8 @@ namespace Mongolid\DataMapper;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\Attributes;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema;
 use TestCase;
@@ -20,12 +22,12 @@ class EntityAssemblerTest extends TestCase
     /**
      * @dataProvider EntityAssemblerFixture
      */
-    public function testShouldAssembleEntityForTheGivenSchema($inputValue, $availableSchmas, $inputSchema, $expectedOutput)
+    public function testShouldAssembleEntityForTheGivenSchema($inputValue, $availableSchemas, $inputSchema, $expectedOutput)
     {
         // Arrange
         $entityAssembler = new EntityAssembler;
         $schemas = [];
-        foreach ($availableSchmas as $key => $value) {
+        foreach ($availableSchemas as $key => $value) {
             $schemas[$key] = m::mock(Schema::class.'[]');
             $schemas[$key]->entityClass = $value['entityClass'];
             $schemas[$key]->fields      = $value['fields'];
@@ -259,11 +261,16 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class _stubStudent extends \stdClass {
+class _stubStudent extends \stdClass implements AttributesAccessInterface{
+
+    use Attributes;
+
     public function __construct($attr = []) {
         foreach ($attr as $key => $value) {
             $this->$key = $value;
         }
+
+        $this->original = $this->attributes;
     }
 }
 
