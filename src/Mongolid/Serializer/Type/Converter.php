@@ -35,7 +35,7 @@ class Converter
      *
      * @return array
      */
-    public function convert(array $data)
+    public function toMongoTypes(array $data)
     {
         array_walk_recursive($data, function (&$value, $key) {
             if ($value instanceof SerializableTypeInterface) {
@@ -56,7 +56,7 @@ class Converter
      *
      * @return array
      */
-    public function unconvert(array $data)
+    public function toDomainTypes(array $data)
     {
         array_walk_recursive($data, function (&$value) {
             $className = $this->getReflectionClass($value);

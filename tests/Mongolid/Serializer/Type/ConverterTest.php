@@ -39,7 +39,7 @@ class ConvererTest extends TestCase
         $this->assertInstanceOf(Converter::class, $this->converter);
     }
 
-    public function testConvertShouldReplaceAllMongoObjectsToOurObjects()
+    public function testToDomainTypesShouldReplaceDomainTypesByMongoTypes()
     {
         $mongoId   = new MongoObjectID();
         $timestamp = time();
@@ -103,10 +103,10 @@ class ConvererTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->converter->convert($data));
+        $this->assertEquals($expected, $this->converter->toMongoTypes($data));
     }
 
-    public function testConvertShouldReplaceOurObjectsToMongoDBObjects()
+    public function testToDomainTypesShouldReplaceMongoTypesByDomainTypes()
     {
         $mongoId   = new MongoObjectID();
         $timestamp = time();
@@ -170,6 +170,6 @@ class ConvererTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->converter->unconvert($data));
+        $this->assertEquals($expected, $this->converter->toDomainTypes($data));
     }
 }

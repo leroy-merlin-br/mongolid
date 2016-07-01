@@ -57,8 +57,9 @@ class Serializer
     }
 
     /**
-     * Converts recursively the given data to persistable objects into database.
-     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
+     * Converts recursively the given objects (probably retrieved from MongoDB)
+     * to our specific types.
+     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
      *
      * @param  array $attributes Array to convert.
      *
@@ -66,14 +67,12 @@ class Serializer
      */
     public function convert(array $attributes)
     {
-        return $this->converter->convert($attributes);
+        return $this->converter->toDomainTypes($attributes);
     }
 
     /**
-     * Unconverts recursively the given objects (probably retrieved from MongoDB)
-     * to our specific types.
-     *
-     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
+     * Unconverts recursively the given objects to persistable objects on MongoDB
+     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
      *
      * @param  array $attributes Array to convert.
      *
@@ -81,6 +80,6 @@ class Serializer
      */
     public function unconvert(array $attributes)
     {
-        return $this->converter->unconvert($attributes);
+        return $this->converter->toMongoTypes($attributes);
     }
 }
