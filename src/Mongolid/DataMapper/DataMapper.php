@@ -4,9 +4,6 @@ namespace Mongolid\DataMapper;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
-use MongoDB\DeleteResult;
-use MongoDB\InsertOneResult;
-use MongoDB\UpdateResult;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
@@ -71,25 +68,6 @@ class DataMapper
     }
 
     /**
-     * If $queryResult is acknowledged, then fire given event.
-     *
-     * @see $this->fire()
-     *
-     * @param InsertOneResult|UpdateResult|DeleteResult $queryResult
-     * @param array                                     $fireArguments
-     *
-     * @return bool whether or not result was acknowledged
-     */
-    protected function fireEventIfAcknowledged($queryResult, ...$fireArguments)
-    {
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent(...$fireArguments);
-        }
-
-        return $result;
-    }
-
-    /**
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
      *
@@ -117,7 +95,14 @@ class DataMapper
             $this->mergeOptions($options, ['upsert' => true])
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'saved', $object);
+        if ($queryResult->isAcknowledged() &&
+            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount())
+        ) {
+            $this->fireEvent('saved', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -146,7 +131,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'inserted', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getInsertedCount()
+        ) {
+            $this->fireEvent('inserted', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -175,7 +167,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'updated', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getModifiedCount()
+        ) {
+            $this->fireEvent('updated', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -201,7 +200,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'deleted', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getDeletedCount()
+        ) {
+            $this->fireEvent('deleted', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
