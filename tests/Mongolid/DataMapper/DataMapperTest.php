@@ -52,14 +52,15 @@ class DataMapperTest extends TestCase
         $options  = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection      = m::mock(Collection::class);
-        $operationResult = m::mock();
         $object          = m::mock();
-        $object->_id     = null;
         $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
 
+        $object->_id = null;
+
+        // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        // Expect
         $mapper->shouldReceive('parseToDocument')
             ->once()
             ->with($object)
@@ -74,25 +75,26 @@ class DataMapperTest extends TestCase
             ->with(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                array_merge(['upsert' => true], $options)
+                ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($expected);
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
+            ->andReturn(1);
 
         $this->expectEventToBeFired('saving', $object, true);
+
         if ($shouldFireEventAfter) {
             $this->expectEventToBeFired('saved', $object, false);
         } else {
             $this->expectEventNotToBeFired('saved', $object);
         }
 
-        // Act
-        $result = $mapper->save($object, $options);
-
         // Assert
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $mapper->save($object, $options));
     }
 
     /**
@@ -106,14 +108,15 @@ class DataMapperTest extends TestCase
         $options  = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection      = m::mock(Collection::class);
-        $operationResult = m::mock();
         $object          = m::mock();
-        $object->_id     = null;
         $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
 
+        $object->_id = null;
+
+        // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        // Expect
         $mapper->shouldReceive('parseToDocument')
             ->once()
             ->with($object)
@@ -125,25 +128,26 @@ class DataMapperTest extends TestCase
 
         $collection->shouldReceive('insertOne')
             ->once()
-            ->with($parsedObject, $options)
+            ->with($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($expected);
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getInsertedCount')
+            ->andReturn(1);
 
         $this->expectEventToBeFired('inserting', $object, true);
+
         if ($shouldFireEventAfter) {
             $this->expectEventToBeFired('inserted', $object, false);
         } else {
             $this->expectEventNotToBeFired('inserted', $object);
         }
 
-        // Act
-        $result = $mapper->insert($object, $options);
-
         // Assert
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $mapper->insert($object, $options));
     }
 
     /**
@@ -156,15 +160,16 @@ class DataMapperTest extends TestCase
         $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
 
         $collection      = m::mock(Collection::class);
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
         $options         = ['writeConcern' => new WriteConcern($writeConcern)];
-        $object          = m::mock();
-        $object->_id     = null;
-        $parsedObject    = ['_id' => 123];
 
+        $object->_id = null;
+
+        // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        // Expect
         $mapper->shouldReceive('parseToDocument')
             ->once()
             ->with($object)
@@ -179,25 +184,26 @@ class DataMapperTest extends TestCase
             ->with(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                $options
+                ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($expected);
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getModifiedCount')
+            ->andReturn(1);
 
         $this->expectEventToBeFired('updating', $object, true);
+
         if ($shouldFireEventAfter) {
             $this->expectEventToBeFired('updated', $object, false);
         } else {
             $this->expectEventNotToBeFired('updated', $object);
         }
 
-        // Act
-        $result = $mapper->update($object, $options);
-
         // Assert
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $mapper->update($object, $options));
     }
 
     /**
@@ -210,15 +216,16 @@ class DataMapperTest extends TestCase
         $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
 
         $collection      = m::mock(Collection::class);
-        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
-        $operationResult = m::mock();
         $object          = m::mock();
-        $object->_id     = null;
         $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
 
+        $object->_id = null;
+
+        // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        // Expect
         $mapper->shouldReceive('parseToDocument')
             ->once()
             ->with($object)
@@ -230,25 +237,26 @@ class DataMapperTest extends TestCase
 
         $collection->shouldReceive('deleteOne')
             ->once()
-            ->with(['_id' => 123], $options)
+            ->with(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($expected);
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getDeletedCount')
+            ->andReturn(1);
 
         $this->expectEventToBeFired('deleting', $object, true);
+
         if ($shouldFireEventAfter) {
             $this->expectEventToBeFired('deleted', $object, false);
         } else {
             $this->expectEventNotToBeFired('deleted', $object);
         }
 
-        // Act
-        $result = $mapper->delete($object, $options);
-
         // Assert
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $mapper->delete($object, $options));
     }
 
     /**
