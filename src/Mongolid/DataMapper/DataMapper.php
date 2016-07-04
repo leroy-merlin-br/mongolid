@@ -4,9 +4,6 @@ namespace Mongolid\DataMapper;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
-use MongoDB\DeleteResult;
-use MongoDB\InsertOneResult;
-use MongoDB\UpdateResult;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
@@ -15,6 +12,7 @@ use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
+use Mongolid\Util\ObjectIdUtils;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -70,25 +68,6 @@ class DataMapper
     }
 
     /**
-     * If $queryResult is acknowledged, then fire given event.
-     *
-     * @see $this->fire()
-     *
-     * @param InsertOneResult|UpdateResult|DeleteResult $queryResult
-     * @param array                                     $fireArguments
-     *
-     * @return bool whether or not result was acknowledged
-     */
-    protected function fireEventIfAcknowledged($queryResult, ...$fireArguments)
-    {
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent(...$fireArguments);
-        }
-
-        return $result;
-    }
-
-    /**
      * Upserts the given object into database. Returns success if write concern
      * is acknowledged.
      *
@@ -116,7 +95,14 @@ class DataMapper
             $this->mergeOptions($options, ['upsert' => true])
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'saved', $object);
+        if ($queryResult->isAcknowledged() &&
+            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount())
+        ) {
+            $this->fireEvent('saved', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -145,7 +131,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'inserted', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getInsertedCount()
+        ) {
+            $this->fireEvent('inserted', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -174,7 +167,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'updated', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getModifiedCount()
+        ) {
+            $this->fireEvent('updated', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -200,7 +200,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'deleted', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getDeletedCount()
+        ) {
+            $this->fireEvent('deleted', $object);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -337,15 +344,18 @@ class DataMapper
      */
     protected function prepareValueQuery($value): array
     {
-        if (is_array($value)) {
-            return $value;
+        if (! is_array($value)) {
+            $value = ['_id' => $value];
         }
 
-        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
-            $value = new ObjectID($value);
+        if (isset($value['_id']) &&
+            is_string($value['_id']) &&
+            ObjectIdUtils::isObjectId($value['_id'])
+        ) {
+            $value['_id'] = new ObjectID($value['_id']);
         }
 
-        return ['_id' => $value];
+        return $value;
     }
 
     /**
@@ -397,7 +407,9 @@ class DataMapper
      *         From: ['name', '-_id']
      *         To:   ['name' => true, '_id' => false]
      *
-     * @param  array  $fields Fields to project.
+     * @param  array $fields Fields to project.
+     *
+     * @throws InvalidArgumentException If the given $fields are not a valid projection.
      *
      * @return array
      */

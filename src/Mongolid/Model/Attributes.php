@@ -64,13 +64,14 @@ trait Attributes
     public function getAttribute(string $key)
     {
         $inAttributes = array_key_exists($key, $this->attributes);
+
         if ($inAttributes) {
             return $this->attributes[$key];
         } elseif ($key == 'attributes') {
             return $this->attributes;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -131,6 +132,22 @@ trait Attributes
     }
 
     /**
+     * Stores original attributes from actual data from attributes
+     * to be used in future comparisons about changes.
+     *
+     * Ideally should be called once right after retrieving data from
+     * the database.
+     *
+     * @return void
+     */
+    public function storeOriginalAttributes()
+    {
+        if (empty($this->original)) {
+            $this->original = $this->attributes;
+        }
+    }
+
+    /**
      * Verify if model has a mutator method defined.
      *
      * @param  mixed $key    Attribute name.
@@ -141,7 +158,7 @@ trait Attributes
     protected function hasMutatorMethod($key, $prefix)
     {
         $method = $this->buildMutatorMethod($key, $prefix);
-        
+
         return method_exists($this, $method);
     }
 
@@ -180,7 +197,7 @@ trait Attributes
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             return $this->{$this->buildMutatorMethod($key, 'get')}();
         }
-        
+
         return $this->getAttribute($key);
     }
 
@@ -197,7 +214,7 @@ trait Attributes
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
-        
+
         $this->setAttribute($key, $value);
     }
 

@@ -22,13 +22,13 @@ class DocumentEmbedderTest extends TestCase
     {
         // Arrange
         $parent = new stdClass;
-        $parent->field = $originalField;
+        $parent->foo = $originalField;
         $embeder = new DocumentEmbedder;
 
         // Assert
-        $embeder->$method($parent, 'field', $entity);
+        $embeder->$method($parent, 'foo', $entity);
 
-        $result = $parent->field;
+        $result = $parent->foo;
         foreach ($expectation as $index => $expectedDoc) {
 
             if ($expectedDoc instanceof ObjectID) {

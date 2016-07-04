@@ -55,7 +55,7 @@ class DocumentEmbedder
             }
         }
 
-        $parent->field = array_values($fieldValue);
+        $parent->$field = array_values($fieldValue);
 
         return true;
     }

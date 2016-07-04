@@ -37,7 +37,7 @@ class Converter
      */
     public function toMongoTypes(array $data)
     {
-        array_walk_recursive($data, function (&$value, $key) {
+        array_walk_recursive($data, function (&$value) {
             if ($value instanceof SerializableTypeInterface) {
                 $value = $value->convert();
             }
