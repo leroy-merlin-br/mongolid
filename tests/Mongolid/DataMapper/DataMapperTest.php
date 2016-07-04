@@ -49,7 +49,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connPool = m::mock(Pool::class);
         $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $options  = ['writeConcern' => $writeConcern];
+        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection      = m::mock(Collection::class);
         $object          = m::mock();
@@ -75,12 +75,12 @@ class DataMapperTest extends TestCase
             ->with(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                ['upsert' => true, 'writeConcern' => $writeConcern]
+                ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($writeConcern);
+            ->andReturn((bool) $writeConcern);
 
         $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
             ->andReturn(1);
@@ -105,7 +105,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connPool = m::mock(Pool::class);
         $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $options  = ['writeConcern' => $writeConcern];
+        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection      = m::mock(Collection::class);
         $object          = m::mock();
@@ -128,12 +128,12 @@ class DataMapperTest extends TestCase
 
         $collection->shouldReceive('insertOne')
             ->once()
-            ->with($parsedObject, ['writeConcern' => $writeConcern])
+            ->with($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($writeConcern);
+            ->andReturn((bool) $writeConcern);
 
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
@@ -163,7 +163,7 @@ class DataMapperTest extends TestCase
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
-        $options         = ['writeConcern' => $writeConcern];
+        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $object->_id = null;
 
@@ -184,12 +184,12 @@ class DataMapperTest extends TestCase
             ->with(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                ['writeConcern' => $writeConcern]
+                ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($writeConcern);
+            ->andReturn((bool) $writeConcern);
 
         $operationResult->shouldReceive('getModifiedCount')
             ->andReturn(1);
@@ -219,7 +219,7 @@ class DataMapperTest extends TestCase
         $object          = m::mock();
         $parsedObject    = ['_id' => 123];
         $operationResult = m::mock();
-        $options         = ['writeConcern' => $writeConcern];
+        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $object->_id = null;
 
@@ -237,12 +237,12 @@ class DataMapperTest extends TestCase
 
         $collection->shouldReceive('deleteOne')
             ->once()
-            ->with(['_id' => 123], ['writeConcern' => $writeConcern])
+            ->with(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
-            ->andReturn($writeConcern);
+            ->andReturn((bool) $writeConcern);
 
         $operationResult->shouldReceive('getDeletedCount')
             ->andReturn(1);
