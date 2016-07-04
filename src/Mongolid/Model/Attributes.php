@@ -64,13 +64,14 @@ trait Attributes
     public function getAttribute(string $key)
     {
         $inAttributes = array_key_exists($key, $this->attributes);
+
         if ($inAttributes) {
             return $this->attributes[$key];
         } elseif ($key == 'attributes') {
             return $this->attributes;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -157,7 +158,7 @@ trait Attributes
     protected function hasMutatorMethod($key, $prefix)
     {
         $method = $this->buildMutatorMethod($key, $prefix);
-        
+
         return method_exists($this, $method);
     }
 
@@ -196,7 +197,7 @@ trait Attributes
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             return $this->{$this->buildMutatorMethod($key, 'get')}();
         }
-        
+
         return $this->getAttribute($key);
     }
 
@@ -213,7 +214,7 @@ trait Attributes
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
-        
+
         $this->setAttribute($key, $value);
     }
 

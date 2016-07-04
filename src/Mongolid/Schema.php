@@ -113,11 +113,9 @@ abstract class Schema
     /**
      * Prepares the field to be now
      *
-     * @param  mixed|null $value Value that will be evaluated.
-     *
      * @return UTCDateTime
      */
-    public function updatedAtTimestamp($value)
+    public function updatedAtTimestamp()
     {
         return new UTCDateTime(floor(microtime(true) * 1000));
     }
