@@ -12,7 +12,7 @@ class ObjectID implements SerializableTypeInterface
     /**
      * @var string
      */
-    protected $id;
+    protected $objecIdString;
 
     /**
      * Constructor
@@ -21,7 +21,7 @@ class ObjectID implements SerializableTypeInterface
      */
     public function __construct(MongoObjectID $mongoId)
     {
-        $this->id = (string) $mongoId;
+        $this->objecIdString = (string) $mongoId;
     }
 
     /**
@@ -31,7 +31,7 @@ class ObjectID implements SerializableTypeInterface
      */
     public function serialize()
     {
-        return serialize($this->id);
+        return serialize($this->objecIdString);
     }
 
     /**
@@ -43,7 +43,7 @@ class ObjectID implements SerializableTypeInterface
      */
     public function unserialize($data)
     {
-        $this->id = unserialize($data);
+        $this->objecIdString = unserialize($data);
     }
 
     /**
@@ -53,6 +53,6 @@ class ObjectID implements SerializableTypeInterface
      */
     public function convert()
     {
-        return new MongoObjectID($this->id);
+        return new MongoObjectID($this->objecIdString);
     }
 }
