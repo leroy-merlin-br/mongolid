@@ -53,6 +53,13 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     ];
 
     /**
+     * The database that the current model uses.
+     *
+     * @var string
+     */
+    protected $database = '';
+
+    /**
      * The $dynamic property tells if the object will accept additional fields
      * that are not specified in the $fields property. This is useful if you
      * does not have a strict document format or if you want to take full
@@ -202,8 +209,9 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
      */
     public function getDataMapper()
     {
-        $dataMapper         = Ioc::make(DataMapper::class);
-        $dataMapper->schema = $this->getSchema();
+        $dataMapper           = Ioc::make(DataMapper::class);
+        $dataMapper->schema   = $this->getSchema();
+        $dataMapper->database = $this->database;
 
         return $dataMapper;
     }
