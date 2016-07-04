@@ -4,6 +4,7 @@ namespace Mongolid;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
+use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Util\SequenceService;
 
 /**
@@ -67,7 +68,7 @@ abstract class Schema
             return new ObjectID();
         }
 
-        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
+        if (is_string($value) && ObjectIdUtils::isObjectId($value)) {
             $value = new ObjectID($value);
         }
 

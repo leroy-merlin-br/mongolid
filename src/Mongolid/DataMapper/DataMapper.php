@@ -15,6 +15,7 @@ use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
+use Mongolid\Util\ObjectIdUtils;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -337,15 +338,18 @@ class DataMapper
      */
     protected function prepareValueQuery($value): array
     {
-        if (is_array($value)) {
-            return $value;
+        if (! is_array($value)) {
+            $value = ['_id' => $value];
         }
 
-        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
-            $value = new ObjectID($value);
+        if (isset($value['_id']) &&
+            is_string($value['_id']) &&
+            ObjectIdUtils::isObjectId($value['_id'])
+        ) {
+            $value['_id'] = new ObjectID($value['_id']);
         }
 
-        return ['_id' => $value];
+        return $value;
     }
 
     /**
