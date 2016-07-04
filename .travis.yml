@@ -4,6 +4,9 @@ php:
   - 7.0
   - hhvm
 
+before_install:
+  - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
 before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install
