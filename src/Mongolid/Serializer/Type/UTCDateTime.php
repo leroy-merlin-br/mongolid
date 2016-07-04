@@ -1,7 +1,6 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
-use DateTime;
 use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
