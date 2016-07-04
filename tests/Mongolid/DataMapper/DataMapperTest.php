@@ -622,6 +622,9 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertEquals($expectation, $result);
+        if (isset($result['_id']) && is_object($expectation['_id'])) {
+            $this->assertInstanceOf(get_class($expectation['_id']), $result['_id']);
+        }
     }
 
     /**
@@ -717,13 +720,18 @@ class DataMapperTest extends TestCase
     public function queryValueScenarios()
     {
         return [
-            'An array'                                => [
+            'An array' => [
                 'value'       => ['age' => ['$gt' => 25]],
                 'expectation' => ['age' => ['$gt' => 25]],
             ],
             // ------------------------
-            'An ObjectId string'                      => [
+            'An ObjectId string' => [
                 'value'       => '507f1f77bcf86cd799439011',
+                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
+            ],
+            // ------------------------
+            'An ObjectId string within a query' => [
+                'value'       => ['_id' => '507f1f77bcf86cd799439011'],
                 'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
             ],
             // ------------------------
