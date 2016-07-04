@@ -407,7 +407,9 @@ class DataMapper
      *         From: ['name', '-_id']
      *         To:   ['name' => true, '_id' => false]
      *
-     * @param  array  $fields Fields to project.
+     * @param  array $fields Fields to project.
+     *
+     * @throws InvalidArgumentException If the given $fields are not a valid projection.
      *
      * @return array
      */
