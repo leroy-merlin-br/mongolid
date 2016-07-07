@@ -75,7 +75,12 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return (new EmbeddedCursor($entity, (array) $this->$field))->first();
+        $items = (array) $this->$field;
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
+            $items = [$items];
+        }
+
+        return (new EmbeddedCursor($entity, $items))->first();
     }
 
     /**
