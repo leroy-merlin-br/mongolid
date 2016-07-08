@@ -71,11 +71,11 @@ class DataMapperTest extends TestCase
             ->once()
             ->andReturn($collection);
 
-        $collection->shouldReceive('updateOne')
+        $collection->shouldReceive('replaceOne')
             ->once()
             ->with(
                 ['_id' => 123],
-                ['$set' => $parsedObject],
+                $parsedObject,
                 ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
@@ -709,7 +709,7 @@ class DataMapperTest extends TestCase
         return [
             'Saving event'    => [
                 'operation'   => 'save',
-                'dbOperation' => 'updateOne',
+                'dbOperation' => 'replaceOne',
                 'eventName'   => 'saving',
             ],
             // ------------------------
