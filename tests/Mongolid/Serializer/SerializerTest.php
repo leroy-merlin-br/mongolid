@@ -4,7 +4,7 @@ namespace Mongolid\Serializer;
 use Mockery as m;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use Mongolid\Serializer\Type\Converter;
-use PHPUnit_Framework_TestCase as TestCase;
+use TestCase;
 
 /**
  * Test case for Serializer class

@@ -5,7 +5,7 @@ use DateTime;
 use Mockery as m;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
-use PHPUnit_Framework_TestCase as TestCase;
+use TestCase;
 
 /**
  * Test case for UTCDateTime class

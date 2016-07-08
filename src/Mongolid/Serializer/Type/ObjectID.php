@@ -30,7 +30,7 @@ class ObjectID implements SerializableTypeInterface
             $mongoId = new MongoObjectID;
         }
 
-        if ($mongoId instanceof MongoObjectID) {
+        if (is_object($mongoId)) {
             $mongoId = (string) $mongoId;
         }
 

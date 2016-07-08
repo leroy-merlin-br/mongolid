@@ -3,7 +3,7 @@ namespace Mongolid\Serializer\Type;
 
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use Mongolid\Serializer\SerializableTypeInterface;
-use PHPUnit_Framework_TestCase as TestCase;
+use TestCase;
 
 /**
  * Test case for ObjectID class

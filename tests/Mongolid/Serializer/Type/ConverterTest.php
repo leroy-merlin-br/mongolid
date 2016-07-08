@@ -4,7 +4,7 @@ namespace Mongolid\Serializer\Type;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\Type\Converter;
-use PHPUnit_Framework_TestCase as TestCase;
+use TestCase;
 
 /**
  * Test case for Converter class
