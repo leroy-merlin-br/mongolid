@@ -230,11 +230,19 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection     = m::mock(Collection::class);
+        $converter      = m::mock(Converter::class);
         $cursor         = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
         $driverCursor   = m::mock('Traversable');
         $driverIterator = m::mock('Iterator');
 
         // Act
+        Ioc::instance(Converter::class, $converter);
+
+        $converter->shouldReceive('toMongoTypes')
+            ->once()
+            ->with([['bacon' => true]])
+            ->passthru();
+
         $collection->shouldReceive('find')
             ->once()
             ->with(['bacon' => true])
