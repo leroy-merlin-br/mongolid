@@ -10,6 +10,7 @@ use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Serializable;
+use MongoDB\Driver\Exception\LogicException;
 use Traversable;
 
 /**
@@ -149,7 +150,13 @@ class Cursor implements CursorInterface, Serializable
      */
     public function rewind()
     {
-        $this->getCursor()->rewind();
+        try {
+            $this->getCursor()->rewind();
+        } catch (LogicException $e) {
+            $this->fresh();
+            $this->getCursor()->rewind();
+        }
+
         $this->position = 0;
     }
 
