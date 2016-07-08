@@ -104,7 +104,7 @@ trait Relations
         }
 
         $items = (array) $this->$field;
-        if (false === array_key_exists(0, $items)) {
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
             $items = [$items];
         }
 
