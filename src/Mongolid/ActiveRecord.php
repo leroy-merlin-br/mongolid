@@ -9,7 +9,6 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
 use Mongolid\Serializer\Serializer;
-use Serializable;
 use MongoDB\Driver\WriteConcern;
 
 /**
@@ -21,7 +20,7 @@ use MongoDB\Driver\WriteConcern;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord implements Serializable, AttributesAccessInterface
+abstract class ActiveRecord implements AttributesAccessInterface
 {
     use Attributes, Relations;
 
@@ -216,28 +215,6 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     public function getCollectionName()
     {
         return $this->collection;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        return Ioc::make(Serializer::class)->serialize($this->getAttributes());
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $data Serialized string to parse.
-     *
-     * @return void
-     */
-    public function unserialize($data)
-    {
-        $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
     }
 
     /**

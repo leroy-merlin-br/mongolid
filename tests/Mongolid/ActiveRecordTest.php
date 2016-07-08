@@ -5,8 +5,6 @@ use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
-use Mongolid\Serializer\Serializer;
-use Serializable;
 use TestCase;
 use MongoDB\Driver\WriteConcern;
 
@@ -35,11 +33,6 @@ class ActiveRecordTest extends TestCase
         parent::tearDown();
         m::close();
         unset($this->entity);
-    }
-
-    public function testActiveRecordShouldBeSerializable()
-    {
-        $this->assertInstanceOf(Serializable::class, $this->entity);
     }
 
     public function testShouldHaveCorrectPropertiesByDefault()
@@ -339,42 +332,6 @@ class ActiveRecordTest extends TestCase
         };
 
         $this->assertEquals($entity->getCollectionName(), 'collection_name');
-    }
-
-    public function testSerializeShouldCallSerializerAndReturnString()
-    {
-        $serializer = m::mock(Serializer::class);
-        $attributes = ['some', 'attributes'];
-        $this->entity->fill($attributes);
-
-        $serializer->shouldReceive('serialize')
-            ->with($attributes)
-            ->once()
-            ->andReturn('some-serialized-string');
-
-        Ioc::instance(Serializer::class, $serializer);
-
-        $this->assertEquals(
-            'some-serialized-string',
-            $this->entity->serialize()
-        );
-    }
-
-    public function testUnderializeShouldCallSerializerAndFillObjectSuccessfully()
-    {
-        $serializer = m::mock(Serializer::class);
-        $attributes = ['some' => 'attributes'];
-
-        $serializer->shouldReceive('unserialize')
-            ->with('some-serialized-string')
-            ->once()
-            ->andReturn($attributes);
-
-        Ioc::instance(Serializer::class, $serializer);
-
-        $this->entity->unserialize('some-serialized-string');
-
-        $this->assertEquals($attributes, $this->entity->getAttributes());
     }
 
     public function testShouldGetSetWriteConcernInActiveRecordClass()
