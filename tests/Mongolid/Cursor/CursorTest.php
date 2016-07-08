@@ -10,6 +10,7 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DynamicSchema;
 use Mongolid\Schema;
+use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 class CursorTest extends TestCase
@@ -99,9 +100,17 @@ class CursorTest extends TestCase
         // Arrange
         $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
+        $converter    = m::mock(Converter::class.'[toDomainTypes]');
         $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
+        Ioc::instance(Converter::class, $converter);
+
+        $converter->shouldReceive('toDomainTypes')
+            ->once()
+            ->with(['name' => 'John Doe'])
+            ->passthru();
+
         $driverCursor->shouldReceive('current')
             ->once()
             ->andReturn(['name' => 'John Doe']);
@@ -117,9 +126,17 @@ class CursorTest extends TestCase
         // Arrange
         $collection   = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
+        $converter    = m::mock(Converter::class.'[toDomainTypes]');
         $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
+        Ioc::instance(Converter::class, $converter);
+
+        $converter->shouldReceive('toDomainTypes')
+            ->once()
+            ->with(['name' => 'John Doe'])
+            ->passthru();
+
         $driverCursor->shouldReceive('rewind')
             ->once();
 

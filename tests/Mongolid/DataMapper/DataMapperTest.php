@@ -12,8 +12,9 @@ use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
-use stdClass;
+use Mongolid\Serializer\Type\Converter;
 use TestCase;
+use stdClass;
 
 class DataMapperTest extends TestCase
 {
@@ -370,9 +371,10 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstWithQuery()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
-        $schema   = m::mock(Schema::class);
+        $connPool  = m::mock(Pool::class);
+        $mapper    = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
+        $schema    = m::mock(Schema::class);
+        $converter = m::mock(Converter::class.'[toDomainTypes]');
 
         $collection    = m::mock(Collection::class);
         $query         = 123;
@@ -383,7 +385,9 @@ class DataMapperTest extends TestCase
 
         $mapper->shouldAllowMockingProtectedMethods();
 
-        // Expect
+        // Act
+        Ioc::instance(Converter::class, $converter);
+
         $mapper->shouldReceive('prepareValueQuery')
             ->once()
             ->with($query)
@@ -398,7 +402,11 @@ class DataMapperTest extends TestCase
             ->with($preparedQuery, ['projection' => []])
             ->andReturn(['name' => 'John Doe']);
 
-        // Act
+        $converter->shouldReceive('toDomainTypes')
+            ->once()
+            ->with(['name' => 'John Doe'])
+            ->passthru();
+
         $result = $mapper->first($query);
 
         // Assert

@@ -12,6 +12,7 @@ use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
+use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -274,6 +275,8 @@ class DataMapper
             $this->prepareValueQuery($query),
             ['projection' => $this->prepareProjection($projection)]
         );
+
+        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
 
         if (! $document) {
             return null;

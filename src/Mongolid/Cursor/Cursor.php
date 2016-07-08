@@ -2,14 +2,15 @@
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
-use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
+use Mongolid\Serializer\Type\Converter;
 use Serializable;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -162,6 +163,8 @@ class Cursor implements CursorInterface, Serializable
     {
         $document = $this->getCursor()->current();
 
+        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
+
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
 
@@ -178,6 +181,8 @@ class Cursor implements CursorInterface, Serializable
         if (! $document) {
             return null;
         }
+
+        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
