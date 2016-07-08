@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\EmbeddedCursor;
+use Mongolid\Cursor\CursorFactory;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema;
 
@@ -84,7 +85,8 @@ trait Relations
             $items = [$items];
         }
 
-        return (new EmbeddedCursor($entity, $items))->first();
+        return Ioc::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items)->first();
     }
 
     /**
@@ -101,7 +103,13 @@ trait Relations
             $entity = (new $entity)->entityClass;
         }
 
-        return new EmbeddedCursor($entity, (array) $this->$field);
+        $items = (array) $this->$field;
+        if (false === array_key_exists(0, $items)) {
+            $items = [$items];
+        }
+
+        return Ioc::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items);
     }
 
     /**

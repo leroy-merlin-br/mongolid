@@ -6,6 +6,7 @@ use MongoDB\BSON\ObjectID;
 use Mongolid\ActiveRecord;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
+use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\DocumentEmbedder;
@@ -82,34 +83,62 @@ class RelationsTest extends TestCase
         );
     }
 
-    public function testShouldEmbedsOne()
+    /**
+     * @dataProvider embedsScenarios
+     */
+    public function testShouldEmbedsOne($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model  = m::mock(ActiveRecord::class.'[]');
-        $document = ['_id' => 12345, 'name' => 'batata'];
-        $model->foo = [$document];
+        $model         = m::mock(ActiveRecord::class.'[]');
+        $cursorFactory = m::mock(CursorFactory::class);
+        $cursor        = m::mock(EmbeddedCursor::class);
+        $document      = $fieldValue;
+        $model->$field = $document;
+
+        $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
+
+        // Act
+        Ioc::instance(CursorFactory::class, $cursorFactory);
+
+        $cursorFactory->shouldReceive('createEmbeddedCursor')
+            ->once()
+            ->with($instantiableClass, $expectedItems)
+            ->andReturn($cursor);
+
+        $cursor->shouldReceive('first')
+            ->once()
+            ->andReturn(new $instantiableClass);
 
         // Assert
-        $result = $this->callProtected($model, 'embedsOne', ['stdClass', 'foo']);
-        $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals($document, (array) $result);
+        $result = $this->callProtected($model, 'embedsOne', [get_class($entity), $field]);
+        $this->assertInstanceOf($instantiableClass, $result);
     }
 
-    public function testShouldEmbedsMany()
+    /**
+     * @dataProvider embedsScenarios
+     */
+    public function testShouldEmbedsMany($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model  = m::mock(ActiveRecord::class.'[]');
-        $documents = [
-            ['_id' => 1, 'name' => 'batata'],
-            ['_id' => 2, 'name' => 'foobar']
-        ];
-        $model->foo = $documents;
+        $model         = m::mock(ActiveRecord::class.'[]');
+        $cursorFactory = m::mock(CursorFactory::class);
+        $cursor        = m::mock(EmbeddedCursor::class);
+        $document      = $fieldValue;
+        $model->$field = $document;
+
+        $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
+
+        // Act
+        Ioc::instance(CursorFactory::class, $cursorFactory);
+
+        $cursorFactory->shouldReceive('createEmbeddedCursor')
+            ->once()
+            ->with($instantiableClass, $expectedItems)
+            ->andReturn($cursor);
 
         // Assert
-        $cursor = $this->callProtected($model, 'embedsMany', ['stdClass', 'foo']);
-        $this->assertInstanceOf(EmbeddedCursor::class, $cursor);
-        $this->assertAttributeEquals($documents, 'items', $cursor);
-        $this->assertAttributeEquals('stdClass', 'entityClass', $cursor);
+        $result = $this->callProtected($model, 'embedsMany', [get_class($entity), $field]);
+        $this->assertEquals($cursor, $result);
     }
 
     /**
@@ -208,6 +237,41 @@ class RelationsTest extends TestCase
                     'referencesMany' => ['_id' => ['$in' => []]]
                 ]
             ],
+        ];
+    }
+
+    public function embedsScenarios()
+    {
+        return [
+            // -------------------------
+            'Embedded document referent to an Schema' => [
+                'entity' => new class extends Schema {},
+                'field' => 'foo',
+                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
+                'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
+            ],
+            // -------------------------
+            'Embedded documents referent to an Schema' => [
+                'entity' => new class extends Schema {},
+                'field' => 'foo',
+                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+            ],
+            // -------------------------
+            'Embedded document referent to an ActiveRecord entity' => [
+                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
+                'field' => 'foo',
+                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
+                'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
+            ],
+            // -------------------------
+            'Embedded documents referent to an ActiveRecord entity' => [
+                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
+                'field' => 'foo',
+                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+            ],
+            // -------------------------
         ];
     }
 

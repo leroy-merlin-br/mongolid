@@ -1,8 +1,6 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Iterator;
-
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
  * By doing this we can use 'sort', 'skip', 'limit' and others after calling 'where'.
@@ -11,7 +9,7 @@ use Iterator;
  *
  * @package Mongolid
  */
-class EmbeddedCursor implements Iterator
+class EmbeddedCursor implements CursorInterface
 {
     /**
      * Entity class that will be returned while iterating

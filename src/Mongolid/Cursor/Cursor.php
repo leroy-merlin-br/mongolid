@@ -1,7 +1,6 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Iterator;
 use IteratorIterator;
 use Traversable;
 use MongoDB\Collection;
@@ -20,7 +19,7 @@ use Serializable;
  *
  * @package Mongolid
  */
-class Cursor implements Iterator, Serializable
+class Cursor implements CursorInterface, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
