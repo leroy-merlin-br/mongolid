@@ -53,12 +53,12 @@ class SchemaMapper
         $data = $this->parseToArray($data);
         $this->clearDynamic($data);
 
-        $data = Ioc::make(Converter::class)->toMongoTypes($data);
-
         // Parse each specified field
         foreach ($this->schema->fields as $key => $fieldType) {
             $data[$key] = $this->parseField($data[$key] ?? null, $fieldType);
         }
+
+        $data = Ioc::make(Converter::class)->toMongoTypes($data);
 
         return $data;
     }

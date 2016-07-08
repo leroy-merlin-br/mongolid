@@ -90,9 +90,9 @@ class DataMapper
 
         $data = $this->parseToDocument($object);
 
-        $queryResult = $this->getCollection()->updateOne(
+        $queryResult = $this->getCollection()->replaceOne(
             ['_id' => $data['_id']],
-            ['$set' => $data],
+            $data,
             $this->mergeOptions($options, ['upsert' => true])
         );
 
