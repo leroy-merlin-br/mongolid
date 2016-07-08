@@ -274,7 +274,7 @@ class Cursor implements CursorInterface, Serializable
     {
         if (! $this->cursor) {
             $params = Ioc::make(Converter::class)->toMongoTypes($this->params);
-            $driverCursor = $this->collection->{$this->command}(...$this->params);
+            $driverCursor = $this->collection->{$this->command}(...$params);
             $this->cursor = new IteratorIterator($driverCursor);
             $this->cursor->rewind();
         }
