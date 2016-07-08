@@ -358,6 +358,8 @@ class DataMapper
             $value['_id'] = new ObjectID($value['_id']);
         }
 
+        $value = Ioc::make(Converter::class)->toMongoTypes($value);
+
         return $value;
     }
 
