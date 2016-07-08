@@ -2,10 +2,10 @@
 
 namespace Mongolid\Model;
 
-use Mongolid\Schema;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\DataMapper;
 use Mongolid\Cursor\EmbeddedCursor;
+use Mongolid\DataMapper\DataMapper;
+use Mongolid\Schema;
 
 /**
  * It is supposed to be used in model classes in general
@@ -30,13 +30,15 @@ trait Relations
             $referenced_id = $referenced_id[0];
         }
 
-        if (is_subclass_of($entity, Schema::class)) {
+        $entityInstance = Ioc::make($entity);
+
+        if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = new $entity;
+            $dataMapper->schema = $entityInstance;
             return $dataMapper->first(['_id' => $referenced_id]);
         }
 
-        return Ioc::make($entity)->first(['_id' => $referenced_id]);
+        return $entityInstance::first(['_id' => $referenced_id]);
     }
 
     /**
@@ -52,13 +54,15 @@ trait Relations
         $referencedIds = (array) $this->$field;
         $query = ['_id' => ['$in' => array_values($referencedIds)]];
 
-        if (is_subclass_of($entity, Schema::class)) {
+        $entityInstance = Ioc::make($entity);
+
+        if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = new $entity;
+            $dataMapper->schema = $entityInstance;
             return $dataMapper->where($query);
         }
 
-        return $entity::where($query);
+        return $entityInstance::where($query);
     }
 
     /**
@@ -111,7 +115,7 @@ trait Relations
      */
     public function embed(string $field, &$obj)
     {
-        $embeder = new DocumentEmbedder;
+        $embeder = Ioc::make(DocumentEmbedder::class);
         $embeder->embed($this, $field, $obj);
     }
 
@@ -126,7 +130,7 @@ trait Relations
      */
     public function unembed(string $field, &$obj)
     {
-        $embeder = new DocumentEmbedder;
+        $embeder = Ioc::make(DocumentEmbedder::class);
         $embeder->unembed($this, $field, $obj);
     }
 
@@ -141,7 +145,7 @@ trait Relations
      */
     public function attach(string $field, &$obj)
     {
-        $embeder = new DocumentEmbedder;
+        $embeder = Ioc::make(DocumentEmbedder::class);
         $embeder->attach($this, $field, $obj);
     }
 
@@ -156,7 +160,7 @@ trait Relations
      */
     public function detach(string $field, &$obj)
     {
-        $embeder = new DocumentEmbedder;
+        $embeder = Ioc::make(DocumentEmbedder::class);
         $embeder->detach($this, $field, $obj);
     }
 }

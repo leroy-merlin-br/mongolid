@@ -1,5 +1,7 @@
 <?php
 
+use MongoDB\BSON\ObjectID;
+
 class TestCase extends PHPUnit_Framework_TestCase
 {
     /**
@@ -11,6 +13,38 @@ class TestCase extends PHPUnit_Framework_TestCase
         require __DIR__ . '/../bootstrap/bootstrap.php';
 
         return false;
+    }
+
+    /**
+     * Assert if two queries are equals. It will compare ObjectIDs within any
+     * level of the query and make sure that they are the same.
+     *
+     * @param  mixed $expectedQuery Correct query.
+     * @param  mixed $query         Query being evaluated.
+     *
+     * @return void
+     */
+    public function assertMongoQueryEquals($expectedQuery, $query)
+    {
+        $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
+
+        if (! is_array($expectedQuery)) {
+            return;
+        }
+
+        foreach ($expectedQuery as $key => $value) {
+            if (is_object($value)) {
+                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
+
+                if (method_exists($value , '__toString')) {
+                    $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
+                }
+            }
+
+            if (is_array($value)) {
+                $this->assertMongoQueryEquals($value, $query[$key]);
+            }
+        }
     }
 
     /**
