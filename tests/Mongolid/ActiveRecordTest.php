@@ -251,7 +251,7 @@ class ActiveRecordTest extends TestCase
         // Assert
         $this->assertEquals(
             $schema,
-            $this->callProtected($this->entity, 'getSchema')
+            $this->entity->getSchema()
         );
     }
 
@@ -262,7 +262,7 @@ class ActiveRecordTest extends TestCase
         $this->setProtected($this->entity, 'fields', $fields);
 
         // Assert
-        $result = $this->callProtected($this->entity, 'getSchema');
+        $result = $this->entity->getSchema();
         $this->assertInstanceOf(Schema::class, $result);
         $this->assertEquals($fields, $result->fields);
         $this->assertEquals($this->entity->dynamic, $result->dynamic);

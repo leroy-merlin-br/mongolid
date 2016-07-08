@@ -244,7 +244,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      *
      * @return Schema
      */
-    protected function getSchema(): Schema
+    public function getSchema(): Schema
     {
         if ($schema = $this->instantiateSchemaInFields()) {
             return $schema;
