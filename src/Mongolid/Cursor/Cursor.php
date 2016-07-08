@@ -4,13 +4,13 @@ namespace Mongolid\Cursor;
 use IteratorIterator;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
+use MongoDB\Driver\Exception\LogicException;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Serializable;
-use MongoDB\Driver\Exception\LogicException;
 use Traversable;
 
 /**
@@ -71,6 +71,13 @@ class Cursor implements CursorInterface, Serializable
     protected $assembler;
 
     /**
+     * Object responsible to convert domain objects to mongo objects and vice versa.
+     *
+     * @var Converter
+     */
+    protected $converter;
+
+    /**
      * @param Schema     $entitySchema Schema that describes the entity that will be retrieved from the database.
      * @param Collection $collection   The raw collection object that will be used to retrieve the documents.
      * @param string     $command      The command that is being called in the $collection.
@@ -87,6 +94,20 @@ class Cursor implements CursorInterface, Serializable
         $this->collection   = $collection;
         $this->command      = $command;
         $this->params       = $params;
+    }
+
+    /**
+     * Converter is responsible to convert domain objects to mongo objects and vice versa.
+     *
+     * @return Converter
+     */
+    protected function getConverter(): Converter
+    {
+        if (! $this->converter) {
+            $this->converter = Ioc::make(Converter::class);
+        }
+
+        return $this->converter;
     }
 
     /**
@@ -170,7 +191,7 @@ class Cursor implements CursorInterface, Serializable
     {
         $document = $this->getCursor()->current();
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
+        $document = $this->getConverter()->toDomainTypes((array)$document);
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
@@ -189,7 +210,7 @@ class Cursor implements CursorInterface, Serializable
             return null;
         }
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
+        $document = $this->getConverter()->toDomainTypes((array)$document);
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
@@ -257,7 +278,7 @@ class Cursor implements CursorInterface, Serializable
     public function toArray(): array
     {
         foreach ($this->getCursor() as $document) {
-            $result[] = $document;
+            $result[] = $this->getConverter()->toDomainTypes((array) $document);
         }
 
         return $result ?? [];
@@ -273,7 +294,7 @@ class Cursor implements CursorInterface, Serializable
     protected function getCursor(): Traversable
     {
         if (! $this->cursor) {
-            $params = Ioc::make(Converter::class)->toMongoTypes($this->params);
+            $params = $this->getConverter()->toMongoTypes($this->params);
             $driverCursor = $this->collection->{$this->command}(...$params);
             $this->cursor = new IteratorIterator($driverCursor);
             $this->cursor->rewind();

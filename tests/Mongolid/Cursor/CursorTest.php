@@ -2,6 +2,7 @@
 
 namespace Mongolid\Cursor;
 
+use Iterator;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
@@ -12,6 +13,7 @@ use Mongolid\DynamicSchema;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use TestCase;
+use Traversable;
 
 class CursorTest extends TestCase
 {
@@ -207,7 +209,7 @@ class CursorTest extends TestCase
             ->once();
 
         // Assert
-        $entity = $cursor->next();
+        $cursor->next();
         $this->assertEquals(8, $cursor->key());
     }
 
@@ -232,8 +234,8 @@ class CursorTest extends TestCase
         $collection     = m::mock(Collection::class);
         $converter      = m::mock(Converter::class);
         $cursor         = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
-        $driverCursor   = m::mock('Traversable');
-        $driverIterator = m::mock('Iterator');
+        $driverCursor   = m::mock(Traversable::class);
+        $driverIterator = m::mock(Iterator::class);
 
         // Act
         Ioc::instance(Converter::class, $converter);
