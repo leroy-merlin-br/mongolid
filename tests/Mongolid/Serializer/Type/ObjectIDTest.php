@@ -68,4 +68,10 @@ class ObjectIDTest extends TestCase
         $objectId = new ObjectID($this->mongoId);
         $this->assertEquals($this->mongoId, $objectId->convert());
     }
+
+    public function testShouldBeCastableToString()
+    {
+        $objectId = new ObjectID($this->mongoId);
+        $this->assertSame((string) $this->mongoId, (string) $objectId->convert());
+    }
 }

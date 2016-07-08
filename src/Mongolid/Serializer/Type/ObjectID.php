@@ -55,4 +55,14 @@ class ObjectID implements SerializableTypeInterface
     {
         return new MongoObjectID($this->objecIdString);
     }
+
+    /**
+     * Returns the hexidecimal representation of this ObjectID
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->objecIdString;
+    }
 }
