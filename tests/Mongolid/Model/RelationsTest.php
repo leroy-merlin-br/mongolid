@@ -188,6 +188,16 @@ class RelationsTest extends TestCase
                 ]
             ],
             // -------------------------
+            'Schema referenced by string objectId' => [
+                'entity' => new class extends Schema {},
+                'field' => 'foo',
+                'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
+                'expectedQuery' => [
+                    'referencesOne' => ['_id' => '553e3c80293fce6572ff2a40'],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]]
+                ]
+            ],
+            // -------------------------
             'ActiveRecord referenced by objectId' => [
                 'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
                 'field' => 'foo',
@@ -214,7 +224,7 @@ class RelationsTest extends TestCase
                 'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
-                    'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83']]]
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]]
                 ]
             ],
             // -------------------------
