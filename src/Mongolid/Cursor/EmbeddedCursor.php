@@ -1,6 +1,12 @@
 <?php
 namespace Mongolid\Cursor;
 
+use Mongolid\ActiveRecord;
+use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\EntityAssembler;
+use Mongolid\DynamicSchema;
+use Mongolid\Schema;
+
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
  * By doing this we can use 'sort', 'skip', 'limit' and others after calling 'where'.
@@ -38,7 +44,7 @@ class EmbeddedCursor implements CursorInterface
      */
     public function __construct(string $entityClass, array $items)
     {
-        $this->items       = $items;
+        $this->items = $items;
         $this->entityClass = $entityClass;
     }
 
@@ -146,13 +152,30 @@ class EmbeddedCursor implements CursorInterface
             return $document;
         }
 
-        $model = new $this->entityClass;
+        $schema = $this->getSchemaForEntity();
+        $entityAssembler = Ioc::make(EntityAssembler::class, [$schema]);
 
-        foreach ($document as $key => $value) {
-            $model->$key = $value;
+        return $entityAssembler->assemble($document, $schema);
+    }
+
+    /**
+     * Retrieve a schema based on Entity Class.
+     *
+     * @return Schema
+     */
+    protected function getSchemaForEntity() : Schema
+    {
+        if ($this->entityClass instanceof Schema) {
+            return $this->entityClass;
         }
 
-        return $model;
+        $model = new $this->entityClass;
+
+        if ($model instanceof ActiveRecord) {
+            return $model->getSchema();
+        }
+
+        return new DynamicSchema;
     }
 
     /**

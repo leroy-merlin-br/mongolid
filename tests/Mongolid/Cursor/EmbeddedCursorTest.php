@@ -3,6 +3,8 @@
 namespace Mongolid\Cursor;
 
 use Mockery as m;
+use Mongolid\ActiveRecord;
+use Mongolid\Model\PolymorphableInterface;
 use stdClass;
 use TestCase;
 
@@ -151,6 +153,28 @@ class EmbeddedCursorTest extends TestCase
         $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('A', 'name', $entity);
+    }
+
+    public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
+    {
+        // Arrange
+        $object = new class extends ActiveRecord implements PolymorphableInterface
+        {
+            public function polymorph()
+            {
+                return 'Bacon';
+            }
+        };
+
+        $class = get_class($object);
+        $items = [$object->attributes];
+        $cursor = $this->getCursor($class, $items);
+
+        $this->setProtected($cursor, 'position', 0);
+
+        // Assert
+        $entity = $cursor->current();
+        $this->assertEquals('Bacon', $entity);
     }
 
     public function testShouldGetFirst()
