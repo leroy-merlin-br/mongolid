@@ -2,11 +2,11 @@
 namespace Mongolid;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
-use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\Exception\Exception as MongoException;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema;
+use Mongolid\Serializer\Type\ObjectID;
+use Mongolid\Serializer\Type\UTCDateTime;
 use Mongolid\Util\SequenceService;
 use TestCase;
 
@@ -136,7 +136,7 @@ class SchemaTest extends TestCase
         // Assertion
         $result = $schema->updatedAtTimestamp($value);
         $this->assertInstanceOf(UTCDateTime::class, $result);
-        $this->assertNotEquals(25, (string) $result);
+        $this->assertNotEquals(25000, (string) $result);
     }
 
     public function testShouldNotRefreshCreatedAtTimestamps()
@@ -148,6 +148,6 @@ class SchemaTest extends TestCase
         // Assertion
         $result = $schema->createdAtTimestamp($value);
         $this->assertInstanceOf(UTCDateTime::class, $result);
-        $this->assertEquals(25, (string) $result);
+        $this->assertEquals(25000, (string) $result);
     }
 }

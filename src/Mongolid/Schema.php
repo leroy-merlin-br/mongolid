@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid;
 
-use MongoDB\BSON\ObjectID;
-use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
+use Mongolid\Serializer\Type\ObjectID;
+use Mongolid\Serializer\Type\UTCDateTime;
 use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Util\SequenceService;
 
@@ -117,6 +117,6 @@ abstract class Schema
      */
     public function updatedAtTimestamp()
     {
-        return new UTCDateTime(floor(microtime(true) * 1000));
+        return new UTCDateTime;
     }
 }

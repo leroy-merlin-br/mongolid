@@ -114,4 +114,14 @@ class UTCDateTime implements SerializableTypeInterface
 
         return false;
     }
+
+    /**
+     * Allows casting to string utilizing drivers UTCDateTime implementation
+     *
+     * @return string Returns the string representation of this UTCDateTime.
+     */
+    public function __toString()
+    {
+        return (string) $this->convert();
+    }
 }
