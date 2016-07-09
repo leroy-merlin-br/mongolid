@@ -87,11 +87,13 @@ class SchemaTest extends TestCase
         $sequenceService = m::mock(SequenceService::class);
         $value           = null;
 
+        $schema->collection = 'resources';
+
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
-            ->with('mongolid')
+            ->with('resources')
             ->once()
             ->andReturn(7);
 
@@ -105,11 +107,13 @@ class SchemaTest extends TestCase
         $sequenceService = m::mock(SequenceService::class);
         $value           = 3;
 
+        $schema->collection = 'resources';
+
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
-            ->with('mongolid')
+            ->with('resources')
             ->never()
             ->andReturn(7); // Should never be returned
 

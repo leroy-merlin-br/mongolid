@@ -29,7 +29,7 @@ abstract class Schema
      * or retrieved from
      * @var string
      */
-    public $collection = 'mongolid';
+    public $collection = null;
 
     /**
      * Tells how a document should look like. If an scalar type is used, it will
@@ -91,7 +91,7 @@ abstract class Schema
         }
 
         return Ioc::make(SequenceService::class)
-            ->getNextValue($this->collection);
+            ->getNextValue($this->collection ?: $this->entityClass);
     }
 
     /**
