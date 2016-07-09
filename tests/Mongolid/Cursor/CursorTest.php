@@ -111,7 +111,7 @@ class CursorTest extends TestCase
 
         // Act
         $driverCursor->shouldReceive('rewind')
-            ->once()
+            ->twice()
             ->andReturnUsing(function () use ($cursor) {
                 if ($this->getProtected($cursor, 'cursor')) {
                     throw new LogicException("Cursor already initialized", 1);
@@ -412,6 +412,8 @@ class CursorTest extends TestCase
         $mock->shouldAllowMockingProtectedMethods();
         $mock->shouldReceive('getCursor')
             ->andReturn($driverCursor);
+
+        $this->setProtected($mock, 'cursor', $driverCursor);
 
         return $mock;
     }

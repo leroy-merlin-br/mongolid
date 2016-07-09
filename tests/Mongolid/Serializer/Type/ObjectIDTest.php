@@ -3,6 +3,7 @@ namespace Mongolid\Serializer\Type;
 
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use Mongolid\Serializer\SerializableTypeInterface;
+use InvalidArgumentException;
 use TestCase;
 
 /**
@@ -54,6 +55,13 @@ class ObjectIDTest extends TestCase
             'objecIdString',
             new ObjectID($this->mongoId)
         );
+    }
+
+    public function testConstructorShouldThrowExceptionWithInvalidStrings()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new ObjectID('batata');
     }
 
     public function testUnserializeShouldKeepStringId()
