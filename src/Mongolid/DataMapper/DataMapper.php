@@ -11,6 +11,7 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
@@ -285,6 +286,30 @@ class DataMapper
         $model = $this->getAssembler()->assemble($document, $this->schema);
 
         return $model;
+    }
+
+    /**
+     * Retrieve one $this->schema->entityClass objects that matches the given
+     * query. If no document was found, throws ModelNotFoundException.
+     *
+     * @param  mixed   $query      MongoDB query to retrieve the document.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $cacheable  Retrieves the first through a CacheableCursor.
+     *
+     * @throws ModelNotFoundException If no document was found.
+     *
+     * @return mixed First document matching query as an $this->schema->entityClass object
+     */
+    public function firstOrFail(
+        $query = [],
+        array $projection = [],
+        bool $cacheable = false
+    ) {
+        if ($result = $this->first($query, $projection, $cacheable)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel($this->schema->entityClass);
     }
 
     /**

@@ -239,6 +239,31 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($cursor, $entity->first($query, $projection, true));
     }
 
+    public function testShouldGetFirstOrFail()
+    {
+        // Arrage
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
+        $query      = ['foo' => 'bar'];
+        $projection = ['some', 'fields'];
+        $dataMapper = m::mock();
+        $cursor     = m::mock();
+
+        // Act
+        Ioc::instance(get_class($entity), $entity);
+
+        $entity->shouldReceive('getDataMapper')
+            ->andReturn($dataMapper);
+
+        $dataMapper->shouldReceive('firstOrFail')
+            ->once()
+            ->with($query, $projection, true)
+            ->andReturn($cursor);
+
+        // Assert
+        $this->assertEquals($cursor, $entity->firstOrFail($query, $projection, true));
+    }
+
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
         // Arrage

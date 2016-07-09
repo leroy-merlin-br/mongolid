@@ -155,6 +155,30 @@ abstract class ActiveRecord implements AttributesAccessInterface
     }
 
     /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param  mixed   $query      MongoDB selection criteria.
+     * @param  array   $projection Fields to project in Mongo query.
+     * @param  boolean $useCache   Retrieves the entity trought a CacheableCursor.
+     *
+     * @throws ModelNotFoundException If no document was found.
+     *
+     * @return ActiveRecord
+     */
+    public static function firstOrFail(
+        $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->firstOrFail(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
      * Handle dynamic method calls into the model.
      *
      * @codeCoverageIgnore
@@ -214,7 +238,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      */
     public function getCollectionName()
     {
-        return $this->collection;
+        return $this->collection ? $this->collection : $this->getSchema()->collection;
     }
 
     /**
@@ -254,7 +278,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
         $schema->entityClass = get_class($this);
         $schema->fields      = $this->fields;
         $schema->dynamic     = $this->dynamic;
-        $schema->collection  = $this->getCollectionName();
+        $schema->collection  = $this->collection;
 
         return $schema;
     }
