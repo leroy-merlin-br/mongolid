@@ -6,6 +6,7 @@ use Iterator;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
+use MongoDB\Driver\Exception\LogicException;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
@@ -88,9 +89,34 @@ class CursorTest extends TestCase
         $driverCursor = m::mock(IteratorIterator::class);
         $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
+        $this->setProtected($cursor, 'position', 10);
+
         // Act
         $driverCursor->shouldReceive('rewind')
             ->once();
+
+        // Assert
+        $cursor->rewind();
+        $this->assertAttributeEquals(0, 'position', $cursor);
+    }
+
+    public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $driverCursor = m::mock(IteratorIterator::class);
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        $this->setProtected($cursor, 'position', 10);
+
+        // Act
+        $driverCursor->shouldReceive('rewind')
+            ->once()
+            ->andReturnUsing(function () use ($cursor) {
+                if ($this->getProtected($cursor, 'cursor')) {
+                    throw new LogicException("Cursor already initialized", 1);
+                }
+            });
 
         // Assert
         $cursor->rewind();

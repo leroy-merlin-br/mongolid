@@ -69,11 +69,13 @@ class TestCase extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Call a protected property of an object
+     * Set a protected property of an object
      *
-     * @param  mixed  $obj      Object Instance
-     * @param  string $property Property name
-     * @param  mixed  $value    Value to be set
+     * @param  mixed  $obj      Object Instance.
+     * @param  string $property Property name.
+     * @param  mixed  $value    Value to be set.
+     *
+     * @return void
      */
     protected function setProtected($obj, $property, $value)
     {
@@ -87,5 +89,26 @@ class TestCase extends PHPUnit_Framework_TestCase
         }
 
         $property->setValue($obj, $value);
+    }
+
+    /**
+     * Get a protected property of an object
+     *
+     * @param  mixed  $obj      Object Instance.
+     * @param  string $property Property name.
+     *
+     * @return mixed Property value.
+     */
+    protected function getProtected($obj, $property)
+    {
+        $class = new ReflectionClass($obj);
+        $property = $class->getProperty($property);
+        $property->setAccessible(true);
+
+        if (is_string($obj)) { // static
+            return $property->getValue();
+        }
+
+        return $property->getValue($obj);
     }
 }
