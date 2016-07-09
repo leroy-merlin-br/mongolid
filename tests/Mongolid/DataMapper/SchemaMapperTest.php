@@ -32,26 +32,16 @@ class SchemaMapperTest extends TestCase
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
-        $oldData = [
-            'name'  => 'John',
-            'age'   => 23,
-            'stuff' => 'value-to-be-replaced',
-        ];
         $data = [
             'name'  => 'John',
             'age'   => 23,
             'stuff' => 'fooBar',
         ];
 
-        $converter->shouldReceive('toMongoTypes')
-            ->with($oldData)
-            ->once()
-            ->andReturn($data);
-
         // Act
         $schemaMapper->shouldReceive('clearDynamic')
             ->once()
-            ->with($oldData);
+            ->with($data);
 
         foreach ($schema->fields as $key => $value) {
             $schemaMapper->shouldReceive('parseField')
@@ -62,14 +52,23 @@ class SchemaMapperTest extends TestCase
 
         Ioc::instance(Converter::class, $converter);
 
+        $converter->shouldReceive('toMongoTypes')
+            ->once()
+            ->andReturnUsing(function ($data) {
+                foreach ($data as $key => $value) {
+                    $data[$key] = str_replace('23', 'batata', $value);
+                }
+                return $data;
+            });
+
         // Assert
         $this->assertEquals(
             [
                 'name'  => 'John.PARSED',
-                'age'   => '23.PARSED',
+                'age'   => 'batata.PARSED',
                 'stuff' => 'fooBar.PARSED'
             ],
-            $schemaMapper->map($oldData)
+            $schemaMapper->map($data)
         );
     }
 
