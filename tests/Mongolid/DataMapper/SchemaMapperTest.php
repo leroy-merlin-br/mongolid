@@ -172,14 +172,14 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknowString()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[pumpkinPoint]');
-        $schemaMapper = new SchemaMapper($schema);
+        $schemaClass = new class extends Schema {
+            public function pumpkinPoint($value) {
+                return $value * 2;
+            }
+        };
 
-        // Act
-        $schema->shouldReceive('pumpkinPoint')
-            ->once()
-            ->with(3)
-            ->andReturn(6);
+        $schema = new $schemaClass;
+        $schemaMapper = new SchemaMapper($schema);
 
         // Assert
         $this->assertSame(

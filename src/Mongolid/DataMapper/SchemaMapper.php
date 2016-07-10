@@ -87,6 +87,16 @@ class SchemaMapper
      */
     public function parseField($value, string $fieldType)
     {
+        // Uses $fieldType method of the schema to parse the value
+        if (method_exists($this->schema, $fieldType)) {
+            return $this->schema->$fieldType($value);
+        }
+
+        // Returns null or an empty array
+        if (null === $value || is_array($value) && empty($value)) {
+            return $value;
+        }
+
         // If fieldType is castable (Ex: 'int')
         if (in_array($fieldType, $this->castableTypes)) {
             return $this->cast($value, $fieldType);
@@ -97,8 +107,7 @@ class SchemaMapper
             return $this->mapToSchema($value, substr($fieldType, 7));
         }
 
-        // Uses $fieldType method of the schema to parse the value
-        return $this->schema->$fieldType($value);
+        return $value;
     }
 
     /**
