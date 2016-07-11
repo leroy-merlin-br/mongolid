@@ -340,15 +340,16 @@ class Cursor implements CursorInterface, Serializable
      */
     public function unserialize($serialized)
     {
-        $attr = unserialize($serialized);
+        $attributes = unserialize($serialized);
 
         $conn             = Ioc::make(Pool::class)->getConnection();
         $db               = $conn->defaultDatabase;
-        $collectionObject = $conn->getRawConnection()->$db->{$attr['collection']};
+        $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
 
-        $this->entitySchema = $attr['entitySchema'];
+        foreach($attributes as $key => $value) {
+            $this->$key = $value;
+        }
+
         $this->collection   = $collectionObject;
-        $this->command      = $attr['command'];
-        $this->params       = $attr['params'];
     }
 }
