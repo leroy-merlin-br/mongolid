@@ -686,7 +686,7 @@ class DataMapperTest extends TestCase
 
     protected function expectEventToBeFired($event, $entity, bool $halt, $return = true)
     {
-        $event = 'mongolid.' . $event . '.' . get_class($entity);
+        $event = 'mongolid.' . $event . ': ' . get_class($entity);
 
         $this->getEventService()->shouldReceive('fire')
             ->with($event, $entity, $halt)
@@ -697,7 +697,7 @@ class DataMapperTest extends TestCase
 
     protected function expectEventNotToBeFired($event, $entity)
     {
-        $event = 'mongolid.' . $event . '.' . get_class($entity);
+        $event = 'mongolid.' . $event . ': ' . get_class($entity);
 
         $this->getEventService()->shouldReceive('fire')
             ->with($event, $entity, m::any())
