@@ -413,7 +413,7 @@ class DataMapper
      */
     protected function fireEvent(string $event, $entity, bool $halt = false)
     {
-        $event = "mongolid.{$event}." . get_class($entity);
+        $event = "mongolid.{$event}: " . get_class($entity);
 
         $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
 
