@@ -128,8 +128,13 @@ class UTCDateTimeTest extends TestCase
     {
         $date      = new DateTime();
         $timestamp = $date->getTimestamp();
-        $mongoDate = new MongoUTCDateTime($timestamp*1000);
 
         $this->assertEquals($date, (new UTCDateTime($timestamp))->toDateTime());
     }
+
+    public function testShouldProperlyEncodeToJson()
+    {
+        $this->assertEquals('"' . (string) $this->mongoDate . '"', json_encode($this->dateTime));
+    }
+
 }

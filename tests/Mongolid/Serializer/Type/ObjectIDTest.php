@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use Mongolid\Serializer\SerializableTypeInterface;
-use InvalidArgumentException;
 use TestCase;
 
 /**
@@ -81,5 +81,12 @@ class ObjectIDTest extends TestCase
     {
         $objectId = new ObjectID($this->mongoId);
         $this->assertSame((string) $this->mongoId, (string) $objectId->convert());
+    }
+
+    public function testShouldProperlyEncodeToJson()
+    {
+        $objectId = new ObjectID($this->mongoId);
+
+        $this->assertSame('"' . (string)$this->mongoId . '"', json_encode($objectId));
     }
 }

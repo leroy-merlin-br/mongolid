@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
+use JsonSerializable;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use InvalidArgumentException;
 use Mongolid\Container\Ioc;
@@ -10,7 +11,7 @@ use Mongolid\Util\ObjectIdUtils;
 /**
  * This class is a workaround to make real Mongo ObjectID serializable
  */
-class ObjectID implements SerializableTypeInterface
+class ObjectID implements SerializableTypeInterface, JsonSerializable
 {
     /**
      * @var string
@@ -81,5 +82,13 @@ class ObjectID implements SerializableTypeInterface
     public function __toString()
     {
         return $this->objecIdString;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    function jsonSerialize()
+    {
+        return (string) $this;
     }
 }

@@ -2,13 +2,14 @@
 namespace Mongolid\Serializer\Type;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
 
 /**
  * This class is a workaround to make real Mongo UTCDateTime serializable
  */
-class UTCDateTime implements SerializableTypeInterface
+class UTCDateTime implements SerializableTypeInterface, JsonSerializable
 {
     /**
      * @var MongoUTCDateTime
@@ -123,5 +124,13 @@ class UTCDateTime implements SerializableTypeInterface
     public function __toString()
     {
         return (string) $this->convert();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    function jsonSerialize()
+    {
+        return (string) $this;
     }
 }
