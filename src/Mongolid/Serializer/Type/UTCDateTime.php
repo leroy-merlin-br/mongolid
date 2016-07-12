@@ -128,8 +128,10 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return (string) $this;
     }
