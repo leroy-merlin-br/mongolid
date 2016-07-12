@@ -2,17 +2,20 @@
 
 namespace Mongolid\Cursor;
 
+use ArrayIterator;
 use Iterator;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
+use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DynamicSchema;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
+use stdClass;
 use TestCase;
 use Traversable;
 
@@ -145,8 +148,32 @@ class CursorTest extends TestCase
 
         // Assert
         $entity = $cursor->current();
-        $this->assertInstanceOf('stdClass', $entity);
+        $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('John Doe', 'name', $entity);
+    }
+
+    public function testShouldGetCurrentUsingActiveRecordClasses()
+    {
+        // Arrange
+        $collection   = m::mock(Collection::class);
+        $entity       = m::mock(ActiveRecord::class . '[]');
+        $entity->name = 'John Doe';
+        $driverCursor = new ArrayIterator([$entity]);
+        $converter    = m::mock(Converter::class.'[toDomainTypes]');
+        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+
+        // Act
+        Ioc::instance(Converter::class, $converter);
+
+        $converter->shouldReceive('toDomainTypes')
+            ->once()
+            ->with(['name' => 'John Doe'])
+            ->passthru();
+
+        // Assert
+        $entity = $cursor->current();
+        $this->assertInstanceOf(ActiveRecord::class, $entity);
+        $this->assertEquals('John Doe', $entity->name);
     }
 
     public function testShouldGetFirst()
@@ -174,7 +201,7 @@ class CursorTest extends TestCase
 
         // Assert
         $entity = $cursor->first();
-        $this->assertInstanceOf('stdClass', $entity);
+        $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('John Doe', 'name', $entity);
     }
 
