@@ -5,6 +5,7 @@ use IteratorIterator;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
+use Mongolid\ActiveRecord;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
@@ -191,7 +192,14 @@ class Cursor implements CursorInterface, Serializable
     {
         $document = $this->getCursor()->current();
 
-        $document = $this->getConverter()->toDomainTypes((array)$document);
+        if ($document instanceof ActiveRecord) {
+            $documentToArray = $document->toArray();
+            $this->entitySchema = $document->getSchema();
+        } else {
+            $documentToArray = (array)$document;
+        }
+
+        $document = $this->getConverter()->toDomainTypes($documentToArray);
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
@@ -236,6 +244,7 @@ class Cursor implements CursorInterface, Serializable
     {
         return $this->position;
     }
+
     /**
      * Iterator next method (used in foreach)
      *
@@ -246,6 +255,7 @@ class Cursor implements CursorInterface, Serializable
         ++$this->position;
         $this->getCursor()->next();
     }
+
     /**
      * Iterator valid method (used in foreach)
      *
@@ -278,7 +288,7 @@ class Cursor implements CursorInterface, Serializable
     public function toArray(): array
     {
         foreach ($this->getCursor() as $document) {
-            $result[] = $this->getConverter()->toDomainTypes((array) $document);
+            $result[] = $this->getConverter()->toDomainTypes((array)$document);
         }
 
         return $result ?? [];
@@ -346,7 +356,7 @@ class Cursor implements CursorInterface, Serializable
         $db               = $conn->defaultDatabase;
         $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
 
-        foreach($attributes as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $this->$key = $value;
         }
 
