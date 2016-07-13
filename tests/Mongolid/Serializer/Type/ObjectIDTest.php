@@ -52,7 +52,7 @@ class ObjectIDTest extends TestCase
     {
         $this->assertAttributeEquals(
             $this->stringId,
-            'objecIdString',
+            'objectIdString',
             new ObjectID($this->mongoId)
         );
     }
@@ -68,7 +68,7 @@ class ObjectIDTest extends TestCase
     {
         $objectId = unserialize(serialize(new ObjectID($this->mongoId)));
 
-        $this->assertAttributeEquals($this->stringId, 'objecIdString', $objectId);
+        $this->assertAttributeEquals($this->stringId, 'objectIdString', $objectId);
     }
 
     public function testConvertShouldRetrieveMongodbObjectId()
