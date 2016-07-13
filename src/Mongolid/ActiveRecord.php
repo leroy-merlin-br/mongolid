@@ -2,14 +2,13 @@
 namespace Mongolid;
 
 use BadMethodCallException;
+use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
-use Mongolid\Serializer\Serializer;
-use MongoDB\Driver\WriteConcern;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
@@ -274,7 +273,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
             return $schema;
         }
 
-        $schema = new DynamicSchema;
+        $schema              = new DynamicSchema;
         $schema->entityClass = get_class($this);
         $schema->fields      = $this->fields;
         $schema->dynamic     = $this->dynamic;
@@ -318,7 +317,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
         return $this->getDataMapper()->$action($this, $options);
     }
 
-        /**
+    /**
      * Returns the a valid instance from Ioc.
      *
      * @return mixed

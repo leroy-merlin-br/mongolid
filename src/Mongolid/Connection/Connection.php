@@ -1,8 +1,8 @@
 <?php
 namespace Mongolid\Connection;
 
-use Mongolid\Container\Ioc;
 use MongoDB\Client;
+use Mongolid\Container\Ioc;
 
 /**
  * Represents a single connection with the database

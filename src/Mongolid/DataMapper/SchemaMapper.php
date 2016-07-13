@@ -30,7 +30,7 @@ class SchemaMapper
      * @see http://php.net/manual/en/language.types.type-juggling.php
      * @var string[]
      */
-    protected $castableTypes = ['int','integer','bool','boolean','float','double','real','string'];
+    protected $castableTypes = ['int', 'integer', 'bool', 'boolean', 'float', 'double', 'real', 'string'];
 
     /**
      * @param Schema $schema Schema that will be used to map each field.
@@ -123,6 +123,7 @@ class SchemaMapper
     protected function cast($value, string $type)
     {
         settype($value, $type);
+
         return $value;
     }
 
@@ -137,7 +138,7 @@ class SchemaMapper
      */
     protected function mapToSchema($value, string $schemaClass)
     {
-        $value  = (array)$value;
+        $value  = (array) $value;
         $schema = Ioc::make($schemaClass);
         $mapper = Ioc::make(SchemaMapper::class, [$schema]);
 

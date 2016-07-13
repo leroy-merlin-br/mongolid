@@ -2,12 +2,12 @@
 
 namespace Mongolid\Model;
 
+use MongoDB\BSON\ObjectID;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema;
-use MongoDB\BSON\ObjectID;
 use Mongolid\Util\ObjectIdUtils;
 
 /**

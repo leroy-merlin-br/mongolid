@@ -196,7 +196,7 @@ class Cursor implements CursorInterface, Serializable
             $documentToArray = $document->toArray();
             $this->entitySchema = $document->getSchema();
         } else {
-            $documentToArray = (array)$document;
+            $documentToArray = (array) $document;
         }
 
         $document = $this->getConverter()->toDomainTypes($documentToArray);
@@ -218,7 +218,7 @@ class Cursor implements CursorInterface, Serializable
             return null;
         }
 
-        $document = $this->getConverter()->toDomainTypes((array)$document);
+        $document = $this->getConverter()->toDomainTypes((array) $document);
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
     }
@@ -288,7 +288,7 @@ class Cursor implements CursorInterface, Serializable
     public function toArray(): array
     {
         foreach ($this->getCursor() as $document) {
-            $result[] = $this->getConverter()->toDomainTypes((array)$document);
+            $result[] = $this->getConverter()->toDomainTypes((array) $document);
         }
 
         return $result ?? [];
@@ -360,6 +360,6 @@ class Cursor implements CursorInterface, Serializable
             $this->$key = $value;
         }
 
-        $this->collection   = $collectionObject;
+        $this->collection = $collectionObject;
     }
 }

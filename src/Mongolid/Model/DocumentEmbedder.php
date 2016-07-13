@@ -125,6 +125,7 @@ class DocumentEmbedder
             if (isset($object['_id']) && $object['_id']) {
                 return $object['_id'];
             }
+
             return $object['_id'] = new ObjectID;
         }
 
@@ -132,6 +133,7 @@ class DocumentEmbedder
             if (isset($object->_id) && $object->_id) {
                 return $object->_id;
             }
+
             return $object->_id = new ObjectID;
         }
 

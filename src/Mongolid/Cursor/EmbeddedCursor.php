@@ -105,7 +105,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @param  integer $amount The number of results to skip.
      *
-     * @return Cursor Returns this cursor.
+     * @return EmbeddedCursor Returns this cursor.
      */
     public function skip(int $amount)
     {

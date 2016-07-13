@@ -94,7 +94,7 @@ class EntityAssembler
      */
     protected function assembleDocumentsRecursively($value, string $schemaClass)
     {
-        $value = (array)$value;
+        $value = (array) $value;
 
         if (empty($value)) {
             return null;

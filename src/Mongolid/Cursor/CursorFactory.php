@@ -1,8 +1,8 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\Schema;
 use MongoDB\Collection;
+use Mongolid\Schema;
 
 /**
  * Factory of new EmbeddedCursor instances.
@@ -27,6 +27,7 @@ class CursorFactory
         array $params,
         bool $cacheable = false
     ): Cursor {
+    
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         return new $cursorClass($entitySchema, $collection, $command, $params);
@@ -38,7 +39,7 @@ class CursorFactory
      * @param string $entityClass Class of the objects that will be retrieved by the cursor.
      * @param array  $items       The items array.
      *
-     * @return EmbeddedCursor
+     * @return CursorInterface
      */
     public function createEmbeddedCursor(string $entityClass, array $items): CursorInterface
     {

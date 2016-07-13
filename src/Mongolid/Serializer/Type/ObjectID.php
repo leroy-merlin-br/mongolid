@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
+use InvalidArgumentException;
 use JsonSerializable;
 use MongoDB\BSON\ObjectID as MongoObjectID;
-use InvalidArgumentException;
 use Mongolid\Serializer\SerializableTypeInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -15,7 +15,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
     /**
      * @var string
      */
-    protected $objecIdString;
+    protected $objectIdString;
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
             throw new InvalidArgumentException("Invalid BSON ID provided");
         }
 
-        $this->objecIdString = $mongoId;
+        $this->objectIdString = $mongoId;
     }
 
     /**
@@ -48,7 +48,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
      */
     public function serialize()
     {
-        return serialize($this->objecIdString);
+        return serialize($this->objectIdString);
     }
 
     /**
@@ -60,7 +60,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
      */
     public function unserialize($data)
     {
-        $this->objecIdString = unserialize($data);
+        $this->objectIdString = unserialize($data);
     }
 
     /**
@@ -70,7 +70,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
      */
     public function convert()
     {
-        return new MongoObjectID($this->objecIdString);
+        return new MongoObjectID($this->objectIdString);
     }
 
     /**
@@ -80,7 +80,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
      */
     public function __toString()
     {
-        return $this->objecIdString;
+        return $this->objectIdString;
     }
 
     /**

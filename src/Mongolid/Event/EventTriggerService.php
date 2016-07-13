@@ -11,6 +11,7 @@ class EventTriggerService
 {
     /**
      * The one who are going to actually trigger the events to the rest of the application
+     *
      * @var EventTriggerInterface
      */
     protected $dispatcher;
