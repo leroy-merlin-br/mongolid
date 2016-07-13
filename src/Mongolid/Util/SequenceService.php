@@ -67,8 +67,9 @@ class SequenceService
      */
     protected function rawCollection(): Collection
     {
-        $conn          = $this->connPool->getConnection();
-        $database      = $conn->defaultDatabase;
+        $conn     = $this->connPool->getConnection();
+        $database = $conn->defaultDatabase;
+
         return $conn->getRawConnection()->$database->{$this->collection};
     }
 }

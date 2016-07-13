@@ -12,6 +12,7 @@ class Ioc
 {
     /**
      * Illuminate instance.
+     *
      * @var Illuminate\Container\Container
      */
     protected static $container;
@@ -33,6 +34,7 @@ class Ioc
      *
      * @param  string $method Method that is being called.
      * @param  array  $args   Method arguments.
+     *
      * @return mixed
      */
     public static function __callStatic(string $method, array $args)

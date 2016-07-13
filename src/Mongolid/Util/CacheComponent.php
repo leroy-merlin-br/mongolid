@@ -25,6 +25,7 @@ class CacheComponent
      * Retrieve an item from the cache by key.
      *
      * @param  string $key Cache key of the item to be retrieved.
+     *
      * @return mixed
      */
     public function get(string $key)
@@ -65,6 +66,7 @@ class CacheComponent
         ) {
             unset($this->ttl[$key]);
             unset($this->storage[$key]);
+
             return false;
         }
 

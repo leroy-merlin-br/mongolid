@@ -20,6 +20,7 @@ abstract class Schema
      * that are not specified in the $fields property. This is useful if you
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
+     *
      * @var boolean
      */
     public $dynamic = false;
@@ -27,6 +28,7 @@ abstract class Schema
     /**
      * Name of the collection where this kind of document is going to be saved
      * or retrieved from
+     *
      * @var string
      */
     public $collection = null;

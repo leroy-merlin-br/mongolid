@@ -37,6 +37,7 @@ class Pool
     {
         if ($chosenConn = $this->connections->pop()) {
             $this->connections->push($chosenConn);
+
             return $chosenConn;
         }
     }
@@ -51,6 +52,7 @@ class Pool
     public function addConnection(Connection $conn)
     {
         $this->connections->push($conn);
+
         return true;
     }
 }

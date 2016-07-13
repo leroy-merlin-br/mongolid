@@ -33,7 +33,7 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     {
         if (false === $this->init($datetime)) {
             throw new InvalidArgumentException(
-                'Invalid argument type given. Constructor allows only integer, '.
+                'Invalid argument type given. Constructor allows only integer, ' .
                 'null or MongoDB\BSON\UTCDateTime'
             );
         }

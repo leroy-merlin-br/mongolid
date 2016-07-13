@@ -19,6 +19,7 @@ class CacheableCursor extends Cursor
 {
     /**
      * The documents that were retrieved from the database in a serializable way
+     *
      * @var array
      */
     protected $documents;

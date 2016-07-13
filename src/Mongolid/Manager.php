@@ -34,18 +34,21 @@ class Manager
 
     /**
      * Container being used by Mongolid
+     *
      * @var \Illuminate\Contracts\Container
      */
     public $container;
 
     /**
      * Mongolid connection pool being object
+     *
      * @var Pool
      */
     public $connectionPool;
 
     /**
      * Mongolid cache component object
+     *
      * @var CacheComponent
      */
     public $cacheComponent;
@@ -53,6 +56,7 @@ class Manager
     /**
      * Stores the schemas that have been registered for later use. This may be
      * useful when using Mongolid DataMapper pattern
+     *
      * @var array
      */
     protected $schemas = [];
@@ -82,6 +86,7 @@ class Manager
     public function getConnection()
     {
         $this->init();
+
         return $this->connectionPool->getConnection()->getRawConnection();
     }
 

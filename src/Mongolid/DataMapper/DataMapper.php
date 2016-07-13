@@ -8,8 +8,6 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
-use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Schema;
@@ -101,6 +99,7 @@ class DataMapper
             ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount())
         ) {
             $this->fireEvent('saved', $object);
+
             return true;
         }
 
@@ -137,6 +136,7 @@ class DataMapper
             $queryResult->getInsertedCount()
         ) {
             $this->fireEvent('inserted', $object);
+
             return true;
         }
 
@@ -173,6 +173,7 @@ class DataMapper
             $queryResult->getModifiedCount()
         ) {
             $this->fireEvent('updated', $object);
+
             return true;
         }
 
@@ -206,6 +207,7 @@ class DataMapper
             $queryResult->getDeletedCount()
         ) {
             $this->fireEvent('deleted', $object);
+
             return true;
         }
 
@@ -227,6 +229,7 @@ class DataMapper
         array $projection = [],
         bool $cacheable = false
     ): Cursor {
+    
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         $cursor = new $cursorClass(
@@ -277,7 +280,7 @@ class DataMapper
             ['projection' => $this->prepareProjection($projection)]
         );
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
+        $document = Ioc::make(Converter::class)->toDomainTypes((array) $document);
 
         if (! $document) {
             return null;
@@ -471,11 +474,13 @@ class DataMapper
                 continue;
             }
 
-            throw new InvalidArgumentException(sprintf(
-                "Invalid projection: '%s' => '%s'",
-                $key,
-                $value
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Invalid projection: '%s' => '%s'",
+                    $key,
+                    $value
+                )
+            );
         }
 
         return $projection;
