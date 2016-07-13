@@ -4,7 +4,6 @@ namespace Mongolid\Serializer\Type;
 use JsonSerializable;
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use InvalidArgumentException;
-use Mongolid\Container\Ioc;
 use Mongolid\Serializer\SerializableTypeInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -35,7 +34,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
             $mongoId = (string) $mongoId;
         }
 
-        if (! Ioc::make(ObjectIdUtils::class)->isObjectId($mongoId)) {
+        if (! ObjectIdUtils::isObjectId($mongoId)) {
             throw new InvalidArgumentException("Invalid BSON ID provided");
         }
 
