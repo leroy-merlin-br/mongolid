@@ -113,14 +113,13 @@ class DataMapper
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      *
-     * @param  mixed $object     The object used in the operation.
-     *
-     * @param  array $options    Possible options to send to mongo driver.
-     * @param bool   $fireEvents Whether events should be fired.
+     * @param  mixed   $object     The object used in the operation.
+     * @param  array   $options    Possible options to send to mongo driver.
+     * @param  boolean $fireEvents Whether events should be fired.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object, array $options = [], $fireEvents = true): bool
+    public function insert($object, array $options = [], bool $fireEvents = true): bool
     {
         if ($fireEvents && $this->fireEvent('inserting', $object, true) === false) {
             return false;
