@@ -113,15 +113,15 @@ class DataMapper
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      *
-     * @param  mixed $object  The object used in the operation.
-     *
-     * @param  array $options Possible options to send to mongo driver.
+     * @param  mixed   $object     The object used in the operation.
+     * @param  array   $options    Possible options to send to mongo driver.
+     * @param  boolean $fireEvents Whether events should be fired.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object, array $options = []): bool
+    public function insert($object, array $options = [], bool $fireEvents = true): bool
     {
-        if ($this->fireEvent('inserting', $object, true) === false) {
+        if ($fireEvents && $this->fireEvent('inserting', $object, true) === false) {
             return false;
         }
 
@@ -132,15 +132,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        if ($queryResult->isAcknowledged() &&
-            $queryResult->getInsertedCount()
-        ) {
-            $this->fireEvent('inserted', $object);
+        $result = $queryResult->isAcknowledged() &&
+            $queryResult->getInsertedCount();
 
-            return true;
+        if ($result && $fireEvents) {
+            $this->fireEvent('inserted', $object);
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -159,6 +158,14 @@ class DataMapper
     {
         if ($this->fireEvent('updating', $object, true) === false) {
             return false;
+        }
+
+        if (! $object->_id) {
+            if ($result = $this->insert($object, $options, false)) {
+                $this->fireEvent('updated', $object);
+            }
+
+            return $result;
         }
 
         $data = $this->parseToDocument($object);

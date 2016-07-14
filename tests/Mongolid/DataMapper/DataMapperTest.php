@@ -154,6 +154,54 @@ class DataMapperTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
+    public function testShouldInsertWithoutFiringEvents($writeConcern, $shouldFireEventAfter, $expected)
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
+
+        $collection      = m::mock(Collection::class);
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+
+        $object->_id = null;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($object)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('insertOne')
+            ->once()
+            ->with($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
+            ->andReturn($operationResult);
+
+        $operationResult->shouldReceive('isAcknowledged')
+            ->once()
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getInsertedCount')
+            ->andReturn(1);
+
+        $this->expectEventNotToBeFired('inserting', $object);
+        $this->expectEventNotToBeFired('inserted', $object);
+
+        // Assert
+        $this->assertEquals($expected, $mapper->insert($object, $options, false));
+    }
+
+    /**
+     * @dataProvider getWriteConcernVariations
+     */
     public function testShouldUpdate($writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -166,7 +214,7 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options         = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $object->_id = null;
+        $object->_id = 123;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
@@ -202,6 +250,64 @@ class DataMapperTest extends TestCase
         } else {
             $this->expectEventNotToBeFired('updated', $object);
         }
+
+        // Assert
+        $this->assertEquals($expected, $mapper->update($object, $options));
+    }
+
+    /**
+     * @dataProvider getWriteConcernVariations
+     */
+    public function testUpdateShouldCallInsertWhenObjectHasNoId($writeConcern, $shouldFireEventAfter, $expected)
+    {
+        // Arrange
+        $connPool = m::mock(Pool::class);
+        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+
+        $collection      = m::mock(Collection::class);
+        $object          = m::mock();
+        $parsedObject    = ['_id' => 123];
+        $operationResult = m::mock();
+        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
+
+        $object->_id = null;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($object)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('insertOne')
+            ->once()
+            ->with(
+                $parsedObject,
+                ['writeConcern' => new WriteConcern($writeConcern)]
+            )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('isAcknowledged')
+            ->once()
+            ->andReturn((bool) $writeConcern);
+
+        $operationResult->shouldReceive('getInsertedCount')
+            ->andReturn(1);
+
+        $this->expectEventToBeFired('updating', $object, true);
+
+        if ($shouldFireEventAfter) {
+            $this->expectEventToBeFired('updated', $object, false);
+        } else {
+            $this->expectEventNotToBeFired('updated', $object);
+        }
+
+        $this->expectEventNotToBeFired('inserting', $object);
+        $this->expectEventNotToBeFired('inserted', $object);
 
         // Assert
         $this->assertEquals($expected, $mapper->update($object, $options));
