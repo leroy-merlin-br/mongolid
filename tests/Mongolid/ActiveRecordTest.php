@@ -1,12 +1,15 @@
 <?php
 namespace Mongolid;
 
+use BadMethodCallException;
 use Mockery as m;
+use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
+use Mongolid\Serializer\Type\ObjectID;
+use stdClass;
 use TestCase;
-use MongoDB\Driver\WriteConcern;
 
 class ActiveRecordTest extends TestCase
 {
@@ -21,7 +24,8 @@ class ActiveRecordTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->entity = new class extends ActiveRecord {
+        $this->entity = new class extends ActiveRecord
+        {
         };
     }
 
@@ -352,11 +356,61 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldGetCollectionName()
     {
-        $entity = new class extends ActiveRecord {
+        $entity = new class extends ActiveRecord
+        {
             protected $collection = 'collection_name';
         };
 
-        $this->assertEquals($entity->getCollectionName(), 'collection_name');
+        $this->assertEquals('collection_name', $entity->getCollectionName());
+    }
+
+    public function testShouldAttachToAttribute()
+    {
+        $entity = new class extends ActiveRecord
+        {
+            protected $collection = 'collection_name';
+
+            public function class()
+            {
+                return $this->referencesOne(stdClass::class, 'courseClass');
+            }
+        };
+        $embedded      = new stdClass();
+        $embedded->_id = new ObjectID();
+        $embedded->name = 'Course Class #1';
+        $entity->attachToCourseClass($embedded);
+
+        $this->assertEquals([$embedded->_id], $entity->courseClass);
+    }
+
+    public function testShouldEmbedToAttribute()
+    {
+        $entity = new class extends ActiveRecord
+        {
+            protected $collection = 'collection_name';
+
+            public function classes()
+            {
+                return $this->embedsMany(stdClass::class, 'courseClasses');
+            }
+        };
+        $embedded = new stdClass();
+        $embedded->name = 'Course Class #1';
+        $entity->embedToCourseClasses($embedded);
+
+        $this->assertEquals('Course Class #1', $entity->classes()->first()->name);
+    }
+
+    public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
+    {
+        $entity = new class extends ActiveRecord
+        {
+            protected $collection = 'collection_name';
+        };
+
+        $this->expectException(BadMethodCallException::class);
+
+        $entity->foobar();
     }
 
     public function testShouldGetSetWriteConcernInActiveRecordClass()

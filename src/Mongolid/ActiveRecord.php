@@ -47,7 +47,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
     protected $fields = [
         '_id'        => 'objectId',
         'created_at' => 'createdAtTimestamp',
-        'updated_at' => 'updatedAtTimestamp'
+        'updated_at' => 'updatedAtTimestamp',
     ];
 
     /**
@@ -180,8 +180,6 @@ abstract class ActiveRecord implements AttributesAccessInterface
     /**
      * Handle dynamic method calls into the model.
      *
-     * @codeCoverageIgnore
-     *
      * @param  mixed $method     Name of the method that is being called.
      * @param  mixed $parameters Parameters of $method.
      *
@@ -195,14 +193,14 @@ abstract class ActiveRecord implements AttributesAccessInterface
 
         // Alias to attach
         if ('attachTo' == substr($method, 0, 8)) {
-            $field = strtolower(substr($method, 8));
+            $field = lcfirst(substr($method, 8));
 
             return $this->attach($field, $value);
         }
 
         // Alias to embed
         if ('embedTo' == substr($method, 0, 7)) {
-            $field = strtolower(substr($method, 7));
+            $field = lcfirst(substr($method, 7));
 
             return $this->embed($field, $value);
         }
