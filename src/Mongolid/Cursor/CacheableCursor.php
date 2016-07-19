@@ -4,7 +4,7 @@ namespace Mongolid\Cursor;
 use ArrayIterator;
 use Mongolid\Container\Ioc;
 use Mongolid\Serializer\Serializer;
-use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
 /**
@@ -41,7 +41,7 @@ class CacheableCursor extends Cursor
             return $this->documents;
         }
 
-        $cacheComponent = Ioc::make(CacheComponent::class);
+        $cacheComponent = Ioc::make(CacheComponentInterface::class);
         $cacheKey       = $this->generateCacheKey();
 
         if ($this->documents = $cacheComponent->get($cacheKey, null)) {

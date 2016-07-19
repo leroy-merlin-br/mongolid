@@ -11,7 +11,7 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
-use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 use TestCase;
 
 class ManagerTest extends TestCase
@@ -117,7 +117,7 @@ class ManagerTest extends TestCase
         $this->assertAttributeEquals($manager, 'singleton', Manager::class);
         $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
         $this->assertAttributeInstanceOf(Pool::class, 'connectionPool', $manager);
-        $this->assertAttributeInstanceOf(CacheComponent::class, 'cacheComponent', $manager);
+        $this->assertAttributeInstanceOf(CacheComponentInterface::class, 'cacheComponent', $manager);
 
         $container = $manager->container;
         $this->callProtected($manager, 'init');

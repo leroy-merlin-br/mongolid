@@ -18,6 +18,15 @@ class CacheComponentTest extends TestCase
         m::close();
     }
 
+    public function testShouldImplementCacheComponentInterface()
+    {
+        // Arrange
+        $cacheComponent = (new CacheComponent);
+
+        // Assertion
+        $this->assertInstanceOf(CacheComponentInterface::class, $cacheComponent);
+    }
+
     public function testShouldPutAndRetrieveValues()
     {
         // Arrange
