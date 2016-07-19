@@ -743,10 +743,7 @@ class DataMapperTest extends TestCase
         $result = $this->callProtected($mapper, 'prepareValueQuery', [$value]);
 
         // Assert
-        $this->assertEquals($expectation, $result);
-        if (isset($result['_id']) && is_object($expectation['_id'])) {
-            $this->assertInstanceOf(get_class($expectation['_id']), $result['_id']);
-        }
+        $this->assertMongoQueryEquals($expectation, $result);
     }
 
     /**
@@ -860,6 +857,16 @@ class DataMapperTest extends TestCase
             'Other type of _id, sequence for example' => [
                 'value'       => 7,
                 'expectation' => ['_id' => 7],
+            ],
+            // ------------------------
+            'Series of string _ids as the $in parameter' => [
+                'value'       => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
+                'expectation' => ['_id' => ['$in' => [new ObjectID('507f1f77bcf86cd799439011'), new ObjectID('507f1f77bcf86cd799439012')]]],
+            ],
+            // ------------------------
+            'Series of string _ids as the $in parameter' => [
+                'value'       => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
+                'expectation' => ['_id' => ['$nin' => [new ObjectID('507f1f77bcf86cd799439011')]]],
             ],
         ];
     }

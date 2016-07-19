@@ -236,7 +236,7 @@ class DataMapper
         array $projection = [],
         bool $cacheable = false
     ): Cursor {
-    
+
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         $cursor = new $cursorClass(
@@ -393,7 +393,38 @@ class DataMapper
             $value['_id'] = new ObjectID($value['_id']);
         }
 
+        if (isset($value['_id']) &&
+            is_array($value['_id'])
+        ) {
+            $value['_id'] = $this->prepareArrayFieldOfQuery($value['_id']);
+        }
+
         $value = Ioc::make(Converter::class)->toMongoTypes($value);
+
+        return $value;
+    }
+
+    /**
+     * Prepares an embedded array of an query. It will convert string ObjectIDs
+     * in operators into actual objects.
+     *
+     * @param  array $value Array that will be treated.
+     *
+     * @return arary Prepared array.
+     */
+    protected function prepareArrayFieldOfQuery(array $value): array
+    {
+        foreach (['$in', '$nin'] as $operator) {
+            if (isset($value[$operator]) &&
+                is_array($value[$operator])
+            ) {
+                foreach ($value[$operator] as $index => $id) {
+                    if (ObjectIdUtils::isObjectId($id)) {
+                        $value[$operator][$index] = new ObjectID($id);
+                    }
+                }
+            }
+        }
 
         return $value;
     }
