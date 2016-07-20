@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Mongolid\Container\Ioc;
@@ -10,8 +11,6 @@ use Mongolid\Util\SequenceService;
 /**
  * A schema maps to a MongoDB collection and defines the shape of the documents
  * within that collection.
- *
- * @package  Mongolid
  */
 abstract class Schema
 {
@@ -21,13 +20,13 @@ abstract class Schema
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      *
-     * @var boolean
+     * @var bool
      */
     public $dynamic = false;
 
     /**
      * Name of the collection where this kind of document is going to be saved
-     * or retrieved from
+     * or retrieved from.
      *
      * @var string
      */
@@ -43,24 +42,25 @@ abstract class Schema
      *
      * @var string[]
      */
-    public $fields  = [
-        '_id' => 'objectId', // Means that the _id will pass trough the `objectId` method
+    public $fields = [
+        '_id'        => 'objectId', // Means that the _id will pass trough the `objectId` method
         'created_at' => 'createdAtTimestamp', // Generates an automatic timestamp
-        'updated_at' => 'updatedAtTimestamp'
+        'updated_at' => 'updatedAtTimestamp',
     ];
 
     /**
      * Name of the class that will be used to represent a document of this
      * Schema when retrieve from the database.
+     *
      * @var string
      */
     public $entityClass = 'stdClass';
 
     /**
      * Filters any field in the $fields that has it's value specified as a
-     * 'objectId'. It will wraps the $value, if any, into a ObjectID object
+     * 'objectId'. It will wraps the $value, if any, into a ObjectID object.
      *
-     * @param  mixed $value Value that may be converted to ObjectID.
+     * @param mixed $value Value that may be converted to ObjectID.
      *
      * @return ObjectID|mixed
      */
@@ -82,9 +82,9 @@ abstract class Schema
      * a new auto-increment number will be "generated" for the collection of
      * the schema. The sequence generation is done by the SequenceService.
      *
-     * @param  integer|null $value Value that will be evaluated.
+     * @param int|null $value Value that will be evaluated.
      *
-     * @return integer
+     * @return int
      */
     public function sequence(int $value = null)
     {
@@ -97,9 +97,9 @@ abstract class Schema
     }
 
     /**
-     * Prepares the field to be the datetime that the document has been created
+     * Prepares the field to be the datetime that the document has been created.
      *
-     * @param  mixed|null $value Value that will be evaluated.
+     * @param mixed|null $value Value that will be evaluated.
      *
      * @return UTCDateTime
      */
@@ -113,12 +113,12 @@ abstract class Schema
     }
 
     /**
-     * Prepares the field to be now
+     * Prepares the field to be now.
      *
      * @return UTCDateTime
      */
     public function updatedAtTimestamp()
     {
-        return new UTCDateTime;
+        return new UTCDateTime();
     }
 }

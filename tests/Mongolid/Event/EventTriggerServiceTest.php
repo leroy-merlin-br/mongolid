@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Event;
 
 use Mockery as m;
@@ -16,7 +17,7 @@ class EventTriggerServiceTest extends TestCase
     {
         // Arrange
         $dispatcher = m::mock(EventTriggerInterface::class);
-        $service = new EventTriggerService;
+        $service = new EventTriggerService();
 
         // Act
         $dispatcher->shouldReceive('fire')
@@ -35,7 +36,7 @@ class EventTriggerServiceTest extends TestCase
     {
         // Arrange
         $dispatcher = m::mock(EventTriggerInterface::class);
-        $service = new EventTriggerService;
+        $service = new EventTriggerService();
 
         // Act
         $dispatcher->shouldReceive('fire')

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
@@ -9,7 +10,6 @@ use TestCase;
 
 class ConnectionTest extends TestCase
 {
-
     public function tearDown()
     {
         parent::tearDown();
@@ -19,16 +19,16 @@ class ConnectionTest extends TestCase
     public function testShouldConstructANewConnection()
     {
         // Arrange
-        $params      =  ['conn/my_db', ['options'], ['driver_opts']];
+        $params = ['conn/my_db', ['options'], ['driver_opts']];
         $mongoClient = m::mock(Client::class);
-        $container   = m::mock(Container::class);
+        $container = m::mock(Container::class);
         Ioc::setContainer($container);
 
         // Act
         $expectedParams = $params;
         $expectedParams[2]['typeMap'] = [
-            'array' => 'array',
-            'document' => 'array'
+            'array'    => 'array',
+            'document' => 'array',
         ];
 
         $container->shouldReceive('make')
@@ -46,7 +46,7 @@ class ConnectionTest extends TestCase
     {
         // Arrange
         $mongoClient = m::mock(Client::class);
-        $container   = m::mock(Container::class);
+        $container = m::mock(Container::class);
         Ioc::setContainer($container);
 
         // Act

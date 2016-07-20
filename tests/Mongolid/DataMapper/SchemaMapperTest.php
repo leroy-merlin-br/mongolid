@@ -1,9 +1,9 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use TestCase;
@@ -19,12 +19,12 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $schema         = m::mock(Schema::class);
-        $converter      = m::mock(Converter::class);
+        $schema = m::mock(Schema::class);
+        $converter = m::mock(Converter::class);
         $schema->fields = [
             'name'  => 'string',
             'age'   => 'int',
-            'stuff' => 'schema.My\Own\Schema'
+            'stuff' => 'schema.My\Own\Schema',
         ];
         $schemaMapper = m::mock(
             'Mongolid\DataMapper\SchemaMapper'.
@@ -58,6 +58,7 @@ class SchemaMapperTest extends TestCase
                 foreach ($data as $key => $value) {
                     $data[$key] = str_replace('23', 'batata', $value);
                 }
+
                 return $data;
             });
 
@@ -66,7 +67,7 @@ class SchemaMapperTest extends TestCase
             [
                 'name'  => 'John.PARSED',
                 'age'   => 'batata.PARSED',
-                'stuff' => 'fooBar.PARSED'
+                'stuff' => 'fooBar.PARSED',
             ],
             $schemaMapper->map($data)
         );
@@ -85,7 +86,7 @@ class SchemaMapperTest extends TestCase
         $data = [
             'name'     => 'John',
             'age'      => 23,
-            'location' => 'Brazil'
+            'location' => 'Brazil',
         ];
 
         // Assert
@@ -93,7 +94,7 @@ class SchemaMapperTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'John',
-                'age'  => 23
+                'age'  => 23,
             ],
             $data
         );
@@ -112,7 +113,7 @@ class SchemaMapperTest extends TestCase
         $data = [
             'name'     => 'John',
             'age'      => 23,
-            'location' => 'Brazil'
+            'location' => 'Brazil',
         ];
 
         // Assert
@@ -121,7 +122,7 @@ class SchemaMapperTest extends TestCase
             [
                 'name'     => 'John',
                 'age'      => 23,
-                'location' => 'Brazil'
+                'location' => 'Brazil',
             ],
             $data
         );
@@ -172,13 +173,14 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknowString()
     {
         // Arrange
-        $schemaClass = new class extends Schema {
-            public function pumpkinPoint($value) {
+        $schemaClass = new class() extends Schema {
+            public function pumpkinPoint($value)
+            {
                 return $value * 2;
             }
         };
 
-        $schema = new $schemaClass;
+        $schema = new $schemaClass();
         $schemaMapper = new SchemaMapper($schema);
 
         // Assert
@@ -191,11 +193,11 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapAnArrayValueToAnotherSchemaSchema()
     {
         // Arrange
-        $schema        = m::mock(Schema::class);
-        $mySchema      = m::mock(Schema::class);
-        $schemaMapper  = new SchemaMapper($schema);
-        $value         = ['foo' => 'bar'];
-        $test          = $this;
+        $schema = m::mock(Schema::class);
+        $mySchema = m::mock(Schema::class);
+        $schemaMapper = new SchemaMapper($schema);
+        $value = ['foo' => 'bar'];
+        $test = $this;
 
         // Act
         Ioc::instance('Xd\MySchema', $mySchema); // Register MySchema in Ioc
@@ -220,7 +222,7 @@ class SchemaMapperTest extends TestCase
         //Assert
         $this->assertEquals(
             [
-                ['foo' => 'PARSED']
+                ['foo' => 'PARSED'],
             ],
             $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema'])
         );
@@ -229,9 +231,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = (object) ['foo' => 'bar', 'name' => 'wilson'];
+        $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
         // Assert
         $this->assertEquals(
@@ -243,9 +245,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = ['age' => 25];
+        $object = ['age' => 25];
 
         // Assert
         $this->assertEquals(
@@ -257,9 +259,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldGetAttributesWhenGetAttributesMethodIsAvailable()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = new class {
+        $object = new class() {
             public function getAttributes()
             {
                 return ['foo' => 'bar'];

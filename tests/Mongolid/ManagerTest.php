@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Illuminate\Container\Container;
@@ -10,7 +11,6 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use TestCase;
 
@@ -26,7 +26,7 @@ class ManagerTest extends TestCase
     public function testShouldAddAndGetConnection()
     {
         // Arrange
-        $manager = new Manager;
+        $manager = new Manager();
         $connection = m::mock(Connection::class);
         $rawConnection = m::mock(Client::class);
 
@@ -43,7 +43,7 @@ class ManagerTest extends TestCase
     {
         // Arrange
         $test = $this;
-        $manager = new Manager;
+        $manager = new Manager();
         $container = m::mock(Container::class);
         $eventTrigger = m::mock(EventTriggerInterface::class);
 
@@ -64,7 +64,7 @@ class ManagerTest extends TestCase
     public function testShouldRegisterSchema()
     {
         // Arrange
-        $manager = new Manager;
+        $manager = new Manager();
         $schema = m::mock(Schema::class);
         $schema->entityClass = 'Bacon';
 
@@ -80,7 +80,7 @@ class ManagerTest extends TestCase
     public function testShouldGetDataMapperForEntitiesWithRegisteredSchemas()
     {
         // Arrange
-        $manager = new Manager;
+        $manager = new Manager();
         $schema = m::mock(Schema::class);
         $dataMapper = m::mock(DataMapper::class);
 
@@ -100,7 +100,7 @@ class ManagerTest extends TestCase
     public function testShouldNotGetDataMapperForUnknownEntities()
     {
         // Arrange
-        $manager = new Manager;
+        $manager = new Manager();
 
         // Assert
         $result = $manager->getMapper('Unknow');
@@ -110,7 +110,7 @@ class ManagerTest extends TestCase
     public function testShouldInitializeOnce()
     {
         // Arrange
-        $manager = new Manager;
+        $manager = new Manager();
         $this->callProtected($manager, 'init');
 
         // Assertion

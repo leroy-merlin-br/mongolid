@@ -1,11 +1,9 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Cursor\CacheableCursor;
-use Mongolid\Cursor\Cursor;
-use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\Schema;
 use TestCase;
 
@@ -14,7 +12,7 @@ class CursorFactoryTest extends TestCase
     public function testShouldCreateACursor()
     {
         // Set
-        $factory = new CursorFactory;
+        $factory = new CursorFactory();
         $schema = m::mock(Schema::class);
         $collection = m::mock(Collection::class);
 
@@ -38,7 +36,7 @@ class CursorFactoryTest extends TestCase
     public function testShouldCreateACacheableCursor()
     {
         // Set
-        $factory = new CursorFactory;
+        $factory = new CursorFactory();
         $schema = m::mock(Schema::class);
         $collection = m::mock(Collection::class);
 
@@ -63,7 +61,7 @@ class CursorFactoryTest extends TestCase
     public function testShouldCreateAEmbeddedCursor()
     {
         // Set
-        $factory = new CursorFactory;
+        $factory = new CursorFactory();
         $entityClass = 'MyModelClass';
 
         // Assert

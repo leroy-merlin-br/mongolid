@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
@@ -13,8 +14,8 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
-use TestCase;
 use stdClass;
+use TestCase;
 
 class DataMapperTest extends TestCase
 {
@@ -49,12 +50,12 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
         $object->_id = null;
@@ -105,12 +106,12 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
         $object->_id = null;
@@ -158,12 +159,12 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
-        $options  = ['writeConcern' => new WriteConcern($writeConcern)];
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
         $object->_id = null;
@@ -206,13 +207,13 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
-        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $object->_id = 123;
 
@@ -232,7 +233,7 @@ class DataMapperTest extends TestCase
             ->once()
             ->with(
                 ['_id' => 123],
-                ['$set' => $parsedObject],
+                ['$set'         => $parsedObject],
                 ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
@@ -262,13 +263,13 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
-        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $object->_id = null;
 
@@ -320,13 +321,13 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
-        $collection      = m::mock(Collection::class);
-        $object          = m::mock();
-        $parsedObject    = ['_id' => 123];
+        $collection = m::mock(Collection::class);
+        $object = m::mock();
+        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
-        $options         = ['writeConcern' => new WriteConcern($writeConcern)];
+        $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $object->_id = null;
 
@@ -375,10 +376,10 @@ class DataMapperTest extends TestCase
         $eventName
     ) {
         // Arrange
-        $connPool   = m::mock(Pool::class);
-        $mapper     = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
         $collection = m::mock(Collection::class);
-        $object     = m::mock();
+        $object = m::mock();
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -407,16 +408,16 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
-        $schema   = m::mock(Schema::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $schema = m::mock(Schema::class);
 
-        $collection    = m::mock(Collection::class);
-        $query         = 123;
+        $collection = m::mock(Collection::class);
+        $query = 123;
         $preparedQuery = ['_id' => 123];
-        $projection    = ['project' => true, '_id' => false];
+        $projection = ['project' => true, '_id' => false];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema      = $schema;
+        $mapper->schema = $schema;
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -429,7 +430,7 @@ class DataMapperTest extends TestCase
             ->andReturn($collection);
 
         // Act
-        $result          = $mapper->where($query, $projection);
+        $result = $mapper->where($query, $projection);
         $cacheableResult = $mapper->where($query, [], true);
 
         // Assert
@@ -457,8 +458,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetAll()
     {
         // Arrange
-        $connPool       = m::mock(Pool::class);
-        $mapper         = m::mock(DataMapper::class . '[where]', [$connPool]);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
         $mongolidCursor = m::mock('Mongolid\Cursor\Cursor');
 
         // Expect
@@ -477,17 +478,17 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstWithQuery()
     {
         // Arrange
-        $connPool  = m::mock(Pool::class);
-        $mapper    = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
-        $schema    = m::mock(Schema::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $schema = m::mock(Schema::class);
         $converter = m::mock(Converter::class.'[toDomainTypes]');
 
-        $collection    = m::mock(Collection::class);
-        $query         = 123;
+        $collection = m::mock(Collection::class);
+        $query = 123;
         $preparedQuery = ['_id' => 123];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema      = $schema;
+        $mapper->schema = $schema;
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -524,15 +525,15 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[prepareValueQuery,getCollection]', [$connPool]);
-        $schema   = m::mock(Schema::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $schema = m::mock(Schema::class);
 
-        $collection    = m::mock(Collection::class);
-        $query         = 123;
+        $collection = m::mock(Collection::class);
+        $query = 123;
         $preparedQuery = ['_id' => 123];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema      = $schema;
+        $mapper->schema = $schema;
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -562,19 +563,19 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(
-            DataMapper::class . '[prepareValueQuery,getCollection]',
+        $mapper = m::mock(
+            DataMapper::class.'[prepareValueQuery,getCollection]',
             [$connPool]
         );
-        $schema   = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
 
-        $collection    = m::mock(Collection::class);
-        $query         = 123;
+        $collection = m::mock(Collection::class);
+        $query = 123;
         $preparedQuery = ['_id' => 123];
-        $projection    = ['project' => true, 'fields' => false];
+        $projection = ['project' => true, 'fields' => false];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema      = $schema;
+        $mapper->schema = $schema;
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -604,10 +605,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = m::mock(DataMapper::class . '[where]', [$connPool]);
-        $query    = 123;
-        $entity   = new stdClass;
-        $cursor   = m::mock(CacheableCursor::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $query = 123;
+        $entity = new stdClass();
+        $cursor = m::mock(CacheableCursor::class);
 
         // Expect
         $mapper->shouldReceive('where')
@@ -629,11 +630,11 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstTroughACacheableCursorProjectingFields()
     {
         // Arrange
-        $connPool   = m::mock(Pool::class);
-        $mapper     = m::mock(DataMapper::class . '[where]', [$connPool]);
-        $query      = 123;
-        $entity     = new stdClass;
-        $cursor     = m::mock(CacheableCursor::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $query = 123;
+        $entity = new stdClass();
+        $cursor = m::mock(CacheableCursor::class);
         $projection = ['project' => true, '_id' => false];
 
         // Expect
@@ -656,11 +657,11 @@ class DataMapperTest extends TestCase
     public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
     {
         // Arrange
-        $connPool       = m::mock(Pool::class);
-        $mapper         = m::mock(DataMapper::class . '[getSchemaMapper]', [$connPool]);
-        $object         = m::mock();
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connPool]);
+        $object = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
-        $schemaMapper   = m::mock('Mongolid\Schema[]');
+        $schemaMapper = m::mock('Mongolid\Schema[]');
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -688,10 +689,10 @@ class DataMapperTest extends TestCase
     public function testShouldGetSchemaMapper()
     {
         // Arrange
-        $connPool            = m::mock(Pool::class);
-        $mapper              = new DataMapper($connPool);
+        $connPool = m::mock(Pool::class);
+        $mapper = new DataMapper($connPool);
         $mapper->schemaClass = 'MySchema';
-        $schema              = m::mock('Mongolid\Schema');
+        $schema = m::mock('Mongolid\Schema');
 
         Ioc::instance('MySchema', $schema);
 
@@ -706,14 +707,14 @@ class DataMapperTest extends TestCase
     public function testShouldGetRawCollection()
     {
         // Arrange
-        $connPool   = m::mock(Pool::class);
-        $mapper     = new DataMapper($connPool);
+        $connPool = m::mock(Pool::class);
+        $mapper = new DataMapper($connPool);
         $connection = m::mock(Connection::class);
         $collection = m::mock(Collection::class);
 
-        $mapper->schema              = (object) ['collection' => 'foobar'];
+        $mapper->schema = (object) ['collection' => 'foobar'];
         $connection->defaultDatabase = 'grimory';
-        $connection->grimory         = (object) ['foobar' => $collection];
+        $connection->grimory = (object) ['foobar' => $collection];
 
         // Expect
         $connPool->shouldReceive('getConnection')
@@ -737,7 +738,7 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = new DataMapper($connPool);
+        $mapper = new DataMapper($connPool);
 
         // Act
         $result = $this->callProtected($mapper, 'prepareValueQuery', [$value]);
@@ -753,7 +754,7 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = new DataMapper($connPool);
+        $mapper = new DataMapper($connPool);
 
         // Act
         $result = $this->callProtected($mapper, 'prepareProjection', [$data]);
@@ -770,8 +771,8 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connPool = m::mock(Pool::class);
-        $mapper   = new DataMapper($connPool);
-        $data     = ['valid' => true, 'invalid-key' => 'invalid-value'];
+        $mapper = new DataMapper($connPool);
+        $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
 
         // Act
         $this->callProtected($mapper, 'prepareProjection', [$data]);
@@ -779,7 +780,7 @@ class DataMapperTest extends TestCase
 
     protected function getEventService()
     {
-        if (! ($this->eventService ?? false)) {
+        if (!($this->eventService ?? false)) {
             $this->eventService = m::mock(EventTriggerService::class);
             Ioc::instance(EventTriggerService::class, $this->eventService);
         }
@@ -789,7 +790,7 @@ class DataMapperTest extends TestCase
 
     protected function expectEventToBeFired($event, $entity, bool $halt, $return = true)
     {
-        $event = 'mongolid.' . $event . ': ' . get_class($entity);
+        $event = 'mongolid.'.$event.': '.get_class($entity);
 
         $this->getEventService()->shouldReceive('fire')
             ->with($event, $entity, $halt)
@@ -800,7 +801,7 @@ class DataMapperTest extends TestCase
 
     protected function expectEventNotToBeFired($event, $entity)
     {
-        $event = 'mongolid.' . $event . ': ' . get_class($entity);
+        $event = 'mongolid.'.$event.': '.get_class($entity);
 
         $this->getEventService()->shouldReceive('fire')
             ->with($event, $entity, m::any())
@@ -888,7 +889,7 @@ class DataMapperTest extends TestCase
     }
 
     /**
-     * Retrieves projections that should be replaced by mapper
+     * Retrieves projections that should be replaced by mapper.
      */
     public function getProjections()
     {

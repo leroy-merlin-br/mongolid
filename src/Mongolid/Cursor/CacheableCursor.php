@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
@@ -12,13 +13,11 @@ use Traversable;
  * cursor. But upon it's creation it will already retrieve documents from the
  * database and store the retrieved documents. By doing this, it is possible
  * to serialize the results and save for later use.
- *
- * @package Mongolid
  */
 class CacheableCursor extends Cursor
 {
     /**
-     * The documents that were retrieved from the database in a serializable way
+     * The documents that were retrieved from the database in a serializable way.
      *
      * @var array
      */
@@ -42,7 +41,7 @@ class CacheableCursor extends Cursor
         }
 
         $cacheComponent = Ioc::make(CacheComponentInterface::class);
-        $cacheKey       = $this->generateCacheKey();
+        $cacheKey = $this->generateCacheKey();
 
         if ($this->documents = $cacheComponent->get($cacheKey, null)) {
             return $this->documents = new ArrayIterator($this->documents);

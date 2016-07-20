@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use BadMethodCallException;
@@ -24,8 +25,7 @@ class ActiveRecordTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->entity = new class extends ActiveRecord
-        {
+        $this->entity = new class() extends ActiveRecord {
         };
     }
 
@@ -44,9 +44,9 @@ class ActiveRecordTest extends TestCase
         // Assert
         $this->assertAttributeEquals(
             [
-                '_id' => 'objectId',
+                '_id'        => 'objectId',
                 'created_at' => 'createdAtTimestamp',
-                'updated_at' => 'updatedAtTimestamp'
+                'updated_at' => 'updatedAtTimestamp',
             ],
             'fields',
             $this->entity
@@ -176,10 +176,10 @@ class ActiveRecordTest extends TestCase
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
-        $query      = ['foo' => 'bar'];
+        $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
+        $cursor = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -202,7 +202,7 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $dataMapper = m::mock();
-        $cursor     = m::mock();
+        $cursor = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -223,10 +223,10 @@ class ActiveRecordTest extends TestCase
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
-        $query      = ['foo' => 'bar'];
+        $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
+        $cursor = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -248,10 +248,10 @@ class ActiveRecordTest extends TestCase
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
-        $query      = ['foo' => 'bar'];
+        $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
+        $cursor = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -323,7 +323,8 @@ class ActiveRecordTest extends TestCase
      */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
     {
-        $entity = new class extends ActiveRecord {};
+        $entity = new class() extends ActiveRecord {
+        };
 
         $this->assertNull($entity->getCollectionName());
 
@@ -335,7 +336,8 @@ class ActiveRecordTest extends TestCase
      */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
     {
-        $entity = new class extends ActiveRecord {};
+        $entity = new class() extends ActiveRecord {
+        };
 
         $this->assertNull($entity->getCollectionName());
 
@@ -347,7 +349,8 @@ class ActiveRecordTest extends TestCase
      */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
     {
-        $entity = new class extends ActiveRecord {};
+        $entity = new class() extends ActiveRecord {
+        };
 
         $this->assertNull($entity->getCollectionName());
 
@@ -356,8 +359,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldGetCollectionName()
     {
-        $entity = new class extends ActiveRecord
-        {
+        $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
         };
 
@@ -366,8 +368,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldAttachToAttribute()
     {
-        $entity = new class extends ActiveRecord
-        {
+        $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
 
             public function class()
@@ -375,7 +376,7 @@ class ActiveRecordTest extends TestCase
                 return $this->referencesOne(stdClass::class, 'courseClass');
             }
         };
-        $embedded      = new stdClass();
+        $embedded = new stdClass();
         $embedded->_id = new ObjectID();
         $embedded->name = 'Course Class #1';
         $entity->attachToCourseClass($embedded);
@@ -385,8 +386,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldEmbedToAttribute()
     {
-        $entity = new class extends ActiveRecord
-        {
+        $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
 
             public function classes()
@@ -403,8 +403,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
     {
-        $entity = new class extends ActiveRecord
-        {
+        $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
         };
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Container;
 
 use Illuminate\Container\Container;
@@ -7,7 +8,6 @@ use TestCase;
 
 class IocTest extends TestCase
 {
-
     public function tearDown()
     {
         parent::tearDown();

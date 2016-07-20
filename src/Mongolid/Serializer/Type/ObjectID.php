@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use InvalidArgumentException;
@@ -8,7 +9,7 @@ use Mongolid\Serializer\SerializableTypeInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
- * This class is a workaround to make real Mongo ObjectID serializable
+ * This class is a workaround to make real Mongo ObjectID serializable.
  */
 class ObjectID implements SerializableTypeInterface, JsonSerializable
 {
@@ -18,24 +19,25 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
     protected $objectIdString;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @throws InvalidArgumentException If $mongoId is not valid.
      *
      * @param MongoObjectID|string $mongoId MongoDB ObjectID or a string.
+     *
+     * @throws InvalidArgumentException If $mongoId is not valid.
      */
     public function __construct($mongoId = null)
     {
-        if (! $mongoId) {
-            $mongoId = new MongoObjectID;
+        if (!$mongoId) {
+            $mongoId = new MongoObjectID();
         }
 
         if (is_object($mongoId)) {
             $mongoId = (string) $mongoId;
         }
 
-        if (! ObjectIdUtils::isObjectId($mongoId)) {
-            throw new InvalidArgumentException("Invalid BSON ID provided");
+        if (!ObjectIdUtils::isObjectId($mongoId)) {
+            throw new InvalidArgumentException('Invalid BSON ID provided');
         }
 
         $this->objectIdString = $mongoId;
@@ -74,7 +76,7 @@ class ObjectID implements SerializableTypeInterface, JsonSerializable
     }
 
     /**
-     * Returns the hexidecimal representation of this ObjectID
+     * Returns the hexidecimal representation of this ObjectID.
      *
      * @return string
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer;
 
 use Mongolid\Serializer\Type\Converter;
@@ -6,7 +7,7 @@ use Mongolid\Serializer\Type\Converter;
 /**
  * This class is responsible to serialize ActiveRecord classes. It is necessary
  * due to a bug in Mongo Driver that does not allow us to serialize some classes,
- * i.e., ObjectID, UTCDateTime
+ * i.e., ObjectID, UTCDateTime.
  *
  * It's a bug present in 1.1 version and should be fixed in version 1.2, so,
  * this class can be deleted after upgrade our dependency of 1.1 version of
@@ -22,7 +23,7 @@ class Serializer
     protected $converter;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Converter $converter Class responsible to convert objects.
      */
@@ -35,7 +36,7 @@ class Serializer
      * Walk into an array to get not serializable objects and replace it by a
      * serializable one.
      *
-     * @param  array $attributes ActiveRecord attributes to be serialized.
+     * @param array $attributes ActiveRecord attributes to be serialized.
      *
      * @return string
      */
@@ -47,7 +48,7 @@ class Serializer
     /**
      * Unserializes the given string and turn it back to specific objects.
      *
-     * @param  string $data Serialized string to be converted.
+     * @param string $data Serialized string to be converted.
      *
      * @return array
      */
@@ -59,9 +60,9 @@ class Serializer
     /**
      * Converts recursively the given objects (probably retrieved from MongoDB)
      * to our specific types.
-     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
+     * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID.
      *
-     * @param  array $attributes Array to convert.
+     * @param array $attributes Array to convert.
      *
      * @return array
      */
@@ -72,9 +73,9 @@ class Serializer
 
     /**
      * Unconverts recursively the given objects to persistable objects on MongoDB
-     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
+     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID.
      *
-     * @param  array $attributes Array to convert.
+     * @param array $attributes Array to convert.
      *
      * @return array
      */
