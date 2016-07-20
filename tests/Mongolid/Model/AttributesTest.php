@@ -1,10 +1,10 @@
 <?php
+
 namespace Mongolid\Model;
 
-use TestCase;
 use Mockery as m;
-use Mongolid\Container\Ioc;
 use stdClass;
+use TestCase;
 
 class AttributesTest extends TestCase
 {
@@ -17,11 +17,11 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
-        $childObj = new stdClass;
+        $childObj = new stdClass();
 
         // Assert
         $model->name = 'John';
@@ -29,8 +29,8 @@ class AttributesTest extends TestCase
         $model->child = $childObj;
         $this->assertAttributeEquals(
             [
-                'name' => 'John',
-                'age' => 25,
+                'name'  => 'John',
+                'age'   => 25,
                 'child' => $childObj,
             ],
             'attributes',
@@ -41,17 +41,17 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicGetters()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
-        $childObj = new stdClass;
+        $childObj = new stdClass();
         $this->setProtected(
             $model,
             'attributes',
             [
-                'name' => 'John',
-                'age' => 25,
+                'name'  => 'John',
+                'age'   => 25,
                 'child' => $childObj,
             ]
         );
@@ -66,14 +66,14 @@ class AttributesTest extends TestCase
     public function testShouldCheckIfAttributeIsSet()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
         $this->setProtected(
             $model,
             'attributes',
-            ['name' => 'John',]
+            ['name' => 'John']
         );
 
         // Assert
@@ -84,7 +84,7 @@ class AttributesTest extends TestCase
     public function testShouldUnsetAttributes()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -93,7 +93,7 @@ class AttributesTest extends TestCase
             'attributes',
             [
                 'name' => 'John',
-                'age' => 25,
+                'age'  => 25,
             ]
         );
 
@@ -111,61 +111,61 @@ class AttributesTest extends TestCase
     public function testShouldGetAttributeFromMutator()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-            
+
             public function getSomeAttribute()
             {
                 return 'something-else';
-            } 
+            }
         };
-        
+
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('something-else', $model->some);
     }
-    
+
     public function testShouldIgnoreMutators()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-                                    
+
             public function getSomeAttribute()
             {
                 return 'something-else';
-            } 
-            
+            }
+
             public function setSomeAttribute($value)
             {
                 return strtoupper($value);
-            } 
+            }
         };
-        
+
         /* Disable mutator methods */
         $model->mutable = false;
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('some-value', $model->some);
     }
-    
+
     public function testShouldSetAttributeFromMutator()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-            
+
             public function setSomeAttribute($value)
             {
                 return strtoupper($value);
-            } 
+            }
         };
-        
+
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('SOME-VALUE', $model->some);
     }
 
@@ -179,7 +179,7 @@ class AttributesTest extends TestCase
         $expected
     ) {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -194,13 +194,13 @@ class AttributesTest extends TestCase
     public function testShouldForceFillAttributes()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
         $input = [
             'name'                => 'Josh',
-            'notAllowedAttribute' => true
+            'notAllowedAttribute' => true,
         ];
 
         // Act
@@ -213,7 +213,7 @@ class AttributesTest extends TestCase
     public function testShouldBeCastableToArray()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -230,7 +230,7 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class implements AttributesAccessInterface {
+        $model = new class() implements AttributesAccessInterface {
             use Attributes;
         };
 
@@ -270,27 +270,27 @@ class AttributesTest extends TestCase
             // -----------------------------
             '$fillable = []; $guarded = []' => [
                 'fillable' => [],
-                'guarded' => [],
-                'input' => [
+                'guarded'  => [],
+                'input'    => [
                     'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
+                    'age'  => 25,
+                    'sex'  => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
+                    'age'  => 25,
+                    'sex'  => 'male',
                 ],
             ],
 
             // -----------------------------
             '$fillable = ["name"]; $guarded = []' => [
                 'fillable' => ['name'],
-                'guarded' => [],
-                'input' => [
+                'guarded'  => [],
+                'input'    => [
                     'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
+                    'age'  => 25,
+                    'sex'  => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
@@ -300,26 +300,26 @@ class AttributesTest extends TestCase
             // -----------------------------
             '$fillable = []; $guarded = []' => [
                 'fillable' => [],
-                'guarded' => ['sex'],
-                'input' => [
+                'guarded'  => ['sex'],
+                'input'    => [
                     'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
+                    'age'  => 25,
+                    'sex'  => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
-                    'age' => 25,
+                    'age'  => 25,
                 ],
             ],
 
             // -----------------------------
             '$fillable = ["name", "sex"]; $guarded = ["sex"]' => [
                 'fillable' => ['name', 'sex'],
-                'guarded' => ['sex'],
-                'input' => [
+                'guarded'  => ['sex'],
+                'input'    => [
                     'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
+                    'age'  => 25,
+                    'sex'  => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',

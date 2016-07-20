@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 /**
@@ -8,15 +9,13 @@ namespace Mongolid\Model;
  * It is supposed to be used in conjunction with Attributes trait
  *
  * @see Attributes
- *
- * @package  Mongolid
  */
 interface AttributesAccessInterface
 {
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key The attribute to be accessed.
+     * @param string $key The attribute to be accessed.
      *
      * @return mixed
      */
@@ -30,10 +29,10 @@ interface AttributesAccessInterface
     public function getAttributes();
 
     /**
-     * Set the model attributes using an array
+     * Set the model attributes using an array.
      *
-     * @param array   $input The data that will be used to fill the attributes.
-     * @param boolean $force Force fill.
+     * @param array $input The data that will be used to fill the attributes.
+     * @param bool  $force Force fill.
      *
      * @return void
      */
@@ -51,8 +50,8 @@ interface AttributesAccessInterface
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key   Name of the attribute to be set.
-     * @param  mixed  $value Value to be set.
+     * @param string $key   Name of the attribute to be set.
+     * @param mixed  $value Value to be set.
      *
      * @return void
      */

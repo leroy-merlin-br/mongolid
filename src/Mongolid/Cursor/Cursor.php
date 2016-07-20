@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
@@ -19,8 +20,6 @@ use Traversable;
  * By doing this we can, call 'sort', 'skip', 'limit' and others after calling
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
- *
- * @package Mongolid
  */
 class Cursor implements CursorInterface, Serializable
 {
@@ -51,16 +50,16 @@ class Cursor implements CursorInterface, Serializable
     protected $params;
 
     /**
-     * The MongoDB cursor used to interact with db
+     * The MongoDB cursor used to interact with db.
      *
      * @var DriverCursor
      */
     protected $cursor = null;
 
     /**
-     * Iterator position (to be used with foreach)
+     * Iterator position (to be used with foreach).
      *
-     * @var integer
+     * @var int
      */
     protected $position = 0;
 
@@ -90,11 +89,11 @@ class Cursor implements CursorInterface, Serializable
         string $command,
         array $params
     ) {
-        $this->cursor       = null;
+        $this->cursor = null;
         $this->entitySchema = $entitySchema;
-        $this->collection   = $collection;
-        $this->command      = $command;
-        $this->params       = $params;
+        $this->collection = $collection;
+        $this->command = $command;
+        $this->params = $params;
     }
 
     /**
@@ -104,7 +103,7 @@ class Cursor implements CursorInterface, Serializable
      */
     protected function getConverter(): Converter
     {
-        if (! $this->converter) {
+        if (!$this->converter) {
             $this->converter = Ioc::make(Converter::class);
         }
 
@@ -112,9 +111,9 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Limits the number of results returned
+     * Limits the number of results returned.
      *
-     * @param  integer $amount The number of results to return.
+     * @param int $amount The number of results to return.
      *
      * @return Cursor Returns this cursor.
      */
@@ -126,11 +125,11 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Sorts the results by given fields
+     * Sorts the results by given fields.
      *
-     * @param  array $fields An array of fields by which to sort.
-     *                       Each element in the array has as key the field name,
-     *                       and as value either 1 for ascending sort, or -1 for descending sort.
+     * @param array $fields An array of fields by which to sort.
+     *                      Each element in the array has as key the field name,
+     *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
      * @return Cursor Returns this cursor.
      */
@@ -142,9 +141,9 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Skips a number of results
+     * Skips a number of results.
      *
-     * @param  integer $amount The number of results to skip.
+     * @param int $amount The number of results to skip.
      *
      * @return Cursor Returns this cursor.
      */
@@ -156,9 +155,9 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Counts the number of results for this cursor
+     * Counts the number of results for this cursor.
      *
-     * @return integer The number of documents returned by this cursor's query.
+     * @return int The number of documents returned by this cursor's query.
      */
     public function count(): int
     {
@@ -166,7 +165,7 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Iterator interface rewind (used in foreach)
+     * Iterator interface rewind (used in foreach).
      *
      * @return void
      */
@@ -184,7 +183,7 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Iterator interface current. Return a model object
-     * with cursor document. (used in foreach)
+     * with cursor document. (used in foreach).
      *
      * @return mixed
      */
@@ -205,7 +204,7 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Returns the first element of the cursor
+     * Returns the first element of the cursor.
      *
      * @return mixed
      */
@@ -214,8 +213,8 @@ class Cursor implements CursorInterface, Serializable
         $this->rewind();
         $document = $this->getCursor()->current();
 
-        if (! $document) {
-            return null;
+        if (!$document) {
+            return;
         }
 
         $document = $this->getConverter()->toDomainTypes((array) $document);
@@ -236,9 +235,9 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Iterator key method (used in foreach)
+     * Iterator key method (used in foreach).
      *
-     * @return integer
+     * @return int
      */
     public function key()
     {
@@ -246,7 +245,7 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Iterator next method (used in foreach)
+     * Iterator next method (used in foreach).
      *
      * @return void
      */
@@ -257,9 +256,9 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Iterator valid method (used in foreach)
+     * Iterator valid method (used in foreach).
      *
-     * @return boolean
+     * @return bool
      */
     public function valid(): bool
     {
@@ -297,13 +296,13 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
-     * $params given
+     * $params given.
      *
      * @return Traversable
      */
     protected function getCursor(): Traversable
     {
-        if (! $this->cursor) {
+        if (!$this->cursor) {
             $params = $this->getConverter()->toMongoTypes($this->params);
             $driverCursor = $this->collection->{$this->command}(...$params);
             $this->cursor = new IteratorIterator($driverCursor);
@@ -314,13 +313,13 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Retrieves an EntityAssembler instance
+     * Retrieves an EntityAssembler instance.
      *
      * @return EntityAssembler
      */
     protected function getAssembler()
     {
-        if (! $this->assembler) {
+        if (!$this->assembler) {
             $this->assembler = Ioc::make(EntityAssembler::class);
         }
 
@@ -329,7 +328,7 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Serializes this object storing the collection name instead of the actual
-     * MongoDb\Collection (which is unserializable)
+     * MongoDb\Collection (which is unserializable).
      *
      * @return string Serialized object.
      */
@@ -344,7 +343,7 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Unserializes this object. Re-creating the database connection.
      *
-     * @param  mixed $serialized Serialized cursor.
+     * @param mixed $serialized Serialized cursor.
      *
      * @return void
      */
@@ -352,8 +351,8 @@ class Cursor implements CursorInterface, Serializable
     {
         $attributes = unserialize($serialized);
 
-        $conn             = Ioc::make(Pool::class)->getConnection();
-        $db               = $conn->defaultDatabase;
+        $conn = Ioc::make(Pool::class)->getConnection();
+        $db = $conn->defaultDatabase;
         $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
 
         foreach ($attributes as $key => $value) {

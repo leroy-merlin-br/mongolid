@@ -9,8 +9,6 @@ namespace Mongolid\Model;
  * will be set.
  *
  * It is supposed to be used in model classes in general
- *
- * @package  Mongolid
  */
 trait Attributes
 {
@@ -39,7 +37,7 @@ trait Attributes
 
     /**
      * The attributes that are not mass assignable. The opposite
-     * to the fillable array;
+     * to the fillable array;.
      *
      * @var array
      */
@@ -50,14 +48,14 @@ trait Attributes
      * the existence of a specific method on model
      * class. Default is true.
      *
-     * @var boolean
+     * @var bool
      */
     public $mutable = true;
 
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key The attribute to be accessed.
+     * @param string $key The attribute to be accessed.
      *
      * @return mixed
      */
@@ -70,8 +68,6 @@ trait Attributes
         } elseif ($key == 'attributes') {
             return $this->attributes;
         }
-
-        return null;
     }
 
     /**
@@ -85,10 +81,10 @@ trait Attributes
     }
 
     /**
-     * Set the model attributes using an array
+     * Set the model attributes using an array.
      *
-     * @param array   $input The data that will be used to fill the attributes.
-     * @param boolean $force Force fill.
+     * @param array $input The data that will be used to fill the attributes.
+     * @param bool  $force Force fill.
      *
      * @return void
      */
@@ -100,7 +96,7 @@ trait Attributes
                 continue;
             }
 
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
+            if ((empty($this->fillable) || in_array($key, $this->fillable)) && !in_array($key, $this->guarded)) {
                 $this->setAttribute($key, $value);
             }
         }
@@ -121,8 +117,8 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key   Name of the attribute to be set.
-     * @param  mixed  $value Value to be set.
+     * @param string $key   Name of the attribute to be set.
+     * @param mixed  $value Value to be set.
      *
      * @return void
      */
@@ -150,10 +146,10 @@ trait Attributes
     /**
      * Verify if model has a mutator method defined.
      *
-     * @param  mixed $key    Attribute name.
-     * @param  mixed $prefix Method prefix to be used.
+     * @param mixed $key    Attribute name.
+     * @param mixed $prefix Method prefix to be used.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasMutatorMethod($key, $prefix)
     {
@@ -165,14 +161,14 @@ trait Attributes
     /**
      * Create mutator method pattern.
      *
-     * @param  mixed $key    Attribute name.
-     * @param  mixed $prefix Method prefix to be used.
+     * @param mixed $key    Attribute name.
+     * @param mixed $prefix Method prefix to be used.
      *
      * @return string
      */
     protected function buildMutatorMethod($key, $prefix)
     {
-        return $prefix . ucfirst($key) . 'Attribute';
+        return $prefix.ucfirst($key).'Attribute';
     }
 
     /**
@@ -188,7 +184,7 @@ trait Attributes
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param  mixed $key Name of the attribute.
+     * @param mixed $key Name of the attribute.
      *
      * @return mixed
      */
@@ -204,8 +200,8 @@ trait Attributes
     /**
      * Dynamically set attributes on the model.
      *
-     * @param  mixed $key   Attribute name.
-     * @param  mixed $value Value to be set.
+     * @param mixed $key   Attribute name.
+     * @param mixed $value Value to be set.
      *
      * @return void
      */
@@ -221,9 +217,9 @@ trait Attributes
     /**
      * Determine if an attribute exists on the model.
      *
-     * @param  mixed $key Attribute name.
+     * @param mixed $key Attribute name.
      *
-     * @return boolean
+     * @return bool
      */
     public function __isset($key)
     {
@@ -233,7 +229,7 @@ trait Attributes
     /**
      * Unset an attribute on the model.
      *
-     * @param  mixed $key Attribute name.
+     * @param mixed $key Attribute name.
      *
      * @return void
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
@@ -12,22 +13,21 @@ use Mongolid\Serializer\Type\Converter;
  * format.
  *
  * This class is meant to do the opposite of the EntityAssembler
- *
- * @package  Mongolid
  */
 class SchemaMapper
 {
     /**
-     * The actual schema to maps the data
+     * The actual schema to maps the data.
      *
      * @var Schema
      */
     public $schema;
 
     /**
-     * Types that can be casted
+     * Types that can be casted.
      *
      * @see http://php.net/manual/en/language.types.type-juggling.php
+     *
      * @var string[]
      */
     protected $castableTypes = ['int', 'integer', 'bool', 'boolean', 'float', 'double', 'real', 'string'];
@@ -41,10 +41,10 @@ class SchemaMapper
     }
 
     /**
-     * Maps the input $data to the schema specified in the $schema property
+     * Maps the input $data to the schema specified in the $schema property.
      *
-     * @param  array|object $data Array or object with the fields that should
-     *                            be mapped to $this->schema specifications.
+     * @param array|object $data Array or object with the fields that should
+     *                           be mapped to $this->schema specifications.
      *
      * @return array
      */
@@ -64,26 +64,26 @@ class SchemaMapper
     }
 
     /**
-     * If the schema is not dynamic, remove all non specified fields
+     * If the schema is not dynamic, remove all non specified fields.
      *
      * @param array $data Reference of the fields. The passed array will be modified.
      *
-     * @return  void
+     * @return void
      */
     protected function clearDynamic(array &$data)
     {
-        if (! $this->schema->dynamic) {
+        if (!$this->schema->dynamic) {
             $data = array_intersect_key($data, $this->schema->fields);
         }
     }
 
     /**
-     * Parse a value based on a field yype of the schema
+     * Parse a value based on a field yype of the schema.
      *
-     * @param  mixed  $value     Value to be parsed.
-     * @param  string $fieldType Description of how the field should be treated.
+     * @param mixed  $value     Value to be parsed.
+     * @param string $fieldType Description of how the field should be treated.
      *
-     * @return mixed  $value Value parsed to match $type
+     * @return mixed $value Value parsed to match $type
      */
     public function parseField($value, string $fieldType)
     {
@@ -111,12 +111,12 @@ class SchemaMapper
     }
 
     /**
-     * Uses PHP's settype to cast a value to a type
+     * Uses PHP's settype to cast a value to a type.
      *
      * @see http://php.net/manual/pt_BR/function.settype.php
      *
-     * @param  mixed  $value Value to be casted.
-     * @param  string $type  Type to which the $value should be casted to.
+     * @param mixed  $value Value to be casted.
+     * @param string $type  Type to which the $value should be casted to.
      *
      * @return mixed
      */
@@ -129,7 +129,7 @@ class SchemaMapper
 
     /**
      * Instantiate another SchemaMapper with the given $schemaClass and maps
-     * the given $value
+     * the given $value.
      *
      * @param mixed  $value       Value that will be mapped.
      * @param string $schemaClass Class that will be passed to the new SchemaMapper constructor.
@@ -138,11 +138,11 @@ class SchemaMapper
      */
     protected function mapToSchema($value, string $schemaClass)
     {
-        $value  = (array) $value;
+        $value = (array) $value;
         $schema = Ioc::make($schemaClass);
-        $mapper = Ioc::make(SchemaMapper::class, [$schema]);
+        $mapper = Ioc::make(self::class, [$schema]);
 
-        if (! isset($value[0])) {
+        if (!isset($value[0])) {
             $value = [$value];
         }
 
@@ -154,15 +154,15 @@ class SchemaMapper
     }
 
     /**
-     * Parses an object to an array before sending it to the SchemaMapper
+     * Parses an object to an array before sending it to the SchemaMapper.
      *
-     * @param  mixed $object The object that will be transformed into an array.
+     * @param mixed $object The object that will be transformed into an array.
      *
      * @return array
      */
     protected function parseToArray($object): array
     {
-        if (! is_array($object)) {
+        if (!is_array($object)) {
             $attributes = method_exists($object, 'getAttributes')
                 ? $object->getAttributes()
                 : get_object_vars($object);
