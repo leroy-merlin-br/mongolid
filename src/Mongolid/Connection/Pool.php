@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Mongolid\Container\Ioc;
@@ -7,20 +8,18 @@ use Mongolid\Container\Ioc;
  * Holds one or more connections and retrieve then as needed. It contains a
  * cache of connections maintained so that the connections can be reused when
  * future requests to the database are required.
- *
- * @package Mongolid
  */
 class Pool
 {
     /**
-     * Opened connections
+     * Opened connections.
      *
      * @var SplQueue
      */
     protected $connections;
 
     /**
-     * Constructs a connection pool
+     * Constructs a connection pool.
      */
     public function __construct()
     {
@@ -43,11 +42,11 @@ class Pool
     }
 
     /**
-     * Adds a new connection to the pool
+     * Adds a new connection to the pool.
      *
-     * @param  Connection $conn The actual connection that will be added to the pool.
+     * @param Connection $conn The actual connection that will be added to the pool.
      *
-     * @return  bool Success
+     * @return bool Success
      */
     public function addConnection(Connection $conn)
     {

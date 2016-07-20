@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use MongoDB\BSON\ObjectID as MongoObjectID;
@@ -17,7 +18,7 @@ class Converter
     protected $mappedTypes = [];
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -29,9 +30,9 @@ class Converter
 
     /**
      * Converts recursively the given data to persistable objects into database.
-     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID
+     * Example: converts Type\ObjectID to MongoDB\BSON\ObjectID.
      *
-     * @param  array $data Array to convert.
+     * @param array $data Array to convert.
      *
      * @return array
      */
@@ -52,7 +53,7 @@ class Converter
      *
      * Example: converts MongoDB\BSON\ObjectID to Type\ObjectID
      *
-     * @param  array $data Array to convert.
+     * @param array $data Array to convert.
      *
      * @return array
      */
@@ -71,9 +72,9 @@ class Converter
     /**
      * Checks if the given parameter is a mapped type and return its index.
      *
-     * @param  mixed $value Value of array to check.
+     * @param mixed $value Value of array to check.
      *
-     * @return boolean|integer
+     * @return bool|int
      */
     protected function getReflectionClass($value)
     {

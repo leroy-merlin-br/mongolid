@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use DateTime;
@@ -8,12 +9,12 @@ use Mongolid\Serializer\SerializableTypeInterface;
 use TestCase;
 
 /**
- * Test case for UTCDateTime class
+ * Test case for UTCDateTime class.
  */
-class UTCDateTimeTest extends TestCase
+class UTCDatetimeTest extends TestCase
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $timestamp;
 
@@ -34,8 +35,8 @@ class UTCDateTimeTest extends TestCase
     {
         parent::setUp();
         $this->timestamp = time();
-        $this->mongoDate = new MongoUTCDateTime($this->timestamp*1000);
-        $this->dateTime  = new UTCDateTime($this->timestamp);
+        $this->mongoDate = new MongoUTCDateTime($this->timestamp * 1000);
+        $this->dateTime = new UTCDateTime($this->timestamp);
     }
 
     /**
@@ -61,7 +62,7 @@ class UTCDateTimeTest extends TestCase
     public function testConstructorUsingTimestampShouldSetMongoDateAndTimestamp()
     {
         $this->assertAttributeEquals(
-            $this->timestamp*1000,
+            $this->timestamp * 1000,
             'timestamp',
             $this->dateTime
         );
@@ -75,7 +76,7 @@ class UTCDateTimeTest extends TestCase
     public function testConstructorUsingNullShouldSetMongoDateAndTimestamp()
     {
         $this->assertAttributeEquals(
-            $this->timestamp*1000,
+            $this->timestamp * 1000,
             'timestamp',
             new UTCDatetime(),
             null,
@@ -91,7 +92,7 @@ class UTCDateTimeTest extends TestCase
     public function testConstructorUsingMongoDateShouldSetMongoDateAndTimestamp()
     {
         $this->assertAttributeEquals(
-            $this->timestamp*1000,
+            $this->timestamp * 1000,
             'timestamp',
             new UTCDateTime($this->mongoDate)
         );
@@ -126,7 +127,7 @@ class UTCDateTimeTest extends TestCase
 
     public function testCallUndefinedMethodOfUtcDateTimeShouldCallMongoUtcDateTime()
     {
-        $date      = new DateTime();
+        $date = new DateTime();
         $timestamp = $date->getTimestamp();
 
         $this->assertEquals($date, (new UTCDateTime($timestamp))->toDateTime());
@@ -134,7 +135,6 @@ class UTCDateTimeTest extends TestCase
 
     public function testShouldProperlyEncodeToJson()
     {
-        $this->assertEquals('"' . (string) $this->mongoDate . '"', json_encode($this->dateTime));
+        $this->assertEquals('"'.(string) $this->mongoDate.'"', json_encode($this->dateTime));
     }
-
 }

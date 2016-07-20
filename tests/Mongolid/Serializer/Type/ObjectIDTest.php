@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use InvalidArgumentException;
@@ -7,7 +8,7 @@ use Mongolid\Serializer\SerializableTypeInterface;
 use TestCase;
 
 /**
- * Test case for ObjectID class
+ * Test case for ObjectID class.
  */
 class ObjectIDTest extends TestCase
 {
@@ -87,6 +88,6 @@ class ObjectIDTest extends TestCase
     {
         $objectId = new ObjectID($this->mongoId);
 
-        $this->assertSame('"' . (string)$this->mongoId . '"', json_encode($objectId));
+        $this->assertSame('"'.(string) $this->mongoId.'"', json_encode($objectId));
     }
 }

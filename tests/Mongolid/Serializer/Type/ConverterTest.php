@@ -1,15 +1,15 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use MongoDB\BSON\ObjectID as MongoObjectID;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
-use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 /**
- * Test case for Converter class
+ * Test case for Converter class.
  */
-class ConvererTest extends TestCase
+class ConverterTest extends TestCase
 {
     /**
      * @var Converter
@@ -41,66 +41,66 @@ class ConvererTest extends TestCase
 
     public function testToDomainTypesShouldReplaceDomainTypesByMongoTypes()
     {
-        $mongoId   = new MongoObjectID();
+        $mongoId = new MongoObjectID();
         $timestamp = time();
-        $mongoDate = new MongoUTCDateTime($timestamp*1000);
-        $id        = new ObjectID($mongoId);
-        $date      = new UTCDateTime($timestamp);
+        $mongoDate = new MongoUTCDateTime($timestamp * 1000);
+        $id = new ObjectID($mongoId);
+        $date = new UTCDateTime($timestamp);
 
         $data = [
-            '_id' => $id,
+            '_id'        => $id,
             'created_at' => $date,
-            'parents' => [$id, $id, $id],
-            'comments' => [
+            'parents'    => [$id, $id, $id],
+            'comments'   => [
                 [
                     'author' => 'Jhon',
-                    'date' => $date,
+                    'date'   => $date,
                 ],
                 [
-                    'author' => 'Doe',
-                    'date' => $date,
+                    'author'   => 'Doe',
+                    'date'     => $date,
                     'versions' => [
                         [
-                            '_id' => $id,
-                            'date' => $date,
+                            '_id'     => $id,
+                            'date'    => $date,
                             'content' => 'Awsome',
                         ],
                         [
-                            '_id' => $id,
-                            'date' => $date,
+                            '_id'     => $id,
+                            'date'    => $date,
                             'content' => 'Great',
                         ],
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
 
         $expected = [
-            '_id' => $mongoId,
+            '_id'        => $mongoId,
             'created_at' => $mongoDate,
-            'parents' => [$mongoId, $mongoId, $mongoId],
-            'comments' => [
+            'parents'    => [$mongoId, $mongoId, $mongoId],
+            'comments'   => [
                 [
                     'author' => 'Jhon',
-                    'date' => $mongoDate,
+                    'date'   => $mongoDate,
                 ],
                 [
-                    'author' => 'Doe',
-                    'date' => $mongoDate,
+                    'author'   => 'Doe',
+                    'date'     => $mongoDate,
                     'versions' => [
                         [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
+                            '_id'     => $mongoId,
+                            'date'    => $mongoDate,
                             'content' => 'Awsome',
                         ],
                         [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
+                            '_id'     => $mongoId,
+                            'date'    => $mongoDate,
                             'content' => 'Great',
                         ],
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->converter->toMongoTypes($data));
@@ -108,66 +108,66 @@ class ConvererTest extends TestCase
 
     public function testToDomainTypesShouldReplaceMongoTypesByDomainTypes()
     {
-        $mongoId   = new MongoObjectID();
+        $mongoId = new MongoObjectID();
         $timestamp = time();
-        $mongoDate = new MongoUTCDateTime($timestamp*1000);
-        $id        = new ObjectID($mongoId);
-        $date      = new UTCDateTime($timestamp);
+        $mongoDate = new MongoUTCDateTime($timestamp * 1000);
+        $id = new ObjectID($mongoId);
+        $date = new UTCDateTime($timestamp);
 
         $data = [
-            '_id' => $mongoId,
+            '_id'        => $mongoId,
             'created_at' => $mongoDate,
-            'parents' => [$mongoId, $mongoId, $mongoId],
-            'comments' => [
+            'parents'    => [$mongoId, $mongoId, $mongoId],
+            'comments'   => [
                 [
                     'author' => 'Jhon',
-                    'date' => $mongoDate,
+                    'date'   => $mongoDate,
                 ],
                 [
-                    'author' => 'Doe',
-                    'date' => $mongoDate,
+                    'author'   => 'Doe',
+                    'date'     => $mongoDate,
                     'versions' => [
                         [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
+                            '_id'     => $mongoId,
+                            'date'    => $mongoDate,
                             'content' => 'Awsome',
                         ],
                         [
-                            '_id' => $mongoId,
-                            'date' => $mongoDate,
+                            '_id'     => $mongoId,
+                            'date'    => $mongoDate,
                             'content' => 'Great',
                         ],
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
 
         $expected = [
-            '_id' => $id,
+            '_id'        => $id,
             'created_at' => $date,
-            'parents' => [$id, $id, $id],
-            'comments' => [
+            'parents'    => [$id, $id, $id],
+            'comments'   => [
                 [
                     'author' => 'Jhon',
-                    'date' => $date,
+                    'date'   => $date,
                 ],
                 [
-                    'author' => 'Doe',
-                    'date' => $date,
+                    'author'   => 'Doe',
+                    'date'     => $date,
                     'versions' => [
                         [
-                            '_id' => $id,
-                            'date' => $date,
+                            '_id'     => $id,
+                            'date'    => $date,
                             'content' => 'Awsome',
                         ],
                         [
-                            '_id' => $id,
-                            'date' => $date,
+                            '_id'     => $id,
+                            'date'    => $date,
                             'content' => 'Great',
                         ],
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->converter->toDomainTypes($data));

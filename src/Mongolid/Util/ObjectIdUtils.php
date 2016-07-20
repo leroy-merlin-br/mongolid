@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 /**
@@ -10,9 +11,9 @@ class ObjectIdUtils
     /**
      * Checks if the given value can be a valid ObjectId.
      *
-     * @param  string $value String to be evaluated if it can be used as a valid ObjectID.
+     * @param string $value String to be evaluated if it can be used as a valid ObjectID.
      *
-     * @return boolean       True if is valid.
+     * @return bool True if is valid.
      */
     public static function isObjectId(string $value)
     {
