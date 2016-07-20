@@ -7,7 +7,7 @@ use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema;
-use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 use TestCase;
 
 class CacheableCursorTest extends TestCase
@@ -41,13 +41,13 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromCache = [['name' => 'joe'], ['name' => 'doe']];
         $cursor             = $this->getCachableCursor();
-        $cacheComponent = m::mock(CacheComponent::class);
+        $cacheComponent = m::mock(CacheComponentInterface::class);
 
         // Act
         $cursor->shouldReceive('generateCacheKey')
             ->andReturn('find:collection:123');
 
-        Ioc::instance(CacheComponent::class, $cacheComponent);
+        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->once()
@@ -66,7 +66,7 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor             = $this->getCachableCursor();
-        $cacheComponent = m::mock(CacheComponent::class);
+        $cacheComponent = m::mock(CacheComponentInterface::class);
         $rawCollection  = m::mock();
 
         $this->setProtected(
@@ -79,7 +79,7 @@ class CacheableCursorTest extends TestCase
         $cursor->shouldReceive('generateCacheKey')
             ->andReturn('find:collection:123');
 
-        Ioc::instance(CacheComponent::class, $cacheComponent);
+        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->with('find:collection:123', null)

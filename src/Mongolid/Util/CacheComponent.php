@@ -5,7 +5,7 @@ namespace Mongolid\Util;
  * CacheComponent will cache values for later use based in "key, value"
  * approach.
  */
-class CacheComponent
+class CacheComponent implements CacheComponentInterface
 {
     /**
      * The array of stored values.

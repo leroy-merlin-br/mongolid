@@ -9,6 +9,7 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -155,7 +156,7 @@ class Manager
         $this->cacheComponent = new CacheComponent;
 
         $this->container->instance(Pool::class, $this->connectionPool);
-        $this->container->instance(CacheComponent::class, $this->cacheComponent);
+        $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
         Ioc::setContainer($this->container);
 
         static::$singleton = $this;
