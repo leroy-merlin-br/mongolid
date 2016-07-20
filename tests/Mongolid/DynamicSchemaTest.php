@@ -1,10 +1,8 @@
 <?php
+
 namespace Mongolid;
 
 use Mockery as m;
-use Mongolid\Container\Ioc;
-use Mongolid\DynamicSchema;
-use Mongolid\Schema;
 use TestCase;
 
 class DynamicSchemaTest extends TestCase

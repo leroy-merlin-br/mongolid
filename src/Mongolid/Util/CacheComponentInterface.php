@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 /**
@@ -10,7 +11,7 @@ interface CacheComponentInterface
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string $key Cache key of the item to be retrieved.
+     * @param string $key Cache key of the item to be retrieved.
      *
      * @return mixed
      */
@@ -32,7 +33,7 @@ interface CacheComponentInterface
      * if the ttl of the given cache key has been expired and will free the
      * memory if so.
      *
-     * @param  string $key Cache key of the item.
+     * @param string $key Cache key of the item.
      *
      * @return bool Has cache key.
      */

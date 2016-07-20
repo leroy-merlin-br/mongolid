@@ -11,17 +11,15 @@ use Mongolid\Schema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
- * It is supposed to be used in model classes in general
- *
- * @package  Mongolid
+ * It is supposed to be used in model classes in general.
  */
 trait Relations
 {
     /**
-     * Returns the referenced documents as objects
+     * Returns the referenced documents as objects.
      *
-     * @param  string $entity Class of the entity or of the schema of the entity.
-     * @param  string $field  The field where the _id is stored.
+     * @param string $entity Class of the entity or of the schema of the entity.
+     * @param string $field  The field where the _id is stored.
      *
      * @return mixed
      */
@@ -38,6 +36,7 @@ trait Relations
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->schema = $entityInstance;
+
             return $dataMapper->first(['_id' => $referenced_id]);
         }
 
@@ -45,7 +44,7 @@ trait Relations
     }
 
     /**
-     * Returns the cursor for the referenced documents as objects
+     * Returns the cursor for the referenced documents as objects.
      *
      * @param string $entity Class of the entity or of the schema of the entity.
      * @param string $field  The field where the _ids are stored.
@@ -69,6 +68,7 @@ trait Relations
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->schema = $entityInstance;
+
             return $dataMapper->where($query);
         }
 
@@ -76,7 +76,7 @@ trait Relations
     }
 
     /**
-     * Return a embedded documents as object
+     * Return a embedded documents as object.
      *
      * @param string $entity Class of the entity or of the schema of the entity.
      * @param string $field  Field where the embedded document is stored.
@@ -86,7 +86,7 @@ trait Relations
     protected function embedsOne(string $entity, string $field)
     {
         if (is_subclass_of($entity, Schema::class)) {
-            $entity = (new $entity)->entityClass;
+            $entity = (new $entity())->entityClass;
         }
 
         $items = (array) $this->$field;
@@ -99,7 +99,7 @@ trait Relations
     }
 
     /**
-     * Return array of embedded documents as objects
+     * Return array of embedded documents as objects.
      *
      * @param string $entity Class of the entity or of the schema of the entity.
      * @param string $field  Field where the embedded documents are stored.
@@ -109,7 +109,7 @@ trait Relations
     protected function embedsMany(string $entity, string $field)
     {
         if (is_subclass_of($entity, Schema::class)) {
-            $entity = (new $entity)->entityClass;
+            $entity = (new $entity())->entityClass;
         }
 
         $items = (array) $this->$field;

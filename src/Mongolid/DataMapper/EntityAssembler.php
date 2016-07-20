@@ -17,12 +17,11 @@ use Mongolid\Schema;
  * This class is meant to do the opposite of the SchemaMapper.
  *
  * @see http://martinfowler.com/eaaCatalog/dataTransferObject.html
- * @package Mongolid
  */
 class EntityAssembler
 {
     /**
-     * Builds an object from the provided data
+     * Builds an object from the provided data.
      *
      * @param array|object $document The attributes that will be used to compose the entity.
      * @param Schema       $schema   Schema that will be used to map each field.
@@ -32,7 +31,7 @@ class EntityAssembler
     public function assemble($document, Schema $schema)
     {
         $entityClass = $schema->entityClass;
-        $model       = Ioc::make($entityClass);
+        $model = Ioc::make($entityClass);
 
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
@@ -50,12 +49,12 @@ class EntityAssembler
     }
 
     /**
-     * Returns the return of polymorph method of the given entity if available
+     * Returns the return of polymorph method of the given entity if available.
      *
      * @see Mongolid\Model\PolymorphableInterface::polymorph
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
-     * @param  mixed $entity The entity that may or may not have a polymorph method.
+     * @param mixed $entity The entity that may or may not have a polymorph method.
      *
      * @return mixed The result of $entity->polymorph or the $entity itself.
      */
@@ -85,10 +84,10 @@ class EntityAssembler
     }
 
     /**
-     * Assembly multiple documents for the given $schemaClass recursively
+     * Assembly multiple documents for the given $schemaClass recursively.
      *
-     * @param  mixed  $value       A value of an embeded field containing entity data to be assembled.
-     * @param  string $schemaClass The schemaClass to be used when assembling the entities within $value.
+     * @param mixed  $value       A value of an embeded field containing entity data to be assembled.
+     * @param string $schemaClass The schemaClass to be used when assembling the entities within $value.
      *
      * @return mixed
      */
@@ -97,13 +96,13 @@ class EntityAssembler
         $value = (array) $value;
 
         if (empty($value)) {
-            return null;
+            return;
         }
 
-        $schema    = Ioc::make($schemaClass);
-        $assembler = Ioc::make(EntityAssembler::class);
+        $schema = Ioc::make($schemaClass);
+        $assembler = Ioc::make(self::class);
 
-        if (! isset($value[0])) {
+        if (!isset($value[0])) {
             $value = [$value];
         }
 

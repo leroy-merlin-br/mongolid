@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer;
 
 use Mockery as m;
@@ -7,7 +8,7 @@ use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 /**
- * Test case for Serializer class
+ * Test case for Serializer class.
  */
 class SerializerTest extends TestCase
 {
@@ -23,7 +24,7 @@ class SerializerTest extends TestCase
     /**
      * This test just check if Mongo driver still blocking us to serialize
      * their BSON objects. If this test fails, maybe Serializer namespace should
-     * be removed =)
+     * be removed =).
      *
      * @expectedException \Exception
      * @expectedExceptionMessage Serialization of 'MongoDB\BSON\ObjectID' is not allowed
@@ -35,11 +36,11 @@ class SerializerTest extends TestCase
 
     public function testSerializeShouldCallConvertAndReturnStringSuccessfully()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
@@ -54,11 +55,11 @@ class SerializerTest extends TestCase
 
     public function testUnserializeShouldParseStringAndCallConverterSuccessfully()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toMongoTypes')
             ->with($attributes)
@@ -73,11 +74,11 @@ class SerializerTest extends TestCase
 
     public function testConvertShouldConvertObjectsToDomainTypes()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
@@ -89,11 +90,11 @@ class SerializerTest extends TestCase
 
     public function testUnconvertShouldConvertObjectsToMongoTypes()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['awsome', 'attrs'];
-        $replaced   = ['some', 'attributes'];
+        $replaced = ['some', 'attributes'];
 
         $converter->shouldReceive('toMongoTypes')
             ->with($attributes)

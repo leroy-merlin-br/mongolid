@@ -44,7 +44,7 @@ class EmbeddedCursorTest extends TestCase
         $items = [
             ['age' => 26, 'name' => 'Abe'],
             ['age' => 25],
-            (object)['age' => 24],
+            (object) ['age' => 24],
             ['age' => 26, 'name' => 'Zizaco'],
         ];
         $cursor = $this->getCursor(stdClass::class, $items);
@@ -53,7 +53,7 @@ class EmbeddedCursorTest extends TestCase
         $cursor->sort(['age' => 1, 'name' - 1]);
         $this->assertAttributeEquals(
             [
-                (object)['age' => 24],
+                (object) ['age' => 24],
                 ['age' => 25],
                 ['age' => 26, 'name' => 'Zizaco'],
                 ['age' => 26, 'name' => 'Abe'],
@@ -158,8 +158,7 @@ class EmbeddedCursorTest extends TestCase
     public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
     {
         // Arrange
-        $object = new class extends ActiveRecord implements PolymorphableInterface
-        {
+        $object = new class() extends ActiveRecord implements PolymorphableInterface {
             public function polymorph()
             {
                 return 'Bacon';
@@ -206,10 +205,10 @@ class EmbeddedCursorTest extends TestCase
 
         $this->setProtected($cursor, 'position', 1);
 
-        $entityA = new stdClass;
+        $entityA = new stdClass();
         $entityA->name = 'A';
 
-        $entityB = new stdClass;
+        $entityB = new stdClass();
         $entityB->name = 'B';
 
         $expected = [

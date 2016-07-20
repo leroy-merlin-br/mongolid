@@ -1,25 +1,24 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use MongoDB\Client;
 use Mongolid\Container\Ioc;
 
 /**
- * Represents a single connection with the database
- *
- * @package  Mongolid
+ * Represents a single connection with the database.
  */
 class Connection
 {
     /**
-     * The raw MongoDB\Client object that represents this connection
+     * The raw MongoDB\Client object that represents this connection.
      *
      * @var Client
      */
     protected $rawConnection;
 
     /**
-     * The default database where mongolid will store the documents
+     * The default database where mongolid will store the documents.
      *
      * @var string
      */
@@ -27,7 +26,7 @@ class Connection
 
     /**
      * Constructs a new Mongolid connection. It uses the same constructor
-     * parameters as the original MongoDB\Client constructor
+     * parameters as the original MongoDB\Client constructor.
      *
      * @see   http://php.net/manual/en/mongodb-driver-manager.construct.php
      *
@@ -36,8 +35,8 @@ class Connection
      * @param array  $driver_options The mongodb driver options when opening a connection.
      */
     public function __construct(
-        string $server = "mongodb://localhost:27017",
-        array $options = ["connect" => true],
+        string $server = 'mongodb://localhost:27017',
+        array $options = ['connect' => true],
         array $driver_options = []
     ) {
         // In order to work with PHP arrays instead of with objects
@@ -52,9 +51,9 @@ class Connection
     }
 
     /**
-     * Find and stores the default database in the connection string
+     * Find and stores the default database in the connection string.
      *
-     * @param  string $connectionString MongoDB connection string.
+     * @param string $connectionString MongoDB connection string.
      *
      * @return void
      */
@@ -68,7 +67,7 @@ class Connection
     }
 
     /**
-     * Getter for Client instance
+     * Getter for Client instance.
      *
      * @return Client
      */
