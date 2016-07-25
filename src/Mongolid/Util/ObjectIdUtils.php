@@ -10,13 +10,17 @@ class ObjectIdUtils
     /**
      * Checks if the given value can be a valid ObjectId.
      *
-     * @param  string $value String to be evaluated if it can be used as a valid ObjectID.
+     * @param  mixed $value String to be evaluated if it can be used as a valid ObjectID.
      *
      * @return boolean       True if is valid.
      */
-    public static function isObjectId(string $value)
+    public static function isObjectId($value)
     {
-        if (strlen($value) == 24 && ctype_xdigit($value)) {
+        if (is_object($value) && method_exists($value, '__toString')) {
+            $value = (string) $value;
+        }
+
+        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
             return true;
         }
 

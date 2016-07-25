@@ -9,7 +9,7 @@ class ObjectIdUtilsTest extends TestCase
     /**
      * @dataProvider objectIdStringScenarios
      */
-    public function testShouldEvaluateIfStringIsAnObjectid($value, $expectation)
+    public function testShouldEvaluateIfValueIsAnObjectid($value, $expectation)
     {
         $this->assertEquals($expectation, ObjectIdUtils::isObjectId($value));
     }
@@ -31,6 +31,7 @@ class ObjectIdUtilsTest extends TestCase
             ['+07f191e810c19729de860ea', false],
             [1234567, false],
             [0.5, false],
+            [['key' => 'value'], false],
         ];
     }
 }
