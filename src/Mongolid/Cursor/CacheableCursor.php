@@ -25,6 +25,27 @@ class CacheableCursor extends Cursor
     protected $documents;
 
     /**
+     * Limit of the query. It is stored because when caching the documents
+     * the DOCUMENT_LIMIT const will be used.
+     *
+     * @var ìnteger
+     */
+    protected $originalLimit;
+
+    /**
+     * Means that the CacheableCursor is wapping the original cursor and not
+     * reading from Cache anymore.
+     *
+     * @var boolean
+     */
+    protected $ignoreCache = false;
+
+    /**
+     * Limits the amount of documents that will be cached for performance reasons.
+     */
+    const DOCUMENT_LIMIT = 100;
+
+    /**
      * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
      * $params given.
@@ -37,10 +58,17 @@ class CacheableCursor extends Cursor
      */
     protected function getCursor(): Traversable
     {
+        // Returns original (non-cached) cursor
+        if ($this->ignoreCache || $this->position >= self::DOCUMENT_LIMIT) {
+            return $this->getOriginalCursor();
+        }
+
+        // Returns cached set of documents
         if ($this->documents) {
             return $this->documents;
         }
 
+        // Check if there is a cached set of documents
         $cacheComponent = Ioc::make(CacheComponentInterface::class);
         $cacheKey       = $this->generateCacheKey();
 
@@ -48,7 +76,10 @@ class CacheableCursor extends Cursor
             return $this->documents = new ArrayIterator($this->documents);
         }
 
-        // Stores the documents within the object.
+        // Stores the original "limit" clause of the query
+        $this->storeOriginalLimit();
+
+        // Stores the documents within the object and cache then for later use
         $this->documents = [];
         foreach (parent::getCursor() as $document) {
             $this->documents[] = $document;
@@ -56,10 +87,10 @@ class CacheableCursor extends Cursor
 
         $cacheComponent->put($cacheKey, $this->documents, 0.6);
 
-        // Drops the unserializable DriverCursor. In order to make the
-        // CacheableCursor object serializable.
-        unset($this->cursor);
+        // Drops the unserializable DriverCursor.
+        $this->cursor = null;
 
+        // Return the documents iterator
         return $this->documents = new ArrayIterator($this->documents);
     }
 
@@ -78,5 +109,69 @@ class CacheableCursor extends Cursor
             $this->collection->getNamespace(),
             md5($serializer->serialize($this->params))
         );
+    }
+
+    /**
+     * Stores the original "limit" clause of the query.
+     *
+     * @return void
+     */
+    protected function storeOriginalLimit()
+    {
+        if (isset($this->params[1]['limit'])) {
+            $this->originalLimit = $this->params[1]['limit'];
+        }
+
+        if ($this->originalLimit > self::DOCUMENT_LIMIT) {
+            $this->limit(self::DOCUMENT_LIMIT);
+        }
+    }
+
+    /**
+     * Gets the limit clause of the query if any.
+     *
+     * @return mixed Int or null
+     */
+    protected function getLimit()
+    {
+        return $this->originalLimit ?: ($this->params[1]['limit'] ?? null);
+    }
+
+    /**
+     * Returns the DriverCursor considering the documents that have already
+     * been retrieved from cache
+     *
+     * @return Traversable
+     */
+    protected function getOriginalCursor(): Traversable
+    {
+        if ($this->ignoreCache) {
+            return parent::getCursor();
+        }
+
+        if ($this->getLimit()) {
+            $this->params[1]['limit'] = $this->getLimit() - $this->position;
+        }
+
+        $skipped = $this->params[1]['skip'] ?? 0;
+
+        $this->skip($skipped + $this->position - 1);
+
+        $this->ignoreCache = true;
+
+        return $this->getOriginalCursor();
+    }
+
+    /**
+     * Serializes this object. Drops the unserializable DriverCursor. In order
+     * to make the CacheableCursor object serializable.
+     *
+     * @return string Serialized object.
+     */
+    public function serialize()
+    {
+        $this->documents = $this->cursor = null;
+
+        return parent::serialize();
     }
 }

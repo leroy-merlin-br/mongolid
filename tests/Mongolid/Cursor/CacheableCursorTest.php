@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Container\Ioc;
@@ -65,7 +66,7 @@ class CacheableCursorTest extends TestCase
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor             = $this->getCachableCursor();
+        $cursor             = $this->getCachableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
         $rawCollection  = m::mock();
 
@@ -86,6 +87,7 @@ class CacheableCursorTest extends TestCase
             ->andReturn(null);
 
         $rawCollection->shouldReceive('find')
+            ->with([], ['limit' => 100])
             ->andReturn(new ArrayIterator($documentsFromDb));
 
         $cacheComponent->shouldReceive('put')
@@ -95,6 +97,50 @@ class CacheableCursorTest extends TestCase
         // Assert
         $this->assertEquals(
             new ArrayIterator($documentsFromDb),
+            $this->callProtected($cursor, 'getCursor')
+        );
+    }
+
+    public function testShouldGetOriginalCursorFromDatabaseAfterTheDocumentLimit()
+    {
+        // Arrange
+        $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
+        $cursor          = $this->getCachableCursor()->limit(150);
+        $cacheComponent  = m::mock(CacheComponentInterface::class);
+        $rawCollection   = m::mock();
+
+        $this->setProtected(
+            $cursor,
+            'position',
+            CacheableCursor::DOCUMENT_LIMIT + 1
+        );
+
+        $this->setProtected(
+            $cursor,
+            'collection',
+            $rawCollection
+        );
+
+        // Act
+        $cursor->shouldReceive('generateCacheKey')
+            ->never();
+
+        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+
+        $cacheComponent->shouldReceive('get')
+            ->with('find:collection:123', null)
+            ->never();
+
+        $rawCollection->shouldReceive('find')
+            ->with([], ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
+            ->andReturn(new ArrayIterator($documentsFromDb));
+
+        $cacheComponent->shouldReceive('put')
+            ->never();
+
+        // Assert
+        $this->assertEquals(
+            new IteratorIterator(new ArrayIterator($documentsFromDb)),
             $this->callProtected($cursor, 'getCursor')
         );
     }
@@ -138,6 +184,8 @@ class CacheableCursorTest extends TestCase
             $collection = m::mock(Collection::class);
             $collection->shouldReceive('getNamespace')
                 ->andReturn('my_db.my_collection');
+            $collection->shouldReceive('getCollectionName')
+                ->andReturn('my_collection');
         }
 
         $mock = m::mock(
