@@ -69,6 +69,20 @@ class CursorTest extends TestCase
         );
     }
 
+    public function testShouldSetNoCursorTimeoutToTrue()
+    {
+        // Arrange
+        $cursor = $this->getCursor();
+
+        // Assert
+        $cursor->disableTimeout();
+        $this->assertAttributeEquals(
+            [[], ['noCursorTimeout' => true]],
+            'params',
+            $cursor
+        );
+    }
+
     public function testShouldCountDocuments()
     {
         // Arrange

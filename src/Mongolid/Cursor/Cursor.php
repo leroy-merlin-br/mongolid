@@ -156,6 +156,21 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
+     * Disable idle timeout of 10 minutes from MongoDB cursor.
+     * This method should be called before the cursor was started.
+     *
+     * @param boolean $flag Toggle timeout on or off.
+     *
+     * @return Cursor Returns this cursor.
+     */
+    public function disableTimeout(bool $flag = true)
+    {
+        $this->params[1]['noCursorTimeout'] = $flag;
+
+        return $this;
+    }
+
+    /**
      * Counts the number of results for this cursor
      *
      * @return integer The number of documents returned by this cursor's query.
@@ -225,7 +240,7 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Refresh the cursor in order to be able to perform a rewind and iterate
-     * trought it again. A new request to the database will be made in the next
+     * through it again. A new request to the database will be made in the next
      * iteration.
      *
      * @return void
