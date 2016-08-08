@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Serializer\Type;
 
+use DateTime;
+use DateTimeZone;
 use InvalidArgumentException;
 use JsonSerializable;
 use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
@@ -70,6 +72,16 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     public function convert()
     {
         return $this->mongoDate;
+    }
+
+    /**
+     * Retrieve a DateTime object with proper timezone set.
+     *
+     * @return DateTime
+     */
+    public function toLocalDateTime()
+    {
+        return $this->mongoDate->toDateTime()->setTimezone(new DateTimeZone(date_default_timezone_get()));
     }
 
     /**

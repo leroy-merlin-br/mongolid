@@ -112,7 +112,7 @@ class UTCDateTimeTest extends TestCase
         new UTCDateTime('invalid-parameter');
     }
 
-    public function testUnserializeShouldKeepFormatedDate()
+    public function testUnserializeShouldKeepFormattedDate()
     {
         $date = unserialize(serialize($this->dateTime));
 
@@ -137,4 +137,16 @@ class UTCDateTimeTest extends TestCase
         $this->assertEquals('"' . (string) $this->mongoDate . '"', json_encode($this->dateTime));
     }
 
+    public function testShouldGetDateTimeWithProperTimezoneSet()
+    {
+        $oldZone = ini_get('date.timezone');
+        $zone    = 'America/Sao_Paulo';
+        ini_set('date.timezone', $zone);
+        $dateTime = new UTCDateTime();
+
+        $result = $dateTime->toLocalDateTime()->getTimezone()->getName();
+
+        $this->assertEquals($zone, $result);
+        ini_set('date.timezone', $oldZone);
+    }
 }
