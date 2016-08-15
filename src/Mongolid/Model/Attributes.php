@@ -52,7 +52,7 @@ trait Attributes
      *
      * @var boolean
      */
-    public $mutable = true;
+    public $mutable = false;
 
     /**
      * Get an attribute from the model.
