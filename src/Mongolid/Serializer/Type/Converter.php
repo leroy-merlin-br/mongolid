@@ -38,6 +38,10 @@ class Converter
     public function toMongoTypes(array $data)
     {
         array_walk_recursive($data, function (&$value) {
+            if (! is_object($value)) {
+                return;
+            }
+
             if ($value instanceof SerializableTypeInterface) {
                 $value = $value->convert();
             }
@@ -59,28 +63,26 @@ class Converter
     public function toDomainTypes(array $data)
     {
         array_walk_recursive($data, function (&$value) {
-            $className = $this->getReflectionClass($value);
-            if (class_exists($className)) {
-                return $value = new $className($value);
+            if (! is_object($value)) {
+                return;
             }
+
+            $className = $this->getReflectionClass(get_class($value));
+            return $value = new $className($value);
         });
 
         return $data;
     }
 
     /**
-     * Checks if the given parameter is a mapped type and return its index.
+     * Returns the mapped type of the given className.
      *
-     * @param  mixed $value Value of array to check.
+     * @param  mixed $className Name of the class to return
      *
-     * @return boolean|integer
+     * @return
      */
-    protected function getReflectionClass($value)
+    protected function getReflectionClass($className)
     {
-        if (false === is_object($value)) {
-            return false;
-        }
-
-        return array_search(get_class($value), $this->mappedTypes);
+        return array_search($className, $this->mappedTypes);
     }
 }
