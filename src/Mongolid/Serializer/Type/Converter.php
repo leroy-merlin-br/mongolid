@@ -68,6 +68,11 @@ class Converter
             }
 
             $className = $this->getReflectionClass(get_class($value));
+
+            if (! $className) {
+                return;
+            }
+
             return $value = new $className($value);
         });
 
