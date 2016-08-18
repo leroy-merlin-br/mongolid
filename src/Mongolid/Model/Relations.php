@@ -38,10 +38,10 @@ trait Relations
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->schema = $entityInstance;
-            return $dataMapper->first(['_id' => $referenced_id]);
+            return $dataMapper->first(['_id' => $referenced_id], [], true);
         }
 
-        return $entityInstance::first(['_id' => $referenced_id]);
+        return $entityInstance::first(['_id' => $referenced_id], [], true);
     }
 
     /**
@@ -69,10 +69,10 @@ trait Relations
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->schema = $entityInstance;
-            return $dataMapper->where($query);
+            return $dataMapper->where($query, [], true);
         }
 
-        return $entityInstance::where($query);
+        return $entityInstance::where($query, [], true);
     }
 
     /**
