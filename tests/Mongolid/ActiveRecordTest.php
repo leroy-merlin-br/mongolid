@@ -66,7 +66,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldSave()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -75,6 +75,9 @@ class ActiveRecordTest extends TestCase
 
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
+
+        $entity->shouldReceive('storeOriginalAttributes')
+            ->once();
 
         $dataMapper->shouldReceive('save')
             ->once()
@@ -88,7 +91,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldInsert()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -97,6 +100,9 @@ class ActiveRecordTest extends TestCase
 
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
+
+        $entity->shouldReceive('storeOriginalAttributes')
+            ->once();
 
         $dataMapper->shouldReceive('insert')
             ->once()
@@ -110,7 +116,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -119,6 +125,9 @@ class ActiveRecordTest extends TestCase
 
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
+
+        $entity->shouldReceive('storeOriginalAttributes')
+            ->once();
 
         $dataMapper->shouldReceive('update')
             ->once()

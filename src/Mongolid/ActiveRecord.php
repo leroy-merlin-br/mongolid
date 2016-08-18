@@ -312,7 +312,11 @@ abstract class ActiveRecord implements AttributesAccessInterface
             'writeConcern' => new WriteConcern($this->getWriteConcern()),
         ];
 
-        return $this->getDataMapper()->$action($this, $options);
+        if ($result = $this->getDataMapper()->$action($this, $options)) {
+            $this->storeOriginalAttributes();
+        }
+
+        return $result;
     }
 
     /**
