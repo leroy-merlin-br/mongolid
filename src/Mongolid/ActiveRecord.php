@@ -178,6 +178,27 @@ abstract class ActiveRecord implements AttributesAccessInterface
     }
 
     /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, a new entity will be returned with the
+     * _if field filled.
+     *
+     * @param  mixed $id Document id.
+     *
+     * @return ActiveRecord
+     */
+    public static function firstOrCreate($id)
+    {
+        if ($entity = self::getDataMapperInstance()->first($id)) {
+            return $entity;
+        }
+
+        $entity = new static;
+        $entity->_id = $id;
+
+        return $entity;
+    }
+
+    /**
      * Handle dynamic method calls into the model.
      *
      * @param  mixed $method     Name of the method that is being called.
