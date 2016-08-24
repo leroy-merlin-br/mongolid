@@ -233,7 +233,6 @@ class ActiveRecordTest extends TestCase
         $query      = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -244,10 +243,10 @@ class ActiveRecordTest extends TestCase
         $dataMapper->shouldReceive('first')
             ->once()
             ->with($query, $projection, true)
-            ->andReturn($cursor);
+            ->andReturn($entity);
 
         // Assert
-        $this->assertEquals($cursor, $entity->first($query, $projection, true));
+        $this->assertEquals($entity, $entity->first($query, $projection, true));
     }
 
     public function testShouldGetFirstOrFail()
@@ -258,7 +257,6 @@ class ActiveRecordTest extends TestCase
         $query      = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -269,10 +267,10 @@ class ActiveRecordTest extends TestCase
         $dataMapper->shouldReceive('firstOrFail')
             ->once()
             ->with($query, $projection, true)
-            ->andReturn($cursor);
+            ->andReturn($entity);
 
         // Assert
-        $this->assertEquals($cursor, $entity->firstOrFail($query, $projection, true));
+        $this->assertEquals($entity, $entity->firstOrFail($query, $projection, true));
     }
 
     public function testShouldGetFirstOrCreateAndReturnExistingModel()
