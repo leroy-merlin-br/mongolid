@@ -33,7 +33,7 @@ class Converter
      *
      * @param  array $data Array to convert.
      *
-     * @return array
+     * @return mixed
      */
     public function toMongoTypes(array $data)
     {
@@ -58,7 +58,7 @@ class Converter
      *
      * @param  array $data Array to convert.
      *
-     * @return array
+     * @return mixed
      */
     public function toDomainTypes(array $data)
     {
@@ -82,9 +82,9 @@ class Converter
     /**
      * Returns the mapped type of the given className.
      *
-     * @param  mixed $className Name of the class to return
+     * @param  mixed $className Name of the class to return.
      *
-     * @return
+     * @return mixed
      */
     protected function getReflectionClass($className)
     {

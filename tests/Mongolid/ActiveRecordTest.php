@@ -24,9 +24,7 @@ class ActiveRecordTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->entity = new class extends ActiveRecord
-        {
-        };
+        $this->entity = new class extends ActiveRecord {};
     }
 
     /**
@@ -235,7 +233,6 @@ class ActiveRecordTest extends TestCase
         $query      = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -246,10 +243,10 @@ class ActiveRecordTest extends TestCase
         $dataMapper->shouldReceive('first')
             ->once()
             ->with($query, $projection, true)
-            ->andReturn($cursor);
+            ->andReturn($entity);
 
         // Assert
-        $this->assertEquals($cursor, $entity->first($query, $projection, true));
+        $this->assertEquals($entity, $entity->first($query, $projection, true));
     }
 
     public function testShouldGetFirstOrFail()
@@ -260,7 +257,6 @@ class ActiveRecordTest extends TestCase
         $query      = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor     = m::mock();
 
         // Act
         Ioc::instance(get_class($entity), $entity);
@@ -271,11 +267,58 @@ class ActiveRecordTest extends TestCase
         $dataMapper->shouldReceive('firstOrFail')
             ->once()
             ->with($query, $projection, true)
-            ->andReturn($cursor);
+            ->andReturn($entity);
 
         // Assert
-        $this->assertEquals($cursor, $entity->firstOrFail($query, $projection, true));
+        $this->assertEquals($entity, $entity->firstOrFail($query, $projection, true));
     }
+
+    public function testShouldGetFirstOrCreateAndReturnExistingModel()
+    {
+        // Arrage
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
+        $id     = 123;
+        $dataMapper = m::mock();
+
+        // Act
+        Ioc::instance(get_class($entity), $entity);
+
+        $entity->shouldReceive('getDataMapper')
+            ->andReturn($dataMapper);
+
+        $dataMapper->shouldReceive('first')
+            ->once()
+            ->with($id)
+            ->andReturn($entity);
+
+        // Assert
+        $this->assertEquals($entity, $entity->firstOrCreate($id));
+    }
+
+    public function testShouldGetFirstOrCreateAndReturnNewModel()
+    {
+        // Arrage
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
+        $id     = 123;
+        $dataMapper = m::mock();
+
+        // Act
+        Ioc::instance(get_class($entity), $entity);
+
+        $entity->shouldReceive('getDataMapper')
+            ->andReturn($dataMapper);
+
+        $dataMapper->shouldReceive('first')
+            ->once()
+            ->with($id)
+            ->andReturn(null);
+
+        // Assert
+        $this->assertNotEquals($entity, $entity->firstOrCreate($id));
+    }
+
 
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
