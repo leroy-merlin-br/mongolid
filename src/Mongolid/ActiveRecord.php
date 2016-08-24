@@ -137,7 +137,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      *
      * @param  mixed   $query      MongoDB selection criteria.
      * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves the entity trought a CacheableCursor.
+     * @param  boolean $useCache   Retrieves the entity through a CacheableCursor.
      *
      * @return ActiveRecord
      */
@@ -159,7 +159,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      *
      * @param  mixed   $query      MongoDB selection criteria.
      * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves the entity trought a CacheableCursor.
+     * @param  boolean $useCache   Retrieves the entity through a CacheableCursor.
      *
      * @throws ModelNotFoundException If no document was found.
      *
