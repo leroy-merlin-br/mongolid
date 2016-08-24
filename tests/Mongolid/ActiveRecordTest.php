@@ -273,7 +273,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($entity, $entity->firstOrFail($query, $projection, true));
     }
 
-    public function testShouldGetFirstOrCreateAndReturnExistingModel()
+    public function testShouldGetFirstOrNewAndReturnExistingModel()
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -293,10 +293,10 @@ class ActiveRecordTest extends TestCase
             ->andReturn($entity);
 
         // Assert
-        $this->assertEquals($entity, $entity->firstOrCreate($id));
+        $this->assertEquals($entity, $entity->firstOrNew($id));
     }
 
-    public function testShouldGetFirstOrCreateAndReturnNewModel()
+    public function testShouldGetFirstOrNewAndReturnNewModel()
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -316,7 +316,7 @@ class ActiveRecordTest extends TestCase
             ->andReturn(null);
 
         // Assert
-        $this->assertNotEquals($entity, $entity->firstOrCreate($id));
+        $this->assertNotEquals($entity, $entity->firstOrNew($id));
     }
 
 

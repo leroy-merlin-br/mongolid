@@ -186,7 +186,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      *
      * @return ActiveRecord
      */
-    public static function firstOrCreate($id)
+    public static function firstOrNew($id)
     {
         if ($entity = self::getDataMapperInstance()->first($id)) {
             return $entity;
