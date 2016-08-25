@@ -10,6 +10,7 @@ use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
@@ -95,15 +96,16 @@ class DataMapper
             $this->mergeOptions($options, ['upsert' => true])
         );
 
-        if ($queryResult->isAcknowledged() &&
-            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount())
-        ) {
-            $this->fireEvent('saved', $object);
+        $result = $queryResult->isAcknowledged() &&
+            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
 
-            return true;
+        if ($result) {
+            $this->afterSuccess($object);
+
+            $this->fireEvent('saved', $object);
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -132,11 +134,14 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        $result = $queryResult->isAcknowledged() &&
-            $queryResult->getInsertedCount();
+        $result = $queryResult->isAcknowledged() && $queryResult->getInsertedCount();
 
-        if ($result && $fireEvents) {
-            $this->fireEvent('inserted', $object);
+        if ($result) {
+            $this->afterSuccess($object);
+
+            if ($fireEvents) {
+                $this->fireEvent('inserted', $object);
+            }
         }
 
         return $result;
@@ -162,6 +167,8 @@ class DataMapper
 
         if (! $object->_id) {
             if ($result = $this->insert($object, $options, false)) {
+                $this->afterSuccess($object);
+
                 $this->fireEvent('updated', $object);
             }
 
@@ -176,15 +183,15 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        if ($queryResult->isAcknowledged() &&
-            $queryResult->getModifiedCount()
-        ) {
-            $this->fireEvent('updated', $object);
+        $result = $queryResult->isAcknowledged() && $queryResult->getModifiedCount();
 
-            return true;
+        if ($result) {
+            $this->afterSuccess($object);
+
+            $this->fireEvent('updated', $object);
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -235,7 +242,8 @@ class DataMapper
         $query = [],
         array $projection = [],
         bool $cacheable = false
-    ): Cursor {
+    ): Cursor
+    {
 
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
@@ -245,7 +253,7 @@ class DataMapper
             'find',
             [
                 $this->prepareValueQuery($query),
-                ['projection' => $this->prepareProjection($projection)]
+                ['projection' => $this->prepareProjection($projection)],
             ]
         );
 
@@ -287,7 +295,7 @@ class DataMapper
             ['projection' => $this->prepareProjection($projection)]
         );
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array) $document);
+        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
 
         if (! $document) {
             return null;
@@ -331,7 +339,7 @@ class DataMapper
      */
     protected function parseToDocument($object)
     {
-        $schemaMapper   = $this->getSchemaMapper();
+        $schemaMapper = $this->getSchemaMapper();
         $parsedDocument = $schemaMapper->map($object);
 
         if (is_object($object)) {
@@ -364,8 +372,8 @@ class DataMapper
      */
     protected function getCollection(): Collection
     {
-        $conn       = $this->connPool->getConnection();
-        $database   = $conn->defaultDatabase;
+        $conn = $this->connPool->getConnection();
+        $database = $conn->defaultDatabase;
         $collection = $this->schema->collection;
 
         return $conn->getRawConnection()->$database->$collection;
@@ -410,7 +418,7 @@ class DataMapper
      *
      * @param  array $value Array that will be treated.
      *
-     * @return arary Prepared array.
+     * @return array Prepared array.
      */
     protected function prepareArrayFieldOfQuery(array $value): array
     {
@@ -535,5 +543,17 @@ class DataMapper
     private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = [])
     {
         return array_merge($defaultOptions, $toMergeOptions);
+    }
+
+    /**
+     * Perform actions on object before firing the after event.
+     *
+     * @param mixed $object
+     */
+    private function afterSuccess($object)
+    {
+        if ($object instanceof AttributesAccessInterface) {
+            $object->syncOriginalAttributes();
+        }
     }
 }

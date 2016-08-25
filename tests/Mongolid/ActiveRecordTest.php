@@ -64,7 +64,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldSave()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -74,7 +74,7 @@ class ActiveRecordTest extends TestCase
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('storeOriginalAttributes')
+        $entity->shouldReceive('syncOriginalAttributes')
             ->once();
 
         $dataMapper->shouldReceive('save')
@@ -89,7 +89,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldInsert()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -99,7 +99,7 @@ class ActiveRecordTest extends TestCase
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('storeOriginalAttributes')
+        $entity->shouldReceive('syncOriginalAttributes')
             ->once();
 
         $dataMapper->shouldReceive('insert')
@@ -114,7 +114,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldUpdate()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,storeOriginalAttributes]');
+        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -124,7 +124,7 @@ class ActiveRecordTest extends TestCase
         $entity->shouldReceive('getCollectionName')
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('storeOriginalAttributes')
+        $entity->shouldReceive('syncOriginalAttributes')
             ->once();
 
         $dataMapper->shouldReceive('update')

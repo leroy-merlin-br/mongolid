@@ -334,7 +334,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
         ];
 
         if ($result = $this->getDataMapper()->$action($this, $options)) {
-            $this->storeOriginalAttributes();
+            $this->syncOriginalAttributes();
         }
 
         return $result;

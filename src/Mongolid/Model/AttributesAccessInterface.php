@@ -67,5 +67,5 @@ interface AttributesAccessInterface
      *
      * @return void
      */
-    public function storeOriginalAttributes();
+    public function syncOriginalAttributes();
 }
