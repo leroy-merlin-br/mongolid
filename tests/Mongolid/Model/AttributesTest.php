@@ -242,30 +242,10 @@ class AttributesTest extends TestCase
         $model->age = 25;
 
         // Act
-        $model->storeOriginalAttributes();
+        $model->syncOriginalAttributes();
 
         // Assert
         $this->assertAttributeEquals($model->attributes, 'original', $model);
-
-        return $model;
-    }
-
-    /**
-     * @depends testShouldSetOriginalAttributes
-     */
-    public function testShouldKeepOriginalAttributesIfPropertiesAreChangedAndMethodCalledAgain($model)
-    {
-        // Arrange
-        $expect = $model->attributes;
-
-        $model->name = 'Rick';
-        $model->age = 18;
-
-        // Act
-        $model->storeOriginalAttributes();
-
-        // Assert
-        $this->assertAttributeEquals($expect, 'original', $model);
     }
 
     public function getFillableOptions()

@@ -78,7 +78,7 @@ class EntityAssembler
     protected function prepareOriginalAttributes($entity)
     {
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->storeOriginalAttributes();
+            $entity->syncOriginalAttributes();
         }
 
         return $entity;

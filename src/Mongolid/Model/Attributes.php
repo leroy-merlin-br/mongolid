@@ -140,11 +140,9 @@ trait Attributes
      *
      * @return void
      */
-    public function storeOriginalAttributes()
+    public function syncOriginalAttributes()
     {
-        if (empty($this->original)) {
-            $this->original = $this->attributes;
-        }
+        $this->original = $this->attributes;
     }
 
     /**
