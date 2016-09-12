@@ -2,6 +2,7 @@
 namespace Mongolid\Connection;
 
 use MongoDB\Client;
+use MongoDB\Driver\Manager;
 use Mongolid\Container\Ioc;
 
 /**
@@ -11,6 +12,13 @@ use Mongolid\Container\Ioc;
  */
 class Connection
 {
+    /**
+     * The raw MongoDB\Manager object to perform bulk operations
+     *
+     * @var Client
+     */
+    protected $rawManager;
+
     /**
      * The raw MongoDB\Client object that represents this connection
      *
@@ -45,10 +53,10 @@ class Connection
 
         $this->findDefaultDatabase($server);
 
-        $this->rawConnection = Ioc::make(
-            Client::class,
-            [$server, $options, $driver_options]
-        );
+        $parameters = [$server, $options, $driver_options];
+
+        $this->rawManager = Ioc::make(Manager::class, $parameters);
+        $this->rawConnection = Ioc::make(Client::class, $parameters);
     }
 
     /**
@@ -75,5 +83,15 @@ class Connection
     public function getRawConnection()
     {
         return $this->rawConnection;
+    }
+
+    /**
+     * Getter for Manager instance
+     *
+     * @return Manager
+     */
+    public function getRawManager()
+    {
+        return $this->rawManager;
     }
 }

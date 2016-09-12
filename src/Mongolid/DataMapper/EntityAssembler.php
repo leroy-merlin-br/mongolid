@@ -11,7 +11,7 @@ use Mongolid\Schema;
  * EntityAssembler have the responsibility of assembling the data coming from
  * the database into actual entities. Since the entities need to be assembled
  * whenever they are being built with data from the database, from a cursor or
- * from an embeded field, this service is a reusable tool to turn field array of
+ * from an embedded field, this service is a reusable tool to turn field array of
  * attributes into the actual Entity.
  *
  * This class is meant to do the opposite of the SchemaMapper.
