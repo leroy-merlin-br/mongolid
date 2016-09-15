@@ -28,7 +28,7 @@ class RelationsTest extends TestCase
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
         $model         = m::mock(ActiveRecord::class.'[]');
-        $dataMapper    = m::mock(DataMapper::class);
+        $dataMapper    = m::mock(DataMapper::class)->makePartial();
         $result        = m::mock();
 
         $model->$field = $fieldValue;
@@ -59,7 +59,7 @@ class RelationsTest extends TestCase
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
         $model         = m::mock(ActiveRecord::class.'[]');
-        $dataMapper    = m::mock(DataMapper::class);
+        $dataMapper    = m::mock(DataMapper::class)->makePartial();
         $result        = m::mock(Cursor::class);
 
         $model->$field = $fieldValue;
@@ -143,7 +143,7 @@ class RelationsTest extends TestCase
     /**
      * @dataProvider manipulativeMethods
      */
-    public function testShouldEmbededUnembedAttachAndDetachDocuments($method)
+    public function testShouldEmbeddedUnembedAttachAndDetachDocuments($method)
     {
         // Set
         $model = new class {

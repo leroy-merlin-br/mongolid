@@ -451,7 +451,7 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, '_id' => false];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema = $schema;
+        $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -522,7 +522,7 @@ class DataMapperTest extends TestCase
         $preparedQuery = ['_id' => 123];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema = $schema;
+        $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -567,7 +567,7 @@ class DataMapperTest extends TestCase
         $preparedQuery = ['_id' => 123];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema = $schema;
+        $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -609,7 +609,7 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, 'fields' => false];
 
         $schema->entityClass = 'stdClass';
-        $mapper->schema = $schema;
+        $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -745,8 +745,10 @@ class DataMapperTest extends TestCase
         $mapper = new DataMapper($connPool);
         $connection = m::mock(Connection::class);
         $collection = m::mock(Collection::class);
+        $schema = m::mock(Schema::class);
+        $schema->collection = 'foobar';
 
-        $mapper->schema = (object)['collection' => 'foobar'];
+        $mapper->setSchema($schema);
         $connection->defaultDatabase = 'grimory';
         $connection->grimory = (object)['foobar' => $collection];
 

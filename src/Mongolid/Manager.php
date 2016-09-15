@@ -133,7 +133,7 @@ class Manager
     {
         if (isset($this->schemas[$entityClass])) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = $this->schemas[$entityClass] ?? null;
+            $dataMapper->setSchema($this->schemas[$entityClass] ?? null);
 
             return $dataMapper;
         }

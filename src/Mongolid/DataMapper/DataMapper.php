@@ -11,6 +11,7 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
@@ -23,7 +24,7 @@ use Mongolid\Util\ObjectIdUtils;
  *
  * @package  Mongolid
  */
-class DataMapper
+class DataMapper implements HasSchemaInterface
 {
     /**
      * Name of the schema class to be used
@@ -37,7 +38,7 @@ class DataMapper
      *
      * @var Schema
      */
-    public $schema;
+    protected $schema;
 
     /**
      * Connections that are going to be used to interact with the database
@@ -555,5 +556,23 @@ class DataMapper
         if ($object instanceof AttributesAccessInterface) {
             $object->syncOriginalAttributes();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
+    /**
+     * Set a Schema object  that describes an Entity in MongoDB
+     *
+     * @param Schema $schema
+     */
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
     }
 }

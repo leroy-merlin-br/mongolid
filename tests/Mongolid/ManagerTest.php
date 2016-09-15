@@ -82,7 +82,7 @@ class ManagerTest extends TestCase
         // Arrange
         $manager = new Manager;
         $schema = m::mock(Schema::class);
-        $dataMapper = m::mock(DataMapper::class);
+        $dataMapper = m::mock(DataMapper::class)->makePartial();
 
         $schema->entityClass = 'Bacon';
 

@@ -10,6 +10,7 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
 use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 
 /**
@@ -21,7 +22,7 @@ use Mongolid\Schema\Schema;
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord implements AttributesAccessInterface
+abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInterface
 {
     use Attributes, Relations;
 
@@ -246,7 +247,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
     public function getDataMapper()
     {
         $dataMapper         = Ioc::make(DataMapper::class);
-        $dataMapper->schema = $this->getSchema();
+        $dataMapper->setSchema($this->getSchema());
 
         return $dataMapper;
     }
@@ -284,9 +285,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
     }
 
     /**
-     * Returns a Schema object that describes this Entity in MongoDB
-     *
-     * @return Schema
+     * {@inheritdoc}
      */
     public function getSchema(): Schema
     {
