@@ -2,9 +2,8 @@
 namespace Mongolid;
 
 use Mockery as m;
-use Mongolid\Container\Ioc;
-use Mongolid\DynamicSchema;
-use Mongolid\Schema;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\Schema;
 use TestCase;
 
 class DynamicSchemaTest extends TestCase
@@ -27,7 +26,7 @@ class DynamicSchemaTest extends TestCase
     public function testShouldBeDynamic()
     {
         // Arrange
-        $schema = m::mock('Mongolid\DynamicSchema[]');
+        $schema = m::mock(DynamicSchema::class.'[]');
 
         // Assert
         $this->assertAttributeEquals(true, 'dynamic', $schema);

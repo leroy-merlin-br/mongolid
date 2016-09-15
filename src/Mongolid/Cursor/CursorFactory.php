@@ -2,7 +2,7 @@
 namespace Mongolid\Cursor;
 
 use MongoDB\Collection;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 
 /**
  * Factory of new EmbeddedCursor instances.

@@ -7,7 +7,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**

@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Schema;
 
 use Mongolid\Container\Ioc;
 use Mongolid\Serializer\Type\ObjectID;

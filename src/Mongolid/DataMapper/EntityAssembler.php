@@ -5,7 +5,7 @@ namespace Mongolid\DataMapper;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 
 /**
  * EntityAssembler have the responsibility of assembling the data coming from
@@ -44,7 +44,7 @@ class EntityAssembler
             $model->$field = $value;
         }
 
-        $entity = $this->morphinTime($model);
+        $entity = $this->morphingTime($model);
 
         return $this->prepareOriginalAttributes($entity);
     }
@@ -52,14 +52,14 @@ class EntityAssembler
     /**
      * Returns the return of polymorph method of the given entity if available
      *
-     * @see Mongolid\Model\PolymorphableInterface::polymorph
+     * @see \Mongolid\Model\PolymorphableInterface::polymorph
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
      * @param  mixed $entity The entity that may or may not have a polymorph method.
      *
      * @return mixed The result of $entity->polymorph or the $entity itself.
      */
-    protected function morphinTime($entity)
+    protected function morphingTime($entity)
     {
         if ($entity instanceof PolymorphableInterface) {
             return $entity->polymorph();

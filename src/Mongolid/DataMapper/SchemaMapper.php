@@ -2,7 +2,7 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 
 /**

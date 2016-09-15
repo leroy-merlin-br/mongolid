@@ -8,6 +8,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 

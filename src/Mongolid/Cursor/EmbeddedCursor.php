@@ -4,8 +4,8 @@ namespace Mongolid\Cursor;
 use Mongolid\ActiveRecord;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\DynamicSchema;
-use Mongolid\Schema;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\Schema;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.

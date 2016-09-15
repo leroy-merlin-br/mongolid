@@ -7,6 +7,7 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\ObjectID;
 use stdClass;
 use TestCase;

@@ -3,8 +3,7 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\SchemaMapper;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
@@ -27,8 +26,7 @@ class SchemaMapperTest extends TestCase
             'stuff' => 'schema.My\Own\Schema'
         ];
         $schemaMapper = m::mock(
-            'Mongolid\DataMapper\SchemaMapper'.
-            '[clearDynamic,parseField]',
+            SchemaMapper::class.'[clearDynamic,parseField]',
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
@@ -150,8 +148,7 @@ class SchemaMapperTest extends TestCase
         // Arrange
         $schema = m::mock(Schema::class);
         $schemaMapper = m::mock(
-            'Mongolid\DataMapper\SchemaMapper'.
-            '[mapToSchema]',
+            SchemaMapper::class.'[mapToSchema]',
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();

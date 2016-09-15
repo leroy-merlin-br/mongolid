@@ -11,7 +11,7 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Model\AttributesAccessInterface;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
 

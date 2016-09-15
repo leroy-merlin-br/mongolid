@@ -10,7 +10,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use TestCase;
 

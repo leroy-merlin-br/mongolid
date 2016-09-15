@@ -12,7 +12,7 @@ use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AttributesAccessInterface;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 use stdClass;
 use TestCase;

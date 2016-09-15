@@ -9,8 +9,7 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Model\DocumentEmbedder;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use TestCase;
 
 class RelationsTest extends TestCase

@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Schema;
 
 /**
  * The DynamicSchema will accept additional fields that are not specified in
