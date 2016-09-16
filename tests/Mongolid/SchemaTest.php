@@ -2,9 +2,8 @@
 namespace Mongolid;
 
 use Mockery as m;
-use MongoDB\Driver\Exception\Exception as MongoException;
 use Mongolid\Container\Ioc;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\ObjectID;
 use Mongolid\Serializer\Type\UTCDateTime;
 use Mongolid\Util\SequenceService;

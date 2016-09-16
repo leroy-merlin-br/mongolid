@@ -9,7 +9,7 @@ use Mongolid\ActiveRecord;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 use Serializable;
 use Traversable;

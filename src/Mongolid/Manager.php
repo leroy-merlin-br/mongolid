@@ -8,6 +8,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -132,7 +133,7 @@ class Manager
     {
         if (isset($this->schemas[$entityClass])) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = $this->schemas[$entityClass] ?? null;
+            $dataMapper->setSchema($this->schemas[$entityClass] ?? null);
 
             return $dataMapper;
         }

@@ -2,11 +2,11 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Serializer\Type\Converter;
 
 /**
- * The SchemaMapper will map an object or an array of data to an Schema object.
+ * The SchemaMapper will map an object or an array of data to a Schema object.
  * When instantiating a SchemaMapper you should provide a Schema. When calling
  * 'map' the Schema provided will be used to format the data to the correct
  * format.

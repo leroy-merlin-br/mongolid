@@ -7,7 +7,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -37,7 +37,7 @@ trait Relations
 
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = $entityInstance;
+            $dataMapper->setSchema($entityInstance);
             return $dataMapper->first(['_id' => $referenced_id], [], true);
         }
 
@@ -68,7 +68,7 @@ trait Relations
 
         if ($entityInstance instanceof Schema) {
             $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->schema = $entityInstance;
+            $dataMapper->setSchema($entityInstance);
             return $dataMapper->where($query, [], true);
         }
 
@@ -132,8 +132,8 @@ trait Relations
      */
     public function embed(string $field, &$obj)
     {
-        $embeder = Ioc::make(DocumentEmbedder::class);
-        $embeder->embed($this, $field, $obj);
+        $embedder = Ioc::make(DocumentEmbedder::class);
+        $embedder->embed($this, $field, $obj);
     }
 
     /**
@@ -147,8 +147,8 @@ trait Relations
      */
     public function unembed(string $field, &$obj)
     {
-        $embeder = Ioc::make(DocumentEmbedder::class);
-        $embeder->unembed($this, $field, $obj);
+        $embedder = Ioc::make(DocumentEmbedder::class);
+        $embedder->unembed($this, $field, $obj);
     }
 
     /**
@@ -162,8 +162,8 @@ trait Relations
      */
     public function attach(string $field, &$obj)
     {
-        $embeder = Ioc::make(DocumentEmbedder::class);
-        $embeder->attach($this, $field, $obj);
+        $embedder = Ioc::make(DocumentEmbedder::class);
+        $embedder->attach($this, $field, $obj);
     }
 
     /**
@@ -177,7 +177,7 @@ trait Relations
      */
     public function detach(string $field, &$obj)
     {
-        $embeder = Ioc::make(DocumentEmbedder::class);
-        $embeder->detach($this, $field, $obj);
+        $embedder = Ioc::make(DocumentEmbedder::class);
+        $embedder->detach($this, $field, $obj);
     }
 }

@@ -3,10 +3,7 @@ namespace Mongolid\Cursor;
 
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Cursor\CacheableCursor;
-use Mongolid\Cursor\Cursor;
-use Mongolid\Cursor\EmbeddedCursor;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use TestCase;
 
 class CursorFactoryTest extends TestCase

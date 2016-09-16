@@ -9,17 +9,20 @@ use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\HasSchemaInterface;
+use Mongolid\Schema\Schema;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
- * The Mongolid\Schema that describes the entity will be generated on the go
+ * The Mongolid\Schema\Schema that describes the entity will be generated on the go
  * based on the $fields.
  *
  * @package  Mongolid
  */
-abstract class ActiveRecord implements AttributesAccessInterface
+abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInterface
 {
     use Attributes, Relations;
 
@@ -41,7 +44,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
-     * @see  Mongolid\Schema::$fields
+     * @see  \Mongolid\Schema\Schema::$fields
      * @var  string|string[]
      */
     protected $fields = [
@@ -244,7 +247,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
     public function getDataMapper()
     {
         $dataMapper         = Ioc::make(DataMapper::class);
-        $dataMapper->schema = $this->getSchema();
+        $dataMapper->setSchema($this->getSchema());
 
         return $dataMapper;
     }
@@ -282,9 +285,7 @@ abstract class ActiveRecord implements AttributesAccessInterface
     }
 
     /**
-     * Returns a Schema object that describes this Entity in MongoDB
-     *
-     * @return Schema
+     * {@inheritdoc}
      */
     public function getSchema(): Schema
     {

@@ -8,7 +8,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use TestCase;
 
 class EntityAssemblerTest extends TestCase

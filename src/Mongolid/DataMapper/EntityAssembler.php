@@ -5,13 +5,13 @@ namespace Mongolid\DataMapper;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 
 /**
  * EntityAssembler have the responsibility of assembling the data coming from
  * the database into actual entities. Since the entities need to be assembled
  * whenever they are being built with data from the database, from a cursor or
- * from an embeded field, this service is a reusable tool to turn field array of
+ * from an embedded field, this service is a reusable tool to turn field array of
  * attributes into the actual Entity.
  *
  * This class is meant to do the opposite of the SchemaMapper.
@@ -44,7 +44,7 @@ class EntityAssembler
             $model->$field = $value;
         }
 
-        $entity = $this->morphinTime($model);
+        $entity = $this->morphingTime($model);
 
         return $this->prepareOriginalAttributes($entity);
     }
@@ -52,14 +52,14 @@ class EntityAssembler
     /**
      * Returns the return of polymorph method of the given entity if available
      *
-     * @see Mongolid\Model\PolymorphableInterface::polymorph
+     * @see \Mongolid\Model\PolymorphableInterface::polymorph
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
      * @param  mixed $entity The entity that may or may not have a polymorph method.
      *
      * @return mixed The result of $entity->polymorph or the $entity itself.
      */
-    protected function morphinTime($entity)
+    protected function morphingTime($entity)
     {
         if ($entity instanceof PolymorphableInterface) {
             return $entity->polymorph();

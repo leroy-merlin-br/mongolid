@@ -10,12 +10,12 @@ First of all, you have to define a _Schema_ for your model. This is the way to m
 
 > **Note:** The _Mongolid Schema_ is equivalent to [mapping your objects using annotation or xml](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/xml-mapping.html) in other ORM or ODM libraries.
 
-In order to define a schema you should extend `Mongolid\Schema` or `Mongolid\DynamicSchema`:
+In order to define a schema you should extend `Mongolid\Schema\Schema` or `Mongolid\Schema\DynamicSchema`:
 
 ```php
 <?php
 
-class ArticleSchema extends Mongolid\Schema {
+class ArticleSchema extends Mongolid\Schema\Schema {
 
     public $entityClass = 'Article';
 
@@ -74,7 +74,7 @@ $manager->getMapper(Article::class)->save($article); // true
 
 ## Schema definition
 
-When defining your schema you can eighter extend the `Mongolid\Schema` or `Mongolid\DynamicSchema`. The main difference is the `$dynamic` property value.
+When defining your schema you can eighter extend the `Mongolid\Schema\Schema` or `Mongolid\Schema\DynamicSchema`. The main difference is the `$dynamic` property value.
 
 **Making a schema dynamic**
 
@@ -90,7 +90,7 @@ The `$fields` property is an array that tells how a document should look like. F
 
 If an scalar type is used, it will perform a cast operation in the value. Othewise the schema will use the type as the name of the method to be called.
 
-See `Mongolid\Schema::objectId` method for example. It means that if a field type (in `$fields`) is defined as `"objectId"`, it will pass trought the `Mongolid\Schema::objectId` before being saved in the database.
+See `Mongolid\Schema\Schema::objectId` method for example. It means that if a field type (in `$fields`) is defined as `"objectId"`, it will pass trought the `Mongolid\Schema\Schema::objectId` before being saved in the database.
 
 Because of this you can create your own custom field types easily. Just create a new public method in your schema and you are ready to use it's name as a type definition in `$fields`.
 
@@ -98,7 +98,7 @@ The last option is to define a field as another schema by using the syntax _'sch
 
 ### Default Schema $field types
 
-By default the `Mongolid\Schema` contains the following types:
+By default the `Mongolid\Schema\Schema` contains the following types:
 
 | type               | description                                                                                                        |
 |--------------------|--------------------------------------------------------------------------------------------------------------------|
@@ -112,7 +112,7 @@ By default the `Mongolid\Schema` contains the following types:
 But you can easily create your own types. For example:
 
 ```php
-class MySchema extends Mongolid\Schema
+class MySchema extends Mongolid\Schema\Schema
 {
     ...
 
@@ -132,7 +132,7 @@ class MySchema extends Mongolid\Schema
 By using the `"schema.<Class>"` syntax you can create schemas and map Entities for embeded documents. For example, with the definition below:
 
 ```php
-class PostSchema extends Mongolid\Schema
+class PostSchema extends Mongolid\Schema\Schema
 {
     public $entityClass = 'Post';
     public $collection = 'posts';
@@ -145,7 +145,7 @@ class PostSchema extends Mongolid\Schema
     ];
 }
 
-class CommentSchema extends Mongolid\Schema
+class CommentSchema extends Mongolid\Schema\Schema
 {
     public $entityClass = 'Comment';
     public $collection = null; // Optional since all comments will be embedded

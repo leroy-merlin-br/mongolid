@@ -10,7 +10,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use TestCase;
 
@@ -82,7 +82,7 @@ class ManagerTest extends TestCase
         // Arrange
         $manager = new Manager;
         $schema = m::mock(Schema::class);
-        $dataMapper = m::mock(DataMapper::class);
+        $dataMapper = m::mock(DataMapper::class)->makePartial();
 
         $schema->entityClass = 'Bacon';
 
