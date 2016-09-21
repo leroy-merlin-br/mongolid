@@ -223,9 +223,7 @@ class DocumentEmbedderTest extends TestCase
                     'name' => 'John Doe'
                 ],
                 'method' => 'attach',
-                'expectation' => [
-                    (new ObjectID)
-                ]
+                'expectation' => []
             ],
 
             // ------------------------------

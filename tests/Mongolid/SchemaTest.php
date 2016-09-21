@@ -146,7 +146,7 @@ class SchemaTest extends TestCase
     /**
      * @dataProvider createdAtTimestampsFixture
      */
-    public function testShouldNotRefreshCreatedAtTimestamps($value, $expectation)
+    public function testShouldNotRefreshCreatedAtTimestamps($value, $expectation, $compareTimestamp = true)
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
@@ -154,7 +154,9 @@ class SchemaTest extends TestCase
         // Assertion
         $result = $schema->createdAtTimestamp($value);
         $this->assertInstanceOf(get_class($expectation), $result);
-        $this->assertEquals((string) $expectation, (string) $result);
+        if ($compareTimestamp) {
+            $this->assertEquals((string) $expectation, (string) $result);
+        }
     }
 
     public function createdAtTimestampsFixture()
@@ -173,11 +175,13 @@ class SchemaTest extends TestCase
             ],
             'Empty field' => [
                 'value' => null,
-                'expectation' => new UTCDateTime
+                'expectation' => new UTCDateTime,
+                'compareTimestamp' => false
             ],
             'An string' => [
                 'value' => 'foobar',
-                'expectation' => new UTCDateTime
+                'expectation' => new UTCDateTime,
+                'compareTimestamp' => false
             ]
         ];
     }
