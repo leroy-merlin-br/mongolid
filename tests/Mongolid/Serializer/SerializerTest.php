@@ -20,19 +20,6 @@ class SerializerTest extends TestCase
         m::close();
     }
 
-    /**
-     * This test just check if Mongo driver still blocking us to serialize
-     * their BSON objects. If this test fails, maybe Serializer namespace should
-     * be removed =)
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Serialization of 'MongoDB\BSON\ObjectID' is not allowed
-     */
-    public function testSerializeMongoObjectShouldTrhowException()
-    {
-        serialize(['id' => new MongoObjectID()]);
-    }
-
     public function testSerializeShouldCallConvertAndReturnStringSuccessfully()
     {
         $converter  = m::mock(Converter::class);
