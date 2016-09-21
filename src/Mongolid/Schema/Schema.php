@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Schema;
 
+use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Serializer\Type\ObjectID;
 use Mongolid\Serializer\Type\UTCDateTime;
@@ -105,7 +106,7 @@ abstract class Schema
      */
     public function createdAtTimestamp($value)
     {
-        if ($value instanceof UTCDateTime) {
+        if ($value instanceof UTCDateTime || $value instanceof MongoUTCDateTime) {
             return $value;
         }
 
