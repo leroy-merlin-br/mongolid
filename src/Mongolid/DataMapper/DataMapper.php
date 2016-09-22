@@ -243,8 +243,7 @@ class DataMapper implements HasSchemaInterface
         $query = [],
         array $projection = [],
         bool $cacheable = false
-    ): Cursor
-    {
+    ): Cursor {
 
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
