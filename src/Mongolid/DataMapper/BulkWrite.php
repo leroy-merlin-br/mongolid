@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use MongoDB\BSON\ObjectID;
@@ -106,7 +107,7 @@ class BulkWrite
         $connection = Ioc::make(Pool::class)->getConnection();
         $manager = $connection->getRawManager();
 
-        $namespace = $connection->defaultDatabase . '.' . $this->schema->collection;
+        $namespace = $connection->defaultDatabase.'.'.$this->schema->collection;
 
         return $manager->executeBulkWrite(
             $namespace,

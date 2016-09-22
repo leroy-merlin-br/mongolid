@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Illuminate\Container\Container;
@@ -22,34 +23,32 @@ use Mongolid\Util\CacheComponentInterface;
  * @example
  *     (new Mongolid\Manager)->addConnection(new Connection);
  *     // And then start persisting and querying your models.
- *
- * @package Mongolid
  */
 class Manager
 {
     /**
-     * Singleton instance of the manager
+     * Singleton instance of the manager.
      *
      * @var Manager
      */
     protected static $singleton;
 
     /**
-     * Container being used by Mongolid
+     * Container being used by Mongolid.
      *
      * @var \Illuminate\Contracts\Container
      */
     public $container;
 
     /**
-     * Mongolid connection pool being object
+     * Mongolid connection pool being object.
      *
      * @var Pool
      */
     public $connectionPool;
 
     /**
-     * Mongolid cache component object
+     * Mongolid cache component object.
      *
      * @var CacheComponent
      */
@@ -57,7 +56,7 @@ class Manager
 
     /**
      * Stores the schemas that have been registered for later use. This may be
-     * useful when using Mongolid DataMapper pattern
+     * useful when using Mongolid DataMapper pattern.
      *
      * @var array
      */
@@ -68,9 +67,9 @@ class Manager
      * pure PHP. After adding a connection into the Manager you are ready to
      * persist and query your models.
      *
-     * @param  Connection $connection Connection instance to be used in database interactions.
+     * @param Connection $connection Connection instance to be used in database interactions.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function addConnection(Connection $connection): bool
     {
@@ -81,7 +80,7 @@ class Manager
     }
 
     /**
-     * Get the raw MongoDB connection
+     * Get the raw MongoDB connection.
      *
      * @return \MongoDB\Client
      */
@@ -102,16 +101,16 @@ class Manager
     public function setEventTrigger(EventTriggerInterface $eventTrigger)
     {
         $this->init();
-        $eventService = new EventTriggerService;
+        $eventService = new EventTriggerService();
         $eventService->registerEventDispatcher($eventTrigger);
 
         $this->container->instance(EventTriggerService::class, $eventService);
     }
 
     /**
-     * Allow document Schemas to be registered for later use
+     * Allow document Schemas to be registered for later use.
      *
-     * @param  Schema $schema Schema being registered.
+     * @param Schema $schema Schema being registered.
      *
      * @return void
      */
@@ -125,9 +124,9 @@ class Manager
      * if the Schema for that entity has been previously registered with
      * registerSchema() method.
      *
-     * @param  string $entityClass Class of the entity that needs to be mapped.
+     * @param string $entityClass Class of the entity that needs to be mapped.
      *
-     * @return DataMapper|null     DataMapper configured for the $entityClass.
+     * @return DataMapper|null DataMapper configured for the $entityClass.
      */
     public function getMapper(string $entityClass)
     {
@@ -137,12 +136,10 @@ class Manager
 
             return $dataMapper;
         }
-
-        return null;
     }
 
     /**
-     * Initializes the Mongolid manager
+     * Initializes the Mongolid manager.
      *
      * @return void
      */
@@ -152,9 +149,9 @@ class Manager
             return;
         }
 
-        $this->container      = new Container;
-        $this->connectionPool = new Pool;
-        $this->cacheComponent = new CacheComponent;
+        $this->container = new Container();
+        $this->connectionPool = new Pool();
+        $this->cacheComponent = new CacheComponent();
 
         $this->container->instance(Pool::class, $this->connectionPool);
         $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);

@@ -1,10 +1,11 @@
 <?php
+
 namespace Mongolid\Exception;
 
 use RuntimeException;
 
 /**
- * Model could not be found
+ * Model could not be found.
  */
 class ModelNotFoundException extends RuntimeException
 {

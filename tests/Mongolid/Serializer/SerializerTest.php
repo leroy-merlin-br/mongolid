@@ -1,13 +1,13 @@
 <?php
+
 namespace Mongolid\Serializer;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID as MongoObjectID;
 use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 /**
- * Test case for Serializer class
+ * Test case for Serializer class.
  */
 class SerializerTest extends TestCase
 {
@@ -22,11 +22,11 @@ class SerializerTest extends TestCase
 
     public function testSerializeShouldCallConvertAndReturnStringSuccessfully()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
@@ -41,11 +41,11 @@ class SerializerTest extends TestCase
 
     public function testUnserializeShouldParseStringAndCallConverterSuccessfully()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toMongoTypes')
             ->with($attributes)
@@ -60,11 +60,11 @@ class SerializerTest extends TestCase
 
     public function testConvertShouldConvertObjectsToDomainTypes()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['some', 'attributes'];
-        $replaced   = ['awsome', 'attrs'];
+        $replaced = ['awsome', 'attrs'];
 
         $converter->shouldReceive('toDomainTypes')
             ->with($attributes)
@@ -76,11 +76,11 @@ class SerializerTest extends TestCase
 
     public function testUnconvertShouldConvertObjectsToMongoTypes()
     {
-        $converter  = m::mock(Converter::class);
+        $converter = m::mock(Converter::class);
         $serializer = new Serializer($converter);
 
         $attributes = ['awsome', 'attrs'];
-        $replaced   = ['some', 'attributes'];
+        $replaced = ['some', 'attributes'];
 
         $converter->shouldReceive('toMongoTypes')
             ->with($attributes)

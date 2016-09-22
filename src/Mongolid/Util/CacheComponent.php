@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 /**
@@ -24,7 +25,7 @@ class CacheComponent implements CacheComponentInterface
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string $key Cache key of the item to be retrieved.
+     * @param string $key Cache key of the item to be retrieved.
      *
      * @return mixed
      */
@@ -55,7 +56,7 @@ class CacheComponent implements CacheComponentInterface
      * if the ttl of the given cache key has been expired and will free the
      * memory if so.
      *
-     * @param  string $key Cache key of the item.
+     * @param string $key Cache key of the item.
      *
      * @return bool Has cache key.
      */
@@ -77,7 +78,8 @@ class CacheComponent implements CacheComponentInterface
      * Return the current time in order to check ttl.
      *
      * @codeCoverageIgnore
-     * @return integer Return current Unix timestamp.
+     *
+     * @return int Return current Unix timestamp.
      */
     protected function time()
     {

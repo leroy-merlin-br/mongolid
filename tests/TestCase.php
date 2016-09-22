@@ -1,16 +1,16 @@
 <?php
 
-use MongoDB\BSON\ObjectID;
 
 class TestCase extends PHPUnit_Framework_TestCase
 {
     /**
      * Setup.
-     * @return  false
+     *
+     * @return false
      */
     public function setUp()
     {
-        require __DIR__ . '/../bootstrap/bootstrap.php';
+        require __DIR__.'/../bootstrap/bootstrap.php';
 
         return false;
     }
@@ -19,8 +19,8 @@ class TestCase extends PHPUnit_Framework_TestCase
      * Assert if two queries are equals. It will compare ObjectIDs within any
      * level of the query and make sure that they are the same.
      *
-     * @param  mixed $expectedQuery Correct query.
-     * @param  mixed $query         Query being evaluated.
+     * @param mixed $expectedQuery Correct query.
+     * @param mixed $query         Query being evaluated.
      *
      * @return void
      */
@@ -28,7 +28,7 @@ class TestCase extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
 
-        if (! is_array($expectedQuery)) {
+        if (!is_array($expectedQuery)) {
             return;
         }
 
@@ -36,7 +36,7 @@ class TestCase extends PHPUnit_Framework_TestCase
             if (is_object($value)) {
                 $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
 
-                if (method_exists($value , '__toString')) {
+                if (method_exists($value, '__toString')) {
                     $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
                 }
             }
@@ -49,12 +49,14 @@ class TestCase extends PHPUnit_Framework_TestCase
 
     /**
      * Actually runs a protected method of the given object.
+     *
      * @param       $obj
      * @param       $method
      * @param array $args
+     *
      * @return mixed
      */
-    protected function callProtected($obj, $method, $args = array())
+    protected function callProtected($obj, $method, $args = [])
     {
         $methodObj = new ReflectionMethod(get_class($obj), $method);
         $methodObj->setAccessible(true);
@@ -69,11 +71,11 @@ class TestCase extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Set a protected property of an object
+     * Set a protected property of an object.
      *
-     * @param  mixed  $obj      Object Instance.
-     * @param  string $property Property name.
-     * @param  mixed  $value    Value to be set.
+     * @param mixed  $obj      Object Instance.
+     * @param string $property Property name.
+     * @param mixed  $value    Value to be set.
      *
      * @return void
      */
@@ -85,6 +87,7 @@ class TestCase extends PHPUnit_Framework_TestCase
 
         if (is_string($obj)) { // static
             $property->setValue($value);
+
             return;
         }
 
@@ -92,10 +95,10 @@ class TestCase extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Get a protected property of an object
+     * Get a protected property of an object.
      *
-     * @param  mixed  $obj      Object Instance.
-     * @param  string $property Property name.
+     * @param mixed  $obj      Object Instance.
+     * @param string $property Property name.
      *
      * @return mixed Property value.
      */

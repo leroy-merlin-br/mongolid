@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
@@ -12,13 +13,11 @@ use Traversable;
  * cursor. But upon it's creation it will already retrieve documents from the
  * database and store the retrieved documents. By doing this, it is possible
  * to serialize the results and save for later use.
- *
- * @package Mongolid
  */
 class CacheableCursor extends Cursor
 {
     /**
-     * The documents that were retrieved from the database in a serializable way
+     * The documents that were retrieved from the database in a serializable way.
      *
      * @var array
      */
@@ -36,7 +35,7 @@ class CacheableCursor extends Cursor
      * Means that the CacheableCursor is wapping the original cursor and not
      * reading from Cache anymore.
      *
-     * @var boolean
+     * @var bool
      */
     protected $ignoreCache = false;
 
@@ -70,7 +69,7 @@ class CacheableCursor extends Cursor
 
         // Check if there is a cached set of documents
         $cacheComponent = Ioc::make(CacheComponentInterface::class);
-        $cacheKey       = $this->generateCacheKey();
+        $cacheKey = $this->generateCacheKey();
 
         if ($this->documents = $cacheComponent->get($cacheKey, null)) {
             return $this->documents = new ArrayIterator($this->documents);
@@ -139,7 +138,7 @@ class CacheableCursor extends Cursor
 
     /**
      * Returns the DriverCursor considering the documents that have already
-     * been retrieved from cache
+     * been retrieved from cache.
      *
      * @return Traversable
      */

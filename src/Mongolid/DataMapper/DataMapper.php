@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
@@ -21,27 +22,25 @@ use Mongolid\Util\ObjectIdUtils;
  * from the database.
  * The DataMapper will always use a Schema trough the SchemaMapper to parse the
  * document in and out of the database.
- *
- * @package  Mongolid
  */
 class DataMapper implements HasSchemaInterface
 {
     /**
-     * Name of the schema class to be used
+     * Name of the schema class to be used.
      *
      * @var string
      */
     public $schemaClass = Schema::class;
 
     /**
-     * Schema object. Will be set after the $schemaClass
+     * Schema object. Will be set after the $schemaClass.
      *
      * @var Schema
      */
     protected $schema;
 
     /**
-     * Connections that are going to be used to interact with the database
+     * Connections that are going to be used to interact with the database.
      *
      * @var Pool
      */
@@ -55,7 +54,7 @@ class DataMapper implements HasSchemaInterface
     protected $assembler;
 
     /**
-     * In order to dispatch events when necessary
+     * In order to dispatch events when necessary.
      *
      * @var EventTriggerService
      */
@@ -75,8 +74,8 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      *
-     * @param  mixed $entity  The entity used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  The entity used in the operation.
+     * @param array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -116,9 +115,9 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      *
-     * @param  mixed   $entity     The entity used in the operation.
-     * @param  array   $options    Possible options to send to mongo driver.
-     * @param  boolean $fireEvents Whether events should be fired.
+     * @param mixed $entity     The entity used in the operation.
+     * @param array $options    Possible options to send to mongo driver.
+     * @param bool  $fireEvents Whether events should be fired.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -155,8 +154,8 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      *
-     * @param  mixed $entity  The entity used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  The entity used in the operation.
+     * @param array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
@@ -166,7 +165,7 @@ class DataMapper implements HasSchemaInterface
             return false;
         }
 
-        if (! $entity->_id) {
+        if (!$entity->_id) {
             if ($result = $this->insert($entity, $options, false)) {
                 $this->afterSuccess($entity);
 
@@ -200,10 +199,10 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
      *
-     * @param  mixed $entity  The entity used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  The entity used in the operation.
+     * @param array $options Possible options to send to mongo driver.
      *
-     * @return boolean Success (but always false if write concern is Unacknowledged)
+     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function delete($entity, array $options = []): bool
     {
@@ -231,11 +230,11 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieve a database cursor that will return $this->schema->entityClass
-     * objects that upon iteration
+     * objects that upon iteration.
      *
-     * @param  mixed   $query      MongoDB query to retrieve documents.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $cacheable  Retrieves a CacheableCursor instead.
+     * @param mixed $query      MongoDB query to retrieve documents.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $cacheable  Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -244,7 +243,6 @@ class DataMapper implements HasSchemaInterface
         array $projection = [],
         bool $cacheable = false
     ): Cursor {
-
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         $cursor = new $cursorClass(
@@ -262,7 +260,7 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieve a database cursor that will return all documents as
-     * $this->schema->entityClass objects upon iteration
+     * $this->schema->entityClass objects upon iteration.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -273,11 +271,11 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieve one $this->schema->entityClass objects that matches the given
-     * query
+     * query.
      *
-     * @param  mixed   $query      MongoDB query to retrieve the document.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $cacheable  Retrieves the first through a CacheableCursor.
+     * @param mixed $query      MongoDB query to retrieve the document.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $cacheable  Retrieves the first through a CacheableCursor.
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -295,10 +293,10 @@ class DataMapper implements HasSchemaInterface
             ['projection' => $this->prepareProjection($projection)]
         );
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array)$document);
+        $document = Ioc::make(Converter::class)->toDomainTypes((array) $document);
 
-        if (! $document) {
-            return null;
+        if (!$document) {
+            return;
         }
 
         $model = $this->getAssembler()->assemble($document, $this->schema);
@@ -310,9 +308,9 @@ class DataMapper implements HasSchemaInterface
      * Retrieve one $this->schema->entityClass objects that matches the given
      * query. If no document was found, throws ModelNotFoundException.
      *
-     * @param  mixed   $query      MongoDB query to retrieve the document.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $cacheable  Retrieves the first through a CacheableCursor.
+     * @param mixed $query      MongoDB query to retrieve the document.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $cacheable  Retrieves the first through a CacheableCursor.
      *
      * @throws ModelNotFoundException If no document was found.
      *
@@ -327,15 +325,15 @@ class DataMapper implements HasSchemaInterface
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel($this->schema->entityClass);
+        throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
     }
 
     /**
-     * Parses an object with SchemaMapper and the given Schema
+     * Parses an object with SchemaMapper and the given Schema.
      *
-     * @param  mixed $entity The object to be parsed.
+     * @param mixed $entity The object to be parsed.
      *
-     * @return array  Document
+     * @return array Document
      */
     protected function parseToDocument($entity)
     {
@@ -352,13 +350,13 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Returns a SchemaMapper with the $schema or $schemaClass instance
+     * Returns a SchemaMapper with the $schema or $schemaClass instance.
      *
      * @return SchemaMapper
      */
     protected function getSchemaMapper()
     {
-        if (! $this->schema) {
+        if (!$this->schema) {
             $this->schema = Ioc::make($this->schemaClass);
         }
 
@@ -384,13 +382,13 @@ class DataMapper implements HasSchemaInterface
      * This method will take care of converting a single value into a query for
      * an _id, including when a objectId is passed as a string.
      *
-     * @param  mixed $value The _id of the document.
+     * @param mixed $value The _id of the document.
      *
      * @return array Query for the given _id
      */
     protected function prepareValueQuery($value): array
     {
-        if (! is_array($value)) {
+        if (!is_array($value)) {
             $value = ['_id' => $value];
         }
 
@@ -416,7 +414,7 @@ class DataMapper implements HasSchemaInterface
      * Prepares an embedded array of an query. It will convert string ObjectIDs
      * in operators into actual objects.
      *
-     * @param  array $value Array that will be treated.
+     * @param array $value Array that will be treated.
      *
      * @return array Prepared array.
      */
@@ -438,13 +436,13 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Retrieves an EntityAssembler instance
+     * Retrieves an EntityAssembler instance.
      *
      * @return EntityAssembler
      */
     protected function getAssembler()
     {
-        if (! $this->assembler) {
+        if (!$this->assembler) {
             $this->assembler = Ioc::make(EntityAssembler::class);
         }
 
@@ -454,15 +452,15 @@ class DataMapper implements HasSchemaInterface
     /**
      * Triggers an event. May return if that event had success.
      *
-     * @param  string  $event  Identification of the event.
-     * @param  mixed   $entity Event payload.
-     * @param  boolean $halt   True if the return of the event handler will be used in a conditional.
+     * @param string $event  Identification of the event.
+     * @param mixed  $entity Event payload.
+     * @param bool   $halt   True if the return of the event handler will be used in a conditional.
      *
-     * @return mixed            Event handler return.
+     * @return mixed Event handler return.
      */
     protected function fireEvent(string $event, $entity, bool $halt = false)
     {
-        $event = "mongolid.{$event}: " . get_class($entity);
+        $event = "mongolid.{$event}: ".get_class($entity);
 
         $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
 
@@ -470,7 +468,7 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Converts the given projection fields to Mongo driver format
+     * Converts the given projection fields to Mongo driver format.
      *
      * How to use:
      *     As Mongo projection using boolean values:
@@ -486,7 +484,7 @@ class DataMapper implements HasSchemaInterface
      *         From: ['name', '-_id']
      *         To:   ['name' => true, '_id' => false]
      *
-     * @param  array $fields Fields to project.
+     * @param array $fields Fields to project.
      *
      * @throws InvalidArgumentException If the given $fields are not a valid projection.
      *
@@ -501,13 +499,13 @@ class DataMapper implements HasSchemaInterface
                     $projection[$key] = $value;
                     continue;
                 }
-                if (is_integer($value)) {
+                if (is_int($value)) {
                     $projection[$key] = ($value >= 1);
                     continue;
                 }
             }
 
-            if (is_integer($key) && is_string($value)) {
+            if (is_int($key) && is_string($value)) {
                 $key = $value;
                 if (strpos($value, '-') === 0) {
                     $key = substr($key, 1);
@@ -566,7 +564,7 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Set a Schema object  that describes an Entity in MongoDB
+     * Set a Schema object  that describes an Entity in MongoDB.
      *
      * @param Schema $schema
      */
