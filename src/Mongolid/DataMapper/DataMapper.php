@@ -75,21 +75,21 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      *
-     * @param  mixed $object  The object used in the operation.
+     * @param  mixed $entity  The entity used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($object, array $options = [])
+    public function save($entity, array $options = [])
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
         // listeners to cancel save operations if validations fail or whatever.
-        if ($this->fireEvent('saving', $object, true) === false) {
+        if ($this->fireEvent('saving', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->replaceOne(
             ['_id' => $data['_id']],
@@ -101,9 +101,9 @@ class DataMapper implements HasSchemaInterface
             ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
 
         if ($result) {
-            $this->afterSuccess($object);
+            $this->afterSuccess($entity);
 
-            $this->fireEvent('saved', $object);
+            $this->fireEvent('saved', $entity);
         }
 
         return $result;
@@ -116,19 +116,19 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      *
-     * @param  mixed   $object     The object used in the operation.
+     * @param  mixed   $entity     The entity used in the operation.
      * @param  array   $options    Possible options to send to mongo driver.
      * @param  boolean $fireEvents Whether events should be fired.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object, array $options = [], bool $fireEvents = true): bool
+    public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
-        if ($fireEvents && $this->fireEvent('inserting', $object, true) === false) {
+        if ($fireEvents && $this->fireEvent('inserting', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->insertOne(
             $data,
@@ -138,10 +138,10 @@ class DataMapper implements HasSchemaInterface
         $result = $queryResult->isAcknowledged() && $queryResult->getInsertedCount();
 
         if ($result) {
-            $this->afterSuccess($object);
+            $this->afterSuccess($entity);
 
             if ($fireEvents) {
-                $this->fireEvent('inserted', $object);
+                $this->fireEvent('inserted', $entity);
             }
         }
 
@@ -155,28 +155,28 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      *
-     * @param  mixed $object  The object used in the operation.
+     * @param  mixed $entity  The entity used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function update($object, array $options = []): bool
+    public function update($entity, array $options = []): bool
     {
-        if ($this->fireEvent('updating', $object, true) === false) {
+        if ($this->fireEvent('updating', $entity, true) === false) {
             return false;
         }
 
-        if (! $object->_id) {
-            if ($result = $this->insert($object, $options, false)) {
-                $this->afterSuccess($object);
+        if (! $entity->_id) {
+            if ($result = $this->insert($entity, $options, false)) {
+                $this->afterSuccess($entity);
 
-                $this->fireEvent('updated', $object);
+                $this->fireEvent('updated', $entity);
             }
 
             return $result;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
@@ -187,9 +187,9 @@ class DataMapper implements HasSchemaInterface
         $result = $queryResult->isAcknowledged() && $queryResult->getModifiedCount();
 
         if ($result) {
-            $this->afterSuccess($object);
+            $this->afterSuccess($entity);
 
-            $this->fireEvent('updated', $object);
+            $this->fireEvent('updated', $entity);
         }
 
         return $result;
@@ -200,18 +200,18 @@ class DataMapper implements HasSchemaInterface
      *
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
      *
-     * @param  mixed $object  The object used in the operation.
+     * @param  mixed $entity  The entity used in the operation.
      * @param  array $options Possible options to send to mongo driver.
      *
      * @return boolean Success (but always false if write concern is Unacknowledged)
      */
-    public function delete($object, array $options = []): bool
+    public function delete($entity, array $options = []): bool
     {
-        if ($this->fireEvent('deleting', $object, true) === false) {
+        if ($this->fireEvent('deleting', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->deleteOne(
             ['_id' => $data['_id']],
@@ -221,7 +221,7 @@ class DataMapper implements HasSchemaInterface
         if ($queryResult->isAcknowledged() &&
             $queryResult->getDeletedCount()
         ) {
-            $this->fireEvent('deleted', $object);
+            $this->fireEvent('deleted', $entity);
 
             return true;
         }
@@ -334,18 +334,18 @@ class DataMapper implements HasSchemaInterface
     /**
      * Parses an object with SchemaMapper and the given Schema
      *
-     * @param  mixed $object The object to be parsed.
+     * @param  mixed $entity The object to be parsed.
      *
      * @return array  Document
      */
-    protected function parseToDocument($object)
+    protected function parseToDocument($entity)
     {
         $schemaMapper = $this->getSchemaMapper();
-        $parsedDocument = $schemaMapper->map($object);
+        $parsedDocument = $schemaMapper->map($entity);
 
-        if (is_object($object)) {
+        if (is_object($entity)) {
             foreach ($parsedDocument as $field => $value) {
-                $object->$field = $value;
+                $entity->$field = $value;
             }
         }
 
@@ -549,12 +549,12 @@ class DataMapper implements HasSchemaInterface
     /**
      * Perform actions on object before firing the after event.
      *
-     * @param mixed $object
+     * @param mixed $entity
      */
-    private function afterSuccess($object)
+    private function afterSuccess($entity)
     {
-        if ($object instanceof AttributesAccessInterface) {
-            $object->syncOriginalAttributes();
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->syncOriginalAttributes();
         }
     }
 

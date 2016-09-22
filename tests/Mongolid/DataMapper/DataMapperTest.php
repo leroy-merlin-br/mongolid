@@ -46,7 +46,7 @@ class DataMapperTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldSave($object, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -57,14 +57,14 @@ class DataMapperTest extends TestCase
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $object->_id = null;
+        $entity->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -86,28 +86,28 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventToBeFired('saving', $object, true);
+        $this->expectEventToBeFired('saving', $entity, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('saved', $object, false);
+            $this->expectEventToBeFired('saved', $entity, false);
         } else {
-            $this->expectEventNotToBeFired('saved', $object);
+            $this->expectEventNotToBeFired('saved', $entity);
         }
 
         // Assert
-        $this->assertEquals($expected, $mapper->save($object, $options));
+        $this->assertEquals($expected, $mapper->save($entity, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsert($object, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -118,14 +118,14 @@ class DataMapperTest extends TestCase
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $object->_id = null;
+        $entity->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -144,28 +144,28 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventToBeFired('inserting', $object, true);
+        $this->expectEventToBeFired('inserting', $entity, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('inserted', $object, false);
+            $this->expectEventToBeFired('inserted', $entity, false);
         } else {
-            $this->expectEventNotToBeFired('inserted', $object);
+            $this->expectEventNotToBeFired('inserted', $entity);
         }
 
         // Assert
-        $this->assertEquals($expected, $mapper->insert($object, $options));
+        $this->assertEquals($expected, $mapper->insert($entity, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsertWithoutFiringEvents($object, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -176,14 +176,14 @@ class DataMapperTest extends TestCase
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $object->_id = null;
+        $entity->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -202,23 +202,23 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventNotToBeFired('inserting', $object);
-        $this->expectEventNotToBeFired('inserted', $object);
+        $this->expectEventNotToBeFired('inserting', $entity);
+        $this->expectEventNotToBeFired('inserted', $entity);
 
         // Assert
-        $this->assertEquals($expected, $mapper->insert($object, $options, false));
+        $this->assertEquals($expected, $mapper->insert($entity, $options, false));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldUpdate($object, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -229,14 +229,14 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $object->_id = 123;
+        $entity->_id = 123;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -258,29 +258,29 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getModifiedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventToBeFired('updating', $object, true);
+        $this->expectEventToBeFired('updating', $entity, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('updated', $object, false);
+            $this->expectEventToBeFired('updated', $entity, false);
         } else {
-            $this->expectEventNotToBeFired('updated', $object);
+            $this->expectEventNotToBeFired('updated', $entity);
         }
 
         // Assert
-        $this->assertEquals($expected, $mapper->update($object, $options));
+        $this->assertEquals($expected, $mapper->update($entity, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
-        $object,
+        $entity,
         $writeConcern,
         $shouldFireEventAfter,
         $expected
@@ -294,14 +294,14 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $object->_id = null;
+        $entity->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -322,31 +322,31 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventToBeFired('updating', $object, true);
+        $this->expectEventToBeFired('updating', $entity, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('updated', $object, false);
+            $this->expectEventToBeFired('updated', $entity, false);
         } else {
-            $this->expectEventNotToBeFired('updated', $object);
+            $this->expectEventNotToBeFired('updated', $entity);
         }
 
-        $this->expectEventNotToBeFired('inserting', $object);
-        $this->expectEventNotToBeFired('inserted', $object);
+        $this->expectEventNotToBeFired('inserting', $entity);
+        $this->expectEventNotToBeFired('inserted', $entity);
 
         // Assert
-        $this->assertEquals($expected, $mapper->update($object, $options));
+        $this->assertEquals($expected, $mapper->update($entity, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldDelete($object, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connPool = m::mock(Pool::class);
@@ -357,14 +357,14 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $object->_id = null;
+        $entity->_id = null;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
         $mapper->shouldReceive('parseToDocument')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedObject);
 
         $mapper->shouldReceive('getCollection')
@@ -383,22 +383,22 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getDeletedCount')
             ->andReturn(1);
 
-        if ($object instanceof AttributesAccessInterface) {
-            $object->shouldReceive('syncOriginalAttributes')
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
         }
 
-        $this->expectEventToBeFired('deleting', $object, true);
+        $this->expectEventToBeFired('deleting', $entity, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('deleted', $object, false);
+            $this->expectEventToBeFired('deleted', $entity, false);
         } else {
-            $this->expectEventNotToBeFired('deleted', $object);
+            $this->expectEventNotToBeFired('deleted', $entity);
         }
 
         // Assert
-        $this->assertEquals($expected, $mapper->delete($object, $options));
+        $this->assertEquals($expected, $mapper->delete($entity, $options));
     }
 
     /**
@@ -413,13 +413,13 @@ class DataMapperTest extends TestCase
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connPool]);
         $collection = m::mock(Collection::class);
-        $object = m::mock();
+        $entity = m::mock();
 
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
         $mapper->shouldReceive('parseToDocument')
-            ->with($object)
+            ->with($entity)
             ->never();
 
         $mapper->shouldReceive('getCollection')
@@ -429,10 +429,10 @@ class DataMapperTest extends TestCase
             ->never();
 
         /* "Mocks" the fireEvent to return false and bail the operation */
-        $this->expectEventToBeFired($eventName, $object, true, false);
+        $this->expectEventToBeFired($eventName, $entity, true, false);
 
         // Act
-        $result = $mapper->$operation($object);
+        $result = $mapper->$operation($entity);
 
         // Assert
         $this->assertFalse($result);
@@ -693,7 +693,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class . '[getSchemaMapper]', [$connPool]);
-        $object = m::mock();
+        $entity = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
         $schemaMapper = m::mock(Schema::class . '[]');
 
@@ -706,17 +706,17 @@ class DataMapperTest extends TestCase
 
         $schemaMapper->shouldReceive('map')
             ->once()
-            ->with($object)
+            ->with($entity)
             ->andReturn($parsedDocument);
 
         // Act
-        $result = $this->callProtected($mapper, 'parseToDocument', $object);
+        $result = $this->callProtected($mapper, 'parseToDocument', $entity);
 
         // Assert
         $this->assertEquals($parsedDocument, $result);
         $this->assertEquals(
             'bacon', // Since this was the parsedDocument _id
-            $object->_id
+            $entity->_id
         );
     }
 
