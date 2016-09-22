@@ -9,20 +9,18 @@ use Mongolid\Connection\Pool;
  * Sequence service will manage and provide auto-increment sequences to be used
  * by the models. It can be useful for objects which the _id must be an integer
  * sequence.
- *
- * @package Mongolid
  */
 class SequenceService
 {
     /**
-     * Sequences collection name on MongoDB. Default 'mongolid_sequences'
+     * Sequences collection name on MongoDB. Default 'mongolid_sequences'.
      *
      * @var string
      */
     protected $collection;
 
     /**
-     * Connections that are going to be used to interact with the database
+     * Connections that are going to be used to interact with the database.
      *
      * @var Pool
      */
@@ -34,22 +32,22 @@ class SequenceService
      */
     public function __construct(Pool $connPool, string $collection = 'mongolid_sequences')
     {
-        $this->connPool   = $connPool;
+        $this->connPool = $connPool;
         $this->collection = $collection;
     }
 
     /**
-     * Get next value for the sequence
+     * Get next value for the sequence.
      *
      * @param string $sequenceName Sequence identifier string.
      *
-     * @return integer
+     * @return int
      */
     public function getNextValue(string $sequenceName): int
     {
         $sequenceValue = $this->rawCollection()->findOneAndUpdate(
             ['_id' => $sequenceName],
-            ['$inc' => ['seq' => 1]],
+            ['$inc'   => ['seq' => 1]],
             ['upsert' => true]
         );
 
@@ -61,13 +59,13 @@ class SequenceService
     }
 
     /**
-     * Get the actual MongoDB Collection object
+     * Get the actual MongoDB Collection object.
      *
      * @return Collection
      */
     protected function rawCollection(): Collection
     {
-        $conn     = $this->connPool->getConnection();
+        $conn = $this->connPool->getConnection();
         $database = $conn->defaultDatabase;
 
         return $conn->getRawConnection()->$database->{$this->collection};

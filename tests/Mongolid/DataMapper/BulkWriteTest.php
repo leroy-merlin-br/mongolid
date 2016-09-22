@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
@@ -58,7 +59,7 @@ class BulkWriteTest extends TestCase
     {
         // Arrange
         $entity = m::mock(HasSchemaInterface::class);
-        $mongoBulkWrite = m::mock(new MongoBulkWrite);
+        $mongoBulkWrite = m::mock(new MongoBulkWrite());
 
         $id = '123';
         $data = ['name' => 'John'];
@@ -71,7 +72,7 @@ class BulkWriteTest extends TestCase
             ->once()
             ->with(['_id' => $id], ['$set' => $data], ['upsert' => true]);
 
-        $bulkWrite = m::mock(BulkWrite::class . '[getBulkWrite]', [$entity]);
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
         $bulkWrite->shouldReceive('getBulkWrite')
             ->once()
@@ -87,7 +88,7 @@ class BulkWriteTest extends TestCase
         $entity = m::mock(HasSchemaInterface::class);
         $schema = m::mock(Schema::class);
         $entity->schema = $schema;
-        $mongoBulkWrite = m::mock(new MongoBulkWrite);
+        $mongoBulkWrite = m::mock(new MongoBulkWrite());
         $pool = m::mock(Pool::class);
         $connection = m::mock(Connection::class);
         $manager = m::mock(Manager::class);
@@ -119,7 +120,7 @@ class BulkWriteTest extends TestCase
             ->with($namespace, $mongoBulkWrite, m::type(WriteConcern::class))
             ->andReturn(true);
 
-        $bulkWrite = m::mock(BulkWrite::class . '[getBulkWrite]', [$entity]);
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
         $bulkWrite->shouldReceive('getBulkWrite')
             ->once()

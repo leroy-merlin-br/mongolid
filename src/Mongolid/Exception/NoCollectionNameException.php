@@ -5,9 +5,7 @@ namespace Mongolid\Exception;
 use Exception;
 
 /**
- * Class NoCollectionNameException
- *
- * @package Mongolid\Exception
+ * Class NoCollectionNameException.
  */
 class NoCollectionNameException extends Exception
 {

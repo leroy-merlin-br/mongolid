@@ -87,7 +87,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $cursor     = $this->getCursor(null, $collection);
+        $cursor = $this->getCursor(null, $collection);
 
         // Act
         $collection->shouldReceive('count')
@@ -102,9 +102,9 @@ class CursorTest extends TestCase
     public function testShouldRewind()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
@@ -120,9 +120,9 @@ class CursorTest extends TestCase
     public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
@@ -131,7 +131,7 @@ class CursorTest extends TestCase
             ->twice()
             ->andReturnUsing(function () use ($cursor) {
                 if ($this->getProtected($cursor, 'cursor')) {
-                    throw new LogicException("Cursor already initialized", 1);
+                    throw new LogicException('Cursor already initialized', 1);
                 }
             });
 
@@ -143,10 +143,10 @@ class CursorTest extends TestCase
     public function testShouldGetCurrent()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $converter    = m::mock(Converter::class.'[toDomainTypes]');
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $converter = m::mock(Converter::class.'[toDomainTypes]');
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         Ioc::instance(Converter::class, $converter);
@@ -169,12 +169,12 @@ class CursorTest extends TestCase
     public function testShouldGetCurrentUsingActiveRecordClasses()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
-        $entity       = m::mock(ActiveRecord::class . '[]');
+        $collection = m::mock(Collection::class);
+        $entity = m::mock(ActiveRecord::class.'[]');
         $entity->name = 'John Doe';
         $driverCursor = new ArrayIterator([$entity]);
-        $converter    = m::mock(Converter::class.'[toDomainTypes]');
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $converter = m::mock(Converter::class.'[toDomainTypes]');
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         Ioc::instance(Converter::class, $converter);
@@ -193,10 +193,10 @@ class CursorTest extends TestCase
     public function testShouldGetFirst()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $converter    = m::mock(Converter::class.'[toDomainTypes]');
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $converter = m::mock(Converter::class.'[toDomainTypes]');
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         Ioc::instance(Converter::class, $converter);
@@ -222,9 +222,9 @@ class CursorTest extends TestCase
     public function testShouldGetFirstWhenEmpty()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('rewind')
@@ -243,7 +243,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor();
+        $cursor = $this->getCursor();
         $this->setProtected($cursor, 'cursor', $driverCursor);
 
         // Assert
@@ -265,9 +265,9 @@ class CursorTest extends TestCase
     public function testShouldImplementNextMethodFromIterator()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
 
@@ -283,9 +283,9 @@ class CursorTest extends TestCase
     public function testShouldImplementValidMethodFromIterator()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('valid')
@@ -298,10 +298,10 @@ class CursorTest extends TestCase
     public function testShouldWrapMongoDriverCursorWithIteratoriterator()
     {
         // Arrange
-        $collection     = m::mock(Collection::class);
-        $converter      = m::mock(Converter::class);
-        $cursor         = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
-        $driverCursor   = m::mock(Traversable::class);
+        $collection = m::mock(Collection::class);
+        $converter = m::mock(Converter::class);
+        $cursor = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
+        $driverCursor = m::mock(Traversable::class);
         $driverIterator = m::mock(Iterator::class);
 
         // Act
@@ -334,9 +334,9 @@ class CursorTest extends TestCase
     public function testShouldReturnAllResults()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('rewind', 'valid', 'key')
@@ -367,9 +367,9 @@ class CursorTest extends TestCase
     public function testShouldReturnResultsToArray()
     {
         // Arrange
-        $collection   = m::mock(Collection::class);
+        $collection = m::mock(Collection::class);
         $driverCursor = m::mock(IteratorIterator::class);
-        $cursor       = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->shouldReceive('rewind', 'valid', 'key')
@@ -400,10 +400,10 @@ class CursorTest extends TestCase
     public function testShouldSerializeAnActiveCursor()
     {
         // Arrange
-        $pool             = m::mock(Pool::class);
-        $conn             = m::mock(Connection::class);
-        $schema           = new DynamicSchema;
-        $cursor           = $this->getCursor($schema, null, 'find', [[]]);
+        $pool = m::mock(Pool::class);
+        $conn = m::mock(Connection::class);
+        $schema = new DynamicSchema();
+        $cursor = $this->getCursor($schema, null, 'find', [[]]);
         $driverCollection = $this->getDriverCollection();
 
         $this->setProtected($cursor, 'collection', $driverCollection);
@@ -418,8 +418,8 @@ class CursorTest extends TestCase
             ->andReturn($conn);
 
         $conn->defaultDatabase = 'db';
-        $conn->db              = $conn;
-        $conn->my_collection   = $driverCollection; // Return the same driver Collection
+        $conn->db = $conn;
+        $conn->my_collection = $driverCollection; // Return the same driver Collection
 
         // Assert
         $result = unserialize(serialize($cursor));
@@ -433,20 +433,20 @@ class CursorTest extends TestCase
         $params = [[]],
         $driverCursor = null
     ) {
-        if (! $entitySchema) {
-            $entitySchema = m::mock(Schema::class . '[]');
+        if (!$entitySchema) {
+            $entitySchema = m::mock(Schema::class.'[]');
         }
 
-        if (! $collection) {
+        if (!$collection) {
             $collection = m::mock(Collection::class);
         }
 
-        if (! $driverCursor) {
+        if (!$driverCursor) {
             return new Cursor($entitySchema, $collection, $command, $params);
         }
 
         $mock = m::mock(
-            Cursor::class . '[getCursor]',
+            Cursor::class.'[getCursor]',
             [$entitySchema, $collection, $command, $params]
         );
 
@@ -465,15 +465,21 @@ class CursorTest extends TestCase
      */
     protected function getDriverCollection()
     {
-        /**
+        /*
          * Emulates a MongoDB\Collection non serializable behavior.
          */
-        return new class implements \Serializable {
-            public function serialize() {
-                throw new Exception("Unable to serialize", 1);
+        return new class() implements \Serializable {
+            public function serialize()
+            {
+                throw new Exception('Unable to serialize', 1);
             }
-            public function unserialize($serialized) {}
-            public function getCollectionName() {
+
+            public function unserialize($serialized)
+            {
+            }
+
+            public function getCollectionName()
+            {
                 return 'my_collection';
             }
         };

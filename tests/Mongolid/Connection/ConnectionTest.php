@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
@@ -20,7 +21,7 @@ class ConnectionTest extends TestCase
     {
         // Arrange
         $params = ['conn/my_db', ['options'], ['driver_opts']];
-        $mongoClient = new Client;
+        $mongoClient = new Client();
         $mongoManager = new Manager('mongodb://localhost:27017');
         $container = m::mock(Container::class);
         Ioc::setContainer($container);
@@ -52,7 +53,7 @@ class ConnectionTest extends TestCase
     public function testShouldGetRawConnection()
     {
         // Arrange
-        $mongoClient = new Client;
+        $mongoClient = new Client();
         $container = m::mock(Container::class)->makePartial();
         Ioc::setContainer($container);
 

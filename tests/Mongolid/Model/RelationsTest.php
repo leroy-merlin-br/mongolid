@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Mockery as m;
@@ -27,9 +28,9 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
-        $model         = m::mock(ActiveRecord::class.'[]');
-        $dataMapper    = m::mock(DataMapper::class)->makePartial();
-        $result        = m::mock();
+        $model = m::mock(ActiveRecord::class.'[]');
+        $dataMapper = m::mock(DataMapper::class)->makePartial();
+        $result = m::mock();
 
         $model->$field = $fieldValue;
 
@@ -41,8 +42,9 @@ class RelationsTest extends TestCase
             ->once()
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
+
                 return $result;
-            }) ;
+            });
 
         // Assert
         $this->assertSame(
@@ -58,9 +60,9 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
-        $model         = m::mock(ActiveRecord::class.'[]');
-        $dataMapper    = m::mock(DataMapper::class)->makePartial();
-        $result        = m::mock(Cursor::class);
+        $model = m::mock(ActiveRecord::class.'[]');
+        $dataMapper = m::mock(DataMapper::class)->makePartial();
+        $result = m::mock(Cursor::class);
 
         $model->$field = $fieldValue;
 
@@ -72,8 +74,9 @@ class RelationsTest extends TestCase
             ->once()
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
+
                 return $result;
-            }) ;
+            });
 
         // Assert
         $this->assertSame(
@@ -88,10 +91,10 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsOne($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model         = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(ActiveRecord::class.'[]');
         $cursorFactory = m::mock(CursorFactory::class);
-        $cursor        = m::mock(EmbeddedCursor::class);
-        $document      = $fieldValue;
+        $cursor = m::mock(EmbeddedCursor::class);
+        $document = $fieldValue;
         $model->$field = $document;
 
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
@@ -106,7 +109,7 @@ class RelationsTest extends TestCase
 
         $cursor->shouldReceive('first')
             ->once()
-            ->andReturn(new $instantiableClass);
+            ->andReturn(new $instantiableClass());
 
         // Assert
         $result = $this->callProtected($model, 'embedsOne', [get_class($entity), $field]);
@@ -119,10 +122,10 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsMany($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model         = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(ActiveRecord::class.'[]');
         $cursorFactory = m::mock(CursorFactory::class);
-        $cursor        = m::mock(EmbeddedCursor::class);
-        $document      = $fieldValue;
+        $cursor = m::mock(EmbeddedCursor::class);
+        $document = $fieldValue;
         $model->$field = $document;
 
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
@@ -146,10 +149,10 @@ class RelationsTest extends TestCase
     public function testShouldEmbeddedUnembedAttachAndDetachDocuments($method)
     {
         // Set
-        $model = new class {
+        $model = new class() {
             use Relations;
         };
-        $document         = m::mock();
+        $document = m::mock();
         $documentEmbedder = m::mock(DocumentEmbedder::class);
 
         // Act
@@ -168,83 +171,95 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Schema referenced by numeric id' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => 12345,
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => 12345,
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => 12345],
-                    'referencesMany' => ['_id' => ['$in' => [12345]]]
-                ]
+                    'referencesOne'  => ['_id' => 12345],
+                    'referencesMany' => ['_id' => ['$in' => [12345]]],
+                ],
             ],
             // -------------------------
             'ActiveRecord referenced by string id' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => 'abc123',
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => 'abc123',
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => 'abc123'],
-                    'referencesMany' => ['_id' => ['$in' => ['abc123']]]
-                ]
+                    'referencesOne'  => ['_id' => 'abc123'],
+                    'referencesMany' => ['_id' => ['$in' => ['abc123']]],
+                ],
             ],
             // -------------------------
             'Schema referenced by string objectId' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => '553e3c80293fce6572ff2a40'],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]]
-                ]
+                    'referencesOne'  => ['_id' => '553e3c80293fce6572ff2a40'],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]],
+                ],
             ],
             // -------------------------
             'ActiveRecord referenced by objectId' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => '577afb0b4d3cec136058fa82',
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => '577afb0b4d3cec136058fa82',
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
-                    'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82']]]
-                ]
+                    'referencesOne'  => ['_id' => '577afb0b4d3cec136058fa82'],
+                    'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82']]],
+                ],
             ],
             // -------------------------
             'Schema referenced with series of numeric ids' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => [1, 2, 3, 4, 5],
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => [1, 2, 3, 4, 5],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => 1],
-                    'referencesMany' => ['_id' => ['$in' => [1, 2, 3, 4, 5]]]
-                ]
+                    'referencesOne'  => ['_id' => 1],
+                    'referencesMany' => ['_id' => ['$in' => [1, 2, 3, 4, 5]]],
+                ],
             ],
             // -------------------------
             'ActiveRecord referenced with series of string objectIds' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]]
-                ]
+                    'referencesOne'  => ['_id' => '577afb0b4d3cec136058fa82'],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
+                ],
             ],
             // -------------------------
             'Schema referenced with series of real objectIds' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]]
-                ]
+                    'referencesOne'  => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
+                ],
             ],
             // -------------------------
             'ActiveRecord referenced with null' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => null,
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => null,
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => null],
-                    'referencesMany' => ['_id' => ['$in' => []]]
-                ]
+                    'referencesOne'  => ['_id' => null],
+                    'referencesMany' => ['_id' => ['$in' => []]],
+                ],
             ],
         ];
     }
@@ -254,30 +269,36 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Embedded document referent to an Schema' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
             // -------------------------
             'Embedded documents referent to an Schema' => [
-                'entity' => new class extends Schema {},
-                'field' => 'foo',
-                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'entity'        => new class() extends Schema {
+                },
+                'field'         => 'foo',
+                'fieldValue'    => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
             // -------------------------
             'Embedded document referent to an ActiveRecord entity' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
             // -------------------------
             'Embedded documents referent to an ActiveRecord entity' => [
-                'entity' => new class extends ActiveRecord { protected $collection = 'foobar'; },
-                'field' => 'foo',
-                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'entity' => new class() extends ActiveRecord {
+                    protected $collection = 'foobar';
+                },
+                'field'         => 'foo',
+                'fieldValue'    => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
             // -------------------------

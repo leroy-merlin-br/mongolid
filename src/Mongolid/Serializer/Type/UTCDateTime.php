@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Serializer\Type;
 
 use DateTime;
@@ -9,7 +10,7 @@ use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
 use Mongolid\Serializer\SerializableTypeInterface;
 
 /**
- * This class is a workaround to make real Mongo UTCDateTime serializable
+ * This class is a workaround to make real Mongo UTCDateTime serializable.
  */
 class UTCDateTime implements SerializableTypeInterface, JsonSerializable
 {
@@ -19,15 +20,15 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     protected $mongoDate;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $timestamp;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param integer|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
-     *                                                current timestamp.
+     * @param int|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
+     *                                            current timestamp.
      *
      * @throws InvalidArgumentException $datetime accepts only integer, null or MongoUTCDateTime.
      */
@@ -35,7 +36,7 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     {
         if (false === $this->init($datetime)) {
             throw new InvalidArgumentException(
-                'Invalid argument type given. Constructor allows only integer, ' .
+                'Invalid argument type given. Constructor allows only integer, '.
                 'null or MongoDB\BSON\UTCDateTime'
             );
         }
@@ -85,10 +86,10 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     }
 
     /**
-     * A wrapper to use this class as MongoUTCDateTime
+     * A wrapper to use this class as MongoUTCDateTime.
      *
-     * @param  string $method Method of MongoUTCDateTime to call.
-     * @param  array  $args   Arguments to pass.
+     * @param string $method Method of MongoUTCDateTime to call.
+     * @param array  $args   Arguments to pass.
      *
      * @return mixed
      */
@@ -98,12 +99,12 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     }
 
     /**
-     * Initializes timestamp and mongoDate variables
+     * Initializes timestamp and mongoDate variables.
      *
-     * @param integer|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
-     *                                                current timestamp.
+     * @param int|MongoUTCDateTime|null $datetime MongoUTCDateTime or Timestamp to wrap. If it was null, uses
+     *                                            current timestamp.
      *
-     * @return boolean
+     * @return bool
      */
     protected function init($datetime)
     {
@@ -111,7 +112,7 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
             $datetime = time();
         }
 
-        if (is_integer($datetime)) {
+        if (is_int($datetime)) {
             $this->timestamp = $datetime * 1000;
             $this->mongoDate = new MongoUTCDateTime($this->timestamp);
 
@@ -129,7 +130,7 @@ class UTCDateTime implements SerializableTypeInterface, JsonSerializable
     }
 
     /**
-     * Allows casting to string utilizing drivers UTCDateTime implementation
+     * Allows casting to string utilizing drivers UTCDateTime implementation.
      *
      * @return string Returns the string representation of this UTCDateTime.
      */

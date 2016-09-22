@@ -23,7 +23,7 @@ class CacheableCursorTest extends TestCase
     {
         // Arrange
         $documentsFromDb = new ArrayIterator([['name' => 'joe'], ['name' => 'doe']]);
-        $cursor          = $this->getCachableCursor();
+        $cursor = $this->getCachableCursor();
         $this->setProtected(
             $cursor,
             'documents',
@@ -41,7 +41,7 @@ class CacheableCursorTest extends TestCase
     {
         // Arrange
         $documentsFromCache = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor             = $this->getCachableCursor();
+        $cursor = $this->getCachableCursor();
         $cacheComponent = m::mock(CacheComponentInterface::class);
 
         // Act
@@ -66,9 +66,9 @@ class CacheableCursorTest extends TestCase
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor             = $this->getCachableCursor()->limit(150);
+        $cursor = $this->getCachableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection  = m::mock();
+        $rawCollection = m::mock();
 
         $this->setProtected(
             $cursor,
@@ -105,9 +105,9 @@ class CacheableCursorTest extends TestCase
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor          = $this->getCachableCursor()->limit(150);
-        $cacheComponent  = m::mock(CacheComponentInterface::class);
-        $rawCollection   = m::mock();
+        $cursor = $this->getCachableCursor()->limit(150);
+        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $rawCollection = m::mock();
 
         $this->setProtected(
             $cursor,
@@ -176,11 +176,11 @@ class CacheableCursorTest extends TestCase
         $params = [[]],
         $driverCursor = null
     ) {
-        if (! $entitySchema) {
-            $entitySchema = m::mock(Schema::class . '[]');
+        if (!$entitySchema) {
+            $entitySchema = m::mock(Schema::class.'[]');
         }
 
-        if (! $collection) {
+        if (!$collection) {
             $collection = m::mock(Collection::class);
             $collection->shouldReceive('getNamespace')
                 ->andReturn('my_db.my_collection');
@@ -189,7 +189,7 @@ class CacheableCursorTest extends TestCase
         }
 
         $mock = m::mock(
-            CacheableCursor::class . '[generateCacheKey]',
+            CacheableCursor::class.'[generateCacheKey]',
             [$entitySchema, $collection, $command, $params]
         );
         $mock->shouldAllowMockingProtectedMethods();

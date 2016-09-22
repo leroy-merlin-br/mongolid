@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use BadMethodCallException;
@@ -19,8 +20,6 @@ use Mongolid\Schema\Schema;
  * 'update', 'where', 'first' and 'all' are available within every instance.
  * The Mongolid\Schema\Schema that describes the entity will be generated on the go
  * based on the $fields.
- *
- * @package  Mongolid
  */
 abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInterface
 {
@@ -28,7 +27,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * Name of the collection where this kind of Entity is going to be saved or
-     * retrieved from
+     * retrieved from.
      *
      * @var string
      */
@@ -36,7 +35,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * @see https://docs.mongodb.com/manual/reference/write-concern/
-     * @var integer
+     *
+     * @var int
      */
     protected $writeConcern = 1;
 
@@ -45,7 +45,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * the name of a Schema class to be used.
      *
      * @see  \Mongolid\Schema\Schema::$fields
-     * @var  string|string[]
+     *
+     * @var string|string[]
      */
     protected $fields = [
         '_id'        => 'objectId',
@@ -59,14 +60,14 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      *
-     * @var boolean
+     * @var bool
      */
     public $dynamic = true;
 
     /**
-     * Saves this object into database
+     * Saves this object into database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function save()
     {
@@ -74,9 +75,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Insert this object into database
+     * Insert this object into database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function insert()
     {
@@ -84,9 +85,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Updates this object in database
+     * Updates this object in database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function update()
     {
@@ -94,9 +95,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Deletes this object in database
+     * Deletes this object in database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function delete()
     {
@@ -105,11 +106,11 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * Gets a cursor of this kind of entities that matches the query from the
-     * database
+     * database.
      *
-     * @param  array   $query      MongoDB selection criteria.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves a CacheableCursor instead.
+     * @param array $query      MongoDB selection criteria.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $useCache   Retrieves a CacheableCursor instead.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -126,7 +127,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Gets a cursor of this kind of entities from the database
+     * Gets a cursor of this kind of entities from the database.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -136,11 +137,11 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Gets the first entity of this kind that matches the query
+     * Gets the first entity of this kind that matches the query.
      *
-     * @param  mixed   $query      MongoDB selection criteria.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves the entity through a CacheableCursor.
+     * @param mixed $query      MongoDB selection criteria.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $useCache   Retrieves the entity through a CacheableCursor.
      *
      * @return ActiveRecord
      */
@@ -160,9 +161,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * Gets the first entity of this kind that matches the query. If no
      * document was found, throws ModelNotFoundException.
      *
-     * @param  mixed   $query      MongoDB selection criteria.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves the entity through a CacheableCursor.
+     * @param mixed $query      MongoDB selection criteria.
+     * @param array $projection Fields to project in Mongo query.
+     * @param bool  $useCache   Retrieves the entity through a CacheableCursor.
      *
      * @throws ModelNotFoundException If no document was found.
      *
@@ -185,7 +186,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * document was found, a new entity will be returned with the
      * _if field filled.
      *
-     * @param  mixed $id Document id.
+     * @param mixed $id Document id.
      *
      * @return ActiveRecord
      */
@@ -195,7 +196,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
             return $entity;
         }
 
-        $entity = new static;
+        $entity = new static();
         $entity->_id = $id;
 
         return $entity;
@@ -204,8 +205,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Handle dynamic method calls into the model.
      *
-     * @param  mixed $method     Name of the method that is being called.
-     * @param  mixed $parameters Parameters of $method.
+     * @param mixed $method     Name of the method that is being called.
+     * @param mixed $parameters Parameters of $method.
      *
      * @throws BadMethodCallException In case of invalid methods be called.
      *
@@ -240,13 +241,13 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * Returns a DataMapper configured with the Schema and collection described
-     * in this entity
+     * in this entity.
      *
      * @return DataMapper
      */
     public function getDataMapper()
     {
-        $dataMapper         = Ioc::make(DataMapper::class);
+        $dataMapper = Ioc::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
 
         return $dataMapper;
@@ -263,7 +264,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Getter for $writeConcern variable
+     * Getter for $writeConcern variable.
      *
      * @return mixed
      */
@@ -273,7 +274,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Setter for $writeConcern variable
+     * Setter for $writeConcern variable.
      *
      * @param mixed $writeConcern Level of write concern to the transation.
      *
@@ -293,11 +294,11 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
             return $schema;
         }
 
-        $schema              = new DynamicSchema;
+        $schema = new DynamicSchema();
         $schema->entityClass = get_class($this);
-        $schema->fields      = $this->fields;
-        $schema->dynamic     = $this->dynamic;
-        $schema->collection  = $this->collection;
+        $schema->fields = $this->fields;
+        $schema->dynamic = $this->dynamic;
+        $schema->collection = $this->collection;
 
         return $schema;
     }
@@ -318,15 +319,15 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     }
 
     /**
-     * Performs the given action into database
+     * Performs the given action into database.
      *
-     * @param  string $action Datamapper function to execute.
+     * @param string $action Datamapper function to execute.
      *
-     * @return boolean
+     * @return bool
      */
     protected function execute(string $action)
     {
-        if (! $this->getCollectionName()) {
+        if (!$this->getCollectionName()) {
             return false;
         }
 
@@ -344,16 +345,16 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Returns the a valid instance from Ioc.
      *
-     * @return mixed
-     *
      * @throws NoCollectionNameException Throws exception when has no collection filled.
+     *
+     * @return mixed
      */
     private static function getDataMapperInstance()
     {
         $instance = Ioc::make(get_called_class());
 
-        if (! $instance->getCollectionName()) {
-            throw new NoCollectionNameException;
+        if (!$instance->getCollectionName()) {
+            throw new NoCollectionNameException();
         }
 
         return $instance->getDataMapper();

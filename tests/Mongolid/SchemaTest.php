@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Mockery as m;
@@ -40,7 +41,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = null;
+        $value = null;
 
         // Assert
         $this->assertInstanceOf(
@@ -53,7 +54,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = 'A random string';
+        $value = 'A random string';
 
         // Assert
         $this->assertEquals(
@@ -66,7 +67,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = '507f1f77bcf86cd799439011';
+        $value = '507f1f77bcf86cd799439011';
 
         // Assert
         $this->assertInstanceOf(
@@ -76,16 +77,16 @@ class SchemaTest extends TestCase
 
         $this->assertEquals(
             $value,
-            (string)$schema->objectId($value)
+            (string) $schema->objectId($value)
         );
     }
 
     public function testShouldCastNullIntoAutoIncrementSequence()
     {
         // Arrange
-        $schema          = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
-        $value           = null;
+        $value = null;
 
         $schema->collection = 'resources';
 
@@ -103,9 +104,9 @@ class SchemaTest extends TestCase
 
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
-        $schema          = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
-        $value           = 3;
+        $value = 3;
 
         $schema->collection = 'resources';
 
@@ -125,7 +126,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = null;
+        $value = null;
 
         // Assertion
         $this->assertInstanceOf(UTCDateTime::class, $schema->createdAtTimestamp($value));
@@ -135,7 +136,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = (new UTCDateTime(25));
+        $value = (new UTCDateTime(25));
 
         // Assertion
         $result = $schema->updatedAtTimestamp($value);
@@ -166,23 +167,23 @@ class SchemaTest extends TestCase
 
         return [
             'MongoDB driver UTCDateTime' => [
-                'value' => $driversDate,
-                'expectation' => $driversDate
+                'value'       => $driversDate,
+                'expectation' => $driversDate,
             ],
             'Mongolid\'s serializable UTCDateTime' => [
-                'value' => $serializableDate,
-                'expectation' => $serializableDate
+                'value'       => $serializableDate,
+                'expectation' => $serializableDate,
             ],
             'Empty field' => [
-                'value' => null,
-                'expectation' => new UTCDateTime,
-                'compareTimestamp' => false
+                'value'            => null,
+                'expectation'      => new UTCDateTime(),
+                'compareTimestamp' => false,
             ],
             'An string' => [
-                'value' => 'foobar',
-                'expectation' => new UTCDateTime,
-                'compareTimestamp' => false
-            ]
+                'value'            => 'foobar',
+                'expectation'      => new UTCDateTime(),
+                'compareTimestamp' => false,
+            ],
         ];
     }
 }
