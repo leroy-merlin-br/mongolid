@@ -58,7 +58,7 @@ Which will translate to:
 - Instantiate a **Phone** object with the attributes found in _'phone'_ attribute of the user
 - Return that object
 
-In order to embed a document to be used in a Embeds One relationship, simply fo the following:
+In order to embed a document to be used in a Embeds One relationship, simply do the following:
 
 ```php
     // The object that will be embeded

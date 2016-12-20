@@ -58,7 +58,7 @@ class Article
 
 ## Interacting with the database
 
-Interact with the database using the `DataMapper` retrieved trought the Mongolid Manager:
+Interact with the database using the `DataMapper` retrieved through the Mongolid Manager:
 
 ```php
 $article = $manager->getMapper(Article::class)
