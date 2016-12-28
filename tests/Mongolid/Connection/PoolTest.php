@@ -3,7 +3,6 @@
 namespace Mongolid\Connection;
 
 use Mockery as m;
-
 use TestCase;
 
 class PoolTest extends TestCase
