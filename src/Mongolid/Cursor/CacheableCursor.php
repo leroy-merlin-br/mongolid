@@ -1,10 +1,8 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use Mongolid\Container\Ioc;
-use Mongolid\Serializer\Serializer;
 use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
@@ -100,13 +98,11 @@ class CacheableCursor extends Cursor
      */
     protected function generateCacheKey(): string
     {
-        $serializer = Ioc::make(Serializer::class);
-
         return sprintf(
             '%s:%s:%s',
             $this->command,
             $this->collection->getNamespace(),
-            md5($serializer->serialize($this->params))
+            md5(serialize($this->params))
         );
     }
 

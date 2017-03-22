@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
@@ -14,7 +13,6 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Serializer\Type\Converter;
 use stdClass;
 use TestCase;
 
@@ -516,8 +514,6 @@ class DataMapperTest extends TestCase
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
         $schema = m::mock(Schema::class);
-        $converter = m::mock(Converter::class.'[toDomainTypes]');
-
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
@@ -528,8 +524,6 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Act
-        Ioc::instance(Converter::class, $converter);
-
         $mapper->shouldReceive('prepareValueQuery')
             ->once()
             ->with($query)
@@ -543,11 +537,6 @@ class DataMapperTest extends TestCase
             ->once()
             ->with($preparedQuery, ['projection' => []])
             ->andReturn(['name' => 'John Doe']);
-
-        $converter->shouldReceive('toDomainTypes')
-            ->once()
-            ->with(['name' => 'John Doe'])
-            ->passthru();
 
         $result = $mapper->first($query);
 
