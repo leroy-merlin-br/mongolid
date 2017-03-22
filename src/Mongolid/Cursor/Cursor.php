@@ -190,7 +190,10 @@ class Cursor implements CursorInterface, Serializable
             $documentToArray = (array) $document;
         }
 
-        return $this->getAssembler()->assemble($document, $this->entitySchema);
+        return $this->getAssembler()->assemble(
+            $documentToArray,
+            $this->entitySchema
+        );
     }
 
     /**
