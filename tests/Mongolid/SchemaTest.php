@@ -1,13 +1,11 @@
 <?php
-
 namespace Mongolid;
 
 use Mockery as m;
-use MongoDB\BSON\UTCDateTime as MongoUTCDateTime;
+use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
-use Mongolid\Serializer\Type\ObjectID;
-use Mongolid\Serializer\Type\UTCDateTime;
 use Mongolid\Util\SequenceService;
 use TestCase;
 
@@ -129,7 +127,10 @@ class SchemaTest extends TestCase
         $value = null;
 
         // Assertion
-        $this->assertInstanceOf(UTCDateTime::class, $schema->createdAtTimestamp($value));
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $schema->createdAtTimestamp($value)
+        );
     }
 
     public function testShouldRefreshUpdatedAtTimestamps()
@@ -147,8 +148,11 @@ class SchemaTest extends TestCase
     /**
      * @dataProvider createdAtTimestampsFixture
      */
-    public function testShouldNotRefreshCreatedAtTimestamps($value, $expectation, $compareTimestamp = true)
-    {
+    public function testShouldNotRefreshCreatedAtTimestamps(
+        $value,
+        $expectation,
+        $compareTimestamp = true
+    ) {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
 
@@ -162,17 +166,10 @@ class SchemaTest extends TestCase
 
     public function createdAtTimestampsFixture()
     {
-        $driversDate = new MongoUTCDateTime(25);
-        $serializableDate = new UTCDateTime(25);
-
         return [
             'MongoDB driver UTCDateTime' => [
-                'value'       => $driversDate,
-                'expectation' => $driversDate,
-            ],
-            'Mongolid\'s serializable UTCDateTime' => [
-                'value'       => $serializableDate,
-                'expectation' => $serializableDate,
+                'value'       => new UTCDateTime(25),
+                'expectation' => new UTCDateTime(25),
             ],
             'Empty field' => [
                 'value'            => null,
