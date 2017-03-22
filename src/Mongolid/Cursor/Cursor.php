@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
