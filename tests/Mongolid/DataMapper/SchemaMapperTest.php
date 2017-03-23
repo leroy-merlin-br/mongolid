@@ -20,7 +20,6 @@ class SchemaMapperTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class);
-        $converter = m::mock(Converter::class);
         $schema->fields = [
             'name'  => 'string',
             'age'   => 'int',
@@ -49,23 +48,11 @@ class SchemaMapperTest extends TestCase
                 ->andReturn($data[$key].'.PARSED');
         }
 
-        Ioc::instance(Converter::class, $converter);
-
-        $converter->shouldReceive('toMongoTypes')
-            ->once()
-            ->andReturnUsing(function ($data) {
-                foreach ($data as $key => $value) {
-                    $data[$key] = str_replace('23', 'batata', $value);
-                }
-
-                return $data;
-            });
-
         // Assert
         $this->assertEquals(
             [
                 'name'  => 'John.PARSED',
-                'age'   => 'batata.PARSED',
+                'age'   => '23.PARSED',
                 'stuff' => 'fooBar.PARSED',
             ],
             $schemaMapper->map($data)
