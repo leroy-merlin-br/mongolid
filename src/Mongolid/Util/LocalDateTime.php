@@ -31,4 +31,19 @@ class LocalDateTime
             new DateTimeZone(date_default_timezone_get())
         );
     }
+
+    /**
+     * Retrieves formated date time using timezone
+     *
+     * @param UTCDateTime $date
+     * @param string      $format
+     *
+     * @return string
+     */
+    public function format(
+        UTCDateTime $date,
+        string $format = 'd/m/Y H:i:s'
+    ): string {
+        return self::get($date)->format($format);
+    }
 }
