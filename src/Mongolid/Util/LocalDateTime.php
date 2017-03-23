@@ -40,10 +40,22 @@ class LocalDateTime
      *
      * @return string
      */
-    public function format(
+    public static function format(
         UTCDateTime $date,
         string $format = 'd/m/Y H:i:s'
     ): string {
         return self::get($date)->format($format);
+    }
+
+    /**
+     * Retrieves timestamp using timezone
+     *
+     * @param UTCDateTime $date
+     *
+     * @return int
+     */
+    public static function timestamp(UTCDateTime $date): int
+    {
+        return self::get($date)->getTimestamp();
     }
 }
