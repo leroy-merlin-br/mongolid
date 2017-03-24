@@ -14,7 +14,6 @@ use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Serializer\Type\Converter;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -293,8 +292,6 @@ class DataMapper implements HasSchemaInterface
             ['projection' => $this->prepareProjection($projection)]
         );
 
-        $document = Ioc::make(Converter::class)->toDomainTypes((array) $document);
-
         if (!$document) {
             return;
         }
@@ -404,8 +401,6 @@ class DataMapper implements HasSchemaInterface
         ) {
             $value['_id'] = $this->prepareArrayFieldOfQuery($value['_id']);
         }
-
-        $value = Ioc::make(Converter::class)->toMongoTypes($value);
 
         return $value;
     }
