@@ -5,7 +5,6 @@ namespace Mongolid\DataMapper;
 use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
-use Mongolid\Serializer\Type\Converter;
 use TestCase;
 
 class SchemaMapperTest extends TestCase

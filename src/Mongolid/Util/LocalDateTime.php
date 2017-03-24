@@ -18,7 +18,7 @@ use MongoDB\BSON\UTCDateTime;
 class LocalDateTime
 {
     /**
-     * Retrieves DateTime instance using default timezone
+     * Retrieves DateTime instance using default timezone.
      *
      * @param UTCDateTime $date
      *
@@ -33,7 +33,7 @@ class LocalDateTime
     }
 
     /**
-     * Retrieves formated date time using timezone
+     * Retrieves formated date time using timezone.
      *
      * @param UTCDateTime $date
      * @param string      $format
@@ -48,7 +48,7 @@ class LocalDateTime
     }
 
     /**
-     * Retrieves timestamp using timezone
+     * Retrieves timestamp using timezone.
      *
      * @param UTCDateTime $date
      *
