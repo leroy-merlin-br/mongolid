@@ -57,12 +57,14 @@ Make sure that the **php.ini** file used in the CLI environment includes the Mon
 
 Run `php -i | grep 'Configuration File'` in a terminal to check the **.ini** that is being used.
 
-To check if PHP in the CLI environment is importing the driver properly run `php -i | grep 'mongo'` in your terminal. You should get output similar to:
+To check if PHP in the CLI environment is importing the driver properly run `php -i | grep -i 'mongo'` in your terminal. You should get output similar to:
 
 ```
-$ php -i | grep 'mongo'
-mongodb support => enabled
-mongodb version => 1.1.3
+$ php -i | grep -i 'mongo'
+MongoDB support => enabled
+MongoDB extension version => 1.2.8
+MongoDB extension stability => stable
+libmongoc bundled version => 1.5.5
 ```
 
 **"This package requires php >=7.0 but your PHP version (X.X.X) does not satisfy that requirement."**
