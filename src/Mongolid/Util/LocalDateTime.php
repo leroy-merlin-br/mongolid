@@ -26,10 +26,10 @@ class LocalDateTime
      */
     public static function get(UTCDateTime $date): DateTime
     {
-        return new DateTime(
-            $date->toDateTime()->format('Y-m-d H:i:s'),
-            new DateTimeZone(date_default_timezone_get())
-        );
+        $date = $date->toDateTime();
+        $date->setTimezone(new DateTimeZone(date_default_timezone_get()));
+
+        return $date;
     }
 
     /**
