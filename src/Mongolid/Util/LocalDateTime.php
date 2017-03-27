@@ -7,7 +7,7 @@ use DateTimeZone;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * This class is responsible to convert UTCDateTime from MongoDB driver in
+ * This class is responsible for converting UTCDateTime from MongoDB driver in
  * local date time.
  *
  * It will be unnecessary once MongoDB driver fixes a know issue in UTCDateTime.
