@@ -20,18 +20,13 @@ class LocalDateTimeTest extends TestCase
     protected $format = 'd/m/Y H:i:s';
 
     /**
-     * @var string
-     */
-    protected $dateString = '01/05/2017 15:40:00';
-
-    /**
      * {@inheritdoc}
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->date = new DateTime($this->dateString);
+        $this->date = new DateTime('01/05/2017 15:40:00');
         $this->date->setTimezone(new DateTimeZone('UTC'));
 
         date_default_timezone_set('America/Sao_Paulo');
@@ -43,7 +38,7 @@ class LocalDateTimeTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-        unset($this->date, $this->format, $this->dateString);
+        unset($this->date, $this->format);
     }
 
     public function testGetShouldRetrievesDateUsingTimezone()
