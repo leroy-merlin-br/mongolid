@@ -3,6 +3,7 @@
 namespace Mongolid\Util;
 
 use DateTime;
+use DateTimeZone;
 use MongoDB\BSON\UTCDateTime;
 use PHPUnit_Framework_TestCase as TestCase;
 
@@ -19,17 +20,21 @@ class LocalDateTimeTest extends TestCase
     protected $format = 'd/m/Y H:i:s';
 
     /**
+     * @var string
+     */
+    protected $dateString = '01/05/2017 15:40:00';
+
+    /**
      * {@inheritdoc}
      */
     public function setUp()
     {
         parent::setUp();
 
-        date_default_timezone_set('UTC');
+        $this->date = new DateTime($this->dateString);
+        $this->date->setTimezone(new DateTimeZone('UTC'));
 
-        $this->date = new DateTime('01/05/2017 15:40:00');
-
-        date_default_timezone_set('Europe/Prague');
+        date_default_timezone_set('America/Sao_Paulo');
     }
 
     /**
@@ -38,21 +43,23 @@ class LocalDateTimeTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-        unset($this->date, $this->format);
+        unset($this->date, $this->format, $this->dateString);
     }
 
     public function testGetShouldRetrievesDateUsingTimezone()
     {
         $this->assertEquals(
-            $this->date->format($this->format),
-            LocalDateTime::get(new UTCDateTime($this->date))->format(
-                $this->format
-            )
+            $this->date,
+            LocalDateTime::get(new UTCDateTime($this->date))
         );
     }
 
     public function testFormatShouldRetrievesDateWithDefaultFormat()
     {
+        $this->date->setTimezone(
+            new DateTimeZone(date_default_timezone_get())
+        );
+
         $this->assertEquals(
             $this->date->format($this->format),
             LocalDateTime::format(new UTCDateTime($this->date))
@@ -61,6 +68,10 @@ class LocalDateTimeTest extends TestCase
 
     public function testFormatShouldRetrieesDateUsingGivenFormat()
     {
+        $this->date->setTimezone(
+            new DateTimeZone(date_default_timezone_get())
+        );
+
         $format = 'Y-m-d H:i:s';
 
         $this->assertEquals(
