@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use ErrorException;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
@@ -58,6 +59,50 @@ class CacheableCursorTest extends TestCase
         // Assert
         $this->assertEquals(
             new ArrayIterator($documentsFromCache),
+            $this->callProtected($cursor, 'getCursor')
+        );
+    }
+
+    public function testShouldGetFromDatabaseWhenCacheFails()
+    {
+        // Arrange
+        $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
+        $cursor = $this->getCachableCursor()->limit(150);
+        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $rawCollection = m::mock();
+        $cacheKey = 'find:collection:123';
+
+        $this->setProtected(
+            $cursor,
+            'collection',
+            $rawCollection
+        );
+
+        // Act
+        $cursor->shouldReceive('generateCacheKey')
+            ->andReturn($cacheKey);
+
+        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+
+        $cacheComponent->shouldReceive('get')
+            ->with($cacheKey, null)
+            ->andThrow(
+                new ErrorException(
+                    sprintf('Unable to unserialize cache %s', $cacheKey)
+                )
+            );
+
+        $rawCollection->shouldReceive('find')
+            ->with([], ['limit' => 100])
+            ->andReturn(new ArrayIterator($documentsFromDb));
+
+        $cacheComponent->shouldReceive('put')
+            ->once()
+            ->with($cacheKey, $documentsFromDb, m::any());
+
+        // Assert
+        $this->assertEquals(
+            new ArrayIterator($documentsFromDb),
             $this->callProtected($cursor, 'getCursor')
         );
     }

@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use ErrorException;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\CacheComponentInterface;
 use Traversable;
@@ -70,8 +71,14 @@ class CacheableCursor extends Cursor
         $cacheComponent = Ioc::make(CacheComponentInterface::class);
         $cacheKey = $this->generateCacheKey();
 
-        if ($this->documents = $cacheComponent->get($cacheKey, null)) {
-            return $this->documents = new ArrayIterator($this->documents);
+        try {
+            $cachedDocuments = $cacheComponent->get($cacheKey, null);
+        } catch (ErrorException $error) {
+            $cachedDocuments = [];
+        }
+
+        if ($cachedDocuments) {
+            return $this->documents = new ArrayIterator($cachedDocuments);
         }
 
         // Stores the original "limit" clause of the query
