@@ -31,7 +31,7 @@ Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementatio
 You can install library through Composer:
 
 ```
-$ composer require leroy-merlin-br/mongolid
+$ composer require zizaco/mongolid
 ```
 
 ### Requirements
