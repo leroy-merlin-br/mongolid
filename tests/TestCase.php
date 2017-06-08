@@ -1,18 +1,15 @@
 <?php
 
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends PHPUnitTestCase
 {
     /**
-     * Setup.
-     *
-     * @return false
+     * {@inheritdoc}
      */
     public function setUp()
     {
         require __DIR__.'/../bootstrap/bootstrap.php';
-
-        return false;
     }
 
     /**

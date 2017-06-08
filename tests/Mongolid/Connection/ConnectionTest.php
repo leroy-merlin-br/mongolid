@@ -13,8 +13,8 @@ class ConnectionTest extends TestCase
 {
     public function tearDown()
     {
-        parent::tearDown();
         m::close();
+        parent::tearDown();
     }
 
     public function testShouldConstructANewConnection()
