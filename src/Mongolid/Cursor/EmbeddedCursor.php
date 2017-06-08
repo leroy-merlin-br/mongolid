@@ -72,13 +72,12 @@ class EmbeddedCursor implements CursorInterface
      */
     public function sort(array $fields)
     {
-        foreach (array_reverse($fields) as $key => $value) {
+        foreach (array_reverse($fields) as $key => $direction) {
             // Uses usort with a function that will access the $key and sort in
-            // the $value direction. It mimics how the mongodb does sorting
-            // internally.
+            // the $direction. It mimics how the mongodb does sorting internally.
             usort(
                 $this->items,
-                function ($a, $b) use ($key, $value) {
+                function ($a, $b) use ($key, $direction) {
                     $a = is_object($a)
                         ? ($a->$key ?? null)
                         : ($a[$key] ?? null);
@@ -87,11 +86,7 @@ class EmbeddedCursor implements CursorInterface
                         ? ($b->$key ?? null)
                         : ($b[$key] ?? null);
 
-                    if ($a < $b) {
-                        return $value * -1;
-                    }
-
-                    return $value;
+                    return ($a <=> $b) * $direction;
                 }
             );
         }

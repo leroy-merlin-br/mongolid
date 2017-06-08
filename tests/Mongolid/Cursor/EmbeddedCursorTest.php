@@ -38,26 +38,18 @@ class EmbeddedCursorTest extends TestCase
         );
     }
 
-    public function testShouldSortDocuments()
+    /**
+     * @dataProvider getDocumentsToSort
+     */
+    public function testShouldSortDocuments($items, $parameters, $expected)
     {
         // Arrange
-        $items = [
-            ['age' => 26, 'name' => 'Abe'],
-            ['age' => 25],
-            (object) ['age' => 24],
-            ['age' => 26, 'name' => 'Zizaco'],
-        ];
         $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
-        $cursor->sort(['age' => 1, 'name' -1]);
-        $this->assertAttributeEquals(
-            [
-                (object) ['age' => 24],
-                ['age' => 25],
-                ['age' => 26, 'name' => 'Zizaco'],
-                ['age' => 26, 'name' => 'Abe'],
-            ],
+        $cursor->sort($parameters);
+        $this->assertAttributeSame(
+            $expected,
             'items',
             $cursor
         );
@@ -283,5 +275,83 @@ class EmbeddedCursorTest extends TestCase
         $items = []
     ) {
         return new EmbeddedCursor($entityClass, $items);
+    }
+
+    public function getDocumentsToSort()
+    {
+        $age24 = (object) ['age' => 24];
+
+        return [
+            'one sorting parameter ASC' => [
+                'items' => [
+                    ['age' => 26, 'name' => 'Abe'],
+                    ['age' => 25],
+                    $age24,
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                ],
+                'parameters' => ['age' => 1],
+                'expected' => [
+                    $age24,
+                    ['age' => 25],
+                    ['age' => 26, 'name' => 'Abe'],
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                ],
+            ],
+            'one sorting parameter DESC' => [
+                'items' => [
+                    ['age' => 26, 'name' => 'Abe'],
+                    ['age' => 25],
+                    $age24,
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                ],
+                'parameters' => ['age' => -1],
+                'expected' => [
+                    ['age' => 26, 'name' => 'Abe'],
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                    ['age' => 25],
+                    $age24,
+                ],
+            ],
+            'two sorting parameters' => [
+                'items' => [
+                    ['age' => 26, 'name' => 'Abe'],
+                    ['age' => 25],
+                    $age24,
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                ],
+                'parameters' => ['age' => 1, 'name' => -1],
+                'expected' => [
+                    $age24,
+                    ['age' => 25],
+                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'John'],
+                    ['age' => 26, 'name' => 'Abe'],
+                ],
+            ],
+            'three sorting parameters' => [
+                'items' => [
+                    ['age' => 26, 'name' => 'Abe', 'color' => 'red'],
+                    ['age' => 25],
+                    $age24,
+                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'red'],
+                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'blue'],
+                    ['age' => 26, 'name' => 'John'],
+                ],
+                'parameters' => ['age' => 1, 'name' => -1, 'color' => 1],
+                'expected' => [
+                    $age24,
+                    ['age' => 25],
+                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'blue'],
+                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'red'],
+                    ['age' => 26, 'name' => 'John'],
+                    ['age' => 26, 'name' => 'Abe', 'color' => 'red'],
+                ],
+            ],
+        ];
     }
 }
