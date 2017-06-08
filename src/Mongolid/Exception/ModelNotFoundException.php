@@ -26,7 +26,7 @@ class ModelNotFoundException extends RuntimeException
     /**
      * Set the affected Mongolid model.
      *
-     * @param string $model Name of the model.
+     * @param string $model name of the model
      *
      * @return $this
      */

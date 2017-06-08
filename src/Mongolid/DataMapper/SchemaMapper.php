@@ -32,7 +32,7 @@ class SchemaMapper
     protected $castableTypes = ['int', 'integer', 'bool', 'boolean', 'float', 'double', 'real', 'string'];
 
     /**
-     * @param Schema $schema Schema that will be used to map each field.
+     * @param Schema $schema schema that will be used to map each field
      */
     public function __construct(Schema $schema)
     {
@@ -42,8 +42,8 @@ class SchemaMapper
     /**
      * Maps the input $data to the schema specified in the $schema property.
      *
-     * @param array|object $data Array or object with the fields that should
-     *                           be mapped to $this->schema specifications.
+     * @param array|object $data array or object with the fields that should
+     *                           be mapped to $this->schema specifications
      *
      * @return array
      */
@@ -64,8 +64,6 @@ class SchemaMapper
      * If the schema is not dynamic, remove all non specified fields.
      *
      * @param array $data Reference of the fields. The passed array will be modified.
-     *
-     * @return void
      */
     protected function clearDynamic(array &$data)
     {
@@ -77,8 +75,8 @@ class SchemaMapper
     /**
      * Parse a value based on a field yype of the schema.
      *
-     * @param mixed  $value     Value to be parsed.
-     * @param string $fieldType Description of how the field should be treated.
+     * @param mixed  $value     value to be parsed
+     * @param string $fieldType description of how the field should be treated
      *
      * @return mixed $value Value parsed to match $type
      */
@@ -112,8 +110,8 @@ class SchemaMapper
      *
      * @see http://php.net/manual/pt_BR/function.settype.php
      *
-     * @param mixed  $value Value to be casted.
-     * @param string $type  Type to which the $value should be casted to.
+     * @param mixed  $value value to be casted
+     * @param string $type  type to which the $value should be casted to
      *
      * @return mixed
      */
@@ -128,8 +126,8 @@ class SchemaMapper
      * Instantiate another SchemaMapper with the given $schemaClass and maps
      * the given $value.
      *
-     * @param mixed  $value       Value that will be mapped.
-     * @param string $schemaClass Class that will be passed to the new SchemaMapper constructor.
+     * @param mixed  $value       value that will be mapped
+     * @param string $schemaClass class that will be passed to the new SchemaMapper constructor
      *
      * @return mixed
      */
@@ -153,7 +151,7 @@ class SchemaMapper
     /**
      * Parses an object to an array before sending it to the SchemaMapper.
      *
-     * @param mixed $object The object that will be transformed into an array.
+     * @param mixed $object the object that will be transformed into an array
      *
      * @return array
      */

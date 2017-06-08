@@ -9,8 +9,8 @@
 return new Sami\Sami(
     './src',
     [
-        'title'                => 'Mongolid ODM Api',
-        'build_dir'            => __DIR__.'/site/api',
-        'cache_dir'            => __DIR__.'/build/cache',
+        'title' => 'Mongolid ODM Api',
+        'build_dir' => __DIR__.'/site/api',
+        'cache_dir' => __DIR__.'/build/cache',
     ]
 );

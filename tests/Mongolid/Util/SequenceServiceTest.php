@@ -36,7 +36,7 @@ class SequenceServiceTest extends TestCase
             ->once()
             ->with(
                 ['_id' => $sequenceName],
-                ['$inc'   => ['seq' => 1]],
+                ['$inc' => ['seq' => 1]],
                 ['upsert' => true]
             )->andReturn(
                 $currentValue ? (object) ['seq' => $currentValue] : null
@@ -81,19 +81,19 @@ class SequenceServiceTest extends TestCase
             'New sequence in collection "products"' => [
                 'sequenceName' => 'products',
                 'currentValue' => 0,
-                'expectation'  => 1,
+                'expectation' => 1,
             ],
             // -----------------------
             'Existing sequence in collection "unicorns"' => [
                 'sequenceName' => 'unicorns',
                 'currentValue' => 7,
-                'expectation'  => 8,
+                'expectation' => 8,
             ],
             // -----------------------
             'Existing sequence in collection "unicorns"' => [
                 'sequenceName' => 'unicorns',
                 'currentValue' => 3,
-                'expectation'  => 4,
+                'expectation' => 4,
             ],
         ];
     }

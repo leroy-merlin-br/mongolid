@@ -247,7 +247,7 @@ class DataMapperTest extends TestCase
             ->once()
             ->with(
                 ['_id' => 123],
-                ['$set'         => $parsedObject],
+                ['$set' => $parsedObject],
                 ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
@@ -838,28 +838,28 @@ class DataMapperTest extends TestCase
     public function eventsToBailOperations()
     {
         return [
-            'Saving event'    => [
-                'operation'   => 'save',
+            'Saving event' => [
+                'operation' => 'save',
                 'dbOperation' => 'replaceOne',
-                'eventName'   => 'saving',
+                'eventName' => 'saving',
             ],
             // ------------------------
             'Inserting event' => [
-                'operation'   => 'insert',
+                'operation' => 'insert',
                 'dbOperation' => 'insertOne',
-                'eventName'   => 'inserting',
+                'eventName' => 'inserting',
             ],
             // ------------------------
-            'Updating event'  => [
-                'operation'   => 'update',
+            'Updating event' => [
+                'operation' => 'update',
                 'dbOperation' => 'updateOne',
-                'eventName'   => 'updating',
+                'eventName' => 'updating',
             ],
             // ------------------------
-            'Deleting event'  => [
-                'operation'   => 'delete',
+            'Deleting event' => [
+                'operation' => 'delete',
                 'dbOperation' => 'deleteOne',
-                'eventName'   => 'deleting',
+                'eventName' => 'deleting',
             ],
         ];
     }
@@ -867,28 +867,28 @@ class DataMapperTest extends TestCase
     public function queryValueScenarios()
     {
         return [
-            'An array'                                   => [
-                'value'       => ['age' => ['$gt' => 25]],
+            'An array' => [
+                'value' => ['age' => ['$gt' => 25]],
                 'expectation' => ['age' => ['$gt' => 25]],
             ],
             // ------------------------
-            'An ObjectId string'                         => [
-                'value'       => '507f1f77bcf86cd799439011',
+            'An ObjectId string' => [
+                'value' => '507f1f77bcf86cd799439011',
                 'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
             ],
             // ------------------------
-            'An ObjectId string within a query'          => [
-                'value'       => ['_id' => '507f1f77bcf86cd799439011'],
+            'An ObjectId string within a query' => [
+                'value' => ['_id' => '507f1f77bcf86cd799439011'],
                 'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
             ],
             // ------------------------
-            'Other type of _id, sequence for example'    => [
-                'value'       => 7,
+            'Other type of _id, sequence for example' => [
+                'value' => 7,
                 'expectation' => ['_id' => 7],
             ],
             // ------------------------
             'Series of string _ids as the $in parameter' => [
-                'value'       => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
+                'value' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
                 'expectation' => [
                     '_id' => [
                         '$in' => [
@@ -900,7 +900,7 @@ class DataMapperTest extends TestCase
             ],
             // ------------------------
             'Series of string _ids as the $in parameter' => [
-                'value'       => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
+                'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
                 'expectation' => ['_id' => ['$nin' => [new ObjectID('507f1f77bcf86cd799439011')]]],
             ],
         ];
@@ -909,29 +909,29 @@ class DataMapperTest extends TestCase
     public function getWriteConcernVariations()
     {
         return [
-            'acknowledged write concern with plain object'                => [
-                'object'               => m::mock(),
-                'writeConcern'         => 1,
+            'acknowledged write concern with plain object' => [
+                'object' => m::mock(),
+                'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
-                'expected'             => true,
+                'expected' => true,
             ],
             'acknowledged write concern with attributesAccessIntesarface' => [
-                'object'               => m::mock(AttributesAccessInterface::class),
-                'writeConcern'         => 1,
+                'object' => m::mock(AttributesAccessInterface::class),
+                'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
-                'expected'             => true,
+                'expected' => true,
             ],
-            'unacknowledged write concern with plain object'              => [
-                'object'               => m::mock(),
-                'writeConcern'         => 0,
+            'unacknowledged write concern with plain object' => [
+                'object' => m::mock(),
+                'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
-                'expected'             => false,
+                'expected' => false,
             ],
             'unacknowledged write concern with attributesAccessInterface' => [
-                'object'               => m::mock(AttributesAccessInterface::class),
-                'writeConcern'         => 0,
+                'object' => m::mock(AttributesAccessInterface::class),
+                'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
-                'expected'             => false,
+                'expected' => false,
             ],
         ];
     }
@@ -942,21 +942,21 @@ class DataMapperTest extends TestCase
     public function getProjections()
     {
         return [
-            'Should return self array'                         => [
+            'Should return self array' => [
                 'projection' => ['some' => true, 'fields' => false],
-                'expected'   => ['some' => true, 'fields' => false],
+                'expected' => ['some' => true, 'fields' => false],
             ],
-            'Should convert number'                            => [
+            'Should convert number' => [
                 'projection' => ['some' => 1, 'fields' => -1],
-                'expected'   => ['some' => true, 'fields' => false],
+                'expected' => ['some' => true, 'fields' => false],
             ],
-            'Should add true in fields'                        => [
+            'Should add true in fields' => [
                 'projection' => ['some', 'fields'],
-                'expected'   => ['some' => true, 'fields' => true],
+                'expected' => ['some' => true, 'fields' => true],
             ],
             'Should add boolean values according to key value' => [
                 'projection' => ['-some', 'fields'],
-                'expected'   => ['some' => false, 'fields' => true],
+                'expected' => ['some' => false, 'fields' => true],
             ],
         ];
     }

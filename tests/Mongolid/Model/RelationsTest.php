@@ -171,12 +171,12 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Schema referenced by numeric id' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => 12345,
+                'field' => 'foo',
+                'fieldValue' => 12345,
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => 12345],
+                    'referencesOne' => ['_id' => 12345],
                     'referencesMany' => ['_id' => ['$in' => [12345]]],
                 ],
             ],
@@ -185,21 +185,21 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => 'abc123',
+                'field' => 'foo',
+                'fieldValue' => 'abc123',
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => 'abc123'],
+                    'referencesOne' => ['_id' => 'abc123'],
                     'referencesMany' => ['_id' => ['$in' => ['abc123']]],
                 ],
             ],
             // -------------------------
             'Schema referenced by string objectId' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
+                'field' => 'foo',
+                'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => '553e3c80293fce6572ff2a40'],
+                    'referencesOne' => ['_id' => '553e3c80293fce6572ff2a40'],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]],
                 ],
             ],
@@ -208,21 +208,21 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => '577afb0b4d3cec136058fa82',
+                'field' => 'foo',
+                'fieldValue' => '577afb0b4d3cec136058fa82',
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => '577afb0b4d3cec136058fa82'],
+                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
                     'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82']]],
                 ],
             ],
             // -------------------------
             'Schema referenced with series of numeric ids' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => [1, 2, 3, 4, 5],
+                'field' => 'foo',
+                'fieldValue' => [1, 2, 3, 4, 5],
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => 1],
+                    'referencesOne' => ['_id' => 1],
                     'referencesMany' => ['_id' => ['$in' => [1, 2, 3, 4, 5]]],
                 ],
             ],
@@ -231,21 +231,21 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
+                'field' => 'foo',
+                'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => '577afb0b4d3cec136058fa82'],
+                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
                 ],
             ],
             // -------------------------
             'Schema referenced with series of real objectIds' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
+                'field' => 'foo',
+                'fieldValue' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
+                    'referencesOne' => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
                 ],
             ],
@@ -254,10 +254,10 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => null,
+                'field' => 'foo',
+                'fieldValue' => null,
                 'expectedQuery' => [
-                    'referencesOne'  => ['_id' => null],
+                    'referencesOne' => ['_id' => null],
                     'referencesMany' => ['_id' => ['$in' => []]],
                 ],
             ],
@@ -269,18 +269,18 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Embedded document referent to an Schema' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => ['_id' => 12345, 'name' => 'batata'],
+                'field' => 'foo',
+                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
             // -------------------------
             'Embedded documents referent to an Schema' => [
-                'entity'        => new class() extends Schema {
+                'entity' => new class() extends Schema {
                 },
-                'field'         => 'foo',
-                'fieldValue'    => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'field' => 'foo',
+                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
             // -------------------------
@@ -288,8 +288,8 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => ['_id' => 12345, 'name' => 'batata'],
+                'field' => 'foo',
+                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
             // -------------------------
@@ -297,8 +297,8 @@ class RelationsTest extends TestCase
                 'entity' => new class() extends ActiveRecord {
                     protected $collection = 'foobar';
                 },
-                'field'         => 'foo',
-                'fieldValue'    => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'field' => 'foo',
+                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
             // -------------------------

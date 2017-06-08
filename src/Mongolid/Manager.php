@@ -67,7 +67,7 @@ class Manager
      * pure PHP. After adding a connection into the Manager you are ready to
      * persist and query your models.
      *
-     * @param Connection $connection Connection instance to be used in database interactions.
+     * @param Connection $connection connection instance to be used in database interactions
      *
      * @return bool Success
      */
@@ -94,9 +94,7 @@ class Manager
     /**
      * Sets the event trigger for Mongolid events.
      *
-     * @param EventTriggerInterface $eventTrigger External event trigger.
-     *
-     * @return void
+     * @param EventTriggerInterface $eventTrigger external event trigger
      */
     public function setEventTrigger(EventTriggerInterface $eventTrigger)
     {
@@ -110,9 +108,7 @@ class Manager
     /**
      * Allow document Schemas to be registered for later use.
      *
-     * @param Schema $schema Schema being registered.
-     *
-     * @return void
+     * @param Schema $schema schema being registered
      */
     public function registerSchema(Schema $schema)
     {
@@ -124,9 +120,9 @@ class Manager
      * if the Schema for that entity has been previously registered with
      * registerSchema() method.
      *
-     * @param string $entityClass Class of the entity that needs to be mapped.
+     * @param string $entityClass class of the entity that needs to be mapped
      *
-     * @return DataMapper|null DataMapper configured for the $entityClass.
+     * @return DataMapper|null dataMapper configured for the $entityClass
      */
     public function getMapper(string $entityClass)
     {
@@ -140,8 +136,6 @@ class Manager
 
     /**
      * Initializes the Mongolid manager.
-     *
-     * @return void
      */
     protected function init()
     {
