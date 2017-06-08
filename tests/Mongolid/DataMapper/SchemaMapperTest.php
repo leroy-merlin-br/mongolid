@@ -154,7 +154,7 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknowString()
+    public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknownString()
     {
         // Arrange
         $schemaClass = new class() extends Schema {
@@ -174,7 +174,7 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldMapAnArrayValueToAnotherSchemaSchema()
+    public function testShouldMapAnArrayValueToAnotherSchema()
     {
         // Arrange
         $schema = m::mock(Schema::class);
@@ -184,17 +184,17 @@ class SchemaMapperTest extends TestCase
         $test = $this;
 
         // Act
-        Ioc::instance('Xd\MySchema', $mySchema); // Register MySchema in Ioc
+        Ioc::instance('Xd\MySchema', $mySchema);
 
         // When instantiating the SchemaMapper with the specified $param as dependency
         Ioc::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
             // Check if mySchema has been injected correctly
-            $test->assertSame($mySchema, $params[0]);
+            $test->assertSame($mySchema, $params['schema']);
 
             // Instantiate a SchemaMapper with mySchema
-            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params[0]]);
+            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params['schema']]);
 
-            // Set expectation to receiva a map call
+            // Set expectation to receive a map call
             $anotherSchemaMapper->shouldReceive('map')
                 ->once()
                 ->with($value)
@@ -203,7 +203,7 @@ class SchemaMapperTest extends TestCase
             return $anotherSchemaMapper;
         });
 
-        //Assert
+        // Assert
         $this->assertEquals(
             [
                 ['foo' => 'PARSED'],

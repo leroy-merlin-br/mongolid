@@ -13,7 +13,7 @@ class Ioc
     /**
      * Illuminate instance.
      *
-     * @var Illuminate\Container\Container
+     * @var IlluminateContainer
      */
     protected static $container;
 

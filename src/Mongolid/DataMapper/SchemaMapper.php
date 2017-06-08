@@ -137,7 +137,7 @@ class SchemaMapper
     {
         $value = (array) $value;
         $schema = Ioc::make($schemaClass);
-        $mapper = Ioc::make(self::class, [$schema]);
+        $mapper = Ioc::makeWith(self::class, compact('schema'));
 
         if (!isset($value[0])) {
             $value = [$value];
