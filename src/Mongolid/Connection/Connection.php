@@ -54,8 +54,7 @@ class Connection
 
         $parameters = [$server, $options, $driver_options];
 
-        $this->rawManager = Ioc::make(Manager::class, $parameters);
-        $this->rawConnection = Ioc::make(Client::class, $parameters);
+        $this->rawConnection = new Client($server, $options, $driver_options);
     }
 
     /**
@@ -91,6 +90,6 @@ class Connection
      */
     public function getRawManager()
     {
-        return $this->rawManager;
+        return $this->getRawConnection()->getManager();
     }
 }
