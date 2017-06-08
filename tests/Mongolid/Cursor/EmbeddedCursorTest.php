@@ -50,7 +50,7 @@ class EmbeddedCursorTest extends TestCase
         $cursor = $this->getCursor(stdClass::class, $items);
 
         // Assert
-        $cursor->sort(['age' => 1, 'name' - 1]);
+        $cursor->sort(['age' => 1, 'name' -1]);
         $this->assertAttributeEquals(
             [
                 (object) ['age' => 24],
