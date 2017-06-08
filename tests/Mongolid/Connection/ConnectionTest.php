@@ -2,11 +2,9 @@
 
 namespace Mongolid\Connection;
 
-use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
 use MongoDB\Driver\Manager;
-use Mongolid\Container\Ioc;
 use TestCase;
 
 class ConnectionTest extends TestCase
@@ -39,9 +37,9 @@ class ConnectionTest extends TestCase
         $options = ['connect' => true];
         $driverOptions = ['some', 'driver', 'options'];
         $expectedParameters = [
-            'uri' => $server,
+            'uri'     => $server,
             'typeMap' => [
-                'array' => 'array',
+                'array'    => 'array',
                 'document' => 'array',
             ],
         ];
@@ -54,7 +52,6 @@ class ConnectionTest extends TestCase
         $this->assertAttributeEquals($expectedParameters['uri'], 'uri', $rawConnection);
         $this->assertAttributeEquals($expectedParameters['typeMap'], 'typeMap', $rawConnection);
     }
-
 
     public function testShouldGetRawManager()
     {

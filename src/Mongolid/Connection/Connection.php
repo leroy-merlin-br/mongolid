@@ -4,7 +4,6 @@ namespace Mongolid\Connection;
 
 use MongoDB\Client;
 use MongoDB\Driver\Manager;
-use Mongolid\Container\Ioc;
 
 /**
  * Represents a single connection with the database.
