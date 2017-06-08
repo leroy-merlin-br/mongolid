@@ -11,13 +11,6 @@ use MongoDB\Driver\Manager;
 class Connection
 {
     /**
-     * The raw MongoDB\Manager object to perform bulk operations.
-     *
-     * @var Client
-     */
-    protected $rawManager;
-
-    /**
      * The raw MongoDB\Client object that represents this connection.
      *
      * @var Client
@@ -37,23 +30,21 @@ class Connection
      *
      * @see   http://php.net/manual/en/mongodb-driver-manager.construct.php
      *
-     * @param string $server         the specified connection string
-     * @param array  $options        the mongodb client options
-     * @param array  $driver_options the mongodb driver options when opening a connection
+     * @param string $server        the specified connection string
+     * @param array  $options       the mongodb client options
+     * @param array  $driverOptions the mongodb driver options when opening a connection
      */
     public function __construct(
         string $server = 'mongodb://localhost:27017',
         array $options = ['connect' => true],
-        array $driver_options = []
+        array $driverOptions = []
     ) {
         // In order to work with PHP arrays instead of with objects
-        $driver_options['typeMap'] = ['array' => 'array', 'document' => 'array'];
+        $driverOptions['typeMap'] = ['array' => 'array', 'document' => 'array'];
 
         $this->findDefaultDatabase($server);
 
-        $parameters = [$server, $options, $driver_options];
-
-        $this->rawConnection = new Client($server, $options, $driver_options);
+        $this->rawConnection = new Client($server, $options, $driverOptions);
     }
 
     /**
