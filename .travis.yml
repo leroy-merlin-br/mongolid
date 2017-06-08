@@ -12,7 +12,7 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - phpunit -c phpunit.xml && make sniff
+  - phpunit -c phpunit.xml.dist && make sniff
 
 after_script:
   - php vendor/bin/coveralls -v
