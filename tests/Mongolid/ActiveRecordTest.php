@@ -45,7 +45,7 @@ class ActiveRecordTest extends TestCase
         // Assert
         $this->assertAttributeEquals(
             [
-                '_id'        => 'objectId',
+                '_id' => 'objectId',
                 'created_at' => 'createdAtTimestamp',
                 'updated_at' => 'updatedAtTimestamp',
             ],

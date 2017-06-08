@@ -25,7 +25,7 @@ class CacheComponent implements CacheComponentInterface
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param string $key Cache key of the item to be retrieved.
+     * @param string $key cache key of the item to be retrieved
      *
      * @return mixed
      */
@@ -39,11 +39,9 @@ class CacheComponent implements CacheComponentInterface
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param string $key     Cache key of the item.
-     * @param mixed  $value   Value being stored in cache.
-     * @param float  $minutes Cache ttl.
-     *
-     * @return void
+     * @param string $key     cache key of the item
+     * @param mixed  $value   value being stored in cache
+     * @param float  $minutes cache ttl
      */
     public function put(string $key, $value, float $minutes)
     {
@@ -56,9 +54,9 @@ class CacheComponent implements CacheComponentInterface
      * if the ttl of the given cache key has been expired and will free the
      * memory if so.
      *
-     * @param string $key Cache key of the item.
+     * @param string $key cache key of the item
      *
-     * @return bool Has cache key.
+     * @return bool has cache key
      */
     public function has(string $key): bool
     {
@@ -79,7 +77,7 @@ class CacheComponent implements CacheComponentInterface
      *
      * @codeCoverageIgnore
      *
-     * @return int Return current Unix timestamp.
+     * @return int return current Unix timestamp
      */
     protected function time()
     {

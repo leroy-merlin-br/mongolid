@@ -16,10 +16,8 @@ class TestCase extends PHPUnitTestCase
      * Assert if two queries are equals. It will compare ObjectIDs within any
      * level of the query and make sure that they are the same.
      *
-     * @param mixed $expectedQuery Correct query.
-     * @param mixed $query         Query being evaluated.
-     *
-     * @return void
+     * @param mixed $expectedQuery correct query
+     * @param mixed $query         query being evaluated
      */
     public function assertMongoQueryEquals($expectedQuery, $query)
     {
@@ -70,11 +68,9 @@ class TestCase extends PHPUnitTestCase
     /**
      * Set a protected property of an object.
      *
-     * @param mixed  $obj      Object Instance.
-     * @param string $property Property name.
-     * @param mixed  $value    Value to be set.
-     *
-     * @return void
+     * @param mixed  $obj      object Instance
+     * @param string $property property name
+     * @param mixed  $value    value to be set
      */
     protected function setProtected($obj, $property, $value)
     {
@@ -94,10 +90,10 @@ class TestCase extends PHPUnitTestCase
     /**
      * Get a protected property of an object.
      *
-     * @param mixed  $obj      Object Instance.
-     * @param string $property Property name.
+     * @param mixed  $obj      object Instance
+     * @param string $property property name
      *
-     * @return mixed Property value.
+     * @return mixed property value
      */
     protected function getProtected($obj, $property)
     {

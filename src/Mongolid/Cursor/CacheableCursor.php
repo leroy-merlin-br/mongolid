@@ -102,7 +102,7 @@ class CacheableCursor extends Cursor
     /**
      * Generates an unique cache key for the cursor in it's current state.
      *
-     * @return string Cache key to identify the query of the current cursor.
+     * @return string cache key to identify the query of the current cursor
      */
     protected function generateCacheKey(): string
     {
@@ -116,8 +116,6 @@ class CacheableCursor extends Cursor
 
     /**
      * Stores the original "limit" clause of the query.
-     *
-     * @return void
      */
     protected function storeOriginalLimit()
     {
@@ -169,7 +167,7 @@ class CacheableCursor extends Cursor
      * Serializes this object. Drops the unserializable DriverCursor. In order
      * to make the CacheableCursor object serializable.
      *
-     * @return string Serialized object.
+     * @return string serialized object
      */
     public function serialize()
     {

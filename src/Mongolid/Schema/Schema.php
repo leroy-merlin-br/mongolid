@@ -43,7 +43,7 @@ abstract class Schema
      * @var string[]
      */
     public $fields = [
-        '_id'        => 'objectId', // Means that the _id will pass trough the `objectId` method
+        '_id' => 'objectId', // Means that the _id will pass trough the `objectId` method
         'created_at' => 'createdAtTimestamp', // Generates an automatic timestamp
         'updated_at' => 'updatedAtTimestamp',
     ];
@@ -60,7 +60,7 @@ abstract class Schema
      * Filters any field in the $fields that has it's value specified as a
      * 'objectId'. It will wraps the $value, if any, into a ObjectID object.
      *
-     * @param mixed $value Value that may be converted to ObjectID.
+     * @param mixed $value value that may be converted to ObjectID
      *
      * @return ObjectID|mixed
      */
@@ -82,7 +82,7 @@ abstract class Schema
      * a new auto-increment number will be "generated" for the collection of
      * the schema. The sequence generation is done by the SequenceService.
      *
-     * @param int|null $value Value that will be evaluated.
+     * @param int|null $value value that will be evaluated
      *
      * @return int
      */
@@ -99,7 +99,7 @@ abstract class Schema
     /**
      * Prepares the field to be the datetime that the document has been created.
      *
-     * @param mixed|null $value Value that will be evaluated.
+     * @param mixed|null $value value that will be evaluated
      *
      * @return UTCDateTime
      */

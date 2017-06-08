@@ -20,9 +20,7 @@ class Ioc
     /**
      * Setter for static::$container.
      *
-     * @param IlluminateContainer $container The IoC container that will be used by mongolid.
-     *
-     * @return void
+     * @param IlluminateContainer $container the IoC container that will be used by mongolid
      */
     public static function setContainer(IlluminateContainer $container)
     {
@@ -32,8 +30,8 @@ class Ioc
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param string $method Method that is being called.
-     * @param array  $args   Method arguments.
+     * @param string $method method that is being called
+     * @param array  $args   method arguments
      *
      * @return mixed
      */

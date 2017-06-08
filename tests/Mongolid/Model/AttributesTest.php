@@ -29,8 +29,8 @@ class AttributesTest extends TestCase
         $model->child = $childObj;
         $this->assertAttributeEquals(
             [
-                'name'  => 'John',
-                'age'   => 25,
+                'name' => 'John',
+                'age' => 25,
                 'child' => $childObj,
             ],
             'attributes',
@@ -50,8 +50,8 @@ class AttributesTest extends TestCase
             $model,
             'attributes',
             [
-                'name'  => 'John',
-                'age'   => 25,
+                'name' => 'John',
+                'age' => 25,
                 'child' => $childObj,
             ]
         );
@@ -93,7 +93,7 @@ class AttributesTest extends TestCase
             'attributes',
             [
                 'name' => 'John',
-                'age'  => 25,
+                'age' => 25,
             ]
         );
 
@@ -203,7 +203,7 @@ class AttributesTest extends TestCase
         };
 
         $input = [
-            'name'                => 'Josh',
+            'name' => 'Josh',
             'notAllowedAttribute' => true,
         ];
 
@@ -254,27 +254,27 @@ class AttributesTest extends TestCase
             // -----------------------------
             '$fillable = []; $guarded = []' => [
                 'fillable' => [],
-                'guarded'  => [],
-                'input'    => [
+                'guarded' => [],
+                'input' => [
                     'name' => 'John',
-                    'age'  => 25,
-                    'sex'  => 'male',
+                    'age' => 25,
+                    'sex' => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
-                    'age'  => 25,
-                    'sex'  => 'male',
+                    'age' => 25,
+                    'sex' => 'male',
                 ],
             ],
 
             // -----------------------------
             '$fillable = ["name"]; $guarded = []' => [
                 'fillable' => ['name'],
-                'guarded'  => [],
-                'input'    => [
+                'guarded' => [],
+                'input' => [
                     'name' => 'John',
-                    'age'  => 25,
-                    'sex'  => 'male',
+                    'age' => 25,
+                    'sex' => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
@@ -284,26 +284,26 @@ class AttributesTest extends TestCase
             // -----------------------------
             '$fillable = []; $guarded = []' => [
                 'fillable' => [],
-                'guarded'  => ['sex'],
-                'input'    => [
+                'guarded' => ['sex'],
+                'input' => [
                     'name' => 'John',
-                    'age'  => 25,
-                    'sex'  => 'male',
+                    'age' => 25,
+                    'sex' => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',
-                    'age'  => 25,
+                    'age' => 25,
                 ],
             ],
 
             // -----------------------------
             '$fillable = ["name", "sex"]; $guarded = ["sex"]' => [
                 'fillable' => ['name', 'sex'],
-                'guarded'  => ['sex'],
-                'input'    => [
+                'guarded' => ['sex'],
+                'input' => [
                     'name' => 'John',
-                    'age'  => 25,
-                    'sex'  => 'male',
+                    'age' => 25,
+                    'sex' => 'male',
                 ],
                 'expected' => [
                     'name' => 'John',

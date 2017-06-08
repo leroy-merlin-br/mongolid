@@ -44,7 +44,7 @@ class Pool
     /**
      * Adds a new connection to the pool.
      *
-     * @param Connection $conn The actual connection that will be added to the pool.
+     * @param Connection $conn the actual connection that will be added to the pool
      *
      * @return bool Success
      */

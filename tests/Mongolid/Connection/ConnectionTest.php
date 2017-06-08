@@ -37,9 +37,9 @@ class ConnectionTest extends TestCase
         $options = ['connect' => true];
         $driverOptions = ['some', 'driver', 'options'];
         $expectedParameters = [
-            'uri'     => $server,
+            'uri' => $server,
             'typeMap' => [
-                'array'    => 'array',
+                'array' => 'array',
                 'document' => 'array',
             ],
         ];

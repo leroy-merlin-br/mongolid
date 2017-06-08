@@ -20,8 +20,8 @@ class SchemaMapperTest extends TestCase
         // Arrange
         $schema = m::mock(Schema::class);
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
+            'name' => 'string',
+            'age' => 'int',
             'stuff' => 'schema.My\Own\Schema',
         ];
         $schemaMapper = m::mock(
@@ -30,8 +30,8 @@ class SchemaMapperTest extends TestCase
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
         $data = [
-            'name'  => 'John',
-            'age'   => 23,
+            'name' => 'John',
+            'age' => 23,
             'stuff' => 'fooBar',
         ];
 
@@ -50,8 +50,8 @@ class SchemaMapperTest extends TestCase
         // Assert
         $this->assertEquals(
             [
-                'name'  => 'John.PARSED',
-                'age'   => '23.PARSED',
+                'name' => 'John.PARSED',
+                'age' => '23.PARSED',
                 'stuff' => 'fooBar.PARSED',
             ],
             $schemaMapper->map($data)
@@ -64,13 +64,13 @@ class SchemaMapperTest extends TestCase
         $schema = m::mock(Schema::class);
         $schema->dynamic = false;
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
+            'name' => 'string',
+            'age' => 'int',
         ];
         $schemaMapper = new SchemaMapper($schema);
         $data = [
-            'name'     => 'John',
-            'age'      => 23,
+            'name' => 'John',
+            'age' => 23,
             'location' => 'Brazil',
         ];
 
@@ -79,7 +79,7 @@ class SchemaMapperTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'John',
-                'age'  => 23,
+                'age' => 23,
             ],
             $data
         );
@@ -91,13 +91,13 @@ class SchemaMapperTest extends TestCase
         $schema = m::mock(Schema::class);
         $schema->dynamic = true;
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
+            'name' => 'string',
+            'age' => 'int',
         ];
         $schemaMapper = new SchemaMapper($schema);
         $data = [
-            'name'     => 'John',
-            'age'      => 23,
+            'name' => 'John',
+            'age' => 23,
             'location' => 'Brazil',
         ];
 
@@ -105,8 +105,8 @@ class SchemaMapperTest extends TestCase
         $this->callProtected($schemaMapper, 'clearDynamic', [&$data]);
         $this->assertEquals(
             [
-                'name'     => 'John',
-                'age'      => 23,
+                'name' => 'John',
+                'age' => 23,
                 'location' => 'Brazil',
             ],
             $data

@@ -169,17 +169,17 @@ class SchemaTest extends TestCase
     {
         return [
             'MongoDB driver UTCDateTime' => [
-                'value'       => new UTCDateTime(25),
+                'value' => new UTCDateTime(25),
                 'expectation' => new UTCDateTime(25),
             ],
             'Empty field' => [
-                'value'            => null,
-                'expectation'      => new UTCDateTime(),
+                'value' => null,
+                'expectation' => new UTCDateTime(),
                 'compareTimestamp' => false,
             ],
             'An string' => [
-                'value'            => 'foobar',
-                'expectation'      => new UTCDateTime(),
+                'value' => 'foobar',
+                'expectation' => new UTCDateTime(),
                 'compareTimestamp' => false,
             ],
         ];
