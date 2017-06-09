@@ -62,7 +62,7 @@ class ConnectionTest extends TestCase
 
         // Act
         $connection = new Connection($server, $options, $driverOptions);
-        $rawManager = $connection->getRawConnection()->getManager();
+        $rawManager = $connection->getRawManager();
 
         // Assert
         $this->assertInstanceOf(Manager::class, $rawManager);
