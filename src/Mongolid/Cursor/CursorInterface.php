@@ -12,9 +12,9 @@ interface CursorInterface extends Iterator
     /**
      * Limits the number of results returned.
      *
-     * @param int $amount The number of results to return.
+     * @param int $amount the number of results to return
      *
-     * @return CursorInterface Returns this cursor.
+     * @return CursorInterface returns this cursor
      */
     public function limit(int $amount);
 
@@ -25,23 +25,23 @@ interface CursorInterface extends Iterator
      *                      Each element in the array has as key the field name,
      *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return CursorInterface Returns this cursor.
+     * @return CursorInterface returns this cursor
      */
     public function sort(array $fields);
 
     /**
      * Skips a number of results.
      *
-     * @param int $amount The number of results to skip.
+     * @param int $amount the number of results to skip
      *
-     * @return CursorInterface Returns this cursor.
+     * @return CursorInterface returns this cursor
      */
     public function skip(int $amount);
 
     /**
      * Counts the number of results for this cursor.
      *
-     * @return int The number of documents returned by this cursor's query.
+     * @return int the number of documents returned by this cursor's query
      */
     public function count();
 

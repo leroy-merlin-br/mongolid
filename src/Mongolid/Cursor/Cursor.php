@@ -70,10 +70,10 @@ class Cursor implements CursorInterface, Serializable
     protected $assembler;
 
     /**
-     * @param Schema     $entitySchema Schema that describes the entity that will be retrieved from the database.
-     * @param Collection $collection   The raw collection object that will be used to retrieve the documents.
-     * @param string     $command      The command that is being called in the $collection.
-     * @param array      $params       The parameters of the $command.
+     * @param Schema     $entitySchema schema that describes the entity that will be retrieved from the database
+     * @param Collection $collection   the raw collection object that will be used to retrieve the documents
+     * @param string     $command      the command that is being called in the $collection
+     * @param array      $params       the parameters of the $command
      */
     public function __construct(
         Schema $entitySchema,
@@ -91,9 +91,9 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Limits the number of results returned.
      *
-     * @param int $amount The number of results to return.
+     * @param int $amount the number of results to return
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function limit(int $amount)
     {
@@ -109,7 +109,7 @@ class Cursor implements CursorInterface, Serializable
      *                      Each element in the array has as key the field name,
      *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function sort(array $fields)
     {
@@ -121,9 +121,9 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Skips a number of results.
      *
-     * @param int $amount The number of results to skip.
+     * @param int $amount the number of results to skip
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function skip(int $amount)
     {
@@ -136,9 +136,9 @@ class Cursor implements CursorInterface, Serializable
      * Disable idle timeout of 10 minutes from MongoDB cursor.
      * This method should be called before the cursor was started.
      *
-     * @param bool $flag Toggle timeout on or off.
+     * @param bool $flag toggle timeout on or off
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function disableTimeout(bool $flag = true)
     {
@@ -150,7 +150,7 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Counts the number of results for this cursor.
      *
-     * @return int The number of documents returned by this cursor's query.
+     * @return int the number of documents returned by this cursor's query
      */
     public function count(): int
     {
@@ -159,8 +159,6 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Iterator interface rewind (used in foreach).
-     *
-     * @return void
      */
     public function rewind()
     {
@@ -218,8 +216,6 @@ class Cursor implements CursorInterface, Serializable
      * Refresh the cursor in order to be able to perform a rewind and iterate
      * through it again. A new request to the database will be made in the next
      * iteration.
-     *
-     * @return void
      */
     public function fresh()
     {
@@ -238,8 +234,6 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Iterator next method (used in foreach).
-     *
-     * @return void
      */
     public function next()
     {
@@ -321,7 +315,7 @@ class Cursor implements CursorInterface, Serializable
      * Serializes this object storing the collection name instead of the actual
      * MongoDb\Collection (which is unserializable).
      *
-     * @return string Serialized object.
+     * @return string serialized object
      */
     public function serialize()
     {
@@ -334,9 +328,7 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Unserializes this object. Re-creating the database connection.
      *
-     * @param mixed $serialized Serialized cursor.
-     *
-     * @return void
+     * @param mixed $serialized serialized cursor
      */
     public function unserialize($serialized)
     {

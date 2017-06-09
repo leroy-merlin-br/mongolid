@@ -13,11 +13,11 @@ class CursorFactory
     /**
      * Creates a new instance of a non embedded Cursor.
      *
-     * @param Schema     $entitySchema Schema that describes the entity that will be retrieved from the database.
-     * @param Collection $collection   The raw collection object that will be used to retrieve the documents.
-     * @param string     $command      The command that is being called in the $collection.
-     * @param array      $params       The parameters of the $command.
-     * @param bool       $cacheable    Retrieves a CacheableCursor instead.
+     * @param Schema     $entitySchema schema that describes the entity that will be retrieved from the database
+     * @param Collection $collection   the raw collection object that will be used to retrieve the documents
+     * @param string     $command      the command that is being called in the $collection
+     * @param array      $params       the parameters of the $command
+     * @param bool       $cacheable    retrieves a CacheableCursor instead
      *
      * @return Cursor
      */
@@ -36,8 +36,8 @@ class CursorFactory
     /**
      * Creates a new instance of EmbeddedCursor.
      *
-     * @param string $entityClass Class of the objects that will be retrieved by the cursor.
-     * @param array  $items       The items array.
+     * @param string $entityClass class of the objects that will be retrieved by the cursor
+     * @param array  $items       the items array
      *
      * @return CursorInterface
      */

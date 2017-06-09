@@ -27,8 +27,8 @@ class SequenceService
     protected $connPool;
 
     /**
-     * @param Pool   $connPool   The connections that are going to be used to interact with the database.
-     * @param string $collection The collection where the sequences will be stored.
+     * @param Pool   $connPool   the connections that are going to be used to interact with the database
+     * @param string $collection the collection where the sequences will be stored
      */
     public function __construct(Pool $connPool, string $collection = 'mongolid_sequences')
     {
@@ -39,7 +39,7 @@ class SequenceService
     /**
      * Get next value for the sequence.
      *
-     * @param string $sequenceName Sequence identifier string.
+     * @param string $sequenceName sequence identifier string
      *
      * @return int
      */
@@ -47,7 +47,7 @@ class SequenceService
     {
         $sequenceValue = $this->rawCollection()->findOneAndUpdate(
             ['_id' => $sequenceName],
-            ['$inc'   => ['seq' => 1]],
+            ['$inc' => ['seq' => 1]],
             ['upsert' => true]
         );
 

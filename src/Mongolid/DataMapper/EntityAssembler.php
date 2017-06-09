@@ -23,8 +23,8 @@ class EntityAssembler
     /**
      * Builds an object from the provided data.
      *
-     * @param array|object $document The attributes that will be used to compose the entity.
-     * @param Schema       $schema   Schema that will be used to map each field.
+     * @param array|object $document the attributes that will be used to compose the entity
+     * @param Schema       $schema   schema that will be used to map each field
      *
      * @return mixed
      */
@@ -54,9 +54,9 @@ class EntityAssembler
      * @see \Mongolid\Model\PolymorphableInterface::polymorph
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
-     * @param mixed $entity The entity that may or may not have a polymorph method.
+     * @param mixed $entity the entity that may or may not have a polymorph method
      *
-     * @return mixed The result of $entity->polymorph or the $entity itself.
+     * @return mixed the result of $entity->polymorph or the $entity itself
      */
     protected function morphingTime($entity)
     {
@@ -70,9 +70,9 @@ class EntityAssembler
     /**
      * Stores original attributes from Entity if needed.
      *
-     * @param mixed $entity The entity that may have the attributes stored.
+     * @param mixed $entity the entity that may have the attributes stored
      *
-     * @return mixed The entity with original attributes.
+     * @return mixed the entity with original attributes
      */
     protected function prepareOriginalAttributes($entity)
     {
@@ -86,8 +86,8 @@ class EntityAssembler
     /**
      * Assembly multiple documents for the given $schemaClass recursively.
      *
-     * @param mixed  $value       A value of an embeded field containing entity data to be assembled.
-     * @param string $schemaClass The schemaClass to be used when assembling the entities within $value.
+     * @param mixed  $value       a value of an embeded field containing entity data to be assembled
+     * @param string $schemaClass the schemaClass to be used when assembling the entities within $value
      *
      * @return mixed
      */

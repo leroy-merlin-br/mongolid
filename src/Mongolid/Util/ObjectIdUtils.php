@@ -11,9 +11,9 @@ class ObjectIdUtils
     /**
      * Checks if the given value can be a valid ObjectId.
      *
-     * @param mixed $value String to be evaluated if it can be used as a valid ObjectID.
+     * @param mixed $value string to be evaluated if it can be used as a valid ObjectID
      *
-     * @return bool True if is valid.
+     * @return bool true if is valid
      */
     public static function isObjectId($value)
     {

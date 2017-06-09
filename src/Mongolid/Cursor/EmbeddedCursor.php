@@ -38,8 +38,8 @@ class EmbeddedCursor implements CursorInterface
     private $position = 0;
 
     /**
-     * @param string $entityClass Class of the objects that will be retrieved by the cursor.
-     * @param array  $items       The items array.
+     * @param string $entityClass class of the objects that will be retrieved by the cursor
+     * @param array  $items       the items array
      */
     public function __construct(string $entityClass, array $items)
     {
@@ -50,9 +50,9 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Limits the number of results returned.
      *
-     * @param int $amount The number of results to return.
+     * @param int $amount the number of results to return
      *
-     * @return EmbeddedCursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function limit(int $amount)
     {
@@ -68,17 +68,16 @@ class EmbeddedCursor implements CursorInterface
      *                      Each element in the array has as key the field name,
      *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return EmbeddedCursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function sort(array $fields)
     {
-        foreach (array_reverse($fields) as $key => $value) {
+        foreach (array_reverse($fields) as $key => $direction) {
             // Uses usort with a function that will access the $key and sort in
-            // the $value direction. It mimics how the mongodb does sorting
-            // internally.
+            // the $direction. It mimics how the mongodb does sorting internally.
             usort(
                 $this->items,
-                function ($a, $b) use ($key, $value) {
+                function ($a, $b) use ($key, $direction) {
                     $a = is_object($a)
                         ? ($a->$key ?? null)
                         : ($a[$key] ?? null);
@@ -87,11 +86,7 @@ class EmbeddedCursor implements CursorInterface
                         ? ($b->$key ?? null)
                         : ($b[$key] ?? null);
 
-                    if ($a < $b) {
-                        return $value * -1;
-                    }
-
-                    return $value;
+                    return ($a <=> $b) * $direction;
                 }
             );
         }
@@ -102,9 +97,9 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Skips a number of results.
      *
-     * @param int $amount The number of results to skip.
+     * @param int $amount the number of results to skip
      *
-     * @return EmbeddedCursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function skip(int $amount)
     {
@@ -116,7 +111,7 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Counts the number of results for this cursor.
      *
-     * @return int The number of documents returned by this cursor's query.
+     * @return int the number of documents returned by this cursor's query
      */
     public function count()
     {
@@ -125,8 +120,6 @@ class EmbeddedCursor implements CursorInterface
 
     /**
      * Iterator interface rewind (used in foreach).
-     *
-     * @return void
      */
     public function rewind()
     {
@@ -152,7 +145,7 @@ class EmbeddedCursor implements CursorInterface
         }
 
         $schema = $this->getSchemaForEntity();
-        $entityAssembler = Ioc::make(EntityAssembler::class, [$schema]);
+        $entityAssembler = Ioc::makeWith(EntityAssembler::class, compact('schema'));
 
         return $entityAssembler->assemble($document, $schema);
     }
@@ -162,7 +155,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return Schema
      */
-    protected function getSchemaForEntity() : Schema
+    protected function getSchemaForEntity(): Schema
     {
         if ($this->entityClass instanceof Schema) {
             return $this->entityClass;
@@ -201,8 +194,6 @@ class EmbeddedCursor implements CursorInterface
 
     /**
      * Iterator next method (used in foreach).
-     *
-     * @return void
      */
     public function next()
     {

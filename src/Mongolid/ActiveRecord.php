@@ -49,7 +49,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * @var string|string[]
      */
     protected $fields = [
-        '_id'        => 'objectId',
+        '_id' => 'objectId',
         'created_at' => 'createdAtTimestamp',
         'updated_at' => 'updatedAtTimestamp',
     ];
@@ -108,9 +108,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * Gets a cursor of this kind of entities that matches the query from the
      * database.
      *
-     * @param array $query      MongoDB selection criteria.
-     * @param array $projection Fields to project in Mongo query.
-     * @param bool  $useCache   Retrieves a CacheableCursor instead.
+     * @param array $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -139,9 +139,9 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Gets the first entity of this kind that matches the query.
      *
-     * @param mixed $query      MongoDB selection criteria.
-     * @param array $projection Fields to project in Mongo query.
-     * @param bool  $useCache   Retrieves the entity through a CacheableCursor.
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
      * @return ActiveRecord
      */
@@ -161,11 +161,11 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * Gets the first entity of this kind that matches the query. If no
      * document was found, throws ModelNotFoundException.
      *
-     * @param mixed $query      MongoDB selection criteria.
-     * @param array $projection Fields to project in Mongo query.
-     * @param bool  $useCache   Retrieves the entity through a CacheableCursor.
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
-     * @throws ModelNotFoundException If no document was found.
+     * @throws ModelNotFoundException if no document was found
      *
      * @return ActiveRecord
      */
@@ -186,7 +186,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * document was found, a new entity will be returned with the
      * _if field filled.
      *
-     * @param mixed $id Document id.
+     * @param mixed $id document id
      *
      * @return ActiveRecord
      */
@@ -205,10 +205,10 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Handle dynamic method calls into the model.
      *
-     * @param mixed $method     Name of the method that is being called.
-     * @param mixed $parameters Parameters of $method.
+     * @param mixed $method     name of the method that is being called
+     * @param mixed $parameters parameters of $method
      *
-     * @throws BadMethodCallException In case of invalid methods be called.
+     * @throws BadMethodCallException in case of invalid methods be called
      *
      * @return mixed
      */
@@ -276,9 +276,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Setter for $writeConcern variable.
      *
-     * @param mixed $writeConcern Level of write concern to the transation.
-     *
-     * @return void
+     * @param mixed $writeConcern level of write concern to the transation
      */
     public function setWriteConcern($writeConcern)
     {
@@ -321,7 +319,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Performs the given action into database.
      *
-     * @param string $action Datamapper function to execute.
+     * @param string $action datamapper function to execute
      *
      * @return bool
      */
@@ -345,7 +343,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Returns the a valid instance from Ioc.
      *
-     * @throws NoCollectionNameException Throws exception when has no collection filled.
+     * @throws NoCollectionNameException throws exception when has no collection filled
      *
      * @return mixed
      */

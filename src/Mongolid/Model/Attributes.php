@@ -55,7 +55,7 @@ trait Attributes
     /**
      * Get an attribute from the model.
      *
-     * @param string $key The attribute to be accessed.
+     * @param string $key the attribute to be accessed
      *
      * @return mixed
      */
@@ -83,10 +83,8 @@ trait Attributes
     /**
      * Set the model attributes using an array.
      *
-     * @param array $input The data that will be used to fill the attributes.
-     * @param bool  $force Force fill.
-     *
-     * @return void
+     * @param array $input the data that will be used to fill the attributes
+     * @param bool  $force force fill
      */
     public function fill(array $input, bool $force = false)
     {
@@ -105,9 +103,7 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param string $key Name of the attribute to be unset.
-     *
-     * @return void
+     * @param string $key name of the attribute to be unset
      */
     public function cleanAttribute(string $key)
     {
@@ -117,10 +113,8 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param string $key   Name of the attribute to be set.
-     * @param mixed  $value Value to be set.
-     *
-     * @return void
+     * @param string $key   name of the attribute to be set
+     * @param mixed  $value value to be set
      */
     public function setAttribute(string $key, $value)
     {
@@ -133,8 +127,6 @@ trait Attributes
      *
      * Ideally should be called once right after retrieving data from
      * the database.
-     *
-     * @return void
      */
     public function syncOriginalAttributes()
     {
@@ -144,8 +136,8 @@ trait Attributes
     /**
      * Verify if model has a mutator method defined.
      *
-     * @param mixed $key    Attribute name.
-     * @param mixed $prefix Method prefix to be used.
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
      *
      * @return bool
      */
@@ -159,8 +151,8 @@ trait Attributes
     /**
      * Create mutator method pattern.
      *
-     * @param mixed $key    Attribute name.
-     * @param mixed $prefix Method prefix to be used.
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
      *
      * @return string
      */
@@ -182,7 +174,7 @@ trait Attributes
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param mixed $key Name of the attribute.
+     * @param mixed $key name of the attribute
      *
      * @return mixed
      */
@@ -198,10 +190,8 @@ trait Attributes
     /**
      * Dynamically set attributes on the model.
      *
-     * @param mixed $key   Attribute name.
-     * @param mixed $value Value to be set.
-     *
-     * @return void
+     * @param mixed $key   attribute name
+     * @param mixed $value value to be set
      */
     public function __set($key, $value)
     {
@@ -215,7 +205,7 @@ trait Attributes
     /**
      * Determine if an attribute exists on the model.
      *
-     * @param mixed $key Attribute name.
+     * @param mixed $key attribute name
      *
      * @return bool
      */
@@ -227,9 +217,7 @@ trait Attributes
     /**
      * Unset an attribute on the model.
      *
-     * @param mixed $key Attribute name.
-     *
-     * @return void
+     * @param mixed $key attribute name
      */
     public function __unset($key)
     {

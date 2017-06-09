@@ -16,12 +16,12 @@
     "require": {
         "php": ">=7.0",
         "mongodb/mongodb": "^1.0",
-        "illuminate/container": ">=5.0 <5.4"
+        "illuminate/container": "^5.4"
     },
     "require-dev": {
         "mockery/mockery": "^0.9",
         "satooshi/php-coveralls": "^1.0",
-        "phpunit/phpunit": "^5.0",
+        "phpunit/phpunit": "^5.7",
         "squizlabs/php_codesniffer": "^2.0"
     },
     "autoload": {
