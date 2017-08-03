@@ -761,15 +761,15 @@ class DataMapperTest extends TestCase
     public function testShouldGetRawCollectionWithCustomDatabase()
     {
         // Arrange
-        $connPool   = m::mock(Pool::class);
-        $mapper     = new DataMapper($connPool);
+        $connPool = m::mock(Pool::class);
+        $mapper = new DataMapper($connPool);
         $connection = m::mock(Connection::class);
         $collection = m::mock(Collection::class);
 
-        $mapper->schema              = (object) ['collection' => 'foobar'];
-        $mapper->database            = 'test_database';
+        $mapper->schema = (object) ['collection' => 'foobar'];
+        $mapper->database = 'test_database';
         $connection->defaultDatabase = 'grimory';
-        $connection->test_database   = (object) ['foobar' => $collection];
+        $connection->test_database = (object) ['foobar' => $collection];
 
         // Expect
         $connPool->shouldReceive('getConnection')
