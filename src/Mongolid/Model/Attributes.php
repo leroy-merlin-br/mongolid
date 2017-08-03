@@ -9,8 +9,6 @@ namespace Mongolid\Model;
  * will be set.
  *
  * It is supposed to be used in model classes in general
- *
- * @package  Mongolid
  */
 trait Attributes
 {
@@ -39,7 +37,7 @@ trait Attributes
 
     /**
      * The attributes that are not mass assignable. The opposite
-     * to the fillable array;
+     * to the fillable array;.
      *
      * @var array
      */
@@ -50,26 +48,25 @@ trait Attributes
      * the existence of a specific method on model
      * class. Default is true.
      *
-     * @var boolean
+     * @var bool
      */
-    public $mutable = true;
+    public $mutable = false;
 
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key The attribute to be accessed.
+     * @param string $key the attribute to be accessed
      *
      * @return mixed
      */
     public function getAttribute(string $key)
     {
         $inAttributes = array_key_exists($key, $this->attributes);
+
         if ($inAttributes) {
             return $this->attributes[$key];
         } elseif ($key == 'attributes') {
             return $this->attributes;
-        } else {
-            return null;
         }
     }
 
@@ -84,12 +81,10 @@ trait Attributes
     }
 
     /**
-     * Set the model attributes using an array
+     * Set the model attributes using an array.
      *
-     * @param array   $input The data that will be used to fill the attributes.
-     * @param boolean $force Force fill.
-     *
-     * @return void
+     * @param array $input the data that will be used to fill the attributes
+     * @param bool  $force force fill
      */
     public function fill(array $input, bool $force = false)
     {
@@ -99,7 +94,7 @@ trait Attributes
                 continue;
             }
 
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && ! in_array($key, $this->guarded)) {
+            if ((empty($this->fillable) || in_array($key, $this->fillable)) && !in_array($key, $this->guarded)) {
                 $this->setAttribute($key, $value);
             }
         }
@@ -108,9 +103,7 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param string $key Name of the attribute to be unset.
-     *
-     * @return void
+     * @param string $key name of the attribute to be unset
      */
     public function cleanAttribute(string $key)
     {
@@ -120,10 +113,8 @@ trait Attributes
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key   Name of the attribute to be set.
-     * @param  mixed  $value Value to be set.
-     *
-     * @return void
+     * @param string $key   name of the attribute to be set
+     * @param mixed  $value value to be set
      */
     public function setAttribute(string $key, $value)
     {
@@ -136,42 +127,38 @@ trait Attributes
      *
      * Ideally should be called once right after retrieving data from
      * the database.
-     *
-     * @return void
      */
-    public function storeOriginalAttributes()
+    public function syncOriginalAttributes()
     {
-        if (empty($this->original)) {
-            $this->original = $this->attributes;
-        }
+        $this->original = $this->attributes;
     }
 
     /**
      * Verify if model has a mutator method defined.
      *
-     * @param  mixed $key    Attribute name.
-     * @param  mixed $prefix Method prefix to be used.
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasMutatorMethod($key, $prefix)
     {
         $method = $this->buildMutatorMethod($key, $prefix);
-        
+
         return method_exists($this, $method);
     }
 
     /**
      * Create mutator method pattern.
      *
-     * @param  mixed $key    Attribute name.
-     * @param  mixed $prefix Method prefix to be used.
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
      *
      * @return string
      */
     protected function buildMutatorMethod($key, $prefix)
     {
-        return $prefix . ucfirst($key) . 'Attribute';
+        return $prefix.ucfirst($key).'Attribute';
     }
 
     /**
@@ -187,7 +174,7 @@ trait Attributes
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param  mixed $key Name of the attribute.
+     * @param mixed $key name of the attribute
      *
      * @return mixed
      */
@@ -196,33 +183,31 @@ trait Attributes
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             return $this->{$this->buildMutatorMethod($key, 'get')}();
         }
-        
+
         return $this->getAttribute($key);
     }
 
     /**
      * Dynamically set attributes on the model.
      *
-     * @param  mixed $key   Attribute name.
-     * @param  mixed $value Value to be set.
-     *
-     * @return void
+     * @param mixed $key   attribute name
+     * @param mixed $value value to be set
      */
     public function __set($key, $value)
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
-        
+
         $this->setAttribute($key, $value);
     }
 
     /**
      * Determine if an attribute exists on the model.
      *
-     * @param  mixed $key Attribute name.
+     * @param mixed $key attribute name
      *
-     * @return boolean
+     * @return bool
      */
     public function __isset($key)
     {
@@ -232,9 +217,7 @@ trait Attributes
     /**
      * Unset an attribute on the model.
      *
-     * @param  mixed $key Attribute name.
-     *
-     * @return void
+     * @param mixed $key attribute name
      */
     public function __unset($key)
     {

@@ -9,6 +9,7 @@ Mongolid supports both **ActiveRecord** and **DataMapper** patterns. **You choos
 
 [![Build Status](https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master)](https://travis-ci.org/leroy-merlin-br/mongolid)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cc45e93bb0d0413d9e0355c7377d4d33)](https://www.codacy.com/app/zizaco/mongolid?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=leroy-merlin-br/mongolid&amp;utm_campaign=Badge_Grade)
+[![StyleCI](https://styleci.io/repos/9799450/shield?branch=master)](https://styleci.io/repos/9799450)
 [![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/zizaco/mongolid/v/stable.png)](https://packagist.org/packages/zizaco/mongolid)
 [![Total Downloads](https://poser.pugx.org/zizaco/mongolid/downloads.png)](https://packagist.org/packages/zizaco/mongolid)
@@ -56,12 +57,14 @@ Make sure that the **php.ini** file used in the CLI environment includes the Mon
 
 Run `php -i | grep 'Configuration File'` in a terminal to check the **.ini** that is being used.
 
-To check if PHP in the CLI environment is importing the driver properly run `php -i | grep 'mongo'` in your terminal. You should get output similar to:
+To check if PHP in the CLI environment is importing the driver properly run `php -i | grep -i 'mongo'` in your terminal. You should get output similar to:
 
 ```
-$ php -i | grep 'mongo'
-mongodb support => enabled
-mongodb version => 1.1.3
+$ php -i | grep -i 'mongo'
+MongoDB support => enabled
+MongoDB extension version => 1.2.8
+MongoDB extension stability => stable
+libmongoc bundled version => 1.5.5
 ```
 
 **"This package requires php >=7.0 but your PHP version (X.X.X) does not satisfy that requirement."**

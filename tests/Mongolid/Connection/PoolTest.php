@@ -1,9 +1,8 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Mockery as m;
-use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
 use TestCase;
 
 class PoolTest extends TestCase
@@ -17,8 +16,8 @@ class PoolTest extends TestCase
     public function testShouldGetAConnectionFromPoolIfContainsAny()
     {
         // Arrange
-        $pool       = new Pool;
-        $connQueue  = m::mock();
+        $pool = new Pool();
+        $connQueue = m::mock();
         $connection = m::mock(Connection::class);
         $this->setProtected($pool, 'connections', $connQueue);
 
@@ -38,8 +37,8 @@ class PoolTest extends TestCase
     public function testShouldGetNullConnectionFromPoolIfItsEmpty()
     {
         // Arrange
-        $pool       = new Pool;
-        $connQueue  = m::mock();
+        $pool = new Pool();
+        $connQueue = m::mock();
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act
@@ -57,8 +56,8 @@ class PoolTest extends TestCase
     public function testShouldAddConnectionToPool()
     {
         // Arrange
-        $pool       = new Pool;
-        $connQueue  = m::mock();
+        $pool = new Pool();
+        $connQueue = m::mock();
         $connection = m::mock(Connection::class);
         $this->setProtected($pool, 'connections', $connQueue);
 

@@ -1,27 +1,26 @@
-<?php namespace Mongolid\Container;
+<?php
+
+namespace Mongolid\Container;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 
 /**
  * This class is a simple Facade for a Illuminate\Container\Container
  * in order to use the Container as IOC at all classes.
- *
- * @package Mongolid
  */
 class Ioc
 {
     /**
      * Illuminate instance.
-     * @var Illuminate\Container\Container
+     *
+     * @var IlluminateContainer
      */
     protected static $container;
 
     /**
      * Setter for static::$container.
      *
-     * @param IlluminateContainer $container The IoC container that will be used by mongolid.
-     *
-     * @return void
+     * @param IlluminateContainer $container the IoC container that will be used by mongolid
      */
     public static function setContainer(IlluminateContainer $container)
     {
@@ -31,8 +30,9 @@ class Ioc
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param  string $method Method that is being called.
-     * @param  array  $args   Method arguments.
+     * @param string $method method that is being called
+     * @param array  $args   method arguments
+     *
      * @return mixed
      */
     public static function __callStatic(string $method, array $args)

@@ -1,10 +1,10 @@
 <?php
+
 namespace Mongolid\Model;
 
-use TestCase;
 use Mockery as m;
-use Mongolid\Container\Ioc;
 use stdClass;
+use TestCase;
 
 class AttributesTest extends TestCase
 {
@@ -17,11 +17,11 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
-        $childObj = new stdClass;
+        $childObj = new stdClass();
 
         // Assert
         $model->name = 'John';
@@ -41,11 +41,11 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicGetters()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
-        $childObj = new stdClass;
+        $childObj = new stdClass();
         $this->setProtected(
             $model,
             'attributes',
@@ -66,14 +66,14 @@ class AttributesTest extends TestCase
     public function testShouldCheckIfAttributeIsSet()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
         $this->setProtected(
             $model,
             'attributes',
-            ['name' => 'John',]
+            ['name' => 'John']
         );
 
         // Assert
@@ -84,7 +84,7 @@ class AttributesTest extends TestCase
     public function testShouldUnsetAttributes()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -111,61 +111,65 @@ class AttributesTest extends TestCase
     public function testShouldGetAttributeFromMutator()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-            
+
             public function getSomeAttribute()
             {
                 return 'something-else';
-            } 
+            }
         };
-        
+
+        /* Enable mutator methods */
+        $model->mutable = true;
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('something-else', $model->some);
     }
-    
+
     public function testShouldIgnoreMutators()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-                                    
+
             public function getSomeAttribute()
             {
                 return 'something-else';
-            } 
-            
+            }
+
             public function setSomeAttribute($value)
             {
                 return strtoupper($value);
-            } 
+            }
         };
-        
+
         /* Disable mutator methods */
         $model->mutable = false;
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('some-value', $model->some);
     }
-    
+
     public function testShouldSetAttributeFromMutator()
     {
         // Arrange
-        $model = new class{ 
+        $model = new class() {
             use Attributes;
-            
+
             public function setSomeAttribute($value)
             {
                 return strtoupper($value);
-            } 
+            }
         };
-        
+
+        /* Enable mutator methods */
+        $model->mutable = true;
         $model->some = 'some-value';
-        
-        // Assert        
+
+        // Assert
         $this->assertEquals('SOME-VALUE', $model->some);
     }
 
@@ -179,7 +183,7 @@ class AttributesTest extends TestCase
         $expected
     ) {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -194,13 +198,13 @@ class AttributesTest extends TestCase
     public function testShouldForceFillAttributes()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
         $input = [
-            'name'                => 'Josh',
-            'notAllowedAttribute' => true
+            'name' => 'Josh',
+            'notAllowedAttribute' => true,
         ];
 
         // Act
@@ -213,7 +217,7 @@ class AttributesTest extends TestCase
     public function testShouldBeCastableToArray()
     {
         // Arrange
-        $model = new class {
+        $model = new class() {
             use Attributes;
         };
 
@@ -230,7 +234,7 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class implements AttributesAccessInterface {
+        $model = new class() implements AttributesAccessInterface {
             use Attributes;
         };
 
@@ -238,30 +242,10 @@ class AttributesTest extends TestCase
         $model->age = 25;
 
         // Act
-        $model->storeOriginalAttributes();
+        $model->syncOriginalAttributes();
 
         // Assert
         $this->assertAttributeEquals($model->attributes, 'original', $model);
-
-        return $model;
-    }
-
-    /**
-     * @depends testShouldSetOriginalAttributes
-     */
-    public function testShouldKeepOriginalAttributesIfPropertiesAreChangedAndMethodCalledAgain($model)
-    {
-        // Arrange
-        $expect = $model->attributes;
-
-        $model->name = 'Rick';
-        $model->age = 18;
-
-        // Act
-        $model->storeOriginalAttributes();
-
-        // Assert
-        $this->assertAttributeEquals($expect, 'original', $model);
     }
 
     public function getFillableOptions()

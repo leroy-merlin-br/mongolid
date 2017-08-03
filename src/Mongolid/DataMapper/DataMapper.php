@@ -1,54 +1,53 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
-use MongoDB\DeleteResult;
-use MongoDB\InsertOneResult;
-use MongoDB\UpdateResult;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
-use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\DataMapper\SchemaMapper;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema;
+use Mongolid\Exception\ModelNotFoundException;
+use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Schema\HasSchemaInterface;
+use Mongolid\Schema\Schema;
+use Mongolid\Util\ObjectIdUtils;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
  * from the database.
  * The DataMapper will always use a Schema trough the SchemaMapper to parse the
  * document in and out of the database.
- *
- * @package  Mongolid
  */
-class DataMapper
+class DataMapper implements HasSchemaInterface
 {
     /**
-     * Name of the schema class to be used
+     * Name of the schema class to be used.
      *
      * @var string
      */
     public $schemaClass = Schema::class;
 
     /**
-     * Schema object. Will be set after the $schemaClass
+     * Schema object. Will be set after the $schemaClass.
      *
      * @var Schema
      */
-    public $schema;
+    protected $schema;
 
     /**
-     * The database to be interacted with
+
+     * The database to be interacted with.
      *
      * @var string
      */
     public $database = '';
 
     /**
-     * Connections that are going to be used to interact with the database
+     * Connections that are going to be used to interact with the database.
      *
      * @var Pool
      */
@@ -62,37 +61,18 @@ class DataMapper
     protected $assembler;
 
     /**
-     * In order to dispatch events when necessary
+     * In order to dispatch events when necessary.
      *
      * @var EventTriggerService
      */
     protected $eventService;
 
     /**
-     * @param Pool $connPool The connections that are going to be used to interact with the database.
+     * @param Pool $connPool the connections that are going to be used to interact with the database
      */
     public function __construct(Pool $connPool)
     {
         $this->connPool = $connPool;
-    }
-
-    /**
-     * If $queryResult is acknowledged, then fire given event.
-     *
-     * @see $this->fire()
-     *
-     * @param InsertOneResult|UpdateResult|DeleteResult $queryResult
-     * @param array                                     $fireArguments
-     *
-     * @return bool whether or not result was acknowledged
-     */
-    protected function fireEventIfAcknowledged($queryResult, ...$fireArguments)
-    {
-        if ($result = $queryResult->isAcknowledged()) {
-            $this->fireEvent(...$fireArguments);
-        }
-
-        return $result;
     }
 
     /**
@@ -101,29 +81,38 @@ class DataMapper
      *
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      *
-     * @param  mixed $object  The object used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  the entity used in the operation
+     * @param array $options possible options to send to mongo driver
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($object, array $options = [])
+    public function save($entity, array $options = [])
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
         // listeners to cancel save operations if validations fail or whatever.
-        if ($this->fireEvent('saving', $object, true) === false) {
+        if ($this->fireEvent('saving', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
-        $queryResult = $this->getCollection()->updateOne(
+        $queryResult = $this->getCollection()->replaceOne(
             ['_id' => $data['_id']],
-            ['$set' => $data],
+            $data,
             $this->mergeOptions($options, ['upsert' => true])
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'saved', $object);
+        $result = $queryResult->isAcknowledged() &&
+            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
+
+        if ($result) {
+            $this->afterSuccess($entity);
+
+            $this->fireEvent('saved', $entity);
+        }
+
+        return $result;
     }
 
     /**
@@ -133,26 +122,36 @@ class DataMapper
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      *
-     * @param  mixed $object  The object used in the operation.
-     *
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity     the entity used in the operation
+     * @param array $options    possible options to send to mongo driver
+     * @param bool  $fireEvents whether events should be fired
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($object, array $options = []): bool
+    public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
-        if ($this->fireEvent('inserting', $object, true) === false) {
+        if ($fireEvents && $this->fireEvent('inserting', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->insertOne(
             $data,
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'inserted', $object);
+        $result = $queryResult->isAcknowledged() && $queryResult->getInsertedCount();
+
+        if ($result) {
+            $this->afterSuccess($entity);
+
+            if ($fireEvents) {
+                $this->fireEvent('inserted', $entity);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -162,18 +161,28 @@ class DataMapper
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      *
-     * @param  mixed $object  The object used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  the entity used in the operation
+     * @param array $options possible options to send to mongo driver
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function update($object, array $options = []): bool
+    public function update($entity, array $options = []): bool
     {
-        if ($this->fireEvent('updating', $object, true) === false) {
+        if ($this->fireEvent('updating', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        if (!$entity->_id) {
+            if ($result = $this->insert($entity, $options, false)) {
+                $this->afterSuccess($entity);
+
+                $this->fireEvent('updated', $entity);
+            }
+
+            return $result;
+        }
+
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
@@ -181,7 +190,15 @@ class DataMapper
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'updated', $object);
+        $result = $queryResult->isAcknowledged() && $queryResult->getModifiedCount();
+
+        if ($result) {
+            $this->afterSuccess($entity);
+
+            $this->fireEvent('updated', $entity);
+        }
+
+        return $result;
     }
 
     /**
@@ -189,34 +206,42 @@ class DataMapper
      *
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
      *
-     * @param  mixed $object  The object used in the operation.
-     * @param  array $options Possible options to send to mongo driver.
+     * @param mixed $entity  the entity used in the operation
+     * @param array $options possible options to send to mongo driver
      *
-     * @return boolean Success (but always false if write concern is Unacknowledged)
+     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function delete($object, array $options = []): bool
+    public function delete($entity, array $options = []): bool
     {
-        if ($this->fireEvent('deleting', $object, true) === false) {
+        if ($this->fireEvent('deleting', $entity, true) === false) {
             return false;
         }
 
-        $data = $this->parseToDocument($object);
+        $data = $this->parseToDocument($entity);
 
         $queryResult = $this->getCollection()->deleteOne(
             ['_id' => $data['_id']],
             $this->mergeOptions($options)
         );
 
-        return $this->fireEventIfAcknowledged($queryResult, 'deleted', $object);
+        if ($queryResult->isAcknowledged() &&
+            $queryResult->getDeletedCount()
+        ) {
+            $this->fireEvent('deleted', $entity);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Retrieve a database cursor that will return $this->schema->entityClass
-     * objects that upon iteration
+     * objects that upon iteration.
      *
-     * @param  mixed   $query      MongoDB query to retrieve documents.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $cacheable  Retrieves a CacheableCursor instead.
+     * @param mixed $query      mongoDB query to retrieve documents
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $cacheable  retrieves a CacheableCursor instead
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -233,7 +258,7 @@ class DataMapper
             'find',
             [
                 $this->prepareValueQuery($query),
-                ['projection' => $this->prepareProjection($projection)]
+                ['projection' => $this->prepareProjection($projection)],
             ]
         );
 
@@ -242,7 +267,7 @@ class DataMapper
 
     /**
      * Retrieve a database cursor that will return all documents as
-     * $this->schema->entityClass objects upon iteration
+     * $this->schema->entityClass objects upon iteration.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -253,11 +278,11 @@ class DataMapper
 
     /**
      * Retrieve one $this->schema->entityClass objects that matches the given
-     * query
+     * query.
      *
-     * @param  mixed   $query      MongoDB query to retrieve the document.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $cacheable  Retrieves the first through a CacheableCursor.
+     * @param mixed $query      mongoDB query to retrieve the document
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -275,8 +300,8 @@ class DataMapper
             ['projection' => $this->prepareProjection($projection)]
         );
 
-        if (! $document) {
-            return null;
+        if (!$document) {
+            return;
         }
 
         $model = $this->getAssembler()->assemble($document, $this->schema);
@@ -285,20 +310,44 @@ class DataMapper
     }
 
     /**
-     * Parses an object with SchemaMapper and the given Schema
+     * Retrieve one $this->schema->entityClass objects that matches the given
+     * query. If no document was found, throws ModelNotFoundException.
      *
-     * @param  mixed $object The object to be parsed.
+     * @param mixed $query      mongoDB query to retrieve the document
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
-     * @return array  Document
+     * @throws ModelNotFoundException if no document was found
+     *
+     * @return mixed First document matching query as an $this->schema->entityClass object
      */
-    protected function parseToDocument($object)
-    {
-        $schemaMapper   = $this->getSchemaMapper();
-        $parsedDocument = $schemaMapper->map($object);
+    public function firstOrFail(
+        $query = [],
+        array $projection = [],
+        bool $cacheable = false
+    ) {
+        if ($result = $this->first($query, $projection, $cacheable)) {
+            return $result;
+        }
 
-        if (is_object($object)) {
+        throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
+    }
+
+    /**
+     * Parses an object with SchemaMapper and the given Schema.
+     *
+     * @param mixed $entity the object to be parsed
+     *
+     * @return array Document
+     */
+    protected function parseToDocument($entity)
+    {
+        $schemaMapper = $this->getSchemaMapper();
+        $parsedDocument = $schemaMapper->map($entity);
+
+        if (is_object($entity)) {
             foreach ($parsedDocument as $field => $value) {
-                $object->$field = $value;
+                $entity->$field = $value;
             }
         }
 
@@ -306,17 +355,17 @@ class DataMapper
     }
 
     /**
-     * Returns a SchemaMapper with the $schema or $schemaClass instance
+     * Returns a SchemaMapper with the $schema or $schemaClass instance.
      *
      * @return SchemaMapper
      */
     protected function getSchemaMapper()
     {
-        if (! $this->schema) {
+        if (!$this->schema) {
             $this->schema = Ioc::make($this->schemaClass);
         }
 
-        return Ioc::make(SchemaMapper::class, [$this->schema]);
+        return Ioc::makeWith(SchemaMapper::class, ['schema' => $this->schema]);
     }
 
     /**
@@ -326,8 +375,8 @@ class DataMapper
      */
     protected function getCollection(): Collection
     {
-        $conn       = $this->connPool->getConnection();
-        $database   = $this->database ?: $conn->defaultDatabase;
+        $conn = $this->connPool->getConnection();
+        $database = $this->database ?: $conn->defaultDatabase;
         $collection = $this->schema->collection;
 
         return $conn->getRawConnection()->$database->$collection;
@@ -338,31 +387,65 @@ class DataMapper
      * This method will take care of converting a single value into a query for
      * an _id, including when a objectId is passed as a string.
      *
-     * @param  mixed $value The _id of the document.
+     * @param mixed $value the _id of the document
      *
      * @return array Query for the given _id
      */
     protected function prepareValueQuery($value): array
     {
-        if (is_array($value)) {
-            return $value;
+        if (!is_array($value)) {
+            $value = ['_id' => $value];
         }
 
-        if (is_string($value) && strlen($value) == 24 && ctype_xdigit($value)) {
-            $value = new ObjectID($value);
+        if (isset($value['_id']) &&
+            is_string($value['_id']) &&
+            ObjectIdUtils::isObjectId($value['_id'])
+        ) {
+            $value['_id'] = new ObjectID($value['_id']);
         }
 
-        return ['_id' => $value];
+        if (isset($value['_id']) &&
+            is_array($value['_id'])
+        ) {
+            $value['_id'] = $this->prepareArrayFieldOfQuery($value['_id']);
+        }
+
+        return $value;
     }
 
     /**
-     * Retrieves an EntityAssembler instance
+     * Prepares an embedded array of an query. It will convert string ObjectIDs
+     * in operators into actual objects.
+     *
+     * @param array $value array that will be treated
+     *
+     * @return array prepared array
+     */
+    protected function prepareArrayFieldOfQuery(array $value): array
+    {
+        foreach (['$in', '$nin'] as $operator) {
+            if (isset($value[$operator]) &&
+                is_array($value[$operator])
+            ) {
+                foreach ($value[$operator] as $index => $id) {
+                    if (ObjectIdUtils::isObjectId($id)) {
+                        $value[$operator][$index] = new ObjectID($id);
+                    }
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Retrieves an EntityAssembler instance.
      *
      * @return EntityAssembler
      */
     protected function getAssembler()
     {
-        if (! $this->assembler) {
+        if (!$this->assembler) {
             $this->assembler = Ioc::make(EntityAssembler::class);
         }
 
@@ -372,15 +455,15 @@ class DataMapper
     /**
      * Triggers an event. May return if that event had success.
      *
-     * @param  string  $event  Identification of the event.
-     * @param  mixed   $entity Event payload.
-     * @param  boolean $halt   True if the return of the event handler will be used in a conditional.
+     * @param string $event  identification of the event
+     * @param mixed  $entity event payload
+     * @param bool   $halt   true if the return of the event handler will be used in a conditional
      *
-     * @return mixed            Event handler return.
+     * @return mixed event handler return
      */
     protected function fireEvent(string $event, $entity, bool $halt = false)
     {
-        $event = "mongolid.{$event}." . get_class($entity);
+        $event = "mongolid.{$event}: ".get_class($entity);
 
         $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
 
@@ -388,7 +471,7 @@ class DataMapper
     }
 
     /**
-     * Converts the given projection fields to Mongo driver format
+     * Converts the given projection fields to Mongo driver format.
      *
      * How to use:
      *     As Mongo projection using boolean values:
@@ -404,7 +487,9 @@ class DataMapper
      *         From: ['name', '-_id']
      *         To:   ['name' => true, '_id' => false]
      *
-     * @param  array  $fields Fields to project.
+     * @param array $fields fields to project
+     *
+     * @throws InvalidArgumentException if the given $fields are not a valid projection
      *
      * @return array
      */
@@ -417,13 +502,13 @@ class DataMapper
                     $projection[$key] = $value;
                     continue;
                 }
-                if (is_integer($value)) {
+                if (is_int($value)) {
                     $projection[$key] = ($value >= 1);
                     continue;
                 }
             }
 
-            if (is_integer($key) && is_string($value)) {
+            if (is_int($key) && is_string($value)) {
                 $key = $value;
                 if (strpos($value, '-') === 0) {
                     $key = substr($key, 1);
@@ -436,11 +521,13 @@ class DataMapper
                 continue;
             }
 
-            throw new InvalidArgumentException(sprintf(
-                "Invalid projection: '%s' => '%s'",
-                $key,
-                $value
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Invalid projection: '%s' => '%s'",
+                    $key,
+                    $value
+                )
+            );
         }
 
         return $projection;
@@ -449,13 +536,43 @@ class DataMapper
     /**
      * Merge all options.
      *
-     * @param array $defaultOptions Default options array.
-     * @param array $toMergeOptions To merge options array.
+     * @param array $defaultOptions default options array
+     * @param array $toMergeOptions to merge options array
      *
      * @return array
      */
     private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = [])
     {
         return array_merge($defaultOptions, $toMergeOptions);
+    }
+
+    /**
+     * Perform actions on object before firing the after event.
+     *
+     * @param mixed $entity
+     */
+    private function afterSuccess($entity)
+    {
+        if ($entity instanceof AttributesAccessInterface) {
+            $entity->syncOriginalAttributes();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
+    /**
+     * Set a Schema object  that describes an Entity in MongoDB.
+     *
+     * @param Schema $schema
+     */
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
     }
 }

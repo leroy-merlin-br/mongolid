@@ -3,7 +3,5 @@
   <description>Extends PSR-2 making sure that the docblocks are well written</description>
   <!-- Include the whole PSR-2 standard -->
   <rule ref="PSR2"/>
-  <rule ref="Squiz.Commenting.FunctionComment" />
-  <rule ref="Squiz.Commenting.FunctionCommentThrowTag" />
   <rule ref="Squiz.Commenting.ClassComment" />
 </ruleset>

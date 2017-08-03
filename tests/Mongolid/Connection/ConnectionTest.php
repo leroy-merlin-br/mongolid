@@ -1,64 +1,70 @@
 <?php
+
 namespace Mongolid\Connection;
 
-use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
-use Mongolid\Container\Ioc;
+use MongoDB\Driver\Manager;
 use TestCase;
 
 class ConnectionTest extends TestCase
 {
-
     public function tearDown()
     {
-        parent::tearDown();
         m::close();
+        parent::tearDown();
     }
 
     public function testShouldConstructANewConnection()
     {
         // Arrange
-        $params      =  ['conn/my_db', ['options'], ['driver_opts']];
-        $mongoClient = m::mock(Client::class);
-        $container   = m::mock(Container::class);
-        Ioc::setContainer($container);
+        $server = 'mongodb://my-server/my_db';
+        $options = ['connect' => true];
+        $driverOptions = ['some', 'driver', 'options'];
 
         // Act
-        $expectedParams = $params;
-        $expectedParams[2]['typeMap'] = [
-            'array' => 'array',
-            'document' => 'array'
-        ];
-
-        $container->shouldReceive('make')
-            ->once()
-            ->with(Client::class, $expectedParams)
-            ->andReturn($mongoClient);
+        $connection = new Connection($server, $options, $driverOptions);
 
         // Assert
-        $connection = new Connection($params[0], $params[1], $params[2]);
-        $this->assertAttributeEquals($mongoClient, 'rawConnection', $connection);
+        $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
         $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
     }
 
     public function testShouldGetRawConnection()
     {
         // Arrange
-        $mongoClient = m::mock(Client::class);
-        $container   = m::mock(Container::class);
-        Ioc::setContainer($container);
+        $server = 'mongodb://my-server/my_db';
+        $options = ['connect' => true];
+        $driverOptions = ['some', 'driver', 'options'];
+        $expectedParameters = [
+            'uri' => $server,
+            'typeMap' => [
+                'array' => 'array',
+                'document' => 'array',
+            ],
+        ];
 
         // Act
-        $container->shouldReceive('make')
-            ->once()
-            ->andReturn($mongoClient);
+        $connection = new Connection($server, $options, $driverOptions);
+        $rawConnection = $connection->getRawConnection();
 
         // Assert
-        $connection = new Connection();
-        $this->assertEquals(
-            $mongoClient,
-            $connection->getRawConnection()
-        );
+        $this->assertAttributeEquals($expectedParameters['uri'], 'uri', $rawConnection);
+        $this->assertAttributeEquals($expectedParameters['typeMap'], 'typeMap', $rawConnection);
+    }
+
+    public function testShouldGetRawManager()
+    {
+        // Arrange
+        $server = 'mongodb://my-server/my_db';
+        $options = ['connect' => true];
+        $driverOptions = ['some', 'driver', 'options'];
+
+        // Act
+        $connection = new Connection($server, $options, $driverOptions);
+        $rawManager = $connection->getRawManager();
+
+        // Assert
+        $this->assertInstanceOf(Manager::class, $rawManager);
     }
 }

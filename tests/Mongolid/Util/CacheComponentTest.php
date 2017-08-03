@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 use Mockery as m;
@@ -7,8 +8,9 @@ use TestCase;
 class CacheComponentTest extends TestCase
 {
     /**
-     * Current time that will be retrieved by CacheComponent::time()
-     * @var integer
+     * Current time that will be retrieved by CacheComponent::time().
+     *
+     * @var int
      */
     public $time = 1466710000;
 
@@ -16,6 +18,15 @@ class CacheComponentTest extends TestCase
     {
         parent::tearDown();
         m::close();
+    }
+
+    public function testShouldImplementCacheComponentInterface()
+    {
+        // Arrange
+        $cacheComponent = (new CacheComponent());
+
+        // Assertion
+        $this->assertInstanceOf(CacheComponentInterface::class, $cacheComponent);
     }
 
     public function testShouldPutAndRetrieveValues()
@@ -58,7 +69,7 @@ class CacheComponentTest extends TestCase
     }
 
     /**
-     * Skips $seconds of time
+     * Skips $seconds of time.
      */
     protected function tick($seconds)
     {

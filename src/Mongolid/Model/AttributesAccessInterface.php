@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 /**
@@ -8,15 +9,13 @@ namespace Mongolid\Model;
  * It is supposed to be used in conjunction with Attributes trait
  *
  * @see Attributes
- *
- * @package  Mongolid
  */
 interface AttributesAccessInterface
 {
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key The attribute to be accessed.
+     * @param string $key the attribute to be accessed
      *
      * @return mixed
      */
@@ -30,31 +29,25 @@ interface AttributesAccessInterface
     public function getAttributes();
 
     /**
-     * Set the model attributes using an array
+     * Set the model attributes using an array.
      *
-     * @param array   $input The data that will be used to fill the attributes.
-     * @param boolean $force Force fill.
-     *
-     * @return void
+     * @param array $input the data that will be used to fill the attributes
+     * @param bool  $force force fill
      */
     public function fill(array $input, bool $force = false);
 
     /**
      * Set a given attribute on the model.
      *
-     * @param string $key Name of the attribute to be unset.
-     *
-     * @return void
+     * @param string $key name of the attribute to be unset
      */
     public function cleanAttribute(string $key);
 
     /**
      * Set a given attribute on the model.
      *
-     * @param  string $key   Name of the attribute to be set.
-     * @param  mixed  $value Value to be set.
-     *
-     * @return void
+     * @param string $key   name of the attribute to be set
+     * @param mixed  $value value to be set
      */
     public function setAttribute(string $key, $value);
 
@@ -64,8 +57,6 @@ interface AttributesAccessInterface
      *
      * Ideally should be called once right after retrieving data from
      * the database.
-     *
-     * @return void
      */
-    public function storeOriginalAttributes();
+    public function syncOriginalAttributes();
 }

@@ -1,10 +1,11 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use ErrorException;
 use Mongolid\Container\Ioc;
-use Mongolid\Serializer\Serializer;
-use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
 /**
@@ -12,16 +13,36 @@ use Traversable;
  * cursor. But upon it's creation it will already retrieve documents from the
  * database and store the retrieved documents. By doing this, it is possible
  * to serialize the results and save for later use.
- *
- * @package Mongolid
  */
 class CacheableCursor extends Cursor
 {
     /**
-     * The documents that were retrieved from the database in a serializable way
+     * The documents that were retrieved from the database in a serializable way.
+     *
      * @var array
      */
     protected $documents;
+
+    /**
+     * Limit of the query. It is stored because when caching the documents
+     * the DOCUMENT_LIMIT const will be used.
+     *
+     * @var ìnteger
+     */
+    protected $originalLimit;
+
+    /**
+     * Means that the CacheableCursor is wapping the original cursor and not
+     * reading from Cache anymore.
+     *
+     * @var bool
+     */
+    protected $ignoreCache = false;
+
+    /**
+     * Limits the amount of documents that will be cached for performance reasons.
+     */
+    const DOCUMENT_LIMIT = 100;
 
     /**
      * Actually returns a Traversable object with the DriverCursor within.
@@ -36,46 +57,122 @@ class CacheableCursor extends Cursor
      */
     protected function getCursor(): Traversable
     {
+        // Returns original (non-cached) cursor
+        if ($this->ignoreCache || $this->position >= self::DOCUMENT_LIMIT) {
+            return $this->getOriginalCursor();
+        }
+
+        // Returns cached set of documents
         if ($this->documents) {
             return $this->documents;
         }
 
-        $cacheComponent = Ioc::make(CacheComponent::class);
-        $cacheKey       = $this->generateCacheKey();
+        // Check if there is a cached set of documents
+        $cacheComponent = Ioc::make(CacheComponentInterface::class);
+        $cacheKey = $this->generateCacheKey();
 
-        if ($this->documents = $cacheComponent->get($cacheKey, null)) {
-            return $this->documents = new ArrayIterator($this->documents);
+        try {
+            $cachedDocuments = $cacheComponent->get($cacheKey, null);
+        } catch (ErrorException $error) {
+            $cachedDocuments = [];
         }
 
-        // Stores the documents within the object.
+        if ($cachedDocuments) {
+            return $this->documents = new ArrayIterator($cachedDocuments);
+        }
+
+        // Stores the original "limit" clause of the query
+        $this->storeOriginalLimit();
+
+        // Stores the documents within the object and cache then for later use
         $this->documents = [];
         foreach (parent::getCursor() as $document) {
             $this->documents[] = $document;
         }
 
-        $cacheComponent->put($cacheKey, $this->documents, 0.3);
+        $cacheComponent->put($cacheKey, $this->documents, 0.6);
 
-        // Drops the unserializable DriverCursor. In order to make the
-        // CacheableCursor object serializable.
-        unset($this->cursor);
+        // Drops the unserializable DriverCursor.
+        $this->cursor = null;
 
+        // Return the documents iterator
         return $this->documents = new ArrayIterator($this->documents);
     }
 
     /**
      * Generates an unique cache key for the cursor in it's current state.
      *
-     * @return string Cache key to identify the query of the current cursor.
+     * @return string cache key to identify the query of the current cursor
      */
     protected function generateCacheKey(): string
     {
-        $serializer = Ioc::make(Serializer::class);
-
         return sprintf(
             '%s:%s:%s',
             $this->command,
             $this->collection->getNamespace(),
-            md5($serializer->serialize($this->params))
+            md5(serialize($this->params))
         );
+    }
+
+    /**
+     * Stores the original "limit" clause of the query.
+     */
+    protected function storeOriginalLimit()
+    {
+        if (isset($this->params[1]['limit'])) {
+            $this->originalLimit = $this->params[1]['limit'];
+        }
+
+        if ($this->originalLimit > self::DOCUMENT_LIMIT) {
+            $this->limit(self::DOCUMENT_LIMIT);
+        }
+    }
+
+    /**
+     * Gets the limit clause of the query if any.
+     *
+     * @return mixed Int or null
+     */
+    protected function getLimit()
+    {
+        return $this->originalLimit ?: ($this->params[1]['limit'] ?? null);
+    }
+
+    /**
+     * Returns the DriverCursor considering the documents that have already
+     * been retrieved from cache.
+     *
+     * @return Traversable
+     */
+    protected function getOriginalCursor(): Traversable
+    {
+        if ($this->ignoreCache) {
+            return parent::getCursor();
+        }
+
+        if ($this->getLimit()) {
+            $this->params[1]['limit'] = $this->getLimit() - $this->position;
+        }
+
+        $skipped = $this->params[1]['skip'] ?? 0;
+
+        $this->skip($skipped + $this->position - 1);
+
+        $this->ignoreCache = true;
+
+        return $this->getOriginalCursor();
+    }
+
+    /**
+     * Serializes this object. Drops the unserializable DriverCursor. In order
+     * to make the CacheableCursor object serializable.
+     *
+     * @return string serialized object
+     */
+    public function serialize()
+    {
+        $this->documents = $this->cursor = null;
+
+        return parent::serialize();
     }
 }

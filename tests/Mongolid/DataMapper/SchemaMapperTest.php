@@ -1,11 +1,10 @@
 <?php
+
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\SchemaMapper;
-use Mongolid\Schema;
-use Mongolid\Serializer\Type\Converter;
+use Mongolid\Schema\Schema;
 use TestCase;
 
 class SchemaMapperTest extends TestCase
@@ -19,39 +18,27 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $schema         = m::mock(Schema::class);
-        $converter      = m::mock(Converter::class);
+        $schema = m::mock(Schema::class);
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
-            'stuff' => 'schema.My\Own\Schema'
+            'name' => 'string',
+            'age' => 'int',
+            'stuff' => 'schema.My\Own\Schema',
         ];
         $schemaMapper = m::mock(
-            'Mongolid\DataMapper\SchemaMapper'.
-            '[clearDynamic,parseField]',
+            SchemaMapper::class.'[clearDynamic,parseField]',
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
-        $oldData = [
-            'name'  => 'John',
-            'age'   => 23,
-            'stuff' => 'value-to-be-replaced',
-        ];
         $data = [
-            'name'  => 'John',
-            'age'   => 23,
+            'name' => 'John',
+            'age' => 23,
             'stuff' => 'fooBar',
         ];
-
-        $converter->shouldReceive('toMongoTypes')
-            ->with($oldData)
-            ->once()
-            ->andReturn($data);
 
         // Act
         $schemaMapper->shouldReceive('clearDynamic')
             ->once()
-            ->with($oldData);
+            ->with($data);
 
         foreach ($schema->fields as $key => $value) {
             $schemaMapper->shouldReceive('parseField')
@@ -60,16 +47,14 @@ class SchemaMapperTest extends TestCase
                 ->andReturn($data[$key].'.PARSED');
         }
 
-        Ioc::instance(Converter::class, $converter);
-
         // Assert
         $this->assertEquals(
             [
-                'name'  => 'John.PARSED',
-                'age'   => '23.PARSED',
-                'stuff' => 'fooBar.PARSED'
+                'name' => 'John.PARSED',
+                'age' => '23.PARSED',
+                'stuff' => 'fooBar.PARSED',
             ],
-            $schemaMapper->map($oldData)
+            $schemaMapper->map($data)
         );
     }
 
@@ -79,14 +64,14 @@ class SchemaMapperTest extends TestCase
         $schema = m::mock(Schema::class);
         $schema->dynamic = false;
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
+            'name' => 'string',
+            'age' => 'int',
         ];
         $schemaMapper = new SchemaMapper($schema);
         $data = [
-            'name'     => 'John',
-            'age'      => 23,
-            'location' => 'Brazil'
+            'name' => 'John',
+            'age' => 23,
+            'location' => 'Brazil',
         ];
 
         // Assert
@@ -94,7 +79,7 @@ class SchemaMapperTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'John',
-                'age'  => 23
+                'age' => 23,
             ],
             $data
         );
@@ -106,23 +91,23 @@ class SchemaMapperTest extends TestCase
         $schema = m::mock(Schema::class);
         $schema->dynamic = true;
         $schema->fields = [
-            'name'  => 'string',
-            'age'   => 'int',
+            'name' => 'string',
+            'age' => 'int',
         ];
         $schemaMapper = new SchemaMapper($schema);
         $data = [
-            'name'     => 'John',
-            'age'      => 23,
-            'location' => 'Brazil'
+            'name' => 'John',
+            'age' => 23,
+            'location' => 'Brazil',
         ];
 
         // Assert
         $this->callProtected($schemaMapper, 'clearDynamic', [&$data]);
         $this->assertEquals(
             [
-                'name'     => 'John',
-                'age'      => 23,
-                'location' => 'Brazil'
+                'name' => 'John',
+                'age' => 23,
+                'location' => 'Brazil',
             ],
             $data
         );
@@ -151,8 +136,7 @@ class SchemaMapperTest extends TestCase
         // Arrange
         $schema = m::mock(Schema::class);
         $schemaMapper = m::mock(
-            'Mongolid\DataMapper\SchemaMapper'.
-            '[mapToSchema]',
+            SchemaMapper::class.'[mapToSchema]',
             [$schema]
         );
         $schemaMapper->shouldAllowMockingProtectedMethods();
@@ -170,17 +154,18 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknowString()
+    public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknownString()
     {
         // Arrange
-        $schema = m::mock('Mongolid\Schema[pumpkinPoint]');
-        $schemaMapper = new SchemaMapper($schema);
+        $schemaClass = new class() extends Schema {
+            public function pumpkinPoint($value)
+            {
+                return $value * 2;
+            }
+        };
 
-        // Act
-        $schema->shouldReceive('pumpkinPoint')
-            ->once()
-            ->with(3)
-            ->andReturn(6);
+        $schema = new $schemaClass();
+        $schemaMapper = new SchemaMapper($schema);
 
         // Assert
         $this->assertSame(
@@ -189,27 +174,27 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldMapAnArrayValueToAnotherSchemaSchema()
+    public function testShouldMapAnArrayValueToAnotherSchema()
     {
         // Arrange
-        $schema        = m::mock(Schema::class);
-        $mySchema      = m::mock(Schema::class);
-        $schemaMapper  = new SchemaMapper($schema);
-        $value         = ['foo' => 'bar'];
-        $test          = $this;
+        $schema = m::mock(Schema::class);
+        $mySchema = m::mock(Schema::class);
+        $schemaMapper = new SchemaMapper($schema);
+        $value = ['foo' => 'bar'];
+        $test = $this;
 
         // Act
-        Ioc::instance('Xd\MySchema', $mySchema); // Register MySchema in Ioc
+        Ioc::instance('Xd\MySchema', $mySchema);
 
         // When instantiating the SchemaMapper with the specified $param as dependency
         Ioc::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
             // Check if mySchema has been injected correctly
-            $test->assertSame($mySchema, $params[0]);
+            $test->assertSame($mySchema, $params['schema']);
 
             // Instantiate a SchemaMapper with mySchema
-            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params[0]]);
+            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params['schema']]);
 
-            // Set expectation to receiva a map call
+            // Set expectation to receive a map call
             $anotherSchemaMapper->shouldReceive('map')
                 ->once()
                 ->with($value)
@@ -218,10 +203,10 @@ class SchemaMapperTest extends TestCase
             return $anotherSchemaMapper;
         });
 
-        //Assert
+        // Assert
         $this->assertEquals(
             [
-                ['foo' => 'PARSED']
+                ['foo' => 'PARSED'],
             ],
             $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema'])
         );
@@ -230,9 +215,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = (object) ['foo' => 'bar', 'name' => 'wilson'];
+        $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
         // Assert
         $this->assertEquals(
@@ -244,9 +229,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = ['age' => 25];
+        $object = ['age' => 25];
 
         // Assert
         $this->assertEquals(
@@ -258,9 +243,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldGetAttributesWhenGetAttributesMethodIsAvailable()
     {
         // Arrange
-        $schema       = m::mock(Schema::class);
+        $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object       = new class {
+        $object = new class() {
             public function getAttributes()
             {
                 return ['foo' => 'bar'];

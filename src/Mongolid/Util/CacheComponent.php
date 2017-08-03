@@ -1,11 +1,12 @@
 <?php
+
 namespace Mongolid\Util;
 
 /**
  * CacheComponent will cache values for later use based in "key, value"
  * approach.
  */
-class CacheComponent
+class CacheComponent implements CacheComponentInterface
 {
     /**
      * The array of stored values.
@@ -24,7 +25,8 @@ class CacheComponent
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string $key Cache key of the item to be retrieved.
+     * @param string $key cache key of the item to be retrieved
+     *
      * @return mixed
      */
     public function get(string $key)
@@ -37,11 +39,9 @@ class CacheComponent
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param string $key     Cache key of the item.
-     * @param mixed  $value   Value being stored in cache.
-     * @param float  $minutes Cache ttl.
-     *
-     * @return void
+     * @param string $key     cache key of the item
+     * @param mixed  $value   value being stored in cache
+     * @param float  $minutes cache ttl
      */
     public function put(string $key, $value, float $minutes)
     {
@@ -54,9 +54,9 @@ class CacheComponent
      * if the ttl of the given cache key has been expired and will free the
      * memory if so.
      *
-     * @param  string $key Cache key of the item.
+     * @param string $key cache key of the item
      *
-     * @return bool Has cache key.
+     * @return bool has cache key
      */
     public function has(string $key): bool
     {
@@ -65,6 +65,7 @@ class CacheComponent
         ) {
             unset($this->ttl[$key]);
             unset($this->storage[$key]);
+
             return false;
         }
 
@@ -75,7 +76,8 @@ class CacheComponent
      * Return the current time in order to check ttl.
      *
      * @codeCoverageIgnore
-     * @return integer Return current Unix timestamp.
+     *
+     * @return int return current Unix timestamp
      */
     protected function time()
     {

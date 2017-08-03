@@ -1,55 +1,58 @@
 <?php
+
 namespace Mongolid\Cursor;
 
-use Iterator;
+use Mongolid\ActiveRecord;
+use Mongolid\Container\Ioc;
+use Mongolid\DataMapper\EntityAssembler;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\Schema;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
  * By doing this we can use 'sort', 'skip', 'limit' and others after calling 'where'.
  * Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
- *
- * @package Mongolid
  */
-class EmbeddedCursor implements Iterator
+class EmbeddedCursor implements CursorInterface
 {
     /**
-     * Entity class that will be returned while iterating
+     * Entity class that will be returned while iterating.
      *
      * @var string
      */
     public $entityClass;
 
     /**
-     * The actual array of embedded documents
+     * The actual array of embedded documents.
      *
      * @var array
      */
     protected $items = [];
 
     /**
-     * Iterator position (to be used with foreach)
+     * Iterator position (to be used with foreach).
      *
-     * @var integer
+     * @var int
      */
     private $position = 0;
 
     /**
-     * @param string $entityClass Class of the objects that will be retrieved by the cursor.
-     * @param array  $items       The items array.
+     * @param string $entityClass class of the objects that will be retrieved by the cursor
+     * @param array  $items       the items array
      */
     public function __construct(string $entityClass, array $items)
     {
-        $this->items       = $items;
+        $this->items = $items;
         $this->entityClass = $entityClass;
     }
 
     /**
-     * Limits the number of results returned
+     * Limits the number of results returned.
      *
-     * @param  integer $amount The number of results to return.
+     * @param int $amount the number of results to return
      *
-     * @return EmbeddedCursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function limit(int $amount)
     {
@@ -61,21 +64,20 @@ class EmbeddedCursor implements Iterator
     /**
      * Sorts the results by given fields.
      *
-     * @param  array $fields An array of fields by which to sort.
-     *                       Each element in the array has as key the field name,
-     *                       and as value either 1 for ascending sort, or -1 for descending sort.
+     * @param array $fields An array of fields by which to sort.
+     *                      Each element in the array has as key the field name,
+     *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return EmbeddedCursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function sort(array $fields)
     {
-        foreach (array_reverse($fields) as $key => $value) {
+        foreach (array_reverse($fields) as $key => $direction) {
             // Uses usort with a function that will access the $key and sort in
-            // the $value direction. It mimics how the mongodb does sorting
-            // internally.
+            // the $direction. It mimics how the mongodb does sorting internally.
             usort(
                 $this->items,
-                function ($a, $b) use ($key, $value) {
+                function ($a, $b) use ($key, $direction) {
                     $a = is_object($a)
                         ? ($a->$key ?? null)
                         : ($a[$key] ?? null);
@@ -84,11 +86,7 @@ class EmbeddedCursor implements Iterator
                         ? ($b->$key ?? null)
                         : ($b[$key] ?? null);
 
-                    if ($a < $b) {
-                        return $value * -1;
-                    }
-
-                    return $value;
+                    return ($a <=> $b) * $direction;
                 }
             );
         }
@@ -97,11 +95,11 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Skips a number of results
+     * Skips a number of results.
      *
-     * @param  integer $amount The number of results to skip.
+     * @param int $amount the number of results to skip
      *
-     * @return Cursor Returns this cursor.
+     * @return EmbeddedCursor returns this cursor
      */
     public function skip(int $amount)
     {
@@ -111,9 +109,9 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Counts the number of results for this cursor
+     * Counts the number of results for this cursor.
      *
-     * @return integer The number of documents returned by this cursor's query.
+     * @return int the number of documents returned by this cursor's query
      */
     public function count()
     {
@@ -121,9 +119,7 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Iterator interface rewind (used in foreach)
-     *
-     * @return void
+     * Iterator interface rewind (used in foreach).
      */
     public function rewind()
     {
@@ -132,14 +128,14 @@ class EmbeddedCursor implements Iterator
 
     /**
      * Iterator interface current. Return a model object
-     * with cursor document. (used in foreach)
+     * with cursor document. (used in foreach).
      *
      * @return mixed
      */
     public function current()
     {
-        if (! $this->valid()) {
-            return null;
+        if (!$this->valid()) {
+            return;
         }
 
         $document = $this->items[$this->position];
@@ -148,17 +144,34 @@ class EmbeddedCursor implements Iterator
             return $document;
         }
 
-        $model = new $this->entityClass;
+        $schema = $this->getSchemaForEntity();
+        $entityAssembler = Ioc::makeWith(EntityAssembler::class, compact('schema'));
 
-        foreach ($document as $key => $value) {
-            $model->$key = $value;
-        }
-
-        return $model;
+        return $entityAssembler->assemble($document, $schema);
     }
 
     /**
-     * Returns the first element of the cursor
+     * Retrieve a schema based on Entity Class.
+     *
+     * @return Schema
+     */
+    protected function getSchemaForEntity(): Schema
+    {
+        if ($this->entityClass instanceof Schema) {
+            return $this->entityClass;
+        }
+
+        $model = new $this->entityClass();
+
+        if ($model instanceof ActiveRecord) {
+            return $model->getSchema();
+        }
+
+        return new DynamicSchema();
+    }
+
+    /**
+     * Returns the first element of the cursor.
      *
      * @return mixed
      */
@@ -170,9 +183,9 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Iterator key method (used in foreach)
+     * Iterator key method (used in foreach).
      *
-     * @return integer
+     * @return int
      */
     public function key()
     {
@@ -180,9 +193,7 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Iterator next method (used in foreach)
-     *
-     * @return void
+     * Iterator next method (used in foreach).
      */
     public function next()
     {
@@ -190,9 +201,9 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Iterator valid method (used in foreach)
+     * Iterator valid method (used in foreach).
      *
-     * @return boolean
+     * @return bool
      */
     public function valid()
     {
@@ -214,7 +225,7 @@ class EmbeddedCursor implements Iterator
     }
 
     /**
-     * Return the raw cursor items
+     * Return the raw cursor items.
      *
      * @return array
      */

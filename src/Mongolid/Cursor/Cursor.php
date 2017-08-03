@@ -1,26 +1,26 @@
 <?php
+
 namespace Mongolid\Cursor;
 
-use Iterator;
 use IteratorIterator;
-use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
+use MongoDB\Driver\Exception\LogicException;
+use Mongolid\ActiveRecord;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Serializable;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
  * By doing this we can, call 'sort', 'skip', 'limit' and others after calling
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
- *
- * @package Mongolid
  */
-class Cursor implements Iterator, Serializable
+class Cursor implements CursorInterface, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
@@ -49,16 +49,16 @@ class Cursor implements Iterator, Serializable
     protected $params;
 
     /**
-     * The MongoDB cursor used to interact with db
+     * The MongoDB cursor used to interact with db.
      *
      * @var DriverCursor
      */
     protected $cursor = null;
 
     /**
-     * Iterator position (to be used with foreach)
+     * Iterator position (to be used with foreach).
      *
-     * @var integer
+     * @var int
      */
     protected $position = 0;
 
@@ -70,10 +70,10 @@ class Cursor implements Iterator, Serializable
     protected $assembler;
 
     /**
-     * @param Schema     $entitySchema Schema that describes the entity that will be retrieved from the database.
-     * @param Collection $collection   The raw collection object that will be used to retrieve the documents.
-     * @param string     $command      The command that is being called in the $collection.
-     * @param array      $params       The parameters of the $command.
+     * @param Schema     $entitySchema schema that describes the entity that will be retrieved from the database
+     * @param Collection $collection   the raw collection object that will be used to retrieve the documents
+     * @param string     $command      the command that is being called in the $collection
+     * @param array      $params       the parameters of the $command
      */
     public function __construct(
         Schema $entitySchema,
@@ -81,19 +81,19 @@ class Cursor implements Iterator, Serializable
         string $command,
         array $params
     ) {
-        $this->cursor       = null;
+        $this->cursor = null;
         $this->entitySchema = $entitySchema;
-        $this->collection   = $collection;
-        $this->command      = $command;
-        $this->params       = $params;
+        $this->collection = $collection;
+        $this->command = $command;
+        $this->params = $params;
     }
 
     /**
-     * Limits the number of results returned
+     * Limits the number of results returned.
      *
-     * @param  integer $amount The number of results to return.
+     * @param int $amount the number of results to return
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function limit(int $amount)
     {
@@ -103,13 +103,13 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Sorts the results by given fields
+     * Sorts the results by given fields.
      *
-     * @param  array $fields An array of fields by which to sort.
-     *                       Each element in the array has as key the field name,
-     *                       and as value either 1 for ascending sort, or -1 for descending sort.
+     * @param array $fields An array of fields by which to sort.
+     *                      Each element in the array has as key the field name,
+     *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function sort(array $fields)
     {
@@ -119,11 +119,11 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Skips a number of results
+     * Skips a number of results.
      *
-     * @param  integer $amount The number of results to skip.
+     * @param int $amount the number of results to skip
      *
-     * @return Cursor Returns this cursor.
+     * @return Cursor returns this cursor
      */
     public function skip(int $amount)
     {
@@ -133,9 +133,24 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Counts the number of results for this cursor
+     * Disable idle timeout of 10 minutes from MongoDB cursor.
+     * This method should be called before the cursor was started.
      *
-     * @return integer The number of documents returned by this cursor's query.
+     * @param bool $flag toggle timeout on or off
+     *
+     * @return Cursor returns this cursor
+     */
+    public function disableTimeout(bool $flag = true)
+    {
+        $this->params[1]['noCursorTimeout'] = $flag;
+
+        return $this;
+    }
+
+    /**
+     * Counts the number of results for this cursor.
+     *
+     * @return int the number of documents returned by this cursor's query
      */
     public function count(): int
     {
@@ -143,19 +158,23 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Iterator interface rewind (used in foreach)
-     *
-     * @return void
+     * Iterator interface rewind (used in foreach).
      */
     public function rewind()
     {
-        $this->getCursor()->rewind();
+        try {
+            $this->getCursor()->rewind();
+        } catch (LogicException $e) {
+            $this->fresh();
+            $this->getCursor()->rewind();
+        }
+
         $this->position = 0;
     }
 
     /**
      * Iterator interface current. Return a model object
-     * with cursor document. (used in foreach)
+     * with cursor document. (used in foreach).
      *
      * @return mixed
      */
@@ -163,11 +182,21 @@ class Cursor implements Iterator, Serializable
     {
         $document = $this->getCursor()->current();
 
-        return $this->getAssembler()->assemble($document, $this->entitySchema);
+        if ($document instanceof ActiveRecord) {
+            $documentToArray = $document->toArray();
+            $this->entitySchema = $document->getSchema();
+        } else {
+            $documentToArray = (array) $document;
+        }
+
+        return $this->getAssembler()->assemble(
+            $documentToArray,
+            $this->entitySchema
+        );
     }
 
     /**
-     * Returns the first element of the cursor
+     * Returns the first element of the cursor.
      *
      * @return mixed
      */
@@ -176,8 +205,8 @@ class Cursor implements Iterator, Serializable
         $this->rewind();
         $document = $this->getCursor()->current();
 
-        if (! $document) {
-            return null;
+        if (!$document) {
+            return;
         }
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
@@ -185,10 +214,8 @@ class Cursor implements Iterator, Serializable
 
     /**
      * Refresh the cursor in order to be able to perform a rewind and iterate
-     * trought it again. A new request to the database will be made in the next
+     * through it again. A new request to the database will be made in the next
      * iteration.
-     *
-     * @return void
      */
     public function fresh()
     {
@@ -196,28 +223,28 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Iterator key method (used in foreach)
+     * Iterator key method (used in foreach).
      *
-     * @return integer
+     * @return int
      */
     public function key()
     {
         return $this->position;
     }
+
     /**
-     * Iterator next method (used in foreach)
-     *
-     * @return void
+     * Iterator next method (used in foreach).
      */
     public function next()
     {
         ++$this->position;
         $this->getCursor()->next();
     }
+
     /**
-     * Iterator valid method (used in foreach)
+     * Iterator valid method (used in foreach).
      *
-     * @return boolean
+     * @return bool
      */
     public function valid(): bool
     {
@@ -246,7 +273,7 @@ class Cursor implements Iterator, Serializable
     public function toArray(): array
     {
         foreach ($this->getCursor() as $document) {
-            $result[] = $document;
+            $result[] = (array) $document;
         }
 
         return $result ?? [];
@@ -255,13 +282,13 @@ class Cursor implements Iterator, Serializable
     /**
      * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
-     * $params given
+     * $params given.
      *
      * @return Traversable
      */
     protected function getCursor(): Traversable
     {
-        if (! $this->cursor) {
+        if (!$this->cursor) {
             $driverCursor = $this->collection->{$this->command}(...$this->params);
             $this->cursor = new IteratorIterator($driverCursor);
             $this->cursor->rewind();
@@ -271,13 +298,13 @@ class Cursor implements Iterator, Serializable
     }
 
     /**
-     * Retrieves an EntityAssembler instance
+     * Retrieves an EntityAssembler instance.
      *
      * @return EntityAssembler
      */
     protected function getAssembler()
     {
-        if (! $this->assembler) {
+        if (!$this->assembler) {
             $this->assembler = Ioc::make(EntityAssembler::class);
         }
 
@@ -286,9 +313,9 @@ class Cursor implements Iterator, Serializable
 
     /**
      * Serializes this object storing the collection name instead of the actual
-     * MongoDb\Collection (which is unserializable)
+     * MongoDb\Collection (which is unserializable).
      *
-     * @return string Serialized object.
+     * @return string serialized object
      */
     public function serialize()
     {
@@ -301,21 +328,20 @@ class Cursor implements Iterator, Serializable
     /**
      * Unserializes this object. Re-creating the database connection.
      *
-     * @param  mixed $serialized Serialized cursor.
-     *
-     * @return void
+     * @param mixed $serialized serialized cursor
      */
     public function unserialize($serialized)
     {
-        $attr = unserialize($serialized);
+        $attributes = unserialize($serialized);
 
-        $conn             = Ioc::make(Pool::class)->getConnection();
-        $db               = $conn->defaultDatabase;
-        $collectionObject = $conn->getRawConnection()->$db->{$attr['collection']};
+        $conn = Ioc::make(Pool::class)->getConnection();
+        $db = $conn->defaultDatabase;
+        $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
 
-        $this->entitySchema = $attr['entitySchema'];
-        $this->collection   = $collectionObject;
-        $this->command      = $attr['command'];
-        $this->params       = $attr['params'];
+        foreach ($attributes as $key => $value) {
+            $this->$key = $value;
+        }
+
+        $this->collection = $collectionObject;
     }
 }

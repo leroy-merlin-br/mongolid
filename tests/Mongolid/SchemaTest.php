@@ -1,12 +1,12 @@
 <?php
+
 namespace Mongolid;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
-use MongoDB\Driver\Exception\Exception as MongoException;
 use Mongolid\Container\Ioc;
-use Mongolid\Schema;
+use Mongolid\Schema\Schema;
 use Mongolid\Util\SequenceService;
 use TestCase;
 
@@ -40,7 +40,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = null;
+        $value = null;
 
         // Assert
         $this->assertInstanceOf(
@@ -53,7 +53,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = 'A random string';
+        $value = 'A random string';
 
         // Assert
         $this->assertEquals(
@@ -66,7 +66,7 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = '507f1f77bcf86cd799439011';
+        $value = '507f1f77bcf86cd799439011';
 
         // Assert
         $this->assertInstanceOf(
@@ -76,22 +76,24 @@ class SchemaTest extends TestCase
 
         $this->assertEquals(
             $value,
-            (string)$schema->objectId($value)
+            (string) $schema->objectId($value)
         );
     }
 
     public function testShouldCastNullIntoAutoIncrementSequence()
     {
         // Arrange
-        $schema          = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
-        $value           = null;
+        $value = null;
+
+        $schema->collection = 'resources';
 
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
-            ->with('mongolid')
+            ->with('resources')
             ->once()
             ->andReturn(7);
 
@@ -101,15 +103,17 @@ class SchemaTest extends TestCase
 
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
-        $schema          = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class.'[]');
         $sequenceService = m::mock(SequenceService::class);
-        $value           = 3;
+        $value = 3;
+
+        $schema->collection = 'resources';
 
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
-            ->with('mongolid')
+            ->with('resources')
             ->never()
             ->andReturn(7); // Should never be returned
 
@@ -121,33 +125,63 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = null;
+        $value = null;
 
         // Assertion
-        $this->assertInstanceOf(UTCDateTime::class, $schema->createdAtTimestamp($value));
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $schema->createdAtTimestamp($value)
+        );
     }
 
     public function testShouldRefreshUpdatedAtTimestamps()
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = (new UTCDateTime(25));
+        $value = (new UTCDateTime(25));
 
         // Assertion
         $result = $schema->updatedAtTimestamp($value);
         $this->assertInstanceOf(UTCDateTime::class, $result);
-        $this->assertNotEquals(25, (string) $result);
+        $this->assertNotEquals(25000, (string) $result);
     }
 
-    public function testShouldNotRefreshCreatedAtTimestamps()
-    {
+    /**
+     * @dataProvider createdAtTimestampsFixture
+     */
+    public function testShouldNotRefreshCreatedAtTimestamps(
+        $value,
+        $expectation,
+        $compareTimestamp = true
+    ) {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $value  = (new UTCDateTime(25));
 
         // Assertion
         $result = $schema->createdAtTimestamp($value);
-        $this->assertInstanceOf(UTCDateTime::class, $result);
-        $this->assertEquals(25, (string) $result);
+        $this->assertInstanceOf(get_class($expectation), $result);
+        if ($compareTimestamp) {
+            $this->assertEquals((string) $expectation, (string) $result);
+        }
+    }
+
+    public function createdAtTimestampsFixture()
+    {
+        return [
+            'MongoDB driver UTCDateTime' => [
+                'value' => new UTCDateTime(25),
+                'expectation' => new UTCDateTime(25),
+            ],
+            'Empty field' => [
+                'value' => null,
+                'expectation' => new UTCDateTime(),
+                'compareTimestamp' => false,
+            ],
+            'An string' => [
+                'value' => 'foobar',
+                'expectation' => new UTCDateTime(),
+                'compareTimestamp' => false,
+            ],
+        ];
     }
 }

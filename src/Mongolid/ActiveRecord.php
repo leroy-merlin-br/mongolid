@@ -1,33 +1,33 @@
 <?php
+
 namespace Mongolid;
 
 use BadMethodCallException;
+use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\Relations;
-use Mongolid\Serializer\Serializer;
-use Serializable;
-use MongoDB\Driver\WriteConcern;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\HasSchemaInterface;
+use Mongolid\Schema\Schema;
 
 /**
  * The Mongolid\ActiveRecord base class will ensure to enable your entity to
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
- * The Mongolid\Schema that describes the entity will be generated on the go
+ * The Mongolid\Schema\Schema that describes the entity will be generated on the go
  * based on the $fields.
- *
- * @package  Mongolid
  */
-abstract class ActiveRecord implements Serializable, AttributesAccessInterface
+abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInterface
 {
     use Attributes, Relations;
 
     /**
      * Name of the collection where this kind of Entity is going to be saved or
-     * retrieved from
+     * retrieved from.
      *
      * @var string
      */
@@ -35,7 +35,8 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
 
     /**
      * @see https://docs.mongodb.com/manual/reference/write-concern/
-     * @var integer
+     *
+     * @var int
      */
     protected $writeConcern = 1;
 
@@ -43,13 +44,14 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
-     * @see  Mongolid\Schema::$fields
-     * @var  string|string[]
+     * @see  \Mongolid\Schema\Schema::$fields
+     *
+     * @var string|string[]
      */
     protected $fields = [
-        '_id'        => 'objectId',
+        '_id' => 'objectId',
         'created_at' => 'createdAtTimestamp',
-        'updated_at' => 'updatedAtTimestamp'
+        'updated_at' => 'updatedAtTimestamp',
     ];
 
     /**
@@ -65,14 +67,14 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      *
-     * @var boolean
+     * @var bool
      */
     public $dynamic = true;
 
     /**
-     * Saves this object into database
+     * Saves this object into database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function save()
     {
@@ -80,9 +82,9 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Insert this object into database
+     * Insert this object into database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function insert()
     {
@@ -90,9 +92,9 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Updates this object in database
+     * Updates this object in database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function update()
     {
@@ -100,9 +102,9 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Deletes this object in database
+     * Deletes this object in database.
      *
-     * @return boolean Success
+     * @return bool Success
      */
     public function delete()
     {
@@ -111,11 +113,11 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
 
     /**
      * Gets a cursor of this kind of entities that matches the query from the
-     * database
+     * database.
      *
-     * @param  array   $query      MongoDB selection criteria.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves a CacheableCursor instead.
+     * @param array $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -132,7 +134,7 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Gets a cursor of this kind of entities from the database
+     * Gets a cursor of this kind of entities from the database.
      *
      * @return \Mongolid\Cursor\Cursor
      */
@@ -142,11 +144,11 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Gets the first entity of this kind that matches the query
+     * Gets the first entity of this kind that matches the query.
      *
-     * @param  mixed   $query      MongoDB selection criteria.
-     * @param  array   $projection Fields to project in Mongo query.
-     * @param  boolean $useCache   Retrieves the entity trought a CacheableCursor.
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
      * @return ActiveRecord
      */
@@ -163,14 +165,57 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     *
+     * @throws ModelNotFoundException if no document was found
+     *
+     * @return ActiveRecord
+     */
+    public static function firstOrFail(
+        $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->firstOrFail(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, a new entity will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     *
+     * @return ActiveRecord
+     */
+    public static function firstOrNew($id)
+    {
+        if ($entity = self::getDataMapperInstance()->first($id)) {
+            return $entity;
+        }
+
+        $entity = new static();
+        $entity->_id = $id;
+
+        return $entity;
+    }
+
+    /**
      * Handle dynamic method calls into the model.
      *
-     * @codeCoverageIgnore
+     * @param mixed $method     name of the method that is being called
+     * @param mixed $parameters parameters of $method
      *
-     * @param  mixed $method     Name of the method that is being called.
-     * @param  mixed $parameters Parameters of $method.
-     *
-     * @throws BadMethodCallException In case of invalid methods be called.
+     * @throws BadMethodCallException in case of invalid methods be called
      *
      * @return mixed
      */
@@ -180,14 +225,14 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
 
         // Alias to attach
         if ('attachTo' == substr($method, 0, 8)) {
-            $field = strtolower(substr($method, 8));
+            $field = lcfirst(substr($method, 8));
 
             return $this->attach($field, $value);
         }
 
         // Alias to embed
         if ('embedTo' == substr($method, 0, 7)) {
-            $field = strtolower(substr($method, 7));
+            $field = lcfirst(substr($method, 7));
 
             return $this->embed($field, $value);
         }
@@ -203,14 +248,14 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
 
     /**
      * Returns a DataMapper configured with the Schema and collection described
-     * in this entity
+     * in this entity.
      *
      * @return DataMapper
      */
     public function getDataMapper()
     {
-        $dataMapper           = Ioc::make(DataMapper::class);
-        $dataMapper->schema   = $this->getSchema();
+        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper->setSchema($this->getSchema());
         $dataMapper->database = $this->database;
 
         return $dataMapper;
@@ -223,33 +268,11 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
      */
     public function getCollectionName()
     {
-        return $this->collection;
+        return $this->collection ? $this->collection : $this->getSchema()->collection;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        return Ioc::make(Serializer::class)->serialize($this->getAttributes());
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $data Serialized string to parse.
-     *
-     * @return void
-     */
-    public function unserialize($data)
-    {
-        $this->fill(Ioc::make(Serializer::class)->unserialize($data), true);
-    }
-
-    /**
-     * Getter for $writeConcern variable
+     * Getter for $writeConcern variable.
      *
      * @return mixed
      */
@@ -259,11 +282,9 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Setter for $writeConcern variable
+     * Setter for $writeConcern variable.
      *
-     * @param mixed $writeConcern Level of write concern to the transation.
-     *
-     * @return void
+     * @param mixed $writeConcern level of write concern to the transation
      */
     public function setWriteConcern($writeConcern)
     {
@@ -271,21 +292,19 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Returns a Schema object that describes this Entity in MongoDB
-     *
-     * @return Schema
+     * {@inheritdoc}
      */
-    protected function getSchema(): Schema
+    public function getSchema(): Schema
     {
         if ($schema = $this->instantiateSchemaInFields()) {
             return $schema;
         }
 
-        $schema = new DynamicSchema;
+        $schema = new DynamicSchema();
         $schema->entityClass = get_class($this);
-        $schema->fields      = $this->fields;
-        $schema->dynamic     = $this->dynamic;
-        $schema->collection  = $this->getCollectionName();
+        $schema->fields = $this->fields;
+        $schema->dynamic = $this->dynamic;
+        $schema->collection = $this->collection;
 
         return $schema;
     }
@@ -306,15 +325,15 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
     }
 
     /**
-     * Performs the given action into database
+     * Performs the given action into database.
      *
-     * @param  string $action Datamapper function to execute.
+     * @param string $action datamapper function to execute
      *
-     * @return boolean
+     * @return bool
      */
     protected function execute(string $action)
     {
-        if (! $this->getCollectionName()) {
+        if (!$this->getCollectionName()) {
             return false;
         }
 
@@ -322,22 +341,26 @@ abstract class ActiveRecord implements Serializable, AttributesAccessInterface
             'writeConcern' => new WriteConcern($this->getWriteConcern()),
         ];
 
-        return $this->getDataMapper()->$action($this, $options);
+        if ($result = $this->getDataMapper()->$action($this, $options)) {
+            $this->syncOriginalAttributes();
+        }
+
+        return $result;
     }
 
-        /**
+    /**
      * Returns the a valid instance from Ioc.
      *
-     * @return mixed
+     * @throws NoCollectionNameException throws exception when has no collection filled
      *
-     * @throws NoCollectionNameException Throws exception when has no collection filled.
+     * @return mixed
      */
     private static function getDataMapperInstance()
     {
         $instance = Ioc::make(get_called_class());
 
-        if (! $instance->getCollectionName()) {
-            throw new NoCollectionNameException;
+        if (!$instance->getCollectionName()) {
+            throw new NoCollectionNameException();
         }
 
         return $instance->getDataMapper();
