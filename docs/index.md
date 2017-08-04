@@ -1,4 +1,4 @@
-![Mongolid](https://dl.dropboxusercontent.com/u/12506137/libs_bundles/mongolid_banner.png)
+![Mongolid](https://user-images.githubusercontent.com/1991286/28967747-fe5c258a-78f2-11e7-91c7-8850ffb32004.png)
 
 > Easy, powerful and ultrafast ODM for PHP7 build on top of the [new mongodb driver](https://docs.mongodb.org/ecosystem/drivers/php/).
 
