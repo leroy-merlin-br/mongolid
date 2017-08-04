@@ -95,7 +95,23 @@ class CursorTest extends TestCase
             ->andReturn(5);
 
         // Assert
-        $this->assertEquals(5, $cursor->count(5));
+        $this->assertEquals(5, $cursor->count());
+    }
+
+    public function testShouldCountDocumentsWithCountFunction()
+    {
+        // Arrange
+        $collection = m::mock(Collection::class);
+        $cursor = $this->getCursor(null, $collection);
+
+        // Act
+        $collection->shouldReceive('count')
+            ->once()
+            ->with([])
+            ->andReturn(5);
+
+        // Assert
+        $this->assertEquals(5, count($cursor));
     }
 
     public function testShouldRewind()
