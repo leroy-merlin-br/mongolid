@@ -2,7 +2,10 @@
 
 namespace Mongolid\Cursor;
 
+use Countable;
 use IteratorIterator;
+use Serializable;
+use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
@@ -11,8 +14,6 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
-use Serializable;
-use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -20,7 +21,7 @@ use Traversable;
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
  */
-class Cursor implements CursorInterface, Serializable
+class Cursor implements CursorInterface, Countable, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
