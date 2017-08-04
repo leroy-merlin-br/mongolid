@@ -15,9 +15,9 @@ ifndef MKDOCS
 endif
 	mkdocs build --clean
 
-SAMI := $(shell sami -V)
+SAMI := $(shell vendor/bin/sami.php -V)
 
 mkapi:
 ifdef SAMI
-	sami update sami.php; exit 0
+	vendor/bin/sami.php update sami.php; exit 0
 endif
