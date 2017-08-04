@@ -3,11 +3,12 @@
 namespace Mongolid\Cursor;
 
 use Iterator;
+use Countable;
 
 /**
  * Common interface for all kinds of cursors.
  */
-interface CursorInterface extends Iterator
+interface CursorInterface extends Countable, Iterator
 {
     /**
      * Limits the number of results returned.
@@ -37,13 +38,6 @@ interface CursorInterface extends Iterator
      * @return CursorInterface returns this cursor
      */
     public function skip(int $amount);
-
-    /**
-     * Counts the number of results for this cursor.
-     *
-     * @return int the number of documents returned by this cursor's query
-     */
-    public function count();
 
     /**
      * Returns the first element of the cursor.

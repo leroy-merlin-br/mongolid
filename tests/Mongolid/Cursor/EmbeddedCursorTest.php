@@ -90,6 +90,20 @@ class EmbeddedCursorTest extends TestCase
         $this->assertEquals(3, $cursor->count());
     }
 
+    public function testShouldCountDocumentsWithCountFunction()
+    {
+        // Arrange
+        $items = [
+            ['name' => 'A'],
+            ['name' => 'B'],
+            ['name' => 'C'],
+        ];
+        $cursor = $this->getCursor(stdClass::class, $items);
+
+        // Assert
+        $this->assertEquals(3, count($cursor));
+    }
+
     public function testShouldRewind()
     {
         // Arrange

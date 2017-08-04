@@ -21,7 +21,7 @@ use Mongolid\Schema\Schema;
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
  */
-class Cursor implements CursorInterface, Countable, Serializable
+class Cursor implements CursorInterface, Serializable
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
