@@ -2,7 +2,6 @@
 
 namespace Mongolid\Cursor;
 
-use Countable;
 use IteratorIterator;
 use Serializable;
 use Traversable;
