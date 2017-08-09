@@ -46,7 +46,7 @@ trait Attributes
     /**
      * Check if model should mutate attributes checking
      * the existence of a specific method on model
-     * class. Default is true.
+     * class. Default is false.
      *
      * @var bool
      */
