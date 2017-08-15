@@ -36,7 +36,7 @@ class Connection
      */
     public function __construct(
         string $server = 'mongodb://localhost:27017',
-        array $options = ['connect' => true],
+        array $options = [],
         array $driverOptions = []
     ) {
         // In order to work with PHP arrays instead of with objects
