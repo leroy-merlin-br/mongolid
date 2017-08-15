@@ -2,7 +2,6 @@
 
 namespace Mongolid\Connection;
 
-use Mockery as m;
 use MongoDB\Client;
 use MongoDB\Driver\Manager;
 use TestCase;

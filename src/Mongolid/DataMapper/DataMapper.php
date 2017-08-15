@@ -492,10 +492,12 @@ class DataMapper implements HasSchemaInterface
             if (is_string($key)) {
                 if (is_bool($value)) {
                     $projection[$key] = $value;
+
                     continue;
                 }
                 if (is_int($value)) {
                     $projection[$key] = ($value >= 1);
+
                     continue;
                 }
             }
@@ -510,6 +512,7 @@ class DataMapper implements HasSchemaInterface
                 }
 
                 $projection[$key] = $value;
+
                 continue;
             }
 

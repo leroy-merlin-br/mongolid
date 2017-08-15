@@ -91,6 +91,7 @@ trait Attributes
         foreach ($input as $key => $value) {
             if ($force) {
                 $this->setAttribute($key, $value);
+
                 continue;
             }
 
