@@ -33,6 +33,7 @@ class DocumentEmbedderTest extends TestCase
         foreach ($expectation as $index => $expectedDoc) {
             if ($expectedDoc instanceof ObjectID) {
                 $this->assertEquals($expectedDoc, $result[$index]);
+
                 continue;
             }
 
