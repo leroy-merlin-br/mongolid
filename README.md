@@ -10,10 +10,10 @@ Mongolid supports both **ActiveRecord** and **DataMapper** patterns. **You choos
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cc45e93bb0d0413d9e0355c7377d4d33)](https://www.codacy.com/app/zizaco/mongolid?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=leroy-merlin-br/mongolid&amp;utm_campaign=Badge_Grade)
 [![StyleCI](https://styleci.io/repos/9799450/shield?branch=master)](https://styleci.io/repos/9799450)
 [![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/zizaco/mongolid/v/stable.png)](https://packagist.org/packages/zizaco/mongolid)
-[![Total Downloads](https://poser.pugx.org/zizaco/mongolid/downloads.png)](https://packagist.org/packages/zizaco/mongolid)
-[![Latest Unstable Version](https://poser.pugx.org/zizaco/mongolid/v/unstable.png)](https://packagist.org/packages/zizaco/mongolid)
-[![License](https://poser.pugx.org/zizaco/mongolid/license.png)](https://packagist.org/packages/zizaco/mongolid)
+[![Latest Stable Version](https://poser.pugx.org/leroy-merlin-br/mongolid/v/stable)](https://packagist.org/packages/leroy-merlin-br/mongolid)
+[![Total Downloads](https://poser.pugx.org/leroy-merlin-br/mongolid/downloads)](https://packagist.org/packages/leroy-merlin-br/mongolid)
+[![Latest Unstable Version](https://poser.pugx.org/leroy-merlin-br/mongolid/v/unstable)](https://packagist.org/packages/leroy-merlin-br/mongolid)
+[![License](https://poser.pugx.org/leroy-merlin-br/mongolid/license)](https://packagist.org/packages/leroy-merlin-br/mongolid)
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/25636a94-9a5d-4438-bd5e-9f9694104529/small.png)](https://insight.sensiolabs.com/projects/25636a94-9a5d-4438-bd5e-9f9694104529)
 
