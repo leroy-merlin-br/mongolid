@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 if (!extension_loaded('mongodb')) {
