@@ -25,7 +25,8 @@ require 'vendor/autoload.php';
 use Mongolid\Manager;
 use Mongolid\Connection;
 
-$manager = new Manager(new Connection('mongodb://localhost:27017'));
+$manager = new Manager();
+$manager->addConnection(new Connection('mongodb://localhost:27017/DATABASE_NAME'));
 ```
 
 Now you are ready to create your own models :smile:
