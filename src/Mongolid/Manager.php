@@ -2,6 +2,10 @@
 
 namespace Mongolid;
 
+if (!extension_loaded('mongodb')) {
+    throw new \Exception('MongoClient PHP extension required.', 1);
+}
+
 use Illuminate\Container\Container;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
@@ -61,6 +65,14 @@ class Manager
      * @var array
      */
     protected $schemas = [];
+
+    public function __construct(Connection $connection = null)
+    {
+        if (!is_null($connection)) {
+            Ioc::setContainer(new Container());
+            $this->addConnection($connection);
+        }
+    }
 
     /**
      * Main entry point to openning a connection and start using Mongolid in
