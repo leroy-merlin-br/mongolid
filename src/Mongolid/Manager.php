@@ -40,7 +40,7 @@ class Manager
     /**
      * Container being used by Mongolid.
      *
-     * @var \Illuminate\Contracts\Container
+     * @var \Illuminate\Container\Container
      */
     public $container;
 
@@ -65,11 +65,6 @@ class Manager
      * @var array
      */
     protected $schemas = [];
-
-    public function __construct(Connection $connection = null)
-    {
-        $this->addConnection($connection);
-    }
 
     /**
      * Main entry point to openning a connection and start using Mongolid in
@@ -157,9 +152,9 @@ class Manager
 
         $this->connectionPool = new Pool();
         $this->cacheComponent = new CacheComponent();
-
         $this->container->instance(Pool::class, $this->connectionPool);
         $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
+
         static::$singleton = $this;
     }
 }
