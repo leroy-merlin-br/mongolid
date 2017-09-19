@@ -81,6 +81,26 @@ class AttributesTest extends TestCase
         $this->assertFalse(isset($model->nonexistant));
     }
 
+    public function testShouldCheckIfMutatedAttributeIsSet()
+    {
+        // Arrange
+        $model = new class() {
+            use Attributes;
+
+            public function getNameAttribute()
+            {
+                return 'John';
+            }
+        };
+
+        /* Enable mutator methods */
+        $model->mutable = true;
+
+        // Assert
+        $this->assertTrue(isset($model->name));
+        $this->assertFalse(isset($model->nonexistant));
+    }
+
     public function testShouldUnsetAttributes()
     {
         // Arrange

@@ -212,7 +212,7 @@ trait Attributes
      */
     public function __isset($key)
     {
-        return isset($this->attributes[$key]);
+        return !is_null($this->{$key});
     }
 
     /**
