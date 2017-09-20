@@ -2,6 +2,10 @@
 
 namespace Mongolid;
 
+if (!extension_loaded('mongodb')) {
+    throw new \Exception('MongoClient PHP extension required.', 1);
+}
+
 use Illuminate\Container\Container;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
@@ -36,7 +40,7 @@ class Manager
     /**
      * Container being used by Mongolid.
      *
-     * @var \Illuminate\Contracts\Container
+     * @var \Illuminate\Container\Container
      */
     public $container;
 
@@ -144,12 +148,12 @@ class Manager
         }
 
         $this->container = new Container();
+        Ioc::setContainer($this->container);
+
         $this->connectionPool = new Pool();
         $this->cacheComponent = new CacheComponent();
-
         $this->container->instance(Pool::class, $this->connectionPool);
         $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
-        Ioc::setContainer($this->container);
 
         static::$singleton = $this;
     }
