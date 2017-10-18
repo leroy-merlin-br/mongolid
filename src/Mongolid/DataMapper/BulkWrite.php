@@ -84,12 +84,17 @@ class BulkWrite
      * @param ObjectID|string $id
      * @param array           $dataToSet
      * @param array           $options
+     * @param string          $operator
      */
-    public function updateOne($id, array $dataToSet, array $options = ['upsert' => true])
-    {
+    public function updateOne(
+        $id,
+        array $dataToSet,
+        array $options = ['upsert' => true],
+        string $operator = '$set'
+    ) {
         return $this->getBulkWrite()->update(
             ['_id' => $id],
-            ['$set' => $dataToSet],
+            [$operator => $dataToSet],
             $options
         );
     }
