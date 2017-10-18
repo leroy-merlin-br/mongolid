@@ -91,8 +91,7 @@ class BulkWrite
         array $dataToSet,
         array $options = ['upsert' => true],
         string $operator = '$set'
-    )
-    {
+    ) {
         return $this->getBulkWrite()->update(
             ['_id' => $id],
             [$operator => $dataToSet],
