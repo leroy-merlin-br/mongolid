@@ -79,7 +79,7 @@ class CacheComponent implements CacheComponentInterface
      *
      * @return int return current Unix timestamp
      */
-    protected function time()
+    protected function time(): int
     {
         return time();
     }
