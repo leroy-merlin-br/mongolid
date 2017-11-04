@@ -5,7 +5,7 @@ namespace Mongolid\Util;
 use DateTime;
 use DateTimeZone;
 use MongoDB\BSON\UTCDateTime;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase as TestCase;
 
 class LocalDateTimeTest extends TestCase
 {
