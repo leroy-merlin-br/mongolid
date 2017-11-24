@@ -24,7 +24,7 @@ class RelationsTest extends TestCase
     /**
      * @dataProvider referenceScenarios
      */
-    public function testShouldReferenceOne($entity, $field, $fieldValue, $expectedQuery)
+    public function testShouldReferenceOne($entity, $field, $fieldValue, $useCache, $expectedQuery)
     {
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
@@ -39,6 +39,7 @@ class RelationsTest extends TestCase
         Ioc::instance('EntityClass', $entity);
 
         $dataMapper->shouldReceive('first')
+            ->with(m::type('array'), [], $useCache)
             ->once()
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
@@ -49,14 +50,14 @@ class RelationsTest extends TestCase
         // Assert
         $this->assertSame(
             $result,
-            $this->callProtected($model, 'referencesOne', ['EntityClass', $field])
+            $this->callProtected($model, 'referencesOne', ['EntityClass', $field, $useCache])
         );
     }
 
     /**
      * @dataProvider referenceScenarios
      */
-    public function testShouldReferenceMany($entity, $field, $fieldValue, $expectedQuery)
+    public function testShouldReferenceMany($entity, $field, $fieldValue, $useCache, $expectedQuery)
     {
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
@@ -71,6 +72,7 @@ class RelationsTest extends TestCase
         Ioc::instance('EntityClass', $entity);
 
         $dataMapper->shouldReceive('where')
+            ->with(m::type('array'), [], $useCache)
             ->once()
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
@@ -81,7 +83,7 @@ class RelationsTest extends TestCase
         // Assert
         $this->assertSame(
             $result,
-            $this->callProtected($model, 'referencesMany', ['EntityClass', $field])
+            $this->callProtected($model, 'referencesMany', ['EntityClass', $field, $useCache])
         );
     }
 
@@ -175,6 +177,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => 12345,
+                'useCache' => true,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => 12345],
                     'referencesMany' => ['_id' => ['$in' => [12345]]],
@@ -187,6 +190,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => 'abc123',
+                'useCache' => true,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => 'abc123'],
                     'referencesMany' => ['_id' => ['$in' => ['abc123']]],
@@ -198,6 +202,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
+                'useCache' => false,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => '553e3c80293fce6572ff2a40'],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]],
@@ -210,6 +215,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => '577afb0b4d3cec136058fa82',
+                'useCache' => true,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
                     'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82']]],
@@ -221,6 +227,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => [1, 2, 3, 4, 5],
+                'useCache' => false,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => 1],
                     'referencesMany' => ['_id' => ['$in' => [1, 2, 3, 4, 5]]],
@@ -233,6 +240,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
+                'useCache' => false,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
@@ -244,6 +252,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
+                'useCache' => true,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
@@ -256,6 +265,7 @@ class RelationsTest extends TestCase
                 },
                 'field' => 'foo',
                 'fieldValue' => null,
+                'useCache' => false,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => null],
                     'referencesMany' => ['_id' => ['$in' => []]],
