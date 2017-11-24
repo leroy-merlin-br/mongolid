@@ -18,12 +18,13 @@ trait Relations
     /**
      * Returns the referenced documents as objects.
      *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  the field where the _id is stored
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _id is stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return mixed
      */
-    protected function referencesOne(string $entity, string $field)
+    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
         $referenced_id = $this->$field;
 
@@ -37,21 +38,22 @@ trait Relations
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->first(['_id' => $referenced_id], [], true);
+            return $dataMapper->first(['_id' => $referenced_id], [], $cacheable);
         }
 
-        return $entityInstance::first(['_id' => $referenced_id], [], true);
+        return $entityInstance::first(['_id' => $referenced_id], [], $cacheable);
     }
 
     /**
      * Returns the cursor for the referenced documents as objects.
      *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  the field where the _ids are stored
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _ids are stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return array
      */
-    protected function referencesMany(string $entity, string $field)
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
     {
         $referencedIds = (array) $this->$field;
 
@@ -69,10 +71,10 @@ trait Relations
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->where($query, [], true);
+            return $dataMapper->where($query, [], $cacheable);
         }
 
-        return $entityInstance::where($query, [], true);
+        return $entityInstance::where($query, [], $cacheable);
     }
 
     /**
