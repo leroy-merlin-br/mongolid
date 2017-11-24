@@ -66,7 +66,7 @@ abstract class Schema
      */
     public function objectId($value = null)
     {
-        if ($value === null) {
+        if (null === $value) {
             return new ObjectID();
         }
 

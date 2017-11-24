@@ -98,7 +98,7 @@ class SchemaMapper
         }
 
         // If the field type points to another schema.
-        if (substr($fieldType, 0, 7) == 'schema.') {
+        if ('schema.' == substr($fieldType, 0, 7)) {
             return $this->mapToSchema($value, substr($fieldType, 7));
         }
 

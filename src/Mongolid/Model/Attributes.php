@@ -65,7 +65,7 @@ trait Attributes
 
         if ($inAttributes) {
             return $this->attributes[$key];
-        } elseif ($key == 'attributes') {
+        } elseif ('attributes' == $key) {
             return $this->attributes;
         }
     }
