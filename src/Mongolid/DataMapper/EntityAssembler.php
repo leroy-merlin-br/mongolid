@@ -36,7 +36,7 @@ class EntityAssembler
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
 
-            if ($fieldType && substr($fieldType, 0, 7) == 'schema.') {
+            if ($fieldType && 'schema.' == substr($fieldType, 0, 7)) {
                 $value = $this->assembleDocumentsRecursively($value, substr($fieldType, 7));
             }
 
