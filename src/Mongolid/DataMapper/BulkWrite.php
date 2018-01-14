@@ -2,7 +2,7 @@
 
 namespace Mongolid\DataMapper;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Pool;
@@ -81,7 +81,7 @@ class BulkWrite
      *
      * @see https://docs.mongodb.com/manual/reference/operator/update/set/#set-top-level-fields
      *
-     * @param ObjectID|string $id
+     * @param ObjectId|string $id
      * @param array           $dataToSet
      * @param array           $options
      * @param string          $operator
