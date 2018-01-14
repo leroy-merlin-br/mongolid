@@ -2,7 +2,7 @@
 
 namespace Mongolid\Model;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
@@ -59,7 +59,7 @@ trait Relations
 
         if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
             foreach ($referencedIds as $key => $value) {
-                $referencedIds[$key] = new ObjectID($value);
+                $referencedIds[$key] = new ObjectId($value);
             }
         }
 

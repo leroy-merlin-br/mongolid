@@ -36,7 +36,7 @@ class Manager
     /**
      * Container being used by Mongolid.
      *
-     * @var \Illuminate\Contracts\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     public $container;
 

@@ -3,7 +3,7 @@
 namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
@@ -393,7 +393,7 @@ class DataMapper implements HasSchemaInterface
             is_string($value['_id']) &&
             ObjectIdUtils::isObjectId($value['_id'])
         ) {
-            $value['_id'] = new ObjectID($value['_id']);
+            $value['_id'] = new ObjectId($value['_id']);
         }
 
         if (isset($value['_id']) &&
@@ -406,7 +406,7 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Prepares an embedded array of an query. It will convert string ObjectIDs
+     * Prepares an embedded array of an query. It will convert string ObjectIds
      * in operators into actual objects.
      *
      * @param array $value array that will be treated
@@ -421,7 +421,7 @@ class DataMapper implements HasSchemaInterface
             ) {
                 foreach ($value[$operator] as $index => $id) {
                     if (ObjectIdUtils::isObjectId($id)) {
-                        $value[$operator][$index] = new ObjectID($id);
+                        $value[$operator][$index] = new ObjectId($id);
                     }
                 }
             }
