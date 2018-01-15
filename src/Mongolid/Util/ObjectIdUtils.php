@@ -21,10 +21,6 @@ class ObjectIdUtils
             $value = (string) $value;
         }
 
-        if (is_string($value) && 24 == strlen($value) && ctype_xdigit($value)) {
-            return true;
-        }
-
-        return false;
+        return is_string($value) && 24 == strlen($value) && ctype_xdigit($value);
     }
 }
