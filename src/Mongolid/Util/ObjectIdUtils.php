@@ -15,7 +15,7 @@ class ObjectIdUtils
      *
      * @return bool true if is valid
      */
-    public static function isObjectId($value)
+    public static function isObjectId($value): bool
     {
         if (is_object($value) && method_exists($value, '__toString')) {
             $value = (string) $value;
