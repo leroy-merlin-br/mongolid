@@ -2,7 +2,7 @@
 
 namespace Mongolid\Schema;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\ObjectIdUtils;
@@ -58,20 +58,20 @@ abstract class Schema
 
     /**
      * Filters any field in the $fields that has it's value specified as a
-     * 'objectId'. It will wraps the $value, if any, into a ObjectID object.
+     * 'objectId'. It will wraps the $value, if any, into a ObjectId object.
      *
-     * @param mixed $value value that may be converted to ObjectID
+     * @param mixed $value value that may be converted to ObjectId
      *
-     * @return ObjectID|mixed
+     * @return ObjectId|mixed
      */
     public function objectId($value = null)
     {
         if (null === $value) {
-            return new ObjectID();
+            return new ObjectId();
         }
 
         if (is_string($value) && ObjectIdUtils::isObjectId($value)) {
-            $value = new ObjectID($value);
+            $value = new ObjectId($value);
         }
 
         return $value;
@@ -109,7 +109,7 @@ abstract class Schema
             return $value;
         }
 
-        return $this->updatedAtTimestamp(null);
+        return $this->updatedAtTimestamp();
     }
 
     /**

@@ -14,7 +14,7 @@ class Pool
     /**
      * Opened connections.
      *
-     * @var SplQueue
+     * @var \SplQueue
      */
     protected $connections;
 

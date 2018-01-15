@@ -27,7 +27,7 @@ class CacheableCursor extends Cursor
      * Limit of the query. It is stored because when caching the documents
      * the DOCUMENT_LIMIT const will be used.
      *
-     * @var ìnteger
+     * @var int
      */
     protected $originalLimit;
 

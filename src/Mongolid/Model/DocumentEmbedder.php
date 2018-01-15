@@ -2,7 +2,7 @@
 
 namespace Mongolid\Model;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 
 /**
  * Document embeder is a service that will embed documents within each other.
@@ -115,7 +115,7 @@ class DocumentEmbedder
      *
      * @param mixed $object the object|array that the _id will be retrieved from
      *
-     * @return ObjectID|mixed
+     * @return ObjectId|mixed
      */
     protected function getId(&$object)
     {
@@ -124,15 +124,15 @@ class DocumentEmbedder
                 return $object['_id'];
             }
 
-            return $object['_id'] = new ObjectID();
+            return $object['_id'] = new ObjectId();
         }
 
-        if (is_object($object) && !$object instanceof ObjectID) {
+        if (is_object($object) && !$object instanceof ObjectId) {
             if (isset($object->_id) && $object->_id) {
                 return $object->_id;
             }
 
-            return $object->_id = new ObjectID();
+            return $object->_id = new ObjectId();
         }
 
         return $object;
