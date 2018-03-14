@@ -146,7 +146,7 @@ class BulkWriteTest extends TestCase
 
         $manager->shouldReceive('executeBulkWrite')
             ->once()
-            ->with($namespace, $mongoBulkWrite, m::type(WriteConcern::class))
+            ->with($namespace, $mongoBulkWrite, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
