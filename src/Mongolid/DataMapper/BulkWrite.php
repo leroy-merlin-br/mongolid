@@ -117,7 +117,7 @@ class BulkWrite
         return $manager->executeBulkWrite(
             $namespace,
             $this->getBulkWrite(),
-            new WriteConcern($writeConcern)
+            ['writeConcern' => new WriteConcern($writeConcern)]
         );
     }
 }
