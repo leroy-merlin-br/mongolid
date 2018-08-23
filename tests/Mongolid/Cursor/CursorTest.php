@@ -82,6 +82,19 @@ class CursorTest extends TestCase
         );
     }
 
+    public function testShouldSetReadPreferenceParameterAccordingly()
+    {
+        // Arrange
+        $cursor = $this->getCursor();
+        $mode = ReadPreference::RP_SECONDARY;
+        $cursor->setReadPreference($mode);
+        $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
+
+        // Assert
+        $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
+        $this->assertSame($readPreferenceParameter->getMode(), $mode);
+    }
+
     public function testShouldCountDocuments()
     {
         // Arrange
