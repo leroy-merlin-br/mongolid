@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
+use MongoDB\Driver\ReadPreference;
 use Serializable;
 use Traversable;
 use MongoDB\Collection;
@@ -143,6 +144,24 @@ class Cursor implements CursorInterface, Serializable
     public function disableTimeout(bool $flag = true)
     {
         $this->params[1]['noCursorTimeout'] = $flag;
+
+        return $this;
+    }
+
+    /**
+     * This describes how the Cursor route the future read operations to the members of a replica set.
+     *
+     * @see http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
+     *
+     * @param int $mode preference mode that the Cursor will use
+     *
+     * @see ReadPreference::class To get a glance of the constants available
+     *
+     * @return $this
+     */
+    public function setReadPreference(int $mode)
+    {
+        $this->params[1]['readPreference'] = new ReadPreference($mode);
 
         return $this;
     }

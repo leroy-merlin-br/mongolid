@@ -8,6 +8,7 @@ use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
+use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
@@ -80,6 +81,19 @@ class CursorTest extends TestCase
             'params',
             $cursor
         );
+    }
+
+    public function testShouldSetReadPreferenceParameterAccordingly()
+    {
+        // Arrange
+        $cursor = $this->getCursor();
+        $mode = ReadPreference::RP_SECONDARY;
+        $cursor->setReadPreference($mode);
+        $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
+
+        // Assert
+        $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
+        $this->assertSame($readPreferenceParameter->getMode(), $mode);
     }
 
     public function testShouldCountDocuments()
