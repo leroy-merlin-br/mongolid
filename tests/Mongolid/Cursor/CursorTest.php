@@ -8,6 +8,7 @@ use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
+use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;

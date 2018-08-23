@@ -3,6 +3,7 @@
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
+use MongoDB\Driver\ReadPreference;
 use Serializable;
 use Traversable;
 use MongoDB\Collection;
@@ -151,9 +152,9 @@ class Cursor implements CursorInterface, Serializable
      *
      * This describes how the Cursor route the future read operations to the members of a replica set.
      *
-     * @link http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
+     * @see http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
      *
-     * @param int $mode Preference mode that the Cursor will use.
+     * @param int $mode preference mode that the Cursor will use.
      *
      * @see ReadPreference::class To get a glance of the constants available
      *
