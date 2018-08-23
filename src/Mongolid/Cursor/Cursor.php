@@ -149,12 +149,11 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     *
      * This describes how the Cursor route the future read operations to the members of a replica set.
      *
      * @see http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
      *
-     * @param int $mode preference mode that the Cursor will use.
+     * @param int $mode preference mode that the Cursor will use
      *
      * @see ReadPreference::class To get a glance of the constants available
      *
