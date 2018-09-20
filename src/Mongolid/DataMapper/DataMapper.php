@@ -39,6 +39,14 @@ class DataMapper implements HasSchemaInterface
     protected $schema;
 
     /**
+
+     * The database to be interacted with.
+     *
+     * @var string
+     */
+    public $database = '';
+
+    /**
      * Connections that are going to be used to interact with the database.
      *
      * @var Pool
@@ -368,7 +376,7 @@ class DataMapper implements HasSchemaInterface
     protected function getCollection(): Collection
     {
         $conn = $this->connPool->getConnection();
-        $database = $conn->defaultDatabase;
+        $database = $this->database ?: $conn->defaultDatabase;
         $collection = $this->schema->collection;
 
         return $conn->getRawConnection()->$database->$collection;
