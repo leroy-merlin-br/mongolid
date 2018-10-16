@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Model;
 
 use Mockery as m;

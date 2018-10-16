@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
@@ -9,6 +8,7 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema\Schema;
+use stdClass;
 use TestCase;
 
 class EntityAssemblerTest extends TestCase
@@ -20,7 +20,7 @@ class EntityAssemblerTest extends TestCase
     }
 
     /**
-     * @dataProvider EntityAssemblerFixture
+     * @dataProvider entityAssemblerFixture
      */
     public function testShouldAssembleEntityForTheGivenSchema($inputValue, $availableSchemas, $inputSchema, $expectedOutput)
     {
@@ -43,7 +43,7 @@ class EntityAssemblerTest extends TestCase
         $this->assertEquals($expectedOutput, $result);
     }
 
-    public function EntityAssemblerFixture()
+    public function entityAssemblerFixture()
     {
         return [
             //---------------------------
@@ -57,7 +57,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -68,7 +68,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new StubStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -88,7 +88,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -98,7 +98,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -107,7 +107,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new StubStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -132,7 +132,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -142,7 +142,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -151,12 +151,12 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new StubStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
-                        new _stubTestGrade([
+                        new StubTestGrade([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
@@ -189,7 +189,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -199,7 +199,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -208,17 +208,17 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new StubStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
-                        new _stubTestGrade([
+                        new StubTestGrade([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
                         ]),
-                        new _stubTestGrade([
+                        new StubTestGrade([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390eb'),
                             'subject' => 'english',
                             'grade' => 9.0,
@@ -239,7 +239,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _polymorphableStudent::class,
+                        'entityClass' => PolymorphableStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -250,7 +250,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new StubStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -261,7 +261,7 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class _stubStudent extends \stdClass implements AttributesAccessInterface
+class StubStudent extends stdClass implements AttributesAccessInterface
 {
     use Attributes;
 
@@ -275,7 +275,7 @@ class _stubStudent extends \stdClass implements AttributesAccessInterface
     }
 }
 
-class _stubTestGrade extends \stdClass
+class StubTestGrade extends stdClass
 {
     public function __construct($attr = [])
     {
@@ -285,7 +285,7 @@ class _stubTestGrade extends \stdClass
     }
 }
 
-class _polymorphableStudent extends \stdClass implements PolymorphableInterface
+class PolymorphableStudent extends stdClass implements PolymorphableInterface
 {
     public function __construct($attr = [])
     {
@@ -296,6 +296,6 @@ class _polymorphableStudent extends \stdClass implements PolymorphableInterface
 
     public function polymorph()
     {
-        return new _stubStudent((array) $this);
+        return new StubStudent((array) $this);
     }
 }

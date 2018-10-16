@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Util;
 
 use MongoDB\BSON\ObjectID;

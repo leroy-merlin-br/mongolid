@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid;
 
 use BadMethodCallException;
@@ -165,7 +164,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
-     * @throws ModelNotFoundException if no document was found
+     * @throws ModelNotFoundException If no document was found
      *
      * @return ActiveRecord
      */
@@ -208,7 +207,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * @param mixed $method     name of the method that is being called
      * @param mixed $parameters parameters of $method
      *
-     * @throws BadMethodCallException in case of invalid methods be called
+     * @throws BadMethodCallException In case of invalid methods be called
      *
      * @return mixed
      */
@@ -260,7 +259,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      */
     public function getCollectionName()
     {
-        return $this->collection ? $this->collection : $this->getSchema()->collection;
+        return $this->collection ?: $this->getSchema()->collection;
     }
 
     /**
@@ -343,7 +342,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     /**
      * Returns the a valid instance from Ioc.
      *
-     * @throws NoCollectionNameException throws exception when has no collection filled
+     * @throws NoCollectionNameException Throws exception when has no collection filled
      *
      * @return mixed
      */

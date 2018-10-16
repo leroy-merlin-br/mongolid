@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
@@ -52,8 +51,6 @@ class CacheableCursor extends Cursor
      * The difference between the CacheableCursor and the normal Cursor is that
      * the Cacheable stores all the results within itself and drops the
      * Driver Cursor in order to be serializable.
-     *
-     * @return Traversable
      */
     protected function getCursor(): Traversable
     {
@@ -141,8 +138,6 @@ class CacheableCursor extends Cursor
     /**
      * Returns the DriverCursor considering the documents that have already
      * been retrieved from cache.
-     *
-     * @return Traversable
      */
     protected function getOriginalCursor(): Traversable
     {

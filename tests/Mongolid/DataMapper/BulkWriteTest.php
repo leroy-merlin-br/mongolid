@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use Mockery as m;

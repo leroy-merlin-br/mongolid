@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
@@ -234,8 +233,6 @@ class DataMapper implements HasSchemaInterface
      * @param mixed $query      mongoDB query to retrieve documents
      * @param array $projection fields to project in Mongo query
      * @param bool  $cacheable  retrieves a CacheableCursor instead
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
     public function where(
         $query = [],
@@ -260,8 +257,6 @@ class DataMapper implements HasSchemaInterface
     /**
      * Retrieve a database cursor that will return all documents as
      * $this->schema->entityClass objects upon iteration.
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
     public function all(): Cursor
     {
@@ -309,7 +304,7 @@ class DataMapper implements HasSchemaInterface
      * @param array $projection fields to project in Mongo query
      * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
-     * @throws ModelNotFoundException if no document was found
+     * @throws ModelNotFoundException If no document was found
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -362,8 +357,6 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieves the Collection object.
-     *
-     * @return Collection
      */
     protected function getCollection(): Collection
     {
@@ -457,7 +450,7 @@ class DataMapper implements HasSchemaInterface
     {
         $event = "mongolid.{$event}: ".get_class($entity);
 
-        $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
+        $this->eventService ?: $this->eventService = Ioc::make(EventTriggerService::class);
 
         return $this->eventService->fire($event, $entity, $halt);
     }
@@ -481,7 +474,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @param array $fields fields to project
      *
-     * @throws InvalidArgumentException if the given $fields are not a valid projection
+     * @throws InvalidArgumentException If the given $fields are not a valid projection
      *
      * @return array
      */
@@ -563,8 +556,6 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Set a Schema object  that describes an Entity in MongoDB.
-     *
-     * @param Schema $schema
      */
     public function setSchema(Schema $schema)
     {

@@ -1,9 +1,8 @@
 <?php
-
 namespace Mongolid\Cursor;
 
-use Iterator;
 use Countable;
+use Iterator;
 
 /**
  * Common interface for all kinds of cursors.
