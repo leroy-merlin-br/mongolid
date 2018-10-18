@@ -1,7 +1,7 @@
 {
     "name": "leroy-merlin-br/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
-    "keywords": ["odm","mongodb","nosql"],
+    "keywords": ["odm", "mongodb", "mongo", "nosql", "active record", "data mapper", "laravel"],
     "license": "MIT",
     "authors": [
         {
@@ -11,6 +11,10 @@
         {
             "name": "Guilherme Guitte",
             "email": "guilherme.guitte@gmail.com"
+        },
+        {
+            "name": "Boitatá",
+            "email": "boitata@leroymerlin.com.br"
         }
     ],
     "require": {
@@ -38,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "v2.1.x-dev"
+            "dev-master": "v3.0.x-dev"
         }
     }
 }
