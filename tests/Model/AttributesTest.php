@@ -1,9 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
-use Mockery as m;
-use stdClass;
 use Mongolid\TestCase;
+use stdClass;
 
 class AttributesTest extends TestCase
 {

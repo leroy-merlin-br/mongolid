@@ -11,7 +11,6 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema\Schema;
 use stdClass;
-use Mongolid\TestCase;
 
 class ActiveRecordTest extends TestCase
 {

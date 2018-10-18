@@ -4,8 +4,8 @@ namespace Mongolid\Model;
 use Mockery as m;
 use Mockery\Matcher\Any;
 use MongoDB\BSON\ObjectID;
-use stdClass;
 use Mongolid\TestCase;
+use stdClass;
 
 class DocumentEmbedderTest extends TestCase
 {

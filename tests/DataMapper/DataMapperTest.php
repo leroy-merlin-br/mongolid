@@ -14,8 +14,8 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema\Schema;
-use stdClass;
 use Mongolid\TestCase;
+use stdClass;
 
 class DataMapperTest extends TestCase
 {

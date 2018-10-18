@@ -8,8 +8,8 @@ use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
-use Mongolid\Util\CacheComponentInterface;
 use Mongolid\TestCase;
+use Mongolid\Util\CacheComponentInterface;
 
 class CacheableCursorTest extends TestCase
 {

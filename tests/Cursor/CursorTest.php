@@ -14,9 +14,9 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
+use Mongolid\TestCase;
 use Serializable;
 use stdClass;
-use Mongolid\TestCase;
 use Traversable;
 
 class CursorTest extends TestCase

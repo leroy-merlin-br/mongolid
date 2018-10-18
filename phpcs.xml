@@ -10,21 +10,17 @@
     <arg value="nps"/>
 
      <!-- Folders that will be tracked -->
-    <file>bootstrap</file>
     <file>src</file>
     <file>tests</file>
 
     <rule ref="LeroyMerlin"/>
 
     <!-- Excluded patterns in some folders -->
-    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>tests/TestCase.php</exclude-pattern>
-    </rule>
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
-        <exclude-pattern>tests/Mongolid/DataMapper/EntityAssemblerTest.php</exclude-pattern>
+        <exclude-pattern>tests/DataMapper/EntityAssemblerTest.php</exclude-pattern>
     </rule>
     <!-- Multiple classes confuses this sniff -->
     <rule ref="Squiz.Classes.ClassFileName.NoMatch">
-        <exclude-pattern>tests/Mongolid/DataMapper/EntityAssemblerTest.php</exclude-pattern>
+        <exclude-pattern>tests/DataMapper/EntityAssemblerTest.php</exclude-pattern>
     </rule>
 </ruleset>

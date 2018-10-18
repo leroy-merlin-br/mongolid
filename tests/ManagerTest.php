@@ -12,7 +12,6 @@ use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
-use Mongolid\TestCase;
 
 class ManagerTest extends TestCase
 {

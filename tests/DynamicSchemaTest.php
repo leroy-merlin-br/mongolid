@@ -4,7 +4,6 @@ namespace Mongolid;
 use Mockery as m;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
-use Mongolid\TestCase;
 
 class DynamicSchemaTest extends TestCase
 {

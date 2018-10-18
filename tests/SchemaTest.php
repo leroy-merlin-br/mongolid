@@ -7,7 +7,6 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\SequenceService;
-use Mongolid\TestCase;
 
 class SchemaTest extends TestCase
 {

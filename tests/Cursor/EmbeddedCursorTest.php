@@ -1,11 +1,10 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mockery as m;
 use Mongolid\ActiveRecord;
 use Mongolid\Model\PolymorphableInterface;
-use stdClass;
 use Mongolid\TestCase;
+use stdClass;
 
 class EmbeddedCursorTest extends TestCase
 {
