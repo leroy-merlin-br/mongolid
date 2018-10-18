@@ -1,11 +1,11 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Schema;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
-use Mongolid\Schema\Schema;
+use Mongolid\TestCase;
 use Mongolid\Util\SequenceService;
 
 class SchemaTest extends TestCase
