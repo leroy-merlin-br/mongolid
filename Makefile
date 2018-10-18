@@ -11,4 +11,4 @@ mkdocs:
 	docker-compose run --rm mkdocs mkdocs build --clean
 
 mkapi:
-	docker-compose run --rm php vendor/bin/sami.php update sami.php; exit 0
+	docker-compose run --rm php vendor/bin/sami.php update sami.php
