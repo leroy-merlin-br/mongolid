@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
@@ -15,6 +14,7 @@ use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
+use Serializable;
 use stdClass;
 use Mongolid\TestCase;
 use Traversable;
@@ -458,7 +458,7 @@ class CursorTest extends TestCase
         /*
          * Emulates a MongoDB\Collection non serializable behavior.
          */
-        return new class() implements \Serializable {
+        return new class() implements Serializable {
             public function serialize()
             {
                 throw new Exception('Unable to serialize', 1);

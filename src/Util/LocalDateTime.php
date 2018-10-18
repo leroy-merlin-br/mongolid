@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Util;
 
 use DateTime;
@@ -19,10 +18,6 @@ class LocalDateTime
 {
     /**
      * Retrieves DateTime instance using default timezone.
-     *
-     * @param UTCDateTime $date
-     *
-     * @return DateTime
      */
     public static function get(UTCDateTime $date): DateTime
     {
@@ -34,11 +29,6 @@ class LocalDateTime
 
     /**
      * Retrieves formated date time using timezone.
-     *
-     * @param UTCDateTime $date
-     * @param string      $format
-     *
-     * @return string
      */
     public static function format(
         UTCDateTime $date,
@@ -49,10 +39,6 @@ class LocalDateTime
 
     /**
      * Retrieves timestamp using timezone.
-     *
-     * @param UTCDateTime $date
-     *
-     * @return int
      */
     public static function timestamp(UTCDateTime $date): int
     {

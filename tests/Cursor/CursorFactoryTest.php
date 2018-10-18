@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use Mockery as m;

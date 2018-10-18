@@ -3,3 +3,4 @@
 /build
 /site
 composer.lock
+.phpcs-cache

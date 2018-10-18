@@ -1,19 +1,18 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
-use MongoDB\Driver\ReadPreference;
-use Serializable;
-use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
+use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
+use Serializable;
+use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -262,8 +261,6 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Iterator valid method (used in foreach).
-     *
-     * @return bool
      */
     public function valid(): bool
     {
@@ -302,8 +299,6 @@ class Cursor implements CursorInterface, Serializable
      * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
      * $params given.
-     *
-     * @return Traversable
      */
     protected function getCursor(): Traversable
     {

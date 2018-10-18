@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Container;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;

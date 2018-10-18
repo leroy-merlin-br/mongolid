@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
 use MongoDB\BSON\ObjectId;
@@ -37,11 +36,6 @@ class BulkWrite
      */
     protected $schema;
 
-    /**
-     * BulkWrite constructor.
-     *
-     * @param HasSchemaInterface $entity
-     */
     public function __construct(HasSchemaInterface $entity)
     {
         $this->setBulkWrite(new MongoBulkWrite(['ordered' => false]));
@@ -63,8 +57,6 @@ class BulkWrite
      * Set BulkWrite object that will receive all operations
      * and later be executed.
      *
-     * @param MongoBulkWrite $bulkWrite
-     *
      * @return $this
      */
     public function setBulkWrite(MongoBulkWrite $bulkWrite)
@@ -84,7 +76,6 @@ class BulkWrite
      * @param ObjectId|string $id
      * @param array           $dataToSet
      * @param array           $options
-     * @param string          $operator
      */
     public function updateOne(
         $id,

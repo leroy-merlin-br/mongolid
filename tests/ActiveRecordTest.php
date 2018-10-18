@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid;
 
 use BadMethodCallException;
@@ -7,6 +6,7 @@ use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
+use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema\Schema;
@@ -371,48 +371,39 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($schema, $result->getSchema());
     }
 
-    /**
-     * @expectedException \Mongolid\Exception\NoCollectionNameException
-     */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
     {
         $entity = new class() extends ActiveRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
+        $this->expectException(NoCollectionNameException::class);
         $entity->all();
     }
 
-    /**
-     * @expectedException \Mongolid\Exception\NoCollectionNameException
-     */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
     {
         $entity = new class() extends ActiveRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
+        $this->expectException(NoCollectionNameException::class);
         $entity->first();
     }
 
-    /**
-     * @expectedException \Mongolid\Exception\NoCollectionNameException
-     */
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
     {
         $entity = new class() extends ActiveRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
+        $this->expectException(NoCollectionNameException::class);
         $entity->where();
     }
 
     public function testShouldGetCollectionName()
     {
         $entity = new class() extends ActiveRecord {
+            /**
+             * @var {inheritdoc}
+             */
             protected $collection = 'collection_name';
         };
 
@@ -422,6 +413,9 @@ class ActiveRecordTest extends TestCase
     public function testShouldAttachToAttribute()
     {
         $entity = new class() extends ActiveRecord {
+            /**
+             * @var {inheritdoc}
+             */
             protected $collection = 'collection_name';
 
             public function class()
@@ -440,6 +434,9 @@ class ActiveRecordTest extends TestCase
     public function testShouldEmbedToAttribute()
     {
         $entity = new class() extends ActiveRecord {
+            /**
+             * @var {inheritdoc}
+             */
             protected $collection = 'collection_name';
 
             public function classes()
@@ -457,6 +454,9 @@ class ActiveRecordTest extends TestCase
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
     {
         $entity = new class() extends ActiveRecord {
+            /**
+             * @var {inheritdoc}
+             */
             protected $collection = 'collection_name';
         };
 

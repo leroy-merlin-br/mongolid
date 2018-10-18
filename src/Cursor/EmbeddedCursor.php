@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Cursor;
 
 use Mongolid\ActiveRecord;
@@ -152,8 +151,6 @@ class EmbeddedCursor implements CursorInterface
 
     /**
      * Retrieve a schema based on Entity Class.
-     *
-     * @return Schema
      */
     protected function getSchemaForEntity(): Schema
     {

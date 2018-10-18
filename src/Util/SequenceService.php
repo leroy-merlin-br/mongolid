@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Util;
 
 use MongoDB\Collection;
@@ -40,8 +39,6 @@ class SequenceService
      * Get next value for the sequence.
      *
      * @param string $sequenceName sequence identifier string
-     *
-     * @return int
      */
     public function getNextValue(string $sequenceName): int
     {
@@ -60,8 +57,6 @@ class SequenceService
 
     /**
      * Get the actual MongoDB Collection object.
-     *
-     * @return Collection
      */
     protected function rawCollection(): Collection
     {
