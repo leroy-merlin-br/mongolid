@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Connection;
 
 use MongoDB\Client;

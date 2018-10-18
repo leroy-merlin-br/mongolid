@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Model;
 
 use Mockery as m;
@@ -186,6 +185,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'ActiveRecord referenced by string id' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',
@@ -211,6 +213,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'ActiveRecord referenced by objectId' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',
@@ -236,6 +241,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'ActiveRecord referenced with series of string objectIds' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',
@@ -261,6 +269,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'ActiveRecord referenced with null' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',
@@ -296,6 +307,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'Embedded document referent to an ActiveRecord entity' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',
@@ -305,6 +319,9 @@ class RelationsTest extends TestCase
             // -------------------------
             'Embedded documents referent to an ActiveRecord entity' => [
                 'entity' => new class() extends ActiveRecord {
+                    /**
+                     * @var {inheritdoc}
+                     */
                     protected $collection = 'foobar';
                 },
                 'field' => 'foo',

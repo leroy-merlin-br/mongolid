@@ -1,5 +1,5 @@
 sniff:
-	docker-compose run --rm php vendor/bin/phpcs ./src --standard='./coding_standard.xml' -n
+	docker-compose run --rm php vendor/bin/phpcs
 
 phpunit:
 	docker-compose run --rm php vendor/bin/phpunit

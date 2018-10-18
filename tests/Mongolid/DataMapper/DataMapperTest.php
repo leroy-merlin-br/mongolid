@@ -1,7 +1,7 @@
 <?php
-
 namespace Mongolid\DataMapper;
 
+use InvalidArgumentException;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
@@ -790,16 +790,16 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expectation, $result);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid projection: 'invalid-key' => 'invalid-value'
-     */
     public function testPrepareProjectionShouldThrownAnException()
     {
         // Arrange
         $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
+
+        // Expectations
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid projection: 'invalid-key' => 'invalid-value'");
 
         // Act
         $this->callProtected($mapper, 'prepareProjection', [$data]);
