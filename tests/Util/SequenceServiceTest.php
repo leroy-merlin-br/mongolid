@@ -21,13 +21,12 @@ class SequenceServiceTest extends TestCase
         $rawCollection = m::mock(Collection::class);
 
         // Act
-        $sequenceService->shouldReceive('rawCollection')
-            ->once()
+        $sequenceService->expects()
+            ->rawCollection()
             ->andReturn($rawCollection);
 
-        $rawCollection->shouldReceive('findOneAndUpdate')
-            ->once()
-            ->with(
+        $rawCollection->expects()
+            ->findOneAndUpdate(
                 ['_id' => $sequenceName],
                 ['$inc' => ['seq' => 1]],
                 ['upsert' => true]
@@ -54,11 +53,12 @@ class SequenceServiceTest extends TestCase
         $connection->grimory = (object) ['foobar' => $collection];
 
         // Act
-        $connPool->shouldReceive('getConnection')
-            ->once()
+        $connPool->expects()
+            ->getConnection()
             ->andReturn($connection);
 
-        $connection->shouldReceive('getRawConnection')
+        $connection->expects()
+            ->getRawConnection()
             ->andReturn($connection);
 
         // Assertion

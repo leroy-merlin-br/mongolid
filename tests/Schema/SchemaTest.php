@@ -84,9 +84,8 @@ class SchemaTest extends TestCase
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
-        $sequenceService->shouldReceive('getNextValue')
-            ->with('resources')
-            ->once()
+        $sequenceService->expects()
+            ->getNextValue('resources')
             ->andReturn(7);
 
         // Assertion
@@ -104,8 +103,8 @@ class SchemaTest extends TestCase
         // Act
         Ioc::instance(SequenceService::class, $sequenceService);
 
-        $sequenceService->shouldReceive('getNextValue')
-            ->with('resources')
+        $sequenceService->expects()
+            ->getNextValue('resources')
             ->never()
             ->andReturn(7); // Should never be returned
 

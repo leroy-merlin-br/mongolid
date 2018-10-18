@@ -31,9 +31,8 @@ class RelationsTest extends TestCase
         Ioc::instance(DataMapper::class, $dataMapper);
         Ioc::instance('EntityClass', $entity);
 
-        $dataMapper->shouldReceive('first')
-            ->with(m::type('array'), [], $useCache)
-            ->once()
+        $dataMapper->expects()
+            ->first(m::type('array'), [], $useCache)
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
 
@@ -64,9 +63,8 @@ class RelationsTest extends TestCase
         Ioc::instance(DataMapper::class, $dataMapper);
         Ioc::instance('EntityClass', $entity);
 
-        $dataMapper->shouldReceive('where')
-            ->with(m::type('array'), [], $useCache)
-            ->once()
+        $dataMapper->expects()
+            ->where(m::type('array'), [], $useCache)
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
                 $this->assertMongoQueryEquals($expectedQuery, $query);
 
@@ -97,13 +95,12 @@ class RelationsTest extends TestCase
         // Act
         Ioc::instance(CursorFactory::class, $cursorFactory);
 
-        $cursorFactory->shouldReceive('createEmbeddedCursor')
-            ->once()
-            ->with($instantiableClass, $expectedItems)
+        $cursorFactory->expects()
+            ->createEmbeddedCursor($instantiableClass, $expectedItems)
             ->andReturn($cursor);
 
-        $cursor->shouldReceive('first')
-            ->once()
+        $cursor->expects()
+            ->first()
             ->andReturn(new $instantiableClass());
 
         // Assert
@@ -128,9 +125,8 @@ class RelationsTest extends TestCase
         // Act
         Ioc::instance(CursorFactory::class, $cursorFactory);
 
-        $cursorFactory->shouldReceive('createEmbeddedCursor')
-            ->once()
-            ->with($instantiableClass, $expectedItems)
+        $cursorFactory->expects()
+            ->createEmbeddedCursor($instantiableClass, $expectedItems)
             ->andReturn($cursor);
 
         // Assert
@@ -153,9 +149,8 @@ class RelationsTest extends TestCase
         // Act
         Ioc::instance(DocumentEmbedder::class, $documentEmbedder);
 
-        $documentEmbedder->shouldReceive($method)
-            ->once()
-            ->with($model, 'foo', $document);
+        $documentEmbedder->expects()
+            ->$method($model, 'foo', $document);
 
         // Assert
         $model->$method('foo', $document);

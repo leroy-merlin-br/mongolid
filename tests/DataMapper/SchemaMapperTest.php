@@ -29,14 +29,12 @@ class SchemaMapperTest extends TestCase
         ];
 
         // Act
-        $schemaMapper->shouldReceive('clearDynamic')
-            ->once()
-            ->with($data);
+        $schemaMapper->expects()
+            ->clearDynamic($data);
 
         foreach ($schema->fields as $key => $value) {
-            $schemaMapper->shouldReceive('parseField')
-                ->once()
-                ->with($data[$key], $value)
+            $schemaMapper->expects()
+                ->parseField($data[$key], $value)
                 ->andReturn($data[$key].'.PARSED');
         }
 
@@ -135,9 +133,8 @@ class SchemaMapperTest extends TestCase
         $schemaMapper->shouldAllowMockingProtectedMethods();
 
         // Act
-        $schemaMapper->shouldReceive('mapToSchema')
-            ->once()
-            ->with(['foo' => 'bar'], 'FooBarSchema')
+        $schemaMapper->expects()
+            ->mapToSchema(['foo' => 'bar'], 'FooBarSchema')
             ->andReturn(['foo' => 123]);
 
         // Assert
@@ -188,9 +185,8 @@ class SchemaMapperTest extends TestCase
             $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params['schema']]);
 
             // Set expectation to receive a map call
-            $anotherSchemaMapper->shouldReceive('map')
-                ->once()
-                ->with($value)
+            $anotherSchemaMapper->expects()
+                ->map($value)
                 ->andReturn(['foo' => 'PARSED']);
 
             return $anotherSchemaMapper;

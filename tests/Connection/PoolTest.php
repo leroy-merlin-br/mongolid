@@ -15,13 +15,12 @@ class PoolTest extends TestCase
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act
-        $connQueue->shouldReceive('pop')
-            ->once()
+        $connQueue->expects()
+            ->pop()
             ->andReturn($connection);
 
-        $connQueue->shouldReceive('push')
-            ->once()
-            ->with($connection);
+        $connQueue->expects()
+            ->push($connection);
 
         // Assert
         $this->assertEquals($connection, $pool->getConnection());
@@ -35,11 +34,12 @@ class PoolTest extends TestCase
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act
-        $connQueue->shouldReceive('pop')
-            ->once()
+        $connQueue->expects()
+            ->pop()
             ->andReturn(null);
 
-        $connQueue->shouldReceive('push')
+        $connQueue->expects()
+            ->push()
             ->never();
 
         // Assert
@@ -55,9 +55,8 @@ class PoolTest extends TestCase
         $this->setProtected($pool, 'connections', $connQueue);
 
         // Act
-        $connQueue->shouldReceive('push')
-            ->once()
-            ->with($connection);
+        $connQueue->expects()
+            ->push($connection);
 
         // Assert
         $this->assertTrue($pool->addConnection($connection));

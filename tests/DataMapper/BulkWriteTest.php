@@ -20,8 +20,8 @@ class BulkWriteTest extends TestCase
         $entity = m::mock(HasSchemaInterface::class);
 
         // Expect
-        $entity->shouldReceive('getSchema')
-            ->once();
+        $entity->expects()
+            ->getSchema();
 
         // Act
         $bulkWrite = new BulkWrite($entity);
@@ -37,8 +37,8 @@ class BulkWriteTest extends TestCase
         $mongoBulkWrite = new MongoBulkWrite();
 
         // Expect
-        $entity->shouldReceive('getSchema')
-            ->once();
+        $entity->expects()
+            ->getSchema();
 
         // Act
         $bulkWrite = new BulkWrite($entity);
@@ -58,18 +58,16 @@ class BulkWriteTest extends TestCase
         $data = ['name' => 'John'];
 
         // Expect
-        $entity->shouldReceive('getSchema')
-            ->once();
+        $entity->expects()
+            ->getSchema();
 
-        $mongoBulkWrite->shouldReceive('update')
-            ->once()
-            ->with(['_id' => $id], ['$set' => $data], ['upsert' => true]);
+        $mongoBulkWrite->expects()
+            ->update(['_id' => $id], ['$set' => $data], ['upsert' => true]);
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
-        $bulkWrite->shouldReceive('getBulkWrite')
-            ->once()
-            ->with()
+        $bulkWrite->expects()
+            ->getBulkWrite()
             ->andReturn($mongoBulkWrite);
 
         // Act
@@ -86,19 +84,16 @@ class BulkWriteTest extends TestCase
         $data = ['name' => 'John'];
 
         // Expect
-        $entity->shouldReceive('getSchema')
-            ->withNoArgs()
-            ->once();
+        $entity->expects()
+            ->getSchema();
 
-        $mongoBulkWrite->shouldReceive('update')
-            ->with(['_id' => $id], ['$unset' => $data], ['upsert' => true])
-            ->once();
+        $mongoBulkWrite->expects()
+            ->update(['_id' => $id], ['$unset' => $data], ['upsert' => true]);
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
-        $bulkWrite->shouldReceive('getBulkWrite')
-            ->with()
-            ->once()
+        $bulkWrite->expects()
+            ->getBulkWrite()
             ->andReturn($mongoBulkWrite);
 
         // Act
@@ -122,31 +117,26 @@ class BulkWriteTest extends TestCase
         Ioc::instance(Pool::class, $pool);
 
         // Expect
-        $entity->shouldReceive('getSchema')
-            ->once()
-            ->with()
+        $entity->expects()
+            ->getSchema()
             ->andReturn($schema);
 
-        $pool->shouldReceive('getConnection')
-            ->once()
-            ->with()
+        $pool->expects()
+            ->getConnection()
             ->andReturn($connection);
 
-        $connection->shouldReceive('getRawManager')
-            ->once()
-            ->with()
+        $connection->expects()
+            ->getRawManager()
             ->andReturn($manager);
 
-        $manager->shouldReceive('executeBulkWrite')
-            ->once()
-            ->with($namespace, $mongoBulkWrite, ['writeConcern' => new WriteConcern(1)])
+        $manager->expects()
+            ->executeBulkWrite($namespace, $mongoBulkWrite, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
-        $bulkWrite->shouldReceive('getBulkWrite')
-            ->once()
-            ->with()
+        $bulkWrite->expects()
+            ->getBulkWrite()
             ->andReturn($mongoBulkWrite);
 
         // Act

@@ -13,9 +13,8 @@ class EventTriggerServiceTest extends TestCase
         $service = new EventTriggerService();
 
         // Act
-        $dispatcher->shouldReceive('fire')
-            ->once()
-            ->with('foobar', ['answer' => 23], true)
+        $dispatcher->expects()
+            ->fire('foobar', ['answer' => 23], true)
             ->andReturn(true);
 
         // Assertion
@@ -32,7 +31,8 @@ class EventTriggerServiceTest extends TestCase
         $service = new EventTriggerService();
 
         // Act
-        $dispatcher->shouldReceive('fire')
+        $dispatcher->expects()
+            ->fire()
             ->never();
 
         // Assertion

@@ -39,14 +39,14 @@ class CacheableCursorTest extends TestCase
         $cacheComponent = m::mock(CacheComponentInterface::class);
 
         // Act
-        $cursor->shouldReceive('generateCacheKey')
+        $cursor->expects()
+            ->generateCacheKey()
             ->andReturn('find:collection:123');
 
         Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
-        $cacheComponent->shouldReceive('get')
-            ->once()
-            ->with('find:collection:123', null)
+        $cacheComponent->expects()
+            ->get('find:collection:123', null)
             ->andReturn($documentsFromCache);
 
         // Assert
@@ -72,26 +72,26 @@ class CacheableCursorTest extends TestCase
         );
 
         // Act
-        $cursor->shouldReceive('generateCacheKey')
+        $cursor->expects()
+            ->generateCacheKey()
             ->andReturn($cacheKey);
 
         Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
-        $cacheComponent->shouldReceive('get')
-            ->with($cacheKey, null)
+        $cacheComponent->expects()
+            ->get($cacheKey, null)
             ->andThrow(
                 new ErrorException(
                     sprintf('Unable to unserialize cache %s', $cacheKey)
                 )
             );
 
-        $rawCollection->shouldReceive('find')
-            ->with([], ['limit' => 100])
+        $rawCollection->expects()
+            ->find([], ['limit' => 100])
             ->andReturn(new ArrayIterator($documentsFromDb));
 
-        $cacheComponent->shouldReceive('put')
-            ->once()
-            ->with($cacheKey, $documentsFromDb, m::any());
+        $cacheComponent->expects()
+            ->put($cacheKey, $documentsFromDb, m::any());
 
         // Assert
         $this->assertEquals(
@@ -115,22 +115,22 @@ class CacheableCursorTest extends TestCase
         );
 
         // Act
-        $cursor->shouldReceive('generateCacheKey')
+        $cursor->expects()
+            ->generateCacheKey()
             ->andReturn('find:collection:123');
 
         Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
-        $cacheComponent->shouldReceive('get')
-            ->with('find:collection:123', null)
+        $cacheComponent->expects()
+            ->get('find:collection:123', null)
             ->andReturn(null);
 
-        $rawCollection->shouldReceive('find')
-            ->with([], ['limit' => 100])
+        $rawCollection->expects()
+            ->find([], ['limit' => 100])
             ->andReturn(new ArrayIterator($documentsFromDb));
 
-        $cacheComponent->shouldReceive('put')
-            ->once()
-            ->with('find:collection:123', $documentsFromDb, m::any());
+        $cacheComponent->expects()
+            ->put('find:collection:123', $documentsFromDb, m::any());
 
         // Assert
         $this->assertEquals(
@@ -160,20 +160,22 @@ class CacheableCursorTest extends TestCase
         );
 
         // Act
-        $cursor->shouldReceive('generateCacheKey')
+        $cursor->expects()
+            ->generateCacheKey()
             ->never();
 
         Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
-        $cacheComponent->shouldReceive('get')
-            ->with('find:collection:123', null)
+        $cacheComponent->expects()
+            ->get('find:collection:123', null)
             ->never();
 
-        $rawCollection->shouldReceive('find')
-            ->with([], ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
+        $rawCollection->expects()
+            ->find([], ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
             ->andReturn(new ArrayIterator($documentsFromDb));
 
-        $cacheComponent->shouldReceive('put')
+        $cacheComponent->expects()
+            ->put()
             ->never();
 
         // Assert
@@ -189,7 +191,8 @@ class CacheableCursorTest extends TestCase
         $cursor = $this->getCachableCursor(null, null, 'find', [['color' => 'red']]);
 
         // Act
-        $cursor->shouldReceive('generateCacheKey')
+        $cursor->expects()
+            ->generateCacheKey()
             ->passthru();
 
         $expectedCacheKey = sprintf(
@@ -220,9 +223,13 @@ class CacheableCursorTest extends TestCase
 
         if (!$collection) {
             $collection = m::mock(Collection::class);
-            $collection->shouldReceive('getNamespace')
+
+            $collection->allows()
+                ->getNamespace()
                 ->andReturn('my_db.my_collection');
-            $collection->shouldReceive('getCollectionName')
+
+            $collection->allows()
+                ->getCollectionName()
                 ->andReturn('my_collection');
         }
 
@@ -233,7 +240,8 @@ class CacheableCursorTest extends TestCase
         $mock->shouldAllowMockingProtectedMethods();
 
         if ($driverCursor) {
-            $mock->shouldReceive('getCursor')
+            $mock->expects()
+                ->getCursor()
                 ->andReturn($driverCursor);
         }
 

@@ -69,18 +69,19 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $entity->shouldReceive('getCollectionName')
+        $entity->expects()
+            ->getCollectionName()
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('syncOriginalAttributes')
-            ->once();
+        $entity->expects()
+            ->syncOriginalAttributes();
 
-        $dataMapper->shouldReceive('save')
-            ->once()
-            ->with($entity, ['writeConcern' => new WriteConcern(1)])
+        $dataMapper->expects()
+            ->save($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -94,18 +95,19 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $entity->shouldReceive('getCollectionName')
+        $entity->expects()
+            ->getCollectionName()
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('syncOriginalAttributes')
-            ->once();
+        $entity->expects()
+            ->syncOriginalAttributes();
 
-        $dataMapper->shouldReceive('insert')
-            ->once()
-            ->with($entity, ['writeConcern' => new WriteConcern(1)])
+        $dataMapper->expects()
+            ->insert($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -119,18 +121,19 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $entity->shouldReceive('getCollectionName')
+        $entity->expects()
+            ->getCollectionName()
             ->andReturn('mongolid');
 
-        $entity->shouldReceive('syncOriginalAttributes')
-            ->once();
+        $entity->expects()
+            ->syncOriginalAttributes();
 
-        $dataMapper->shouldReceive('update')
-            ->once()
-            ->with($entity, ['writeConcern' => new WriteConcern(1)])
+        $dataMapper->expects()
+            ->update($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -144,15 +147,16 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $entity->shouldReceive('getCollectionName')
+        $entity->expects()
+            ->getCollectionName()
             ->andReturn('mongolid');
 
-        $dataMapper->shouldReceive('delete')
-            ->once()
-            ->with($entity, ['writeConcern' => new WriteConcern(1)])
+        $dataMapper->expects()
+            ->delete($entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
@@ -192,12 +196,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('where')
-            ->once()
-            ->with($query, $projection, true)
+        $dataMapper->expects()
+            ->where($query, $projection, true)
             ->andReturn($cursor);
 
         // Assert
@@ -215,11 +219,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('all')
-            ->once()
+        $dataMapper->expects()
+            ->all()
             ->andReturn($cursor);
 
         // Assert
@@ -238,12 +243,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('first')
-            ->once()
-            ->with($query, $projection, true)
+        $dataMapper->expects()
+            ->first($query, $projection, true)
             ->andReturn($entity);
 
         // Assert
@@ -262,12 +267,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('firstOrFail')
-            ->once()
-            ->with($query, $projection, true)
+        $dataMapper->expects()
+            ->firstOrFail($query, $projection, true)
             ->andReturn($entity);
 
         // Assert
@@ -285,12 +290,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('first')
-            ->once()
-            ->with($id)
+        $dataMapper->expects()
+            ->first($id)
             ->andReturn($entity);
 
         // Assert
@@ -308,12 +313,12 @@ class ActiveRecordTest extends TestCase
         // Act
         Ioc::instance(get_class($entity), $entity);
 
-        $entity->shouldReceive('getDataMapper')
+        $entity->expects()
+            ->getDataMapper()
             ->andReturn($dataMapper);
 
-        $dataMapper->shouldReceive('first')
-            ->once()
-            ->with($id)
+        $dataMapper->expects()
+            ->first($id)
             ->andReturn(null);
 
         // Assert
@@ -360,8 +365,8 @@ class ActiveRecordTest extends TestCase
         // Act
         $entity->shouldAllowMockingProtectedMethods();
 
-        $entity->shouldReceive('getSchema')
-            ->once()
+        $entity->expects()
+            ->getSchema()
             ->andReturn($schema);
 
         // Assert

@@ -50,34 +50,36 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('replaceOne')
-            ->once()
-            ->with(
+        $collection->expects()
+            ->replaceOne(
                 ['_id' => 123],
                 $parsedObject,
                 ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
+        $operationResult->allows()
+            ->getModifiedCount()
+            ->andReturn(1);
+
+        $operationResult->allows()
+            ->getUpsertedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventToBeFired('saving', $entity, true);
@@ -111,31 +113,29 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('insertOne')
-            ->once()
-            ->with($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection->expects()
+            ->insertOne($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getInsertedCount')
+        $operationResult->allows()
+            ->getInsertedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventToBeFired('inserting', $entity, true);
@@ -169,31 +169,29 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('insertOne')
-            ->once()
-            ->with($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection->expects()
+            ->insertOne($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getInsertedCount')
+        $operationResult->allows()
+            ->getInsertedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventNotToBeFired('inserting', $entity);
@@ -222,34 +220,32 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('updateOne')
-            ->once()
-            ->with(
+        $collection->expects()
+            ->updateOne(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
                 ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getModifiedCount')
+        $operationResult->allows()
+            ->getModifiedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventToBeFired('updating', $entity, true);
@@ -287,33 +283,31 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('insertOne')
-            ->once()
-            ->with(
+        $collection->expects()
+            ->insertOne(
                 $parsedObject,
                 ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getInsertedCount')
+        $operationResult->allows()
+            ->getInsertedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventToBeFired('updating', $entity, true);
@@ -350,31 +344,29 @@ class DataMapperTest extends TestCase
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
 
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->andReturn($parsedObject);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('deleteOne')
-            ->once()
-            ->with(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection->expects()
+            ->deleteOne(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
+        $operationResult->expects()
+            ->isAcknowledged()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->shouldReceive('getDeletedCount')
+        $operationResult->allows()
+            ->getDeletedCount()
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->shouldReceive('syncOriginalAttributes')
-                ->once()
-                ->with();
+            $entity->expects()
+                ->syncOriginalAttributes();
         }
 
         $this->expectEventToBeFired('deleting', $entity, true);
@@ -406,14 +398,15 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('parseToDocument')
-            ->with($entity)
+        $mapper->expects()
+            ->parseToDocument($entity)
             ->never();
 
-        $mapper->shouldReceive('getCollection')
+        $mapper->allows()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive($dbOperation)
+        $collection->expects($dbOperation)
             ->never();
 
         /* "Mocks" the fireEvent to return false and bail the operation */
@@ -444,11 +437,14 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->with($query)
+        $mapper->expects()
+            ->prepareValueQuery($query)
+            ->twice()
             ->andReturn($preparedQuery);
 
-        $mapper->shouldReceive('getCollection')
+        $mapper->expects()
+            ->getCollection()
+            ->twice()
             ->andReturn($collection);
 
         // Act
@@ -485,9 +481,8 @@ class DataMapperTest extends TestCase
         $mongolidCursor = m::mock(Cursor::class);
 
         // Expect
-        $mapper->shouldReceive('where')
-            ->once()
-            ->with([])
+        $mapper->expects()
+            ->where([])
             ->andReturn($mongolidCursor);
 
         // Act
@@ -513,18 +508,16 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Act
-        $mapper->shouldReceive('prepareValueQuery')
-            ->once()
-            ->with($query)
+        $mapper->expects()
+            ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('findOne')
-            ->once()
-            ->with($preparedQuery, ['projection' => []])
+        $collection->expects()
+            ->findOne($preparedQuery, ['projection' => []])
             ->andReturn(['name' => 'John Doe']);
 
         $result = $mapper->first($query);
@@ -551,18 +544,16 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->once()
-            ->with($query)
+        $mapper->expects()
+            ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('findOne')
-            ->once()
-            ->with($preparedQuery, ['projection' => []])
+        $collection->expects()
+            ->findOne($preparedQuery, ['projection' => []])
             ->andReturn(null);
 
         // Act
@@ -593,18 +584,16 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->once()
-            ->with($query)
+        $mapper->expects()
+            ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $mapper->shouldReceive('getCollection')
-            ->once()
+        $mapper->expects()
+            ->getCollection()
             ->andReturn($collection);
 
-        $collection->shouldReceive('findOne')
-            ->once()
-            ->with($preparedQuery, ['projection' => $projection])
+        $collection->expects()
+            ->findOne($preparedQuery, ['projection' => $projection])
             ->andReturn(null);
 
         // Act
@@ -624,13 +613,12 @@ class DataMapperTest extends TestCase
         $cursor = m::mock(CacheableCursor::class);
 
         // Expect
-        $mapper->shouldReceive('where')
-            ->once()
-            ->with($query, [], true)
+        $mapper->expects()
+            ->where($query, [], true)
             ->andReturn($cursor);
 
-        $cursor->shouldReceive('first')
-            ->once()
+        $cursor->expects()
+            ->first()
             ->andReturn($entity);
 
         // Act
@@ -651,13 +639,12 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, '_id' => false];
 
         // Expect
-        $mapper->shouldReceive('where')
-            ->once()
-            ->with($query, $projection, true)
+        $mapper->expects()
+            ->where($query, $projection, true)
             ->andReturn($cursor);
 
-        $cursor->shouldReceive('first')
-            ->once()
+        $cursor->expects()
+            ->first()
             ->andReturn($entity);
 
         // Act
@@ -679,13 +666,12 @@ class DataMapperTest extends TestCase
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('getSchemaMapper')
-            ->once()
+        $mapper->expects()
+            ->getSchemaMapper()
             ->andReturn($schemaMapper);
 
-        $schemaMapper->shouldReceive('map')
-            ->once()
-            ->with($entity)
+        $schemaMapper->expects()
+            ->map($entity)
             ->andReturn($parsedDocument);
 
         // Act
@@ -732,11 +718,12 @@ class DataMapperTest extends TestCase
         $connection->grimory = (object) ['foobar' => $collection];
 
         // Expect
-        $connPool->shouldReceive('getConnection')
-            ->once()
+        $connPool->expects()
+            ->getConnection()
             ->andReturn($connection);
 
-        $connection->shouldReceive('getRawConnection')
+        $connection->expects()
+            ->getRawConnection()
             ->andReturn($connection);
 
         // Act
@@ -806,10 +793,8 @@ class DataMapperTest extends TestCase
     {
         $event = 'mongolid.'.$event.': '.get_class($entity);
 
-        $this->getEventService()->shouldReceive('fire')
-            ->with($event, $entity, $halt)
-            ->atLeast()
-            ->once()
+        $this->getEventService()->expects()
+            ->fire($event, $entity, $halt)
             ->andReturn($return);
     }
 
@@ -817,8 +802,8 @@ class DataMapperTest extends TestCase
     {
         $event = 'mongolid.'.$event.': '.get_class($entity);
 
-        $this->getEventService()->shouldReceive('fire')
-            ->with($event, $entity, m::any())
+        $this->getEventService()->expects()
+            ->fire($event, $entity, m::any())
             ->never();
     }
 

@@ -97,9 +97,8 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
-            ->once()
-            ->with([])
+        $collection->expects()
+            ->count([])
             ->andReturn(5);
 
         // Assert
@@ -113,9 +112,8 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
-            ->once()
-            ->with([])
+        $collection->expects()
+            ->count([])
             ->andReturn(5);
 
         // Assert
@@ -132,8 +130,8 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'position', 10);
 
         // Act
-        $driverCursor->shouldReceive('rewind')
-            ->once();
+        $driverCursor->expects()
+            ->rewind();
 
         // Assert
         $cursor->rewind();
@@ -150,7 +148,8 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'position', 10);
 
         // Act
-        $driverCursor->shouldReceive('rewind')
+        $driverCursor->expects()
+            ->rewind()
             ->twice()
             ->andReturnUsing(function () use ($cursor) {
                 if ($this->getProtected($cursor, 'cursor')) {
@@ -171,8 +170,8 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('current')
-            ->once()
+        $driverCursor->expects()
+            ->current()
             ->andReturn(['name' => 'John Doe']);
 
         // Assert
@@ -204,11 +203,11 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('rewind')
-            ->once();
+        $driverCursor->expects()
+            ->rewind();
 
-        $driverCursor->shouldReceive('current')
-            ->once()
+        $driverCursor->expects()
+            ->current()
             ->andReturn(['name' => 'John Doe']);
 
         // Assert
@@ -225,11 +224,11 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('rewind')
-            ->once();
+        $driverCursor->expects()
+            ->rewind();
 
-        $driverCursor->shouldReceive('current')
-            ->once()
+        $driverCursor->expects()
+            ->current()
             ->andReturn(null);
 
         // Assert
@@ -270,8 +269,8 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'position', 7);
 
         // Act
-        $driverCursor->shouldReceive('next')
-            ->once();
+        $driverCursor->expects()
+            ->next();
 
         // Assert
         $cursor->next();
@@ -286,14 +285,15 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('valid')
+        $driverCursor->expects()
+            ->valid()
             ->andReturn(true);
 
         // Assert
         $this->assertTrue($cursor->valid());
     }
 
-    public function testShouldWrapMongoDriverCursorWithIteratoriterator()
+    public function testShouldWrapMongoDriverCursorWithIterator()
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -302,18 +302,30 @@ class CursorTest extends TestCase
         $driverIterator = m::mock(Iterator::class);
 
         // Act
-        $collection->shouldReceive('find')
-            ->once()
-            ->with(['bacon' => true])
+        $collection->expects()
+            ->find(['bacon' => true])
             ->andReturn($driverCursor);
 
-        $driverCursor->shouldReceive('getIterator')
+        $driverCursor->expects()
+            ->getIterator()
             ->andReturn($driverIterator);
 
         // Because when creating an IteratorIterator with the driverCursor
         // this methods will be called once to initialize the iterable object.
-        $driverIterator->shouldReceive('rewind', 'valid', 'current', 'key')
-            ->once()
+        $driverIterator->expects()
+            ->rewind()
+            ->andReturn(true);
+
+        $driverIterator->expects()
+            ->valid()
+            ->andReturn(true);
+
+        $driverIterator->expects()
+            ->current()
+            ->andReturn(true);
+
+        $driverIterator->expects()
+            ->key()
             ->andReturn(true);
 
         // Assert
@@ -329,13 +341,20 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('rewind', 'valid', 'key')
+        $driverCursor->expects()
+            ->rewind();
+
+        $driverCursor->expects()
+            ->valid()
+            ->times(3)
             ->andReturn(true, true, false);
 
-        $driverCursor->shouldReceive('next')
+        $driverCursor->expects('next')
+            ->twice()
             ->andReturn(true, false);
 
-        $driverCursor->shouldReceive('current')
+        $driverCursor->expects()
+            ->current()
             ->twice()
             ->andReturn(
                 ['name' => 'bob', 'occupation' => 'coder'],
@@ -362,13 +381,21 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->shouldReceive('rewind', 'valid', 'key')
+        $driverCursor->expects()
+            ->rewind();
+
+        $driverCursor->expects()
+            ->valid()
+            ->times(3)
             ->andReturn(true, true, false);
 
-        $driverCursor->shouldReceive('next')
+        $driverCursor->expects()
+            ->next()
+            ->twice()
             ->andReturn(true, false);
 
-        $driverCursor->shouldReceive('current')
+        $driverCursor->expects()
+            ->current()
             ->twice()
             ->andReturn(
                 ['name' => 'bob', 'occupation' => 'coder'],
@@ -401,10 +428,12 @@ class CursorTest extends TestCase
         // Act
         Ioc::instance(Pool::class, $pool);
 
-        $pool->shouldReceive('getConnection')
+        $pool->expects()
+            ->getConnection()
             ->andReturn($conn);
 
-        $conn->shouldReceive('getRawConnection')
+        $conn->expects()
+            ->getRawConnection()
             ->andReturn($conn);
 
         $conn->defaultDatabase = 'db';
@@ -441,7 +470,8 @@ class CursorTest extends TestCase
         );
 
         $mock->shouldAllowMockingProtectedMethods();
-        $mock->shouldReceive('getCursor')
+        $mock->allows()
+            ->getCursor()
             ->andReturn($driverCursor);
 
         $this->setProtected($mock, 'cursor', $driverCursor);

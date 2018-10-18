@@ -54,7 +54,8 @@ class CacheComponentTest extends TestCase
         $test = $this;
         $cacheComponent = m::mock(CacheComponent::class.'[time]');
         $cacheComponent->shouldAllowMockingProtectedMethods();
-        $cacheComponent->shouldReceive('time')
+        $cacheComponent->allows()
+            ->time()
             ->andReturnUsing(function () use ($test) {
                 return $test->time;
             });

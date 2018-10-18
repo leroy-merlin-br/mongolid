@@ -29,7 +29,8 @@ class ManagerTest extends TestCase
         $rawConnection = m::mock(Client::class);
 
         // Act
-        $connection->shouldReceive('getRawConnection')
+        $connection->expects()
+            ->getRawConnection()
             ->andReturn($rawConnection);
 
         // Assert
@@ -48,8 +49,8 @@ class ManagerTest extends TestCase
         $this->setProtected($manager, 'container', $container);
 
         // Act
-        $container->shouldReceive('instance')
-            ->once()
+        $container->expects()
+            ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
                 $test->assertEquals(EventTriggerService::class, $class);
                 $test->assertAttributeEquals($eventTrigger, 'dispatcher', $eventService);
