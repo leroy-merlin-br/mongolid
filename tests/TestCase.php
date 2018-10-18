@@ -1,15 +1,26 @@
 <?php
 
+namespace Mongolid;
+
+use Illuminate\Container\Container;
+use Mockery as m;
+use Mongolid\Container\Ioc;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
 class TestCase extends PHPUnitTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
-        require __DIR__.'/../bootstrap/bootstrap.php';
+        Ioc::setContainer(new Container());
+    }
+
+    protected function tearDown()
+    {
+        Ioc::flush();
+        m::close();
+        parent::tearDown();
     }
 
     /**
@@ -29,10 +40,18 @@ class TestCase extends PHPUnitTestCase
 
         foreach ($expectedQuery as $key => $value) {
             if (is_object($value)) {
-                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
+                $this->assertInstanceOf(
+                    get_class($value),
+                    $query[$key],
+                    'Type of an object within the query is not equals'
+                );
 
                 if (method_exists($value, '__toString')) {
-                    $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
+                    $this->assertEquals(
+                        (string) $expectedQuery[$key],
+                        (string) $query[$key],
+                        'Object within the query is not equals'
+                    );
                 }
             }
 
