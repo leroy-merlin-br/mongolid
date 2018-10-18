@@ -1,23 +1,14 @@
 sniff:
-	vendor/bin/phpcs
+	docker-compose run --rm php vendor/bin/phpcs
 
 phpunit:
-	vendor/bin/phpunit
+	docker-compose run --rm php vendor/bin/phpunit
 
 coverage:
-	vendor/bin/phpunit --coverage-html ./.coverage
-
-MKDOCS := $(shell mkdocs -V)
+	docker-compose run --rm php vendor/bin/phpunit --coverage-html ./.coverage
 
 mkdocs:
-ifndef MKDOCS
-	pip install mkdocs
-endif
-	mkdocs build --clean
-
-SAMI := $(shell vendor/bin/sami.php -V)
+	docker-compose run --rm mkdocs mkdocs build --clean
 
 mkapi:
-ifdef SAMI
-	vendor/bin/sami.php update sami.php; exit 0
-endif
+	docker-compose run --rm php vendor/bin/sami.php update sami.php

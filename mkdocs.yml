@@ -4,7 +4,7 @@ repo_url: https://github.com/leroy-merlin-br/mongolid
 
 theme: readthedocs
 
-pages:
+nav:
     - 'Home': 'index.md'
     - 'Basics': 'basics.md'
     - 'Relationships': 'relationships.md'
