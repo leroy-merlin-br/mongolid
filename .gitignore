@@ -2,5 +2,5 @@
 /.coverage
 /build
 /site
-composer.lock
 .phpcs-cache
+docker-compose.override.yml
