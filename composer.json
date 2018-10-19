@@ -37,7 +37,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Mongolid\\": "tests"
+            "Mongolid\\": "tests/Unit"
         }
     },
     "extra": {
