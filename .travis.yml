@@ -12,9 +12,9 @@ before_script:
   - composer install --no-interaction
 
 script:
-  - mkdir -p build/logs
   - vendor/bin/phpcs
-  - phpunit -c phpunit.xml.dist && make sniff
+  - phpunit --testsuite unit -c phpunit.xml.dist
+  - phpunit --testsuite integration
 
 after_script:
   - php vendor/bin/coveralls -v
