@@ -7,6 +7,8 @@ services:
       - db
     volumes:
       - .:/var/www/html
+    environment:
+      - DB_HOST=db
 
   db:
     image: mongo:4.0
