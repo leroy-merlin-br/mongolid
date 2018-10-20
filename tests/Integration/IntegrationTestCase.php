@@ -3,12 +3,12 @@ namespace Mongolid\Tests\Integration;
 
 use Mongolid\TestCase;
 use Mongolid\Tests\Util\DropDatabaseTrait;
-use Mongolid\Tests\Util\SetupPoolTrait;
+use Mongolid\Tests\Util\SetupConnectionTrait;
 
 class IntegrationTestCase extends TestCase
 {
     use DropDatabaseTrait;
-    use SetupPoolTrait;
+    use SetupConnectionTrait;
 
     protected function setUp()
     {
@@ -16,7 +16,7 @@ class IntegrationTestCase extends TestCase
         $host = env('DB_HOST', 'localhost');
         $database = env('DB_DATABASE', 'testing');
 
-        $this->setupPool($host, $database);
+        $this->setupConnection($host, $database);
         $this->dropDatabase();
     }
 

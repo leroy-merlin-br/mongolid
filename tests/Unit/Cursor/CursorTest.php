@@ -10,7 +10,6 @@ use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
@@ -417,8 +416,7 @@ class CursorTest extends TestCase
     public function testShouldSerializeAnActiveCursor()
     {
         // Arrange
-        $pool = m::mock(Pool::class);
-        $conn = m::mock(Connection::class);
+        $connection = m::mock(Connection::class);
         $schema = new DynamicSchema();
         $cursor = $this->getCursor($schema, null, 'find', [[]]);
         $driverCollection = $this->getDriverCollection();
@@ -426,19 +424,15 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'collection', $driverCollection);
 
         // Act
-        Ioc::instance(Pool::class, $pool);
+        Ioc::instance(Connection::class, $connection);
 
-        $pool->expects()
-            ->getConnection()
-            ->andReturn($conn);
-
-        $conn->expects()
+        $connection->expects()
             ->getRawConnection()
-            ->andReturn($conn);
+            ->andReturn($connection);
 
-        $conn->defaultDatabase = 'db';
-        $conn->db = $conn;
-        $conn->my_collection = $driverCollection; // Return the same driver Collection
+        $connection->defaultDatabase = 'db';
+        $connection->db = $connection;
+        $connection->my_collection = $driverCollection; // Return the same driver Collection
 
         // Assert
         $result = unserialize(serialize($cursor));

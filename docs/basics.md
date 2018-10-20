@@ -2,20 +2,18 @@
 
 You can install library through Composer:
 
-```
-$ composer require leroy-merlin-br/mongolid
+```shell
+composer require leroy-merlin-br/mongolid
 ```
 
 ### Requirements
 
-- PHP**7**
+- PHP **7.1**
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
-
-> **Note:** If you are looking for the old PHP 5.x version, head to the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
 
 ## Setup
 
-If you are not using Laravel, you should initialize the Mongolid connection pool and container manually.
+If you are not using Laravel, you should initialize the Mongolid connection and container manually.
 The minimalistic way of doing it is to use `Mongolid\Manager`:
 
 ```php
@@ -23,9 +21,10 @@ The minimalistic way of doing it is to use `Mongolid\Manager`:
 require 'vendor/autoload.php';
 
 use Mongolid\Manager;
-use Mongolid\Connection;
+use Mongolid\Connection\Connection;
 
-$manager = new Manager(new Connection('mongodb://localhost:27017'));
+$manager = new Manager();
+$manager->setConnection(new Connection('mongodb://localhost:27017'));
 ```
 
 Now you are ready to create your own models :smile:
@@ -35,7 +34,9 @@ Now you are ready to create your own models :smile:
 > **Note:** Mongolid does support [**DataMapper** pattern](./datamapper.md), but in order to understand it let's begin with the **ActiveRecord** pattern:
 
 ```php
-class Post extends Mongolid\ActiveRecord {}
+class Post extends Mongolid\ActiveRecord
+{
+}
 ```
 
 Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**. This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
@@ -59,56 +60,55 @@ Once a model is defined, you are ready to start retrieving and creating document
 **Retrieving All Models**
 
 ```php
-    $posts = Post::all();
+$posts = Post::all();
 ```
 
 **Retrieving A Document By Primary Key**
 
 ```php
-    $post = Post::first('4af9f23d8ead0e1d32000000');
+$post = Post::first('4af9f23d8ead0e1d32000000');
 
-    // or
+// or
 
-    $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
+$post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
 ```
 
 **Retrieving One Document By attribute**
 
 ```php
-    $user = Post::first(['title'=>'How Monglid saved the day']);
+$user = Post::first(['title' => 'How Mongolid saved the day']);
 ```
 
 **Retrieving Many Documents By attribute**
 
 ```php
-    $posts = Post::where(['category'=>'coding']);
+$posts = Post::where(['category' => 'coding']);
 ```
 
 **Querying Using Mongolid Models**
 
 ```php
-    $posts = Post::where(['votes'=>['$gt'=>100]])->limit(10); // Mongolid\Cursor\Cursor
+$posts = Post::where(['votes' => ['$gt' => 100]])->limit(10); // Mongolid\Cursor\Cursor
 
-    foreach ($posts as $post)
-    {
-        var_dump($post->title);
-    }
+foreach ($posts as $post) {
+    var_dump($post->title);
+}
 ```
 
 **Mongolid Count**
 
 ```php
-    $count = Post::where(['votes'=>['$gt'=>100]])->count(); // integer
+$count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
 ```
 
 Pretty easy right?
 
-## Monglid Cursor
+## Mongolid Cursor
 
 In MongoDB, a cursor is used to iterate through the results of a database query. For example, to query the database and see all results:
 
 ```php
-    $cursor = User::where(['kind'=>'visitor']);
+$cursor = User::where(['kind' => 'visitor']);
 ```
 
 In the above example, the $cursor variable will be a `Mongolid\Cursor\Cursor`.
@@ -120,36 +120,36 @@ The Mongolid's `Cursor` wraps the original `MongoDB\Driver\Cursor` object of the
 The `Mongolid\Cursor\Cursor` object has alot of methods that helps you to iterate, refine and get information. For example:
 
 ```php
-    $cursor = User::where(['kind'=>'visitor']);
+$cursor = User::where(['kind'=>'visitor']);
 
-    // Sorts the results by given fields. In the example bellow, it sorts by username DESC
-    $cursor->sort(['username'=>-1]);
+// Sorts the results by given fields. In the example bellow, it sorts by username DESC
+$cursor->sort(['username'=>-1]);
 
-    // Limits the number of results returned.
-    $cursor->limit(10);
+// Limits the number of results returned.
+$cursor->limit(10);
 
-    // Skips a number of results. Good for pagination
-    $cursor->skip(20);
+// Skips a number of results. Good for pagination
+$cursor->skip(20);
 
-    // Checks if the cursor is reading a valid result.
-    $cursor->valid();
+// Checks if the cursor is reading a valid result.
+$cursor->valid();
 
-    // Returns the first result
-    $cursor->first();
+// Returns the first result
+$cursor->first();
 ```
 
 You can also chain some methods:
 
 ```php
-    $page = 2;
+$page = 2;
 
-    // In order to display 10 results per page
-    $cursor = User::all()->sort(['_id'=>1])->skip(10 * $page)->limit(10);
+// In order to display 10 results per page
+$cursor = User::all()->sort(['_id'=>1])->skip(10 * $page)->limit(10);
 
-    // Then iterate through it
-    foreach($cursor as $user) {
-        // do something
-    }
+// Then iterate through it
+foreach($cursor as $user) {
+    // do something
+}
 ```
 
 ## Insert, Update, Delete
@@ -159,11 +159,11 @@ To create a new document in the database from a model, simply create a new model
 **Saving A New Model**
 
 ```php
-    $post = new Post;
+$post = new Post();
 
-    $post->title = 'Foo bar john doe';
+$post->title = 'Foo bar john doe';
 
-    $post->save();
+$post->save();
 ```
 
 > **Note:** Typically, your Mongolid models will have auto-generated `_id` keys. However, if you wish to specify your own keys, set the `_id` attribute.
@@ -173,11 +173,11 @@ To update a model, you may retrieve it, change an attribute, and use the `save` 
 **Updating A Retrieved Model**
 
 ```php
-    $post = Post::first('4af9f23d8ead0e1d32000000');
+$post = Post::first('4af9f23d8ead0e1d32000000');
 
-    $post->subject = 'technology';
+$post->subject = 'technology';
 
-    $post->save();
+$post->save();
 ```
 
 To delete a model, simply call the `delete` method on the instance:
@@ -185,9 +185,9 @@ To delete a model, simply call the `delete` method on the instance:
 **Deleting An Existing Model**
 
 ```php
-    $post = Post::first('4af9f23d8ead0e1d32000000');
+$post = Post::first('4af9f23d8ead0e1d32000000');
 
-    $post->delete();
+$post->delete();
 ```
 
 ## Mass Assignment
@@ -201,11 +201,11 @@ The `fillable` property specifies which attributes should be mass-assignable. Th
 **Defining Fillable Attributes On A Model**
 
 ```php
-    class Post extends ActiveRecord {
+class Post extends ActiveRecord {
 
-        protected $fillable = ['title', 'category', 'body'];
+    protected $fillable = ['title', 'category', 'body'];
 
-    }
+}
 ```
 
 In this example, only the three listed attributes will be mass-assignable.
@@ -215,11 +215,11 @@ The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of 
 **Defining Guarded Attributes On A Model**
 
 ```php
-    class Post extends ActiveRecord {
+class Post extends ActiveRecord {
 
-        protected $guarded = ['_id', 'votes'];
+    protected $guarded = ['_id', 'votes'];
 
-    }
+}
 ```
 
 In the example above, the `id` and `votes` attributes may **not** be mass assigned. All other attributes will be mass assignable.
@@ -227,8 +227,8 @@ In the example above, the `id` and `votes` attributes may **not** be mass assign
 You can mass assign attributes using the `fill` method:
 
 ```php
-    $post = new Post;
-    $post->fill(['title' => 'Bacon']);
+$post = new Post;
+$post->fill(['title' => 'Bacon']);
 ```
 
 ## Converting To Arrays / JSON
@@ -238,15 +238,15 @@ When building JSON APIs, you may often need to convert your models to arrays or 
 **Converting A Model To An Array**
 
 ```php
-    $user = User::with('roles')->first();
+$user = User::first();
 
-    return $user->toArray();
+return $user->toArray();
 ```
 
 Note that [cursors](#cursor) can be converted to array too:
 
 ```php
-    return User::all()->toArray();
+return User::all()->toArray();
 ```
 
 To convert a model to JSON, you may use the `toJson` method:
@@ -254,5 +254,5 @@ To convert a model to JSON, you may use the `toJson` method:
 **Converting A Model To JSON**
 
 ```php
-    return User::find(1)->toJson();
+return User::find(1)->toJson();
 ```

@@ -4,7 +4,7 @@ namespace Mongolid\DataMapper;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
@@ -38,11 +38,11 @@ class DataMapper implements HasSchemaInterface
     protected $schema;
 
     /**
-     * Connections that are going to be used to interact with the database.
+     * Connection that is going to be used to interact with the database.
      *
-     * @var Pool
+     * @var Connection
      */
-    protected $connPool;
+    protected $connection;
 
     /**
      * Have the responsibility of assembling the data coming from the database into actual entities.
@@ -58,12 +58,9 @@ class DataMapper implements HasSchemaInterface
      */
     protected $eventService;
 
-    /**
-     * @param Pool $connPool the connections that are going to be used to interact with the database
-     */
-    public function __construct(Pool $connPool)
+    public function __construct(Connection $connection)
     {
-        $this->connPool = $connPool;
+        $this->connection = $connection;
     }
 
     /**
@@ -360,11 +357,11 @@ class DataMapper implements HasSchemaInterface
      */
     protected function getCollection(): Collection
     {
-        $conn = $this->connPool->getConnection();
-        $database = $conn->defaultDatabase;
+        $connection = $this->connection;
+        $database = $connection->defaultDatabase;
         $collection = $this->schema->collection;
 
-        return $conn->getRawConnection()->$database->$collection;
+        return $connection->getRawConnection()->$database->$collection;
     }
 
     /**

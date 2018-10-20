@@ -7,7 +7,7 @@ use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
@@ -348,9 +348,9 @@ class Cursor implements CursorInterface, Serializable
     {
         $attributes = unserialize($serialized);
 
-        $conn = Ioc::make(Pool::class)->getConnection();
-        $db = $conn->defaultDatabase;
-        $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
+        $connection = Ioc::make(Connection::class);
+        $db = $connection->defaultDatabase;
+        $collectionObject = $connection->getRawConnection()->$db->{$attributes['collection']};
 
         foreach ($attributes as $key => $value) {
             $this->$key = $value;

@@ -3,11 +3,10 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
+use MongoDB\Driver\Manager;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
-use Mongolid\Manager;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
@@ -106,24 +105,19 @@ class BulkWriteTest extends TestCase
         $schema = m::mock(Schema::class);
         $entity->schema = $schema;
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
-        $pool = m::mock(Pool::class);
         $connection = m::mock(Connection::class);
-        $manager = m::mock(Manager::class);
+        $manager = m::mock(new Manager());
 
         $connection->defaultDatabase = 'foo';
         $schema->collection = 'bar';
         $namespace = 'foo.bar';
 
-        Ioc::instance(Pool::class, $pool);
+        Ioc::instance(Connection::class, $connection);
 
         // Expect
         $entity->expects()
             ->getSchema()
             ->andReturn($schema);
-
-        $pool->expects()
-            ->getConnection()
-            ->andReturn($connection);
 
         $connection->expects()
             ->getRawManager()

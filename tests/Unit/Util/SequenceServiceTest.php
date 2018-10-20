@@ -4,7 +4,6 @@ namespace Mongolid\Util;
 use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\TestCase;
 
 class SequenceServiceTest extends TestCase
@@ -15,8 +14,8 @@ class SequenceServiceTest extends TestCase
     public function testShouldGetNextValue($sequenceName, $currentValue, $expectation)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $sequenceService = m::mock(SequenceService::class.'[rawCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $sequenceService = m::mock(SequenceService::class.'[rawCollection]', [$connection]);
         $sequenceService->shouldAllowMockingProtectedMethods();
         $rawCollection = m::mock(Collection::class);
 
@@ -44,22 +43,17 @@ class SequenceServiceTest extends TestCase
     public function testShouldGetRawCollection()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $sequenceService = new SequenceService($connPool, 'foobar');
         $connection = m::mock(Connection::class);
+        $sequenceService = new SequenceService($connection, 'foobar');
         $collection = m::mock(Collection::class);
 
         $connection->defaultDatabase = 'grimory';
         $connection->grimory = (object) ['foobar' => $collection];
 
         // Act
-        $connPool->expects()
-            ->getConnection()
-            ->andReturn($connection);
-
         $connection->expects()
             ->getRawConnection()
-            ->andReturn($connection);
+            ->andReturnSelf($connection);
 
         // Assertion
         $this->assertEquals(

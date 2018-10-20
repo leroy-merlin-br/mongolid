@@ -3,7 +3,6 @@ namespace Mongolid;
 
 use Illuminate\Container\Container;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
@@ -17,10 +16,10 @@ use Mongolid\Util\CacheComponentInterface;
  * it easy to use without any framework.
  *
  * With the Mongolid\Manager, you can start using Mongolid with pure PHP by
- * simply calling the addConnection method.
+ * simply calling the setConnection method.
  *
  * @example
- *     (new Mongolid\Manager)->addConnection(new Connection);
+ *     (new Mongolid\Manager)->setConnection(new Connection);
  *     // And then start persisting and querying your models.
  */
 class Manager
@@ -40,18 +39,18 @@ class Manager
     public $container;
 
     /**
-     * Mongolid connection pool being object.
-     *
-     * @var Pool
-     */
-    public $connectionPool;
-
-    /**
      * Mongolid cache component object.
      *
      * @var CacheComponent
      */
     public $cacheComponent;
+
+    /**
+     * Mongolid connection object.
+     *
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * Stores the schemas that have been registered for later use. This may be
@@ -70,10 +69,12 @@ class Manager
      *
      * @return bool Success
      */
-    public function addConnection(Connection $connection): bool
+    public function setConnection(Connection $connection): bool
     {
         $this->init();
-        $this->connectionPool->addConnection($connection);
+        $this->container->instance(Connection::class, $this->connection);
+
+        $this->connection = $connection;
 
         return true;
     }
@@ -87,7 +88,7 @@ class Manager
     {
         $this->init();
 
-        return $this->connectionPool->getConnection()->getRawConnection();
+        return $this->connection->getRawConnection();
     }
 
     /**
@@ -143,12 +144,13 @@ class Manager
         }
 
         $this->container = new Container();
-        $this->connectionPool = new Pool();
-        $this->cacheComponent = new CacheComponent();
-
-        $this->container->instance(Pool::class, $this->connectionPool);
-        $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
         Ioc::setContainer($this->container);
+
+        $this->cacheComponent = new CacheComponent();
+        $this->container->instance(
+            CacheComponentInterface::class,
+            $this->cacheComponent
+        );
 
         static::$singleton = $this;
     }

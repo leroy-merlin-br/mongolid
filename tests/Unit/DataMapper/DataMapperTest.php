@@ -7,7 +7,6 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
@@ -22,13 +21,13 @@ class DataMapperTest extends TestCase
     public function testShouldBeAbleToConstructWithSchema()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
+        $connection = m::mock(Connection::class);
 
         // Act
-        $mapper = new DataMapper($connPool);
+        $mapper = new DataMapper($connection);
 
         // Assert
-        $this->assertAttributeEquals($connPool, 'connPool', $mapper);
+        $this->assertAttributeEquals($connection, 'connection', $mapper);
     }
 
     /**
@@ -37,8 +36,8 @@ class DataMapperTest extends TestCase
     public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
@@ -100,8 +99,8 @@ class DataMapperTest extends TestCase
     public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
@@ -156,8 +155,8 @@ class DataMapperTest extends TestCase
     public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
@@ -207,8 +206,8 @@ class DataMapperTest extends TestCase
     public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -270,8 +269,8 @@ class DataMapperTest extends TestCase
         $expected
     ) {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -331,8 +330,8 @@ class DataMapperTest extends TestCase
     public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -390,8 +389,8 @@ class DataMapperTest extends TestCase
         $eventName
     ) {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
         $entity = m::mock();
 
@@ -422,8 +421,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetWithWhereQuery()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(Schema::class);
 
         $collection = m::mock(Collection::class);
@@ -476,8 +475,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetAll()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connection]);
         $mongolidCursor = m::mock(Cursor::class);
 
         // Expect
@@ -495,8 +494,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstWithQuery()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(Schema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -530,8 +529,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetNullIfFirstCantFindAnything()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(Schema::class);
 
         $collection = m::mock(Collection::class);
@@ -566,10 +565,10 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstProjectingFields()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
+        $connection = m::mock(Connection::class);
         $mapper = m::mock(
             DataMapper::class.'[prepareValueQuery,getCollection]',
-            [$connPool]
+            [$connection]
         );
         $schema = m::mock(Schema::class);
 
@@ -606,8 +605,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstTroughACacheableCursor()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connection]);
         $query = 123;
         $entity = new stdClass();
         $cursor = m::mock(CacheableCursor::class);
@@ -631,8 +630,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetFirstTroughACacheableCursorProjectingFields()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[where]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[where]', [$connection]);
         $query = 123;
         $entity = new stdClass();
         $cursor = m::mock(CacheableCursor::class);
@@ -657,8 +656,8 @@ class DataMapperTest extends TestCase
     public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connPool]);
+        $connection = m::mock(Connection::class);
+        $mapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connection]);
         $entity = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
         $schemaMapper = m::mock(Schema::class.'[]');
@@ -688,8 +687,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetSchemaMapper()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
+        $connection = m::mock(Connection::class);
+        $mapper = new DataMapper($connection);
         $mapper->schemaClass = 'MySchema';
         $schema = m::mock(Schema::class);
 
@@ -706,9 +705,8 @@ class DataMapperTest extends TestCase
     public function testShouldGetRawCollection()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
         $connection = m::mock(Connection::class);
+        $mapper = new DataMapper($connection);
         $collection = m::mock(Collection::class);
         $schema = m::mock(Schema::class);
         $schema->collection = 'foobar';
@@ -718,10 +716,6 @@ class DataMapperTest extends TestCase
         $connection->grimory = (object) ['foobar' => $collection];
 
         // Expect
-        $connPool->expects()
-            ->getConnection()
-            ->andReturn($connection);
-
         $connection->expects()
             ->getRawConnection()
             ->andReturn($connection);
@@ -739,8 +733,8 @@ class DataMapperTest extends TestCase
     public function testShouldPrepareQueryValue($value, $expectation)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
+        $connection = m::mock(Connection::class);
+        $mapper = new DataMapper($connection);
 
         // Act
         $result = $this->callProtected($mapper, 'prepareValueQuery', [$value]);
@@ -755,8 +749,8 @@ class DataMapperTest extends TestCase
     public function testPrepareProjectionShouldConvertArray($data, $expectation)
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
+        $connection = m::mock(Connection::class);
+        $mapper = new DataMapper($connection);
 
         // Act
         $result = $this->callProtected($mapper, 'prepareProjection', [$data]);
@@ -768,8 +762,8 @@ class DataMapperTest extends TestCase
     public function testPrepareProjectionShouldThrownAnException()
     {
         // Arrange
-        $connPool = m::mock(Pool::class);
-        $mapper = new DataMapper($connPool);
+        $connection = m::mock(Connection::class);
+        $mapper = new DataMapper($connection);
         $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
 
         // Expectations

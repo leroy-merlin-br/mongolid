@@ -2,7 +2,7 @@
 namespace Mongolid\Util;
 
 use MongoDB\Collection;
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 
 /**
  * Sequence service will manage and provide auto-increment sequences to be used
@@ -19,19 +19,15 @@ class SequenceService
     protected $collection;
 
     /**
-     * Connections that are going to be used to interact with the database.
+     * Connection that is going to be used to interact with the database.
      *
-     * @var Pool
+     * @var Connection
      */
-    protected $connPool;
+    protected $connection;
 
-    /**
-     * @param Pool   $connPool   the connections that are going to be used to interact with the database
-     * @param string $collection the collection where the sequences will be stored
-     */
-    public function __construct(Pool $connPool, string $collection = 'mongolid_sequences')
+    public function __construct(Connection $connection, string $collection = 'mongolid_sequences')
     {
-        $this->connPool = $connPool;
+        $this->connection = $connection;
         $this->collection = $collection;
     }
 
@@ -60,9 +56,10 @@ class SequenceService
      */
     protected function rawCollection(): Collection
     {
-        $conn = $this->connPool->getConnection();
-        $database = $conn->defaultDatabase;
+        $database = $this->connection->defaultDatabase;
 
-        return $conn->getRawConnection()->$database->{$this->collection};
+        return $this->connection->getRawConnection()
+            ->$database
+            ->{$this->collection};
     }
 }

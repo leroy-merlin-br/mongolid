@@ -1,15 +1,14 @@
 <?php
 namespace Mongolid\Tests\Util;
 
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 
 trait DropDatabaseTrait
 {
     public function dropDatabase()
     {
-        $pool = Ioc::make(Pool::class);
-        $connection = $pool->getConnection();
+        $connection = Ioc::make(Connection::class);
 
         $connection->getRawConnection()
             ->dropDatabase($connection->defaultDatabase);

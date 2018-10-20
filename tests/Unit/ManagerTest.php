@@ -5,7 +5,6 @@ use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
@@ -28,13 +27,15 @@ class ManagerTest extends TestCase
         $connection = m::mock(Connection::class);
         $rawConnection = m::mock(Client::class);
 
-        // Act
+        // Expect
         $connection->expects()
             ->getRawConnection()
             ->andReturn($rawConnection);
 
+        // Act
+        $manager->setConnection($connection);
+
         // Assert
-        $manager->addConnection($connection);
         $this->assertEquals($rawConnection, $manager->getConnection());
     }
 
@@ -115,7 +116,6 @@ class ManagerTest extends TestCase
         // Assertion
         $this->assertAttributeEquals($manager, 'singleton', Manager::class);
         $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
-        $this->assertAttributeInstanceOf(Pool::class, 'connectionPool', $manager);
         $this->assertAttributeInstanceOf(CacheComponentInterface::class, 'cacheComponent', $manager);
 
         $container = $manager->container;

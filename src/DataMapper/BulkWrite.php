@@ -4,7 +4,7 @@ namespace Mongolid\DataMapper;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
@@ -91,7 +91,7 @@ class BulkWrite
     }
 
     /**
-     * Execute the BulkWrite, using a connection from the Pool.
+     * Execute the BulkWrite, using connection.
      * The collection is inferred from entity's collection name.
      *
      * @param int $writeConcern
@@ -100,7 +100,7 @@ class BulkWrite
      */
     public function execute($writeConcern = 1)
     {
-        $connection = Ioc::make(Pool::class)->getConnection();
+        $connection = Ioc::make(Connection::class);
         $manager = $connection->getRawManager();
 
         $namespace = $connection->defaultDatabase.'.'.$this->schema->collection;

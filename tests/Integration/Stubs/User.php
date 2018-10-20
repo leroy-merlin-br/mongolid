@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration\Stubs;
 
 use MongoDB\Collection;
 use Mongolid\ActiveRecord;
-use Mongolid\Connection\Pool;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 
 class User extends ActiveRecord
@@ -22,7 +22,7 @@ class User extends ActiveRecord
 
     public function collection(): Collection
     {
-        $connection = Ioc::make(Pool::class)->getConnection();
+        $connection = Ioc::make(Connection::class);
         $client = $connection->getRawConnection();
 
         return $client->{$connection->defaultDatabase}->{$this->collection};
