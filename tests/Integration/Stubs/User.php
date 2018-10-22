@@ -27,4 +27,14 @@ class User extends ActiveRecord
 
         return $client->{$connection->defaultDatabase}->{$this->collection};
     }
+
+    public function parent()
+    {
+        return $this->referencesOne(User::class, 'parent');
+    }
+
+    public function siblings()
+    {
+        return $this->referencesMany(User::class, 'siblings');
+    }
 }

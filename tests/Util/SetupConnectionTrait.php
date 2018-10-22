@@ -3,6 +3,8 @@ namespace Mongolid\Tests\Util;
 
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
+use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 
 trait SetupConnectionTrait
 {
@@ -16,6 +18,11 @@ trait SetupConnectionTrait
 
                 return $connection;
             }
+        );
+
+        Ioc::instance(
+            CacheComponentInterface::class,
+            new CacheComponent()
         );
     }
 }
