@@ -15,8 +15,7 @@ before_script:
 
 script:
   - vendor/bin/phpcs
-  - phpunit --testsuite unit -c phpunit.xml.dist
-  - phpunit --testsuite integration
+  - vendor/bin/phpunit -c phpunit.xml.dist
 
 after_script:
   - php vendor/bin/coveralls -v
