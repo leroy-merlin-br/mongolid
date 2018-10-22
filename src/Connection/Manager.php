@@ -1,8 +1,7 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
-use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
@@ -15,11 +14,11 @@ use Mongolid\Util\CacheComponentInterface;
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
  * it easy to use without any framework.
  *
- * With the Mongolid\Manager, you can start using Mongolid with pure PHP by
+ * With Manager, you can start using Mongolid with pure PHP by
  * simply calling the setConnection method.
  *
  * @example
- *     (new Mongolid\Manager)->setConnection(new Connection);
+ *     (new Mongolid\Connection\Manager)->setConnection(new Connection());
  *     // And then start persisting and querying your models.
  */
 class Manager
@@ -61,7 +60,7 @@ class Manager
     protected $schemas = [];
 
     /**
-     * Main entry point to openning a connection and start using Mongolid in
+     * Main entry point to opening a connection and start using Mongolid in
      * pure PHP. After adding a connection into the Manager you are ready to
      * persist and query your models.
      *

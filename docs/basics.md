@@ -14,13 +14,13 @@ composer require leroy-merlin-br/mongolid
 ## Setup
 
 If you are not using Laravel, you should initialize the Mongolid connection and container manually.
-The minimalistic way of doing it is to use `Mongolid\Manager`:
+The minimalistic way of doing it is to use `Mongolid\Connection\Manager`:
 
 ```php
 <?php
 require 'vendor/autoload.php';
 
-use Mongolid\Manager;
+use Mongolid\Connection\Manager;
 use Mongolid\Connection\Connection;
 
 $manager = new Manager();

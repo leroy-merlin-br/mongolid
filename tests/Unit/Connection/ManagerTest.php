@@ -1,15 +1,15 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
-use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema\Schema;
+use Mongolid\TestCase;
 use Mongolid\Util\CacheComponentInterface;
 
 class ManagerTest extends TestCase

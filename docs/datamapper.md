@@ -32,7 +32,7 @@ class ArticleSchema extends Mongolid\Schema\Schema {
 }
 ```
 
-Then you should register an instance of the schema into the `Mongolid\Manager`:
+Then you should register an instance of the schema into the `Mongolid\Connection\Manager`:
 
 ```php
 $manager->registerSchema(new ArticleSchema);
