@@ -14,6 +14,15 @@ use Exception;
 trait Attributes
 {
     /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is false.
+     *
+     * @var bool
+     */
+    public $mutable = false;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -45,13 +54,11 @@ trait Attributes
     protected $guarded = [];
 
     /**
-     * Check if model should mutate attributes checking
-     * the existence of a specific method on model
-     * class. Default is false.
+     * Store mutable attribute values to work with `&__get()`.
      *
-     * @var bool
+     * @var array
      */
-    public $mutable = false;
+    protected $mutableCache = [];
 
     /**
      * Get an attribute from the model.
@@ -62,13 +69,7 @@ trait Attributes
      */
     public function getAttribute(string $key)
     {
-        $inAttributes = array_key_exists($key, $this->attributes);
-
-        if ($inAttributes) {
-            return $this->attributes[$key];
-        } elseif ('attributes' == $key) {
-            return $this->attributes;
-        }
+        return $this->{$key};
     }
 
     /**
@@ -149,34 +150,6 @@ trait Attributes
     }
 
     /**
-     * Verify if model has a mutator method defined.
-     *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return bool
-     */
-    protected function hasMutatorMethod($key, $prefix)
-    {
-        $method = $this->buildMutatorMethod($key, $prefix);
-
-        return method_exists($this, $method);
-    }
-
-    /**
-     * Create mutator method pattern.
-     *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return string
-     */
-    protected function buildMutatorMethod($key, $prefix)
-    {
-        return $prefix.ucfirst($key).'Attribute';
-    }
-
-    /**
      * Returns the model instance as an Array.
      *
      * @return array
@@ -193,13 +166,23 @@ trait Attributes
      *
      * @return mixed
      */
-    public function __get($key)
+    public function &__get($key)
     {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
-            return $this->{$this->buildMutatorMethod($key, 'get')}();
+        if ('attributes' === $key) {
+            return $this->attributes;
         }
 
-        return $this->getAttribute($key);
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
+            $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
+
+            return $this->mutableCache[$key];
+        }
+
+        if (!array_key_exists($key, $this->attributes)) {
+            $this->attributes[$key] = null;
+        }
+
+        return $this->attributes[$key];
     }
 
     /**
@@ -237,5 +220,33 @@ trait Attributes
     public function __unset($key)
     {
         unset($this->attributes[$key]);
+    }
+
+    /**
+     * Verify if model has a mutator method defined.
+     *
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
+     *
+     * @return bool
+     */
+    protected function hasMutatorMethod($key, $prefix)
+    {
+        $method = $this->buildMutatorMethod($key, $prefix);
+
+        return method_exists($this, $method);
+    }
+
+    /**
+     * Create mutator method pattern.
+     *
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
+     *
+     * @return string
+     */
+    protected function buildMutatorMethod($key, $prefix)
+    {
+        return $prefix.ucfirst($key).'Attribute';
     }
 }

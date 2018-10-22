@@ -36,6 +36,7 @@ class PersistedDataTest extends IntegrationTestCase
                 'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
                 'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
             ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
         ];
 
         // Actions
@@ -75,6 +76,7 @@ class PersistedDataTest extends IntegrationTestCase
                 'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
                 'HTML' => ['percentage' => '89%', 'version' => 'HTML5'],
             ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
             'email' => 'jane@doe.com',
         ];
 
@@ -114,6 +116,7 @@ class PersistedDataTest extends IntegrationTestCase
                 'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
                 'HTML' => ['percentage' => '89%', 'version' => 'HTML5'],
             ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
             'address' => '123 Blue Street',
             'email' => 'jane@doe.com',
         ];
@@ -145,6 +148,13 @@ class PersistedDataTest extends IntegrationTestCase
             'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
             'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
         ];
+
+        // dinamically set array
+        $user->photos['profile'] = '/user-photo';
+        $user->photos['icon'] = '/user-icon';
+
+        // access unknown field and don't find it saved later.
+        $user->unknown;
 
         if ($save) {
             $this->assertTrue($user->save(), 'Failed to save user!');
