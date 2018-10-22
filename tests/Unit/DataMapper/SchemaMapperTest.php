@@ -5,48 +5,74 @@ use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
+use stdClass;
 
 class SchemaMapperTest extends TestCase
 {
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
-        $schema->fields = [
-            'name' => 'string',
-            'age' => 'int',
-            'stuff' => 'schema.My\Own\Schema',
-        ];
-        $schemaMapper = m::mock(
-            SchemaMapper::class.'[clearDynamic,parseField]',
-            [$schema]
-        );
-        $schemaMapper->shouldAllowMockingProtectedMethods();
+        $myOwnSchema = new class() extends Schema
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $dynamic = true;
+
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [];
+        };
+
+        Ioc::instance('My\Own\Schema', $myOwnSchema);
+
+        $schema = new class() extends Schema
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $dynamic = true;
+
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                'name' => 'string',
+                'surname' => 'string',
+                'age' => 'int',
+                'stuff' => 'schema.My\Own\Schema',
+            ];
+        };
+
+        $schemaMapper = new SchemaMapper($schema);
+        $stuff = new stdClass();
+        $stuff->address = '1, Blue Street';
+
+        $otherStuff = new stdClass();
+        $otherStuff->address = '2, Green Street';
+
         $data = [
             'name' => 'John',
+            'surname' => null,
+            'age' => '23',
+            'stuff' => [$stuff, $otherStuff],
+            'invalid' => null,
+            'empty' => '',
+        ];
+
+        $expected = [
+            'name' => 'John',
             'age' => 23,
-            'stuff' => 'fooBar',
+            'stuff' => [['address' => '1, Blue Street'], ['address' => '2, Green Street']],
+            'empty' => '',
         ];
 
         // Act
-        $schemaMapper->expects()
-            ->clearDynamic($data);
-
-        foreach ($schema->fields as $key => $value) {
-            $schemaMapper->expects()
-                ->parseField($data[$key], $value)
-                ->andReturn($data[$key].'.PARSED');
-        }
+        $result = $schemaMapper->map($data);
 
         // Assert
-        $this->assertEquals(
-            [
-                'name' => 'John.PARSED',
-                'age' => '23.PARSED',
-                'stuff' => 'fooBar.PARSED',
-            ],
-            $schemaMapper->map($data)
-        );
+        $this->assertSame($expected, $result);
     }
 
     public function testShouldClearDynamicFieldsIfSchemaIsNotDynamic()
@@ -147,7 +173,8 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknownString()
     {
         // Arrange
-        $schemaClass = new class() extends Schema {
+        $schemaClass = new class() extends Schema
+        {
             public function pumpkinPoint($value)
             {
                 return $value * 2;
@@ -177,20 +204,23 @@ class SchemaMapperTest extends TestCase
         Ioc::instance('Xd\MySchema', $mySchema);
 
         // When instantiating the SchemaMapper with the specified $param as dependency
-        Ioc::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
-            // Check if mySchema has been injected correctly
-            $test->assertSame($mySchema, $params['schema']);
+        Ioc::bind(
+            SchemaMapper::class,
+            function ($container, $params) use ($value, $mySchema, $test) {
+                // Check if mySchema has been injected correctly
+                $test->assertSame($mySchema, $params['schema']);
 
-            // Instantiate a SchemaMapper with mySchema
-            $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params['schema']]);
+                // Instantiate a SchemaMapper with mySchema
+                $anotherSchemaMapper = m::mock(SchemaMapper::class, [$params['schema']]);
 
-            // Set expectation to receive a map call
-            $anotherSchemaMapper->expects()
-                ->map($value)
-                ->andReturn(['foo' => 'PARSED']);
+                // Set expectation to receive a map call
+                $anotherSchemaMapper->expects()
+                    ->map($value)
+                    ->andReturn(['foo' => 'PARSED']);
 
-            return $anotherSchemaMapper;
-        });
+                return $anotherSchemaMapper;
+            }
+        );
 
         // Assert
         $this->assertEquals(
@@ -234,7 +264,8 @@ class SchemaMapperTest extends TestCase
         // Arrange
         $schema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
-        $object = new class() {
+        $object = new class()
+        {
             public function getAttributes()
             {
                 return ['foo' => 'bar'];

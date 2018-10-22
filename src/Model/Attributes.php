@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
+use Exception;
+
 /**
  * This trait adds attribute getter, setters and also a useful
  * `fill` method that can be used with $fillable and $guarded
@@ -71,10 +73,8 @@ trait Attributes
 
     /**
      * Get all attributes from the model.
-     *
-     * @return mixed
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -124,13 +124,28 @@ trait Attributes
     /**
      * Stores original attributes from actual data from attributes
      * to be used in future comparisons about changes.
+     * It tries to clone the attributes (using serialize/unserialize)
+     * so modifications to objects will be correctly identified
+     * as changes.
      *
      * Ideally should be called once right after retrieving data from
      * the database.
      */
     public function syncOriginalAttributes()
     {
-        $this->original = $this->attributes;
+        try {
+            $this->original = unserialize(serialize($this->attributes));
+        } catch (Exception $e) {
+            $this->original = $this->attributes;
+        }
+    }
+
+    /**
+     * Retrieve original attributes.
+     */
+    public function getOriginalAttributes(): array
+    {
+        return $this->original;
     }
 
     /**

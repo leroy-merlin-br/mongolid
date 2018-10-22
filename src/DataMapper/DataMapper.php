@@ -79,7 +79,7 @@ class DataMapper implements HasSchemaInterface
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
         // listeners to cancel save operations if validations fail or whatever.
-        if (false === $this->fireEvent('saving', $entity, true)) {
+        if (!$this->fireEvent('saving', $entity, true)) {
             return false;
         }
 
@@ -118,7 +118,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
-        if ($fireEvents && false === $this->fireEvent('inserting', $entity, true)) {
+        if ($fireEvents && !$this->fireEvent('inserting', $entity, true)) {
             return false;
         }
 
@@ -156,7 +156,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function update($entity, array $options = []): bool
     {
-        if (false === $this->fireEvent('updating', $entity, true)) {
+        if (!$this->fireEvent('updating', $entity, true)) {
             return false;
         }
 
@@ -172,9 +172,11 @@ class DataMapper implements HasSchemaInterface
 
         $data = $this->parseToDocument($entity);
 
+        $updateData = $this->getUpdateData($entity, $data);
+
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
-            ['$set' => $data],
+            $updateData,
             $this->mergeOptions($options)
         );
 
@@ -201,7 +203,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function delete($entity, array $options = []): bool
     {
-        if (false === $this->fireEvent('deleting', $entity, true)) {
+        if (!$this->fireEvent('deleting', $entity, true)) {
             return false;
         }
 
@@ -315,6 +317,22 @@ class DataMapper implements HasSchemaInterface
         }
 
         throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
+    /**
+     * Set a Schema object  that describes an Entity in MongoDB.
+     */
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
     }
 
     /**
@@ -519,6 +537,36 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
+     * Based on the work of bjori/mongo-php-transistor.
+     * Calculate `$set` and `$unset` arrays for update operation and store them on $changes.
+     *
+     * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108
+     */
+    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
+    {
+        foreach ($newData as $k => $v) {
+            if (!isset($oldData[$k])) { // new field
+                $changes['$set']["{$keyfix}{$k}"] = $v;
+            } elseif ($oldData[$k] != $v) {  // changed value
+                if (is_array($v) && $oldData[$k] && $v) { // check array recursively for changes
+                    $this->calculateChanges($changes, $v, $oldData[$k], "{$keyfix}{$k}.");
+                } else {
+                    // overwrite normal changes in keys
+                    // this applies to previously empty arrays/documents too
+                    $changes['$set']["{$keyfix}{$k}"] = $v;
+                }
+            }
+        }
+
+        foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
+            if (!isset($newData[$k])) { // removed field
+                $changes['$unset']["{$keyfix}{$k}"] = '';
+                continue;
+            }
+        }
+    }
+
+    /**
      * Merge all options.
      *
      * @param array $defaultOptions default options array
@@ -543,19 +591,15 @@ class DataMapper implements HasSchemaInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSchema(): Schema
+    private function getUpdateData($entity, array $data)
     {
-        return $this->schema;
-    }
+        if (!$entity instanceof AttributesAccessInterface) {
+            return ['$set' => $data];
+        }
 
-    /**
-     * Set a Schema object  that describes an Entity in MongoDB.
-     */
-    public function setSchema(Schema $schema)
-    {
-        $this->schema = $schema;
+        $changes = [];
+        $this->calculateChanges($changes, $data, $entity->getOriginalAttributes());
+
+        return $changes;
     }
 }

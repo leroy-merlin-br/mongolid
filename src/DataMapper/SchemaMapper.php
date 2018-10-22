@@ -56,19 +56,12 @@ class SchemaMapper
             $data[$key] = $this->parseField($data[$key] ?? null, $fieldType);
         }
 
-        return $data;
-    }
-
-    /**
-     * If the schema is not dynamic, remove all non specified fields.
-     *
-     * @param array $data Reference of the fields. The passed array will be modified.
-     */
-    protected function clearDynamic(array &$data)
-    {
-        if (!$this->schema->dynamic) {
-            $data = array_intersect_key($data, $this->schema->fields);
-        }
+        return array_filter(
+            $data,
+            function ($value) {
+                return null !== $value;
+            }
+        );
     }
 
     /**
@@ -87,7 +80,7 @@ class SchemaMapper
         }
 
         // Returns null or an empty array
-        if (null === $value || is_array($value) && empty($value)) {
+        if (null === $value || [] === $value) {
             return $value;
         }
 
@@ -102,6 +95,18 @@ class SchemaMapper
         }
 
         return $value;
+    }
+
+    /**
+     * If the schema is not dynamic, remove all non specified fields.
+     *
+     * @param array $data Reference of the fields. The passed array will be modified.
+     */
+    protected function clearDynamic(array &$data)
+    {
+        if (!$this->schema->dynamic) {
+            $data = array_intersect_key($data, $this->schema->fields);
+        }
     }
 
     /**
