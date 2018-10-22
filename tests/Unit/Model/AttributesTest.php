@@ -9,7 +9,8 @@ class AttributesTest extends TestCase
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
         };
 
@@ -19,64 +20,67 @@ class AttributesTest extends TestCase
         $model->name = 'John';
         $model->age = 25;
         $model->child = $childObj;
-        $this->assertAttributeEquals(
+        $this->assertSame(
             [
                 'name' => 'John',
                 'age' => 25,
                 'child' => $childObj,
             ],
-            'attributes',
-            $model
+            $model->attributes()
         );
     }
 
     public function testShouldHaveDynamicGetters()
     {
         // Arrange
-        $model = new class() {
-            use Attributes;
-        };
+        $child = new stdClass();
+        $attributes = [
+            'name' => 'John',
+            'age' => 25,
+            'child' => $child,
+        ];
 
-        $childObj = new stdClass();
-        $this->setProtected(
-            $model,
-            'attributes',
-            [
-                'name' => 'John',
-                'age' => 25,
-                'child' => $childObj,
-            ]
-        );
+        $model = new class($attributes)
+        {
+            use Attributes;
+
+            public function __construct(array $attributes)
+            {
+                $this->_mongolid_attributes = $attributes;
+            }
+        };
 
         // Assert
         $this->assertEquals('John', $model->name);
         $this->assertEquals(25, $model->age);
-        $this->assertEquals($childObj, $model->child);
+        $this->assertEquals($child, $model->child);
         $this->assertEquals(null, $model->nonexistant);
     }
 
     public function testShouldCheckIfAttributeIsSet()
     {
         // Arrange
-        $model = new class() {
+        $model = new class(['name' => 'John', 'ignored' => null])
+        {
             use Attributes;
-        };
 
-        $this->setProtected(
-            $model,
-            'attributes',
-            ['name' => 'John']
-        );
+            public function __construct(array $attributes)
+            {
+                $this->_mongolid_attributes = $attributes;
+            }
+        };
 
         // Assert
         $this->assertTrue(isset($model->name));
         $this->assertFalse(isset($model->nonexistant));
+        $this->assertFalse(isset($model->ignored));
     }
 
     public function testShouldCheckIfMutatedAttributeIsSet()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
 
             public function __construct()
@@ -98,33 +102,32 @@ class AttributesTest extends TestCase
     public function testShouldUnsetAttributes()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
 
             public function __construct()
             {
-                $this->attributes = [
+                $this->_mongolid_attributes = [
                     'name' => 'John',
                     'age' => 25,
                 ];
             }
         };
 
-        // Assert
+        // Act
         unset($model->age);
-        $this->assertAttributeSame(
-            [
-                'name' => 'John',
-            ],
-            'attributes',
-            $model
-        );
+        $result = $model->attributes();
+
+        // Assert
+        $this->assertSame(['name' => 'John'], $result);
     }
 
     public function testShouldGetAttributeFromMutator()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
 
             public function __construct()
@@ -147,7 +150,8 @@ class AttributesTest extends TestCase
     public function testShouldIgnoreMutators()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
 
             public function getSomeAttribute()
@@ -170,7 +174,8 @@ class AttributesTest extends TestCase
     public function testShouldSetAttributeFromMutator()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
 
             public function __construct()
@@ -200,22 +205,29 @@ class AttributesTest extends TestCase
         $expected
     ) {
         // Arrange
-        $model = new class() {
+        $model = new class($fillable, $guarded)
+        {
             use Attributes;
+
+            public function __construct(array $fillable, array $guarded)
+            {
+                $this->fillable = $fillable;
+                $this->guarded = $guarded;
+            }
         };
 
-        $this->setProtected($model, 'fillable', $fillable);
-        $this->setProtected($model, 'guarded', $guarded);
+        // Act
+        $model->fill($input);
 
         // Assert
-        $model->fill($input);
-        $this->assertAttributeEquals($expected, 'attributes', $model);
+        $this->assertSame($expected, $model->attributes());
     }
 
     public function testShouldForceFillAttributes()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
         };
 
@@ -234,7 +246,8 @@ class AttributesTest extends TestCase
     public function testShouldBeCastableToArray()
     {
         // Arrange
-        $model = new class() {
+        $model = new class()
+        {
             use Attributes;
         };
 
@@ -251,7 +264,8 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface {
+        $model = new class() implements AttributesAccessInterface
+        {
             use Attributes;
         };
 
@@ -262,7 +276,7 @@ class AttributesTest extends TestCase
         $model->syncOriginalAttributes();
 
         // Assert
-        $this->assertAttributeEquals($model->attributes, 'original', $model);
+        $this->assertSame($model->attributes(), $model->originalAttributes());
     }
 
     public function getFillableOptions()

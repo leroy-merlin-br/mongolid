@@ -602,7 +602,7 @@ class DataMapper implements HasSchemaInterface
         }
 
         $changes = [];
-        $this->calculateChanges($changes, $data, $entity->getOriginalAttributes());
+        $this->calculateChanges($changes, $data, $entity->originalAttributes());
 
         return $changes;
     }

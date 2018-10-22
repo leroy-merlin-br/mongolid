@@ -2,6 +2,7 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema\Schema;
 
 /**
@@ -162,8 +163,8 @@ class SchemaMapper
     protected function parseToArray($object): array
     {
         if (!is_array($object)) {
-            $attributes = method_exists($object, 'getAttributes')
-                ? $object->getAttributes()
+            $attributes = $object instanceof AttributesAccessInterface
+                ? $object->attributes()
                 : get_object_vars($object);
 
             return $attributes;

@@ -18,14 +18,14 @@ trait Attributes
      *
      * @var array
      */
-    protected $attributes = [];
+    private $_mongolid_attributes = [];
 
     /**
      * The model attribute's original state.
      *
      * @var array
      */
-    protected $original = [];
+    private $_mongolid_original_attributes = [];
 
     /**
      * Once you put at least one string in this array, only
@@ -75,9 +75,9 @@ trait Attributes
     /**
      * Get all attributes from the model.
      */
-    public function getAttributes(): array
+    public function attributes(): array
     {
-        return $this->attributes;
+        return $this->_mongolid_attributes;
     }
 
     /**
@@ -103,7 +103,7 @@ trait Attributes
      */
     public function cleanAttribute(string $key)
     {
-        unset($this->attributes[$key]);
+        unset($this->_mongolid_attributes[$key]);
     }
 
     /**
@@ -114,7 +114,7 @@ trait Attributes
      */
     public function setAttribute(string $key, $value)
     {
-        $this->attributes[$key] = $value;
+        $this->_mongolid_attributes[$key] = $value;
     }
 
     /**
@@ -130,18 +130,18 @@ trait Attributes
     public function syncOriginalAttributes()
     {
         try {
-            $this->original = unserialize(serialize($this->attributes));
+            $this->_mongolid_original_attributes = unserialize(serialize($this->attributes()));
         } catch (Exception $e) {
-            $this->original = $this->attributes;
+            $this->_mongolid_original_attributes = $this->attributes();
         }
     }
 
     /**
      * Retrieve original attributes.
      */
-    public function getOriginalAttributes(): array
+    public function originalAttributes(): array
     {
-        return $this->original;
+        return $this->_mongolid_original_attributes;
     }
 
     /**
@@ -151,7 +151,7 @@ trait Attributes
      */
     public function toArray(): array
     {
-        return $this->getAttributes();
+        return $this->attributes();
     }
 
     /**
@@ -163,21 +163,17 @@ trait Attributes
      */
     public function &__get($key)
     {
-        if ('attributes' === $key) {
-            return $this->attributes;
-        }
-
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
 
             return $this->mutableCache[$key];
         }
 
-        if (!array_key_exists($key, $this->attributes)) {
-            $this->attributes[$key] = null;
+        if (!array_key_exists($key, $this->_mongolid_attributes)) {
+            $this->_mongolid_attributes[$key] = null;
         }
 
-        return $this->attributes[$key];
+        return $this->_mongolid_attributes[$key];
     }
 
     /**
@@ -214,7 +210,7 @@ trait Attributes
      */
     public function __unset($key)
     {
-        unset($this->attributes[$key]);
+        unset($this->_mongolid_attributes[$key]);
     }
 
     /**

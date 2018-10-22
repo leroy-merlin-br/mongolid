@@ -164,7 +164,7 @@ class EmbeddedCursorTest extends TestCase
         };
 
         $class = get_class($object);
-        $items = [$object->attributes];
+        $items = [$object->attributes()];
         $cursor = $this->getCursor($class, $items);
 
         $this->setProtected($cursor, 'position', 0);

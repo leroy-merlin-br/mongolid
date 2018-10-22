@@ -3,6 +3,7 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
@@ -280,18 +281,42 @@ class SchemaMapperTest extends TestCase
         );
     }
 
-    public function testShouldGetAttributesWhenGetAttributesMethodIsAvailable()
+    public function testShouldGetAttributesWhenObjectImplementsAttributesAccessInterface()
     {
         // Arrange
         $schema = new class extends Schema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
-        $object = new class()
+        $object = new class implements AttributesAccessInterface
         {
-            public function getAttributes()
+            public function getAttribute(string $key)
+            {
+            }
+
+            public function attributes(): array
             {
                 return ['foo' => 'bar'];
+            }
+
+            public function fill(array $input, bool $force = false)
+            {
+            }
+
+            public function cleanAttribute(string $key)
+            {
+            }
+
+            public function setAttribute(string $key, $value)
+            {
+            }
+
+            public function syncOriginalAttributes()
+            {
+            }
+
+            public function originalAttributes(): array
+            {
             }
         };
 

@@ -25,7 +25,7 @@ interface PolymorphableInterface
      *  {
      *      if ($this->video != null) {
      *          $obj = new VideoContent;
-     *          $obj->fill($this->attributes);
+     *          $obj->fill($this->attributes();
      *
      *          return $obj;
      *      } else {

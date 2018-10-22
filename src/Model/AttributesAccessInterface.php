@@ -23,7 +23,7 @@ interface AttributesAccessInterface
     /**
      * Get all attributes from the model.
      */
-    public function getAttributes(): array;
+    public function attributes(): array;
 
     /**
      * Set the model attributes using an array.
@@ -60,5 +60,5 @@ interface AttributesAccessInterface
     /**
      * Retrieve original attributes.
      */
-    public function getOriginalAttributes(): array;
+    public function originalAttributes(): array;
 }
