@@ -89,13 +89,8 @@ trait Attributes
     public function fill(array $input, bool $force = false)
     {
         foreach ($input as $key => $value) {
-            if ($force) {
-                $this->setAttribute($key, $value);
-
-                continue;
-            }
-
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && !in_array($key, $this->guarded)) {
+            if ($force
+                || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
                 $this->setAttribute($key, $value);
             }
         }
@@ -154,7 +149,7 @@ trait Attributes
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->getAttributes();
     }

@@ -3,6 +3,7 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
+use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use stdClass;
@@ -78,12 +79,16 @@ class SchemaMapperTest extends TestCase
     public function testShouldClearDynamicFieldsIfSchemaIsNotDynamic()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
-        $schema->dynamic = false;
-        $schema->fields = [
-            'name' => 'string',
-            'age' => 'int',
-        ];
+        $schema = new class extends Schema
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                'name' => 'string',
+                'age' => 'int',
+            ];
+        };
         $schemaMapper = new SchemaMapper($schema);
         $data = [
             'name' => 'John',
@@ -105,12 +110,16 @@ class SchemaMapperTest extends TestCase
     public function testShouldNotClearDynamicFieldsIfSchemaIsDynamic()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
-        $schema->dynamic = true;
-        $schema->fields = [
-            'name' => 'string',
-            'age' => 'int',
-        ];
+        $schema = new class extends DynamicSchema
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                'name' => 'string',
+                'age' => 'int',
+            ];
+        };
         $schemaMapper = new SchemaMapper($schema);
         $data = [
             'name' => 'John',
@@ -133,7 +142,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoCastableType()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
         $schemaMapper = new SchemaMapper($schema);
 
         // Assert
@@ -151,7 +162,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoAnotherMappedSchemaIfTypeBeginsWithSchema()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
         $schemaMapper = m::mock(
             SchemaMapper::class.'[mapToSchema]',
             [$schema]
@@ -194,8 +207,12 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapAnArrayValueToAnotherSchema()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
-        $mySchema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
+        $mySchema = new class extends Schema
+        {
+        };
         $schemaMapper = new SchemaMapper($schema);
         $value = ['foo' => 'bar'];
         $test = $this;
@@ -234,7 +251,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
         $schemaMapper = new SchemaMapper($schema);
         $object = (object) ['foo' => 'bar', 'name' => 'wilson'];
 
@@ -248,7 +267,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
         $schemaMapper = new SchemaMapper($schema);
         $object = ['age' => 25];
 
@@ -262,7 +283,9 @@ class SchemaMapperTest extends TestCase
     public function testShouldGetAttributesWhenGetAttributesMethodIsAvailable()
     {
         // Arrange
-        $schema = m::mock(Schema::class);
+        $schema = new class extends Schema
+        {
+        };
         $schemaMapper = new SchemaMapper($schema);
         $object = new class()
         {
