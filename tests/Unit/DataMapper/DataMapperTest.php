@@ -13,6 +13,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Model\ActiveRecord;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
@@ -235,7 +236,7 @@ class DataMapperTest extends TestCase
             ->updateOne(
                 ['_id' => 123],
                 ['$set' => $parsedObject],
-                ['writeConcern' => new WriteConcern($writeConcern)]
+                $options
             )->andReturn($operationResult);
 
         $operationResult->expects()
@@ -259,6 +260,81 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertSame($expected, $result);
+    }
+
+    public function testShouldUpdateUnsettingFields()
+    {
+        // Arrange
+        $connection = m::mock(Connection::class);
+        $client = m::mock(Client::class);
+        $database = m::mock(Database::class);
+        $dataMapper = new DataMapper($connection);
+
+        $entity = new class extends ActiveRecord
+        {
+        };
+        $collection = m::mock(Collection::class);
+        $operationResult = m::mock();
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        Ioc::instance(
+            Schema::class,
+            new class() extends Schema
+            {
+                /**
+                 * {@inheritdoc}
+                 */
+                public $fields = [
+                    '_id' => 'objectId',
+                    'unchanged' => 'string',
+                ];
+            }
+        );
+
+        $entity->unchanged = 'unchanged';
+        $entity->notOnSchema = 'to be deleted';
+        $entity->name = 'John';
+        $entity->syncOriginalAttributes();
+        $entity->_id = 123;
+        unset($entity->name);
+
+        // Expect
+        $connection->expects()
+            ->getRawConnection()
+            ->andReturn($client);
+
+        $client->expects()
+            ->selectDatabase('mongolid')
+            ->andReturn($database);
+
+        $database->expects()
+            ->selectCollection('')
+            ->andReturn($collection);
+
+        $collection->expects()
+            ->updateOne(
+                ['_id' => 123],
+                ['$set' => ['_id' => 123], '$unset' => ['name' => '', 'notOnSchema' => '']],
+                $options
+            )->andReturn($operationResult);
+
+        $operationResult->expects()
+            ->isAcknowledged()
+            ->andReturn(true);
+
+        $operationResult->allows()
+            ->getModifiedCount()
+            ->andReturn(1);
+
+        $this->expectEventToBeFired('updating', $entity, true);
+
+        $this->expectEventToBeFired('updated', $entity, false);
+
+        // Act
+        $result = $dataMapper->update($entity, $options);
+
+        // Assert
+        $this->assertTrue($result);
     }
 
     /**
@@ -529,6 +605,63 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertNull($result);
+    }
+
+    public function testFirstOrFailShouldGetFirst()
+    {
+        // Arrange
+        $connection = m::mock(Connection::class);
+        $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $schema = m::mock(Schema::class);
+        $collection = m::mock(Collection::class);
+        $query = 123;
+        $preparedQuery = ['_id' => 123];
+
+        $schema->entityClass = 'stdClass';
+        $dataMapper->setSchema($schema);
+
+        $dataMapper->shouldAllowMockingProtectedMethods();
+
+        // Act
+        $dataMapper->expects()
+            ->prepareValueQuery($query)
+            ->andReturn($preparedQuery);
+
+        $dataMapper->expects()
+            ->getCollection()
+            ->andReturn($collection);
+
+        $collection->expects()
+            ->findOne($preparedQuery, ['projection' => []])
+            ->andReturn(['name' => 'John Doe']);
+
+        $result = $dataMapper->firstOrFail($query);
+
+        // Assert
+        $this->assertInstanceOf(stdClass::class, $result);
+        $this->assertAttributeEquals('John Doe', 'name', $result);
+    }
+
+    public function testFirstOrFailWithNullShouldFail()
+    {
+        // Arrange
+        $connection = m::mock(Connection::class);
+        $dataMapper = new DataMapper($connection);
+        $dataMapper->setSchema(
+            new class extends Schema
+            {
+                /**
+                 * {@inheritdoc}
+                 */
+                public $entityClass = 'User';
+            }
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [User].');
+
+        // Act
+        $dataMapper->firstOrFail(null);
     }
 
     public function testShouldGetNullIfFirstCantFindAnything()

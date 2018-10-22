@@ -210,7 +210,7 @@ trait Attributes
      */
     public function __unset($key)
     {
-        unset($this->_mongolid_attributes[$key]);
+        $this->cleanAttribute($key);
     }
 
     /**

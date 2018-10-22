@@ -145,6 +145,7 @@ class AttributesTest extends TestCase
 
         // Assert
         $this->assertEquals('something-else', $model->some);
+        $this->assertEquals('something-else', $model->getAttribute('some'));
     }
 
     public function testShouldIgnoreMutators()
@@ -169,6 +170,7 @@ class AttributesTest extends TestCase
 
         // Assert
         $this->assertEquals('some-value', $model->some);
+        $this->assertEquals('some-value', $model->getAttribute('some'));
     }
 
     public function testShouldSetAttributeFromMutator()
@@ -271,6 +273,28 @@ class AttributesTest extends TestCase
 
         $model->name = 'John';
         $model->age = 25;
+
+        // Act
+        $model->syncOriginalAttributes();
+
+        // Assert
+        $this->assertSame($model->attributes(), $model->originalAttributes());
+    }
+
+    public function testShouldFallbackOriginalAttributesIfUnserializationFails()
+    {
+        // Arrange
+        $model = new class() implements AttributesAccessInterface
+        {
+            use Attributes;
+
+            public function __construct()
+            {
+                $this->_mongolid_attributes = [function () {
+                },
+                ];
+            }
+        };
 
         // Act
         $model->syncOriginalAttributes();
