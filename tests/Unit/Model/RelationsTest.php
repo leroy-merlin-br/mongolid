@@ -3,7 +3,6 @@ namespace Mongolid\Model;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\ActiveRecord;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorFactory;

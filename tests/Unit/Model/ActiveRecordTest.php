@@ -1,15 +1,15 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Model;
 
 use BadMethodCallException;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
+use Mongolid\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\Relations;
 use Mongolid\Schema\Schema;
+use Mongolid\TestCase;
 use stdClass;
 
 class ActiveRecordTest extends TestCase

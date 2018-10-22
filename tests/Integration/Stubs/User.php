@@ -2,9 +2,9 @@
 namespace Mongolid\Tests\Integration\Stubs;
 
 use MongoDB\Collection;
-use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\ActiveRecord;
 
 class User extends ActiveRecord
 {

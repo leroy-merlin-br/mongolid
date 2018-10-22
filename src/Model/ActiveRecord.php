@@ -1,20 +1,18 @@
 <?php
-namespace Mongolid;
+namespace Mongolid\Model;
 
 use BadMethodCallException;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\AttributesAccessInterface;
-use Mongolid\Model\Relations;
+use Mongolid\ModelNotFoundException;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 
 /**
- * The Mongolid\ActiveRecord base class will ensure to enable your entity to
+ * The Mongolid\Model\ActiveRecord base class will ensure to enable your entity to
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
  * The Mongolid\Schema\Schema that describes the entity will be generated on the go

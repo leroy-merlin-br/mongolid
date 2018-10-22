@@ -34,7 +34,7 @@ Now you are ready to create your own models :smile:
 > **Note:** Mongolid does support [**DataMapper** pattern](./datamapper.md), but in order to understand it let's begin with the **ActiveRecord** pattern:
 
 ```php
-class Post extends Mongolid\ActiveRecord
+class Post extends Mongolid\Model\ActiveRecord
 {
 }
 ```
@@ -192,9 +192,9 @@ $post->delete();
 
 ## Mass Assignment
 
-If you are extending `Mongolid\ActiveRecord` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
+If you are extending `Mongolid\Model\ActiveRecord` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
 
-`Mongolid\ActiveRecord` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
+`Mongolid\Model\ActiveRecord` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 

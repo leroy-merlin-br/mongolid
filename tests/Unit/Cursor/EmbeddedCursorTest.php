@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\ActiveRecord;
+use Mongolid\Model\ActiveRecord;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\TestCase;
 use stdClass;

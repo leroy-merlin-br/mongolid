@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\ActiveRecord;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
+use Mongolid\Model\ActiveRecord;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 
