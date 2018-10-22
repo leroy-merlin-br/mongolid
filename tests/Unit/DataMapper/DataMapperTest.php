@@ -518,6 +518,19 @@ class DataMapperTest extends TestCase
         $this->assertAttributeEquals('John Doe', 'name', $result);
     }
 
+    public function testFirstWithNullShouldNotHitTheDatabase()
+    {
+        // Arrange
+        $connection = m::mock(Connection::class);
+        $dataMapper = new DataMapper($connection);
+
+        // Act
+        $result = $dataMapper->first(null);
+
+        // Assert
+        $this->assertNull($result);
+    }
+
     public function testShouldGetNullIfFirstCantFindAnything()
     {
         // Arrange

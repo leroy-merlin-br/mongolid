@@ -277,6 +277,10 @@ class DataMapper implements HasSchemaInterface
         array $projection = [],
         bool $cacheable = false
     ) {
+        if (null === $query) {
+            return null;
+        }
+
         if ($cacheable) {
             return $this->where($query, $projection, true)->first();
         }
@@ -287,7 +291,7 @@ class DataMapper implements HasSchemaInterface
         );
 
         if (!$document) {
-            return;
+            return null;
         }
 
         $model = $this->getAssembler()->assemble($document, $this->schema);
