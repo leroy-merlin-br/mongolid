@@ -79,14 +79,16 @@ class AttributesTest extends TestCase
         $model = new class() {
             use Attributes;
 
+            public function __construct()
+            {
+                $this->mutable = true;
+            }
+
             public function getNameAttribute()
             {
                 return 'John';
             }
         };
-
-        /* Enable mutator methods */
-        $model->mutable = true;
 
         // Assert
         $this->assertTrue(isset($model->name));
@@ -98,20 +100,19 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class() {
             use Attributes;
-        };
 
-        $this->setProtected(
-            $model,
-            'attributes',
-            [
-                'name' => 'John',
-                'age' => 25,
-            ]
-        );
+            public function __construct()
+            {
+                $this->attributes = [
+                    'name' => 'John',
+                    'age' => 25,
+                ];
+            }
+        };
 
         // Assert
         unset($model->age);
-        $this->assertAttributeEquals(
+        $this->assertAttributeSame(
             [
                 'name' => 'John',
             ],
@@ -126,14 +127,17 @@ class AttributesTest extends TestCase
         $model = new class() {
             use Attributes;
 
+            public function __construct()
+            {
+                $this->mutable = true;
+            }
+
             public function getSomeAttribute()
             {
                 return 'something-else';
             }
         };
 
-        /* Enable mutator methods */
-        $model->mutable = true;
         $model->some = 'some-value';
 
         // Assert
@@ -157,8 +161,6 @@ class AttributesTest extends TestCase
             }
         };
 
-        /* Disable mutator methods */
-        $model->mutable = false;
         $model->some = 'some-value';
 
         // Assert
@@ -171,14 +173,17 @@ class AttributesTest extends TestCase
         $model = new class() {
             use Attributes;
 
+            public function __construct()
+            {
+                $this->mutable = true;
+            }
+
             public function setSomeAttribute($value)
             {
                 return strtoupper($value);
             }
         };
 
-        /* Enable mutator methods */
-        $model->mutable = true;
         $model->some = 'some-value';
 
         // Assert

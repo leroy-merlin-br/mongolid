@@ -14,15 +14,6 @@ use Exception;
 trait Attributes
 {
     /**
-     * Check if model should mutate attributes checking
-     * the existence of a specific method on model
-     * class. Default is false.
-     *
-     * @var bool
-     */
-    public $mutable = false;
-
-    /**
      * The model's attributes.
      *
      * @var array
@@ -52,6 +43,15 @@ trait Attributes
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is false.
+     *
+     * @var bool
+     */
+    protected $mutable = false;
 
     /**
      * Store mutable attribute values to work with `&__get()`.
