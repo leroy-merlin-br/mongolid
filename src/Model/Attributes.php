@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
+use Exception;
+
 /**
  * This trait adds attribute getter, setters and also a useful
  * `fill` method that can be used with $fillable and $guarded
@@ -11,6 +13,15 @@ namespace Mongolid\Model;
  */
 trait Attributes
 {
+    /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is false.
+     *
+     * @var bool
+     */
+    public $mutable = false;
+
     /**
      * The model's attributes.
      *
@@ -43,13 +54,11 @@ trait Attributes
     protected $guarded = [];
 
     /**
-     * Check if model should mutate attributes checking
-     * the existence of a specific method on model
-     * class. Default is false.
+     * Store mutable attribute values to work with `&__get()`.
      *
-     * @var bool
+     * @var array
      */
-    public $mutable = false;
+    protected $mutableCache = [];
 
     /**
      * Get an attribute from the model.
@@ -60,21 +69,13 @@ trait Attributes
      */
     public function getAttribute(string $key)
     {
-        $inAttributes = array_key_exists($key, $this->attributes);
-
-        if ($inAttributes) {
-            return $this->attributes[$key];
-        } elseif ('attributes' == $key) {
-            return $this->attributes;
-        }
+        return $this->{$key};
     }
 
     /**
      * Get all attributes from the model.
-     *
-     * @return mixed
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -124,41 +125,28 @@ trait Attributes
     /**
      * Stores original attributes from actual data from attributes
      * to be used in future comparisons about changes.
+     * It tries to clone the attributes (using serialize/unserialize)
+     * so modifications to objects will be correctly identified
+     * as changes.
      *
      * Ideally should be called once right after retrieving data from
      * the database.
      */
     public function syncOriginalAttributes()
     {
-        $this->original = $this->attributes;
+        try {
+            $this->original = unserialize(serialize($this->attributes));
+        } catch (Exception $e) {
+            $this->original = $this->attributes;
+        }
     }
 
     /**
-     * Verify if model has a mutator method defined.
-     *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return bool
+     * Retrieve original attributes.
      */
-    protected function hasMutatorMethod($key, $prefix)
+    public function getOriginalAttributes(): array
     {
-        $method = $this->buildMutatorMethod($key, $prefix);
-
-        return method_exists($this, $method);
-    }
-
-    /**
-     * Create mutator method pattern.
-     *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return string
-     */
-    protected function buildMutatorMethod($key, $prefix)
-    {
-        return $prefix.ucfirst($key).'Attribute';
+        return $this->original;
     }
 
     /**
@@ -178,13 +166,23 @@ trait Attributes
      *
      * @return mixed
      */
-    public function __get($key)
+    public function &__get($key)
     {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
-            return $this->{$this->buildMutatorMethod($key, 'get')}();
+        if ('attributes' === $key) {
+            return $this->attributes;
         }
 
-        return $this->getAttribute($key);
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
+            $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
+
+            return $this->mutableCache[$key];
+        }
+
+        if (!array_key_exists($key, $this->attributes)) {
+            $this->attributes[$key] = null;
+        }
+
+        return $this->attributes[$key];
     }
 
     /**
@@ -222,5 +220,33 @@ trait Attributes
     public function __unset($key)
     {
         unset($this->attributes[$key]);
+    }
+
+    /**
+     * Verify if model has a mutator method defined.
+     *
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
+     *
+     * @return bool
+     */
+    protected function hasMutatorMethod($key, $prefix)
+    {
+        $method = $this->buildMutatorMethod($key, $prefix);
+
+        return method_exists($this, $method);
+    }
+
+    /**
+     * Create mutator method pattern.
+     *
+     * @param mixed $key    attribute name
+     * @param mixed $prefix method prefix to be used
+     *
+     * @return string
+     */
+    protected function buildMutatorMethod($key, $prefix)
+    {
+        return $prefix.ucfirst($key).'Attribute';
     }
 }

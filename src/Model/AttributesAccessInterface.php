@@ -22,10 +22,8 @@ interface AttributesAccessInterface
 
     /**
      * Get all attributes from the model.
-     *
-     * @return mixed
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * Set the model attributes using an array.
@@ -36,7 +34,7 @@ interface AttributesAccessInterface
     public function fill(array $input, bool $force = false);
 
     /**
-     * Set a given attribute on the model.
+     * Unset a given attribute on the model.
      *
      * @param string $key name of the attribute to be unset
      */
@@ -58,4 +56,9 @@ interface AttributesAccessInterface
      * the database.
      */
     public function syncOriginalAttributes();
+
+    /**
+     * Retrieve original attributes.
+     */
+    public function getOriginalAttributes(): array;
 }

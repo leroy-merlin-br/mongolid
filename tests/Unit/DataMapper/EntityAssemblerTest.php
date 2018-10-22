@@ -265,7 +265,7 @@ class StubStudent extends stdClass implements AttributesAccessInterface
             $this->$key = $value;
         }
 
-        $this->original = $this->attributes;
+        $this->syncOriginalAttributes();
     }
 }
 

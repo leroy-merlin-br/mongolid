@@ -31,7 +31,12 @@ class PersistedDataTest extends IntegrationTestCase
                 'email' => 'never',
             ],
             'friends' => [],
-            'address' => null,
+            'skills' => [
+                'PHP' => ['percentage' => '100%', 'version' => '7.0'],
+                'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
+                'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
+            ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
         ];
 
         // Actions
@@ -56,14 +61,22 @@ class PersistedDataTest extends IntegrationTestCase
         $user->preferences = [];
         $user->friends = ['Mary'];
         $user->address = '123 Blue Street';
+        $user->skills->HTML = ['percentage' => '89%', 'version' => 'HTML5'];
+        $user->skills->PHP['version'] = '7.1';
 
         $expected = [
             '_id' => (string) $user->_id,
             'name' => 'Jane Doe',
-            'height' => null,
             'preferences' => [],
             'friends' => ['Mary'],
             'address' => '123 Blue Street',
+            'skills' => [
+                'PHP' => ['percentage' => '100%', 'version' => '7.1'],
+                'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
+                'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
+                'HTML' => ['percentage' => '89%', 'version' => 'HTML5'],
+            ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
             'email' => 'jane@doe.com',
         ];
 
@@ -80,23 +93,30 @@ class PersistedDataTest extends IntegrationTestCase
     public function testUpdateData()
     {
         // Set
-        $user  = $this->getUser(true);
+        $user = $this->getUser(true);
 
         $user->name = 'Jane Doe';
-        $user->age = null; // TODO unset($user->age); not working right now - bug!
+        unset($user->age);
         $user->height = null;
         $user->email = 'jane@doe.com';
         $user->preferences = [];
         $user->friends = ['Mary'];
         $user->address = '123 Blue Street';
+        $user->skills->HTML = ['percentage' => '89%', 'version' => 'HTML5'];
+        $user->skills->PHP['version'] = '7.1';
 
         $expected = [
             '_id' => (string) $user->_id,
             'name' => 'Jane Doe',
-            'age' => null,
-            'height' => null,
             'preferences' => [],
             'friends' => ['Mary'],
+            'skills' => [
+                'PHP' => ['percentage' => '100%', 'version' => '7.1'],
+                'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
+                'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
+                'HTML' => ['percentage' => '89%', 'version' => 'HTML5'],
+            ],
+            'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
             'address' => '123 Blue Street',
             'email' => 'jane@doe.com',
         ];
@@ -123,6 +143,18 @@ class PersistedDataTest extends IntegrationTestCase
         ];
         $user->friends = [];
         $user->address = null;
+        $user->skills = (object) [
+            'PHP' => ['percentage' => '100%', 'version' => '7.0'],
+            'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
+            'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
+        ];
+
+        // dinamically set array
+        $user->photos['profile'] = '/user-photo';
+        $user->photos['icon'] = '/user-icon';
+
+        // access unknown field and don't find it saved later.
+        $user->unknown;
 
         if ($save) {
             $this->assertTrue($user->save(), 'Failed to save user!');
