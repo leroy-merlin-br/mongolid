@@ -49,5 +49,8 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "suggest": {
+        "leroy-merlin-br/mongolid-laravel": "Easy, powerful and ultrafast MongoDB ODM for Laravel."
     }
 }
