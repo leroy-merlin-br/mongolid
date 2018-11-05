@@ -3,11 +3,16 @@ language: php
 php:
   - 7.1
   - 7.2
+  - 7.3
+
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 services: mongodb
 
 before_install:
-  - if [[ $TRAVIS_PHP_VERSION != 7.2 ]]; then pecl install mongodb; fi
+  - if [[ $(phpenv version-name) = "7.1" ]]; then pecl install mongodb; fi
   - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 before_script:
@@ -19,3 +24,7 @@ script:
 
 after_script:
   - php vendor/bin/coveralls -v
+
+matrix:
+  allow_failures:
+    - php: 7.3
