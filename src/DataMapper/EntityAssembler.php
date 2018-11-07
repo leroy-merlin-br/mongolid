@@ -99,7 +99,7 @@ class EntityAssembler
         }
 
         $schema = Ioc::make($schemaClass);
-        $assembler = Ioc::make(self::class);
+        $assembler = Ioc::make(static::class);
 
         if (!isset($value[0])) {
             $value = [$value];

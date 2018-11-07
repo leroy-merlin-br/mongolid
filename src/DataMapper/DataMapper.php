@@ -372,7 +372,7 @@ class DataMapper implements HasSchemaInterface
             $this->schema = Ioc::make($this->schemaClass);
         }
 
-        return Ioc::makeWith(SchemaMapper::class, ['schema' => $this->schema]);
+        return Ioc::make(SchemaMapper::class, ['schema' => $this->schema]);
     }
 
     /**

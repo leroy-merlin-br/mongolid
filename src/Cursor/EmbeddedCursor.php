@@ -139,7 +139,7 @@ class EmbeddedCursor implements CursorInterface
         }
 
         $schema = $this->getSchemaForEntity();
-        $entityAssembler = Ioc::makeWith(EntityAssembler::class, compact('schema'));
+        $entityAssembler = Ioc::make(EntityAssembler::class, compact('schema'));
 
         return $entityAssembler->assemble($document, $schema);
     }
