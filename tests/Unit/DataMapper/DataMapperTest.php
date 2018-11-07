@@ -294,7 +294,7 @@ class DataMapperTest extends TestCase
         $entity->unchanged = 'unchanged';
         $entity->notOnSchema = 'to be deleted';
         $entity->name = 'John';
-        $entity->syncOriginalAttributes();
+        $entity->syncOriginalDocumentAttributes();
         $entity->_id = 123;
         unset($entity->name);
 

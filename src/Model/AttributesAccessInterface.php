@@ -18,12 +18,12 @@ interface AttributesAccessInterface
      *
      * @return mixed
      */
-    public function getAttribute(string $key);
+    public function getDocumentAttribute(string $key);
 
     /**
      * Get all attributes from the model.
      */
-    public function attributes(): array;
+    public function getDocumentAttributes(): array;
 
     /**
      * Set the model attributes using an array.
@@ -38,7 +38,7 @@ interface AttributesAccessInterface
      *
      * @param string $key name of the attribute to be unset
      */
-    public function cleanAttribute(string $key);
+    public function cleanDocumentAttribute(string $key);
 
     /**
      * Set a given attribute on the model.
@@ -46,7 +46,7 @@ interface AttributesAccessInterface
      * @param string $key   name of the attribute to be set
      * @param mixed  $value value to be set
      */
-    public function setAttribute(string $key, $value);
+    public function setDocumentAttribute(string $key, $value);
 
     /**
      * Stores original attributes from actual data from attributes
@@ -55,10 +55,10 @@ interface AttributesAccessInterface
      * Ideally should be called once right after retrieving data from
      * the database.
      */
-    public function syncOriginalAttributes();
+    public function syncOriginalDocumentAttributes();
 
     /**
      * Retrieve original attributes.
      */
-    public function originalAttributes(): array;
+    public function getOriginalDocumentAttributes(): array;
 }

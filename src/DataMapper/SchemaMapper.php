@@ -164,7 +164,7 @@ class SchemaMapper
     {
         if (!is_array($object)) {
             $attributes = $object instanceof AttributesAccessInterface
-                ? $object->attributes()
+                ? $object->getDocumentAttributes()
                 : get_object_vars($object);
 
             return $attributes;

@@ -26,7 +26,7 @@ class AttributesTest extends TestCase
                 'age' => 25,
                 'child' => $childObj,
             ],
-            $model->attributes()
+            $model->getDocumentAttributes()
         );
     }
 
@@ -46,7 +46,7 @@ class AttributesTest extends TestCase
 
             public function __construct(array $attributes)
             {
-                $this->_mongolid_attributes = $attributes;
+                $this->attributes = $attributes;
             }
         };
 
@@ -66,7 +66,7 @@ class AttributesTest extends TestCase
 
             public function __construct(array $attributes)
             {
-                $this->_mongolid_attributes = $attributes;
+                $this->attributes = $attributes;
             }
         };
 
@@ -88,7 +88,7 @@ class AttributesTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function getNameAttribute()
+            public function getNameDocumentAttribute()
             {
                 return 'John';
             }
@@ -108,7 +108,7 @@ class AttributesTest extends TestCase
 
             public function __construct()
             {
-                $this->_mongolid_attributes = [
+                $this->attributes = [
                     'name' => 'John',
                     'age' => 25,
                 ];
@@ -117,7 +117,7 @@ class AttributesTest extends TestCase
 
         // Act
         unset($model->age);
-        $result = $model->attributes();
+        $result = $model->getDocumentAttributes();
 
         // Assert
         $this->assertSame(['name' => 'John'], $result);
@@ -135,7 +135,7 @@ class AttributesTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function getSomeAttribute()
+            public function getSomeDocumentAttribute()
             {
                 return 'something-else';
             }
@@ -145,7 +145,7 @@ class AttributesTest extends TestCase
 
         // Assert
         $this->assertEquals('something-else', $model->some);
-        $this->assertEquals('something-else', $model->getAttribute('some'));
+        $this->assertEquals('something-else', $model->getDocumentAttribute('some'));
     }
 
     public function testShouldIgnoreMutators()
@@ -155,12 +155,12 @@ class AttributesTest extends TestCase
         {
             use Attributes;
 
-            public function getSomeAttribute()
+            public function getSomeDocumentAttribute()
             {
                 return 'something-else';
             }
 
-            public function setSomeAttribute($value)
+            public function setSomeDocumentAttribute($value)
             {
                 return strtoupper($value);
             }
@@ -170,7 +170,7 @@ class AttributesTest extends TestCase
 
         // Assert
         $this->assertEquals('some-value', $model->some);
-        $this->assertEquals('some-value', $model->getAttribute('some'));
+        $this->assertEquals('some-value', $model->getDocumentAttribute('some'));
     }
 
     public function testShouldSetAttributeFromMutator()
@@ -185,7 +185,7 @@ class AttributesTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function setSomeAttribute($value)
+            public function setSomeDocumentAttribute($value)
             {
                 return strtoupper($value);
             }
@@ -222,7 +222,7 @@ class AttributesTest extends TestCase
         $model->fill($input);
 
         // Assert
-        $this->assertSame($expected, $model->attributes());
+        $this->assertSame($expected, $model->getDocumentAttributes());
     }
 
     public function testShouldForceFillAttributes()
@@ -275,10 +275,10 @@ class AttributesTest extends TestCase
         $model->age = 25;
 
         // Act
-        $model->syncOriginalAttributes();
+        $model->syncOriginalDocumentAttributes();
 
         // Assert
-        $this->assertSame($model->attributes(), $model->originalAttributes());
+        $this->assertSame($model->getDocumentAttributes(), $model->getOriginalDocumentAttributes());
     }
 
     public function testShouldFallbackOriginalAttributesIfUnserializationFails()
@@ -290,17 +290,17 @@ class AttributesTest extends TestCase
 
             public function __construct()
             {
-                $this->_mongolid_attributes = [function () {
+                $this->attributes = [function () {
                 },
                 ];
             }
         };
 
         // Act
-        $model->syncOriginalAttributes();
+        $model->syncOriginalDocumentAttributes();
 
         // Assert
-        $this->assertSame($model->attributes(), $model->originalAttributes());
+        $this->assertSame($model->getDocumentAttributes(), $model->getOriginalDocumentAttributes());
     }
 
     public function getFillableOptions()

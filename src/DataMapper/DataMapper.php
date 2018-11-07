@@ -592,7 +592,7 @@ class DataMapper implements HasSchemaInterface
     private function afterSuccess($entity)
     {
         if ($entity instanceof AttributesAccessInterface) {
-            $entity->syncOriginalAttributes();
+            $entity->syncOriginalDocumentAttributes();
         }
     }
 
@@ -603,7 +603,7 @@ class DataMapper implements HasSchemaInterface
         }
 
         $changes = [];
-        $this->calculateChanges($changes, $data, $entity->originalAttributes());
+        $this->calculateChanges($changes, $data, $entity->getOriginalDocumentAttributes());
 
         return $changes;
     }

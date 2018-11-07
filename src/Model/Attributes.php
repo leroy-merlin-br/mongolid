@@ -18,19 +18,19 @@ trait Attributes
      *
      * @var array
      */
-    private $_mongolid_attributes = [];
+    private $attributes = [];
 
     /**
      * The model attribute's original state.
      *
      * @var array
      */
-    private $_mongolid_original_attributes = [];
+    private $originalAttributes = [];
 
     /**
      * Once you put at least one string in this array, only
      * the attributes specified here will be changed
-     * with the setAttributes method.
+     * with the setDocumentAttributes method.
      *
      * @var array
      */
@@ -67,7 +67,7 @@ trait Attributes
      *
      * @return mixed
      */
-    public function getAttribute(string $key)
+    public function getDocumentAttribute(string $key)
     {
         return $this->{$key};
     }
@@ -75,9 +75,9 @@ trait Attributes
     /**
      * Get all attributes from the model.
      */
-    public function attributes(): array
+    public function getDocumentAttributes(): array
     {
-        return $this->_mongolid_attributes;
+        return $this->attributes;
     }
 
     /**
@@ -91,7 +91,7 @@ trait Attributes
         foreach ($input as $key => $value) {
             if ($force
                 || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
-                $this->setAttribute($key, $value);
+                $this->setDocumentAttribute($key, $value);
             }
         }
     }
@@ -101,9 +101,9 @@ trait Attributes
      *
      * @param string $key name of the attribute to be unset
      */
-    public function cleanAttribute(string $key)
+    public function cleanDocumentAttribute(string $key)
     {
-        unset($this->_mongolid_attributes[$key]);
+        unset($this->attributes[$key]);
     }
 
     /**
@@ -112,9 +112,9 @@ trait Attributes
      * @param string $key   name of the attribute to be set
      * @param mixed  $value value to be set
      */
-    public function setAttribute(string $key, $value)
+    public function setDocumentAttribute(string $key, $value)
     {
-        $this->_mongolid_attributes[$key] = $value;
+        $this->attributes[$key] = $value;
     }
 
     /**
@@ -127,21 +127,21 @@ trait Attributes
      * Ideally should be called once right after retrieving data from
      * the database.
      */
-    public function syncOriginalAttributes()
+    public function syncOriginalDocumentAttributes()
     {
         try {
-            $this->_mongolid_original_attributes = unserialize(serialize($this->attributes()));
+            $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
         } catch (Exception $e) {
-            $this->_mongolid_original_attributes = $this->attributes();
+            $this->originalAttributes = $this->getDocumentAttributes();
         }
     }
 
     /**
      * Retrieve original attributes.
      */
-    public function originalAttributes(): array
+    public function getOriginalDocumentAttributes(): array
     {
-        return $this->_mongolid_original_attributes;
+        return $this->originalAttributes;
     }
 
     /**
@@ -151,7 +151,7 @@ trait Attributes
      */
     public function toArray(): array
     {
-        return $this->attributes();
+        return $this->getDocumentAttributes();
     }
 
     /**
@@ -169,11 +169,11 @@ trait Attributes
             return $this->mutableCache[$key];
         }
 
-        if (!array_key_exists($key, $this->_mongolid_attributes)) {
-            $this->_mongolid_attributes[$key] = null;
+        if (!array_key_exists($key, $this->attributes)) {
+            $this->attributes[$key] = null;
         }
 
-        return $this->_mongolid_attributes[$key];
+        return $this->attributes[$key];
     }
 
     /**
@@ -188,7 +188,7 @@ trait Attributes
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
 
-        $this->setAttribute($key, $value);
+        $this->setDocumentAttribute($key, $value);
     }
 
     /**
@@ -210,7 +210,7 @@ trait Attributes
      */
     public function __unset($key)
     {
-        $this->cleanAttribute($key);
+        $this->cleanDocumentAttribute($key);
     }
 
     /**
@@ -238,6 +238,6 @@ trait Attributes
      */
     protected function buildMutatorMethod($key, $prefix)
     {
-        return $prefix.ucfirst($key).'Attribute';
+        return $prefix.ucfirst($key).'DocumentAttribute';
     }
 }

@@ -289,11 +289,11 @@ class SchemaMapperTest extends TestCase
         $schemaMapper = new SchemaMapper($schema);
         $object = new class implements AttributesAccessInterface
         {
-            public function getAttribute(string $key)
+            public function getDocumentAttribute(string $key)
             {
             }
 
-            public function attributes(): array
+            public function getDocumentAttributes(): array
             {
                 return ['foo' => 'bar'];
             }
@@ -302,19 +302,19 @@ class SchemaMapperTest extends TestCase
             {
             }
 
-            public function cleanAttribute(string $key)
+            public function cleanDocumentAttribute(string $key)
             {
             }
 
-            public function setAttribute(string $key, $value)
+            public function setDocumentAttribute(string $key, $value)
             {
             }
 
-            public function syncOriginalAttributes()
+            public function syncOriginalDocumentAttributes()
             {
             }
 
-            public function originalAttributes(): array
+            public function getOriginalDocumentAttributes(): array
             {
             }
         };

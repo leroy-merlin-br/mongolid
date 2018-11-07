@@ -4,7 +4,7 @@ namespace Mongolid\Model;
 use MongoDB\BSON\ObjectId;
 
 /**
- * Document embeder is a service that will embed documents within each other.
+ * Document embedder is a service that will embed documents within each other.
  */
 class DocumentEmbedder
 {

@@ -328,7 +328,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
         ];
 
         if ($result = $this->getDataMapper()->$action($this, $options)) {
-            $this->syncOriginalAttributes();
+            $this->syncOriginalDocumentAttributes();
         }
 
         return $result;

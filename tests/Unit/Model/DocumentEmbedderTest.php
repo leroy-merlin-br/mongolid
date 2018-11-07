@@ -17,10 +17,10 @@ class DocumentEmbedderTest extends TestCase
         // Arrange
         $parent = new stdClass();
         $parent->foo = $originalField;
-        $embeder = new DocumentEmbedder();
+        $embedder = new DocumentEmbedder();
 
         // Assert
-        $embeder->$method($parent, 'foo', $entity);
+        $embedder->$method($parent, 'foo', $entity);
 
         $result = $parent->foo;
         foreach ($expectation as $index => $expectedDoc) {
