@@ -24,7 +24,7 @@ class CursorFactory
         string $command,
         array $params,
         bool $cacheable = false
-    ): Cursor {
+    ): CursorInterface {
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         return new $cursorClass($entitySchema, $collection, $command, $params);

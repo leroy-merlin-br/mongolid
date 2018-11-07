@@ -53,7 +53,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return EmbeddedCursor returns this cursor
      */
-    public function limit(int $amount)
+    public function limit(int $amount): CursorInterface
     {
         $this->items = array_slice($this->items, 0, $amount);
 
@@ -69,21 +69,16 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return EmbeddedCursor returns this cursor
      */
-    public function sort(array $fields)
+    public function sort(array $fields): CursorInterface
     {
         foreach (array_reverse($fields) as $key => $direction) {
             // Uses usort with a function that will access the $key and sort in
-            // the $direction. It mimics how the mongodb does sorting internally.
+            // the $direction. It mimics how MongoDB does sorting internally.
             usort(
                 $this->items,
                 function ($a, $b) use ($key, $direction) {
-                    $a = is_object($a)
-                        ? ($a->$key ?? null)
-                        : ($a[$key] ?? null);
-
-                    $b = is_object($b)
-                        ? ($b->$key ?? null)
-                        : ($b[$key] ?? null);
+                    $a = (is_object($a) ? $a->$key : $a[$key]) ?? null;
+                    $b = (is_object($b) ? $b->$key : $b[$key]) ?? null;
 
                     return ($a <=> $b) * $direction;
                 }
@@ -100,7 +95,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return EmbeddedCursor returns this cursor
      */
-    public function skip(int $amount)
+    public function skip(int $amount): CursorInterface
     {
         $this->items = array_slice($this->items, $amount);
 

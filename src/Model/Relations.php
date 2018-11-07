@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema\Schema;
@@ -15,7 +16,7 @@ use Mongolid\Util\ObjectIdUtils;
 trait Relations
 {
     /**
-     * Returns the referenced documents as objects.
+     * Returns the referenced document as object.
      *
      * @param string $entity    class of the entity or of the schema of the entity
      * @param string $field     the field where the _id is stored
@@ -44,15 +45,13 @@ trait Relations
     }
 
     /**
-     * Returns the cursor for the referenced documents as objects.
+     * Returns the cursor for the referenced document objects.
      *
      * @param string $entity    class of the entity or of the schema of the entity
      * @param string $field     the field where the _ids are stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
-     *
-     * @return array
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {
         $referencedIds = (array) $this->$field;
 
@@ -77,30 +76,20 @@ trait Relations
     }
 
     /**
-     * Return a embedded documents as object.
+     * Return first embedded document as object.
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded document is stored
      *
-     * @return Model|null
+     * @return mixed
      */
     protected function embedsOne(string $entity, string $field)
     {
-        if (is_subclass_of($entity, Schema::class)) {
-            $entity = (new $entity())->entityClass;
-        }
-
-        $items = (array) $this->$field;
-        if (false === empty($items) && false === array_key_exists(0, $items)) {
-            $items = [$items];
-        }
-
-        return Ioc::make(CursorFactory::class)
-            ->createEmbeddedCursor($entity, $items)->first();
+        return $this->embedsMany($entity, $field)->first();
     }
 
     /**
-     * Return array of embedded documents as objects.
+     * Return embedded documents cursor.
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded documents are stored

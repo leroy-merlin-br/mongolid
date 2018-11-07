@@ -8,6 +8,7 @@ use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
 use Mongolid\Model\AttributesAccessInterface;
@@ -237,7 +238,7 @@ class DataMapper implements HasSchemaInterface
         $query = [],
         array $projection = [],
         bool $cacheable = false
-    ): Cursor {
+    ): CursorInterface {
         $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
 
         $cursor = new $cursorClass(
@@ -257,7 +258,7 @@ class DataMapper implements HasSchemaInterface
      * Retrieve a database cursor that will return all documents as
      * $this->schema->entityClass objects upon iteration.
      */
-    public function all(): Cursor
+    public function all(): CursorInterface
     {
         return $this->where([]);
     }

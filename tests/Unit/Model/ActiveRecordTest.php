@@ -5,9 +5,10 @@ use BadMethodCallException;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Container\Ioc;
-use Mongolid\DataMapper;
+use Mongolid\Cursor\CursorInterface;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
+use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use stdClass;
@@ -25,7 +26,22 @@ class ActiveRecordTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->entity = new class() extends ActiveRecord {
+        $this->entity = new class() extends ActiveRecord
+        {
+            /**
+             * {@inheritdoc}
+             */
+            protected $collection = 'mongolid';
+
+            public function unsetCollection()
+            {
+                unset($this->collection);
+            }
+
+            public function setFields($value)
+            {
+                $this->fields = $value;
+            }
         };
     }
 
@@ -56,7 +72,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldImplementModelTraits()
     {
         // Assert
-        $this->assertEquals(
+        $this->assertSame(
             [Attributes::class, Relations::class],
             array_keys(class_uses(ActiveRecord::class))
         );
@@ -65,277 +81,217 @@ class ActiveRecordTest extends TestCase
     public function testShouldSave()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
-        $dataMapper = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         // Act
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
-
-        $entity->expects()
-            ->getCollectionName()
-            ->andReturn('mongolid');
-
-        $entity->expects()
-            ->syncOriginalAttributes();
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->save($entity, ['writeConcern' => new WriteConcern(1)])
+            ->save($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
-        $this->assertTrue($entity->save());
+        $this->assertTrue($this->entity->save());
     }
 
     public function testShouldInsert()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
-        $dataMapper = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         // Act
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
-
-        $entity->expects()
-            ->getCollectionName()
-            ->andReturn('mongolid');
-
-        $entity->expects()
-            ->syncOriginalAttributes();
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->insert($entity, ['writeConcern' => new WriteConcern(1)])
+            ->insert($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
-        $this->assertTrue($entity->insert());
+        $this->assertTrue($this->entity->insert());
     }
 
     public function testShouldUpdate()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
-        $dataMapper = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         // Act
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
-
-        $entity->expects()
-            ->getCollectionName()
-            ->andReturn('mongolid');
-
-        $entity->expects()
-            ->syncOriginalAttributes();
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->update($entity, ['writeConcern' => new WriteConcern(1)])
+            ->update($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
-        $this->assertTrue($entity->update());
+        $this->assertTrue($this->entity->update());
     }
 
     public function testShouldDelete()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
-        $dataMapper = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         // Act
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
-
-        $entity->expects()
-            ->getCollectionName()
-            ->andReturn('mongolid');
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->delete($entity, ['writeConcern' => new WriteConcern(1)])
+            ->delete($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Assert
-        $this->assertTrue($entity->delete());
+        $this->assertTrue($this->entity->delete());
     }
 
     public function testSaveShouldReturnFalseIfCollectionIsNull()
     {
+        $this->entity->unsetCollection();
         $this->assertFalse($this->entity->save());
     }
 
     public function testUpdateShouldReturnFalseIfCollectionIsNull()
     {
+        $this->entity->unsetCollection();
         $this->assertFalse($this->entity->update());
     }
 
     public function testInsertShouldReturnFalseIfCollectionIsNull()
     {
+        $this->entity->unsetCollection();
         $this->assertFalse($this->entity->insert());
     }
 
     public function testDeleteShouldReturnFalseIfCollectionIsNull()
     {
+        $this->entity->unsetCollection();
         $this->assertFalse($this->entity->delete());
     }
 
     public function testShouldGetWithWhereQuery()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
-        $cursor = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
+
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->where($query, $projection, true)
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->where($query, $projection, true));
+        $this->assertSame($cursor, $this->entity->where($query, $projection, true));
     }
 
     public function testShouldGetAll()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
-        $dataMapper = m::mock();
-        $cursor = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
+
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->all()
             ->andReturn($cursor);
 
         // Assert
-        $this->assertEquals($cursor, $entity->all());
+        $this->assertSame($cursor, $this->entity->all());
     }
 
     public function testShouldGetFirstWithQuery()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->first($query, $projection, true)
-            ->andReturn($entity);
+            ->andReturn($this->entity);
 
         // Assert
-        $this->assertEquals($entity, $entity->first($query, $projection, true));
+        $this->assertSame($this->entity, $this->entity->first($query, $projection, true));
     }
 
     public function testShouldGetFirstOrFail()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->firstOrFail($query, $projection, true)
-            ->andReturn($entity);
+            ->andReturn($this->entity);
 
         // Assert
-        $this->assertEquals($entity, $entity->firstOrFail($query, $projection, true));
+        $this->assertSame($this->entity, $this->entity->firstOrFail($query, $projection, true));
     }
 
     public function testShouldGetFirstOrNewAndReturnExistingModel()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $id = 123;
-        $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->first($id)
-            ->andReturn($entity);
+            ->andReturn($this->entity);
 
         // Assert
-        $this->assertEquals($entity, $entity->firstOrNew($id));
+        $this->assertSame($this->entity, $this->entity->firstOrNew($id));
     }
 
     public function testShouldGetFirstOrNewAndReturnNewModel()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
-        $this->setProtected($entity, 'collection', 'mongolid');
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $id = 123;
-        $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
-
-        $entity->expects()
-            ->getDataMapper()
-            ->andReturn($dataMapper);
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
             ->first($id)
             ->andReturn(null);
 
         // Assert
-        $this->assertNotEquals($entity, $entity->firstOrNew($id));
+        $this->assertNotEquals($this->entity, $this->entity->firstOrNew($id));
     }
 
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
         // Arrage
-        $this->setProtected($this->entity, 'fields', 'MySchemaClass');
-        $schema = m::mock(Schema::class);
-
-        // Act
-        Ioc::instance('MySchemaClass', $schema);
+        $this->entity->setFields('MySchemaClass');
+        $schema = $this->instance('MySchemaClass', m::mock(Schema::class));
 
         // Assert
-        $this->assertEquals(
+        $this->assertSame(
             $schema,
             $this->entity->getSchema()
         );
@@ -345,15 +301,15 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $fields = ['name' => 'string', 'age' => 'int'];
-        $this->setProtected($this->entity, 'fields', $fields);
+        $this->entity->setFields($fields);
 
         // Assert
         $result = $this->entity->getSchema();
         $this->assertInstanceOf(Schema::class, $result);
-        $this->assertEquals($fields, $result->fields);
-        $this->assertEquals($this->entity->dynamic, $result->dynamic);
-        $this->assertEquals($this->entity->getCollectionName(), $result->collection);
-        $this->assertEquals(get_class($this->entity), $result->entityClass);
+        $this->assertSame($fields, $result->fields);
+        $this->assertSame($this->entity->dynamic, $result->dynamic);
+        $this->assertSame($this->entity->getCollectionName(), $result->collection);
+        $this->assertSame(get_class($this->entity), $result->entityClass);
     }
 
     public function testShouldGetDataMapper()
@@ -371,8 +327,8 @@ class ActiveRecordTest extends TestCase
 
         // Assert
         $result = $this->callProtected($entity, 'getDataMapper');
-        $this->assertInstanceOf(DataMapper\DataMapper::class, $result);
-        $this->assertEquals($schema, $result->getSchema());
+        $this->assertInstanceOf(DataMapper::class, $result);
+        $this->assertSame($schema, $result->getSchema());
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
@@ -404,19 +360,13 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldGetCollectionName()
     {
-        $entity = new class() extends ActiveRecord {
-            /**
-             * @var {inheritdoc}
-             */
-            protected $collection = 'collection_name';
-        };
-
-        $this->assertEquals('collection_name', $entity->getCollectionName());
+        $this->assertSame('mongolid', $this->entity->getCollectionName());
     }
 
     public function testShouldAttachToAttribute()
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends ActiveRecord
+        {
             /**
              * @var {inheritdoc}
              */
@@ -432,12 +382,13 @@ class ActiveRecordTest extends TestCase
         $embedded->name = 'Course Class #1';
         $entity->attachToCourseClass($embedded);
 
-        $this->assertEquals([$embedded->_id], $entity->courseClass);
+        $this->assertSame([$embedded->_id], $entity->courseClass);
     }
 
     public function testShouldEmbedToAttribute()
     {
-        $entity = new class() extends ActiveRecord {
+        $this->entity = new class() extends ActiveRecord
+        {
             /**
              * @var {inheritdoc}
              */
@@ -450,14 +401,15 @@ class ActiveRecordTest extends TestCase
         };
         $embedded = new stdClass();
         $embedded->name = 'Course Class #1';
-        $entity->embedToCourseClasses($embedded);
+        $this->entity->embedToCourseClasses($embedded);
 
-        $this->assertEquals('Course Class #1', $entity->classes()->first()->name);
+        $this->assertSame('Course Class #1', $this->entity->classes()->first()->name);
     }
 
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
     {
-        $entity = new class() extends ActiveRecord {
+        $this->entity = new class() extends ActiveRecord
+        {
             /**
              * @var {inheritdoc}
              */
@@ -466,14 +418,13 @@ class ActiveRecordTest extends TestCase
 
         $this->expectException(BadMethodCallException::class);
 
-        $entity->foobar();
+        $this->entity->foobar();
     }
 
     public function testShouldGetSetWriteConcernInActiveRecordClass()
     {
-        $this->assertEquals(1, $this->entity->getWriteConcern());
-        $this->assertEquals(1, $this->entity->getWriteConcern());
+        $this->assertSame(1, $this->entity->getWriteConcern());
         $this->entity->setWriteConcern(0);
-        $this->assertEquals(0, $this->entity->getWriteConcern());
+        $this->assertSame(0, $this->entity->getWriteConcern());
     }
 }

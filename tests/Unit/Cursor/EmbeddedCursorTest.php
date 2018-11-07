@@ -295,9 +295,11 @@ class EmbeddedCursorTest extends TestCase
                     $age24,
                     ['age' => 26, 'name' => 'Zizaco'],
                     ['age' => 26, 'name' => 'John'],
+                    [],
                 ],
                 'parameters' => ['age' => 1],
                 'expected' => [
+                    [],
                     $age24,
                     ['age' => 25],
                     ['age' => 26, 'name' => 'Abe'],
@@ -312,6 +314,7 @@ class EmbeddedCursorTest extends TestCase
                     $age24,
                     ['age' => 26, 'name' => 'Zizaco'],
                     ['age' => 26, 'name' => 'John'],
+                    [],
                 ],
                 'parameters' => ['age' => -1],
                 'expected' => [
@@ -320,6 +323,7 @@ class EmbeddedCursorTest extends TestCase
                     ['age' => 26, 'name' => 'John'],
                     ['age' => 25],
                     $age24,
+                    [],
                 ],
             ],
             'two sorting parameters' => [
@@ -329,9 +333,11 @@ class EmbeddedCursorTest extends TestCase
                     $age24,
                     ['age' => 26, 'name' => 'Zizaco'],
                     ['age' => 26, 'name' => 'John'],
+                    [],
                 ],
                 'parameters' => ['age' => 1, 'name' => -1],
                 'expected' => [
+                    [],
                     $age24,
                     ['age' => 25],
                     ['age' => 26, 'name' => 'Zizaco'],

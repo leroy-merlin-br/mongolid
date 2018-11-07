@@ -93,9 +93,9 @@ class Cursor implements CursorInterface, Serializable
      *
      * @param int $amount the number of results to return
      *
-     * @return Cursor returns this cursor
+     * @return static
      */
-    public function limit(int $amount)
+    public function limit(int $amount): CursorInterface
     {
         $this->params[1]['limit'] = $amount;
 
@@ -109,9 +109,9 @@ class Cursor implements CursorInterface, Serializable
      *                      Each element in the array has as key the field name,
      *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return Cursor returns this cursor
+     * @return static
      */
-    public function sort(array $fields)
+    public function sort(array $fields): CursorInterface
     {
         $this->params[1]['sort'] = $fields;
 
@@ -123,9 +123,9 @@ class Cursor implements CursorInterface, Serializable
      *
      * @param int $amount the number of results to skip
      *
-     * @return Cursor returns this cursor
+     * @return static
      */
-    public function skip(int $amount)
+    public function skip(int $amount): CursorInterface
     {
         $this->params[1]['skip'] = $amount;
 
@@ -138,7 +138,7 @@ class Cursor implements CursorInterface, Serializable
      *
      * @param bool $flag toggle timeout on or off
      *
-     * @return Cursor returns this cursor
+     * @return static
      */
     public function disableTimeout(bool $flag = true)
     {

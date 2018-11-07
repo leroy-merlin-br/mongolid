@@ -125,4 +125,19 @@ class TestCase extends PHPUnitTestCase
 
         return $property->getValue($obj);
     }
+
+    /**
+     * Replace instance on Ioc
+     */
+    protected function instance($abstract, $instance)
+    {
+        Ioc::bind(
+            $abstract,
+            function () use ($instance) {
+                return $instance;
+            }
+        );
+
+        return $instance;
+    }
 }

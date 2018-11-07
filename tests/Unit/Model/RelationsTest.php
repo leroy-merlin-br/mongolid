@@ -4,8 +4,8 @@ namespace Mongolid\Model;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use Mongolid\Container\Ioc;
-use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorFactory;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema\Schema;
@@ -22,13 +22,14 @@ class RelationsTest extends TestCase
         $expectedQuery = $expectedQuery['referencesOne'];
         $model = m::mock(ActiveRecord::class.'[]');
         $dataMapper = m::mock(DataMapper::class)->makePartial();
-        $result = m::mock();
+        $result = new class() extends Schema {
+        };
 
         $model->$field = $fieldValue;
 
         // Act
         Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance('EntityClass', $entity);
+        Ioc::instance(get_class($entity), $entity);
 
         $dataMapper->expects()
             ->first(m::type('array'), [], $useCache)
@@ -41,7 +42,7 @@ class RelationsTest extends TestCase
         // Assert
         $this->assertSame(
             $result,
-            $this->callProtected($model, 'referencesOne', ['EntityClass', $field, $useCache])
+            $this->callProtected($model, 'referencesOne', [get_class($entity), $field, $useCache])
         );
     }
 
@@ -54,13 +55,13 @@ class RelationsTest extends TestCase
         $expectedQuery = $expectedQuery['referencesMany'];
         $model = m::mock(ActiveRecord::class.'[]');
         $dataMapper = m::mock(DataMapper::class)->makePartial();
-        $result = m::mock(Cursor::class);
+        $result = m::mock(CursorInterface::class);
 
         $model->$field = $fieldValue;
 
         // Act
         Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance('EntityClass', $entity);
+        Ioc::instance(get_class($entity), $entity);
 
         $dataMapper->expects()
             ->where(m::type('array'), [], $useCache)
@@ -73,7 +74,7 @@ class RelationsTest extends TestCase
         // Assert
         $this->assertSame(
             $result,
-            $this->callProtected($model, 'referencesMany', ['EntityClass', $field, $useCache])
+            $this->callProtected($model, 'referencesMany', [get_class($entity), $field, $useCache])
         );
     }
 

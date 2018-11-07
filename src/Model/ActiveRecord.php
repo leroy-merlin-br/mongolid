@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use BadMethodCallException;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
 use Mongolid\ModelNotFoundException;
@@ -108,14 +109,12 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * @param array $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves a CacheableCursor instead
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
     public static function where(
         array $query = [],
         array $projection = [],
         bool $useCache = false
-    ) {
+    ): CursorInterface {
         return self::getDataMapperInstance()->where(
             $query,
             $projection,
@@ -125,10 +124,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * Gets a cursor of this kind of entities from the database.
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
-    public static function all()
+    public static function all(): CursorInterface
     {
         return self::getDataMapperInstance()->all();
     }
@@ -230,7 +227,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
         throw new BadMethodCallException(
             sprintf(
                 'The following method can not be reached or does not exist: %s@%s',
-                get_class($this),
+                static::class,
                 $method
             )
         );
@@ -290,7 +287,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
         }
 
         $schema = new DynamicSchema();
-        $schema->entityClass = get_class($this);
+        $schema->entityClass = static::class;
         $schema->fields = $this->fields;
         $schema->dynamic = $this->dynamic;
         $schema->collection = $this->collection;
@@ -341,12 +338,10 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * Returns the a valid instance from Ioc.
      *
      * @throws NoCollectionNameException Throws exception when has no collection filled
-     *
-     * @return mixed
      */
-    private static function getDataMapperInstance()
+    private static function getDataMapperInstance(): DataMapper
     {
-        $instance = Ioc::make(get_called_class());
+        $instance = new static();
 
         if (!$instance->getCollectionName()) {
             throw new NoCollectionNameException();

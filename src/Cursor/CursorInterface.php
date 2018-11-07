@@ -14,9 +14,9 @@ interface CursorInterface extends Countable, Iterator
      *
      * @param int $amount the number of results to return
      *
-     * @return CursorInterface returns this cursor
+     * @return static
      */
-    public function limit(int $amount);
+    public function limit(int $amount): CursorInterface;
 
     /**
      * Sorts the results by given fields.
@@ -25,18 +25,18 @@ interface CursorInterface extends Countable, Iterator
      *                      Each element in the array has as key the field name,
      *                      and as value either 1 for ascending sort, or -1 for descending sort.
      *
-     * @return CursorInterface returns this cursor
+     * @return static
      */
-    public function sort(array $fields);
+    public function sort(array $fields): CursorInterface;
 
     /**
      * Skips a number of results.
      *
      * @param int $amount the number of results to skip
      *
-     * @return CursorInterface returns this cursor
+     * @return static
      */
-    public function skip(int $amount);
+    public function skip(int $amount): CursorInterface;
 
     /**
      * Returns the first element of the cursor.
