@@ -77,8 +77,13 @@ class EmbeddedCursor implements CursorInterface
             usort(
                 $this->items,
                 function ($a, $b) use ($key, $direction) {
-                    $a = (is_object($a) ? $a->$key : $a[$key]) ?? null;
-                    $b = (is_object($b) ? $b->$key : $b[$key]) ?? null;
+                    $a = is_object($a)
+                        ? ($a->$key ?? null)
+                        : ($a[$key] ?? null);
+
+                    $b = is_object($b)
+                        ? ($b->$key ?? null)
+                        : ($b[$key] ?? null);
 
                     return ($a <=> $b) * $direction;
                 }
