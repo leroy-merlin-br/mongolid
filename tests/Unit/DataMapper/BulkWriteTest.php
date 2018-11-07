@@ -6,7 +6,6 @@ use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
@@ -105,14 +104,12 @@ class BulkWriteTest extends TestCase
         $schema = m::mock(Schema::class);
         $entity->schema = $schema;
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
-        $connection = m::mock(Connection::class);
+        $connection = $this->instance(Connection::class, m::mock(Connection::class));
         $manager = m::mock(new Manager());
 
         $connection->defaultDatabase = 'foo';
         $schema->collection = 'bar';
         $namespace = 'foo.bar';
-
-        Ioc::instance(Connection::class, $connection);
 
         // Expect
         $entity->expects()

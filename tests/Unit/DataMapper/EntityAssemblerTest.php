@@ -3,7 +3,6 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\Container\Ioc;
 use Mongolid\Model\Attributes;
 use Mongolid\Model\AttributesAccessInterface;
 use Mongolid\Model\PolymorphableInterface;
@@ -22,18 +21,15 @@ class EntityAssemblerTest extends TestCase
         $entityAssembler = new EntityAssembler();
         $schemas = [];
         foreach ($availableSchemas as $key => $value) {
-            $schemas[$key] = m::mock(Schema::class.'[]');
+            $schemas[$key] = $this->instance($key, m::mock(Schema::class.'[]'));
             $schemas[$key]->entityClass = $value['entityClass'];
             $schemas[$key]->fields = $value['fields'];
         }
 
         // Act
-        foreach ($schemas as $className => $instance) {
-            Ioc::instance($className, $instance);
-        }
+        $result = $entityAssembler->assemble($inputValue, $schemas[$inputSchema]);
 
         // Assert
-        $result = $entityAssembler->assemble($inputValue, $schemas[$inputSchema]);
         $this->assertEquals($expectedOutput, $result);
     }
 

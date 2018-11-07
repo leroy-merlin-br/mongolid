@@ -20,7 +20,7 @@ trait SetupConnectionTrait
             }
         );
 
-        Ioc::instance(
+        $this->instance(
             CacheComponentInterface::class,
             new CacheComponent()
         );

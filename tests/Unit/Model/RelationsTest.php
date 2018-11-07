@@ -3,7 +3,6 @@ namespace Mongolid\Model;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
@@ -21,16 +20,15 @@ class RelationsTest extends TestCase
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
         $model = m::mock(ActiveRecord::class.'[]');
-        $dataMapper = m::mock(DataMapper::class)->makePartial();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
         $result = new class() extends Schema {
         };
 
         $model->$field = $fieldValue;
 
-        // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance(get_class($entity), $entity);
+        $this->instance(get_class($entity), $entity);
 
+        // Act
         $dataMapper->expects()
             ->first(m::type('array'), [], $useCache)
             ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
@@ -54,14 +52,13 @@ class RelationsTest extends TestCase
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
         $model = m::mock(ActiveRecord::class.'[]');
-        $dataMapper = m::mock(DataMapper::class)->makePartial();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
         $result = m::mock(CursorInterface::class);
 
         $model->$field = $fieldValue;
 
         // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance(get_class($entity), $entity);
+        $this->instance(get_class($entity), $entity);
 
         $dataMapper->expects()
             ->where(m::type('array'), [], $useCache)
@@ -85,7 +82,7 @@ class RelationsTest extends TestCase
     {
         // Set
         $model = m::mock(ActiveRecord::class.'[]');
-        $cursorFactory = m::mock(CursorFactory::class);
+        $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
         $model->$field = $document;
@@ -93,8 +90,6 @@ class RelationsTest extends TestCase
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
 
         // Act
-        Ioc::instance(CursorFactory::class, $cursorFactory);
-
         $cursorFactory->expects()
             ->createEmbeddedCursor($instantiableClass, $expectedItems)
             ->andReturn($cursor);
@@ -115,7 +110,7 @@ class RelationsTest extends TestCase
     {
         // Set
         $model = m::mock(ActiveRecord::class.'[]');
-        $cursorFactory = m::mock(CursorFactory::class);
+        $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
         $model->$field = $document;
@@ -123,8 +118,6 @@ class RelationsTest extends TestCase
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
 
         // Act
-        Ioc::instance(CursorFactory::class, $cursorFactory);
-
         $cursorFactory->expects()
             ->createEmbeddedCursor($instantiableClass, $expectedItems)
             ->andReturn($cursor);
@@ -144,11 +137,9 @@ class RelationsTest extends TestCase
             use Relations;
         };
         $document = m::mock();
-        $documentEmbedder = m::mock(DocumentEmbedder::class);
+        $documentEmbedder = $this->instance(DocumentEmbedder::class, m::mock(DocumentEmbedder::class));
 
         // Act
-        Ioc::instance(DocumentEmbedder::class, $documentEmbedder);
-
         $documentEmbedder->expects()
             ->$method($model, 'foo', $document);
 

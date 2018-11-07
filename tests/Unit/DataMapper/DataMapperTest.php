@@ -204,7 +204,7 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        Ioc::instance(
+        $this->instance(
             Schema::class,
             new class() extends Schema
             {
@@ -277,7 +277,7 @@ class DataMapperTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
 
-        Ioc::instance(
+        $this->instance(
             Schema::class,
             new class() extends Schema
             {
@@ -828,9 +828,7 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $dataMapper = new DataMapper($connection);
         $dataMapper->schemaClass = 'MySchema';
-        $schema = m::mock(Schema::class);
-
-        Ioc::instance('MySchema', $schema);
+        $schema = $this->instance('MySchema', m::mock(Schema::class));
 
         // Act
         $result = $this->callProtected($dataMapper, 'getSchemaMapper');

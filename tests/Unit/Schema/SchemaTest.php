@@ -4,7 +4,6 @@ namespace Mongolid\Schema;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Container\Ioc;
 use Mongolid\TestCase;
 use Mongolid\Util\SequenceService;
 
@@ -76,14 +75,12 @@ class SchemaTest extends TestCase
     {
         // Arrange
         $schema = m::mock(Schema::class.'[]');
-        $sequenceService = m::mock(SequenceService::class);
+        $sequenceService = $this->instance(SequenceService::class, m::mock(SequenceService::class));
         $value = null;
 
         $schema->collection = 'resources';
 
         // Act
-        Ioc::instance(SequenceService::class, $sequenceService);
-
         $sequenceService->expects()
             ->getNextValue('resources')
             ->andReturn(7);
@@ -95,14 +92,12 @@ class SchemaTest extends TestCase
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
         $schema = m::mock(Schema::class.'[]');
-        $sequenceService = m::mock(SequenceService::class);
+        $sequenceService = $this->instance(SequenceService::class, m::mock(SequenceService::class));
         $value = 3;
 
         $schema->collection = 'resources';
 
         // Act
-        Ioc::instance(SequenceService::class, $sequenceService);
-
         $sequenceService->expects()
             ->getNextValue('resources')
             ->never()

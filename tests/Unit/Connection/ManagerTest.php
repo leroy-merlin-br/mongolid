@@ -4,7 +4,6 @@ namespace Mongolid\Connection;
 use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
-use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
@@ -82,17 +81,15 @@ class ManagerTest extends TestCase
         // Arrange
         $manager = new Manager();
         $schema = m::mock(Schema::class);
-        $dataMapper = m::mock(DataMapper::class)->makePartial();
+        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
 
         $schema->entityClass = 'Bacon';
 
         // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
-
-        // Assert
         $manager->registerSchema($schema);
         $result = $manager->getMapper('Bacon');
 
+        // Assert
         $this->assertEquals($dataMapper, $result);
         $this->assertAttributeEquals($schema, 'schema', $result);
     }

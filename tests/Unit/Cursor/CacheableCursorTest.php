@@ -6,7 +6,6 @@ use ErrorException;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use Mongolid\Util\CacheComponentInterface;
@@ -36,14 +35,12 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromCache = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCachableCursor();
-        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $cacheComponent = $this->instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
 
         // Act
         $cursor->expects()
             ->generateCacheKey()
             ->andReturn('find:collection:123');
-
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->expects()
             ->get('find:collection:123', null)
@@ -61,7 +58,7 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCachableCursor()->limit(150);
-        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $cacheComponent = $this->instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $rawCollection = m::mock();
         $cacheKey = 'find:collection:123';
 
@@ -75,8 +72,6 @@ class CacheableCursorTest extends TestCase
         $cursor->expects()
             ->generateCacheKey()
             ->andReturn($cacheKey);
-
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->expects()
             ->get($cacheKey, null)
@@ -105,7 +100,7 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCachableCursor()->limit(150);
-        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $cacheComponent = $this->instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $rawCollection = m::mock();
 
         $this->setProtected(
@@ -118,8 +113,6 @@ class CacheableCursorTest extends TestCase
         $cursor->expects()
             ->generateCacheKey()
             ->andReturn('find:collection:123');
-
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->expects()
             ->get('find:collection:123', null)
@@ -144,7 +137,7 @@ class CacheableCursorTest extends TestCase
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCachableCursor()->limit(150);
-        $cacheComponent = m::mock(CacheComponentInterface::class);
+        $cacheComponent = $this->instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $rawCollection = m::mock();
 
         $this->setProtected(
@@ -163,8 +156,6 @@ class CacheableCursorTest extends TestCase
         $cursor->expects()
             ->generateCacheKey()
             ->never();
-
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->expects()
             ->get('find:collection:123', null)

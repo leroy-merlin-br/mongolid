@@ -14,20 +14,21 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
-        $myOwnSchema = new class() extends Schema
-        {
-            /**
-             * {@inheritdoc}
-             */
-            public $dynamic = true;
+        $this->instance(
+            'My\Own\Schema',
+            new class() extends Schema
+            {
+                /**
+                 * {@inheritdoc}
+                 */
+                public $dynamic = true;
 
-            /**
-             * {@inheritdoc}
-             */
-            public $fields = [];
-        };
-
-        Ioc::instance('My\Own\Schema', $myOwnSchema);
+                /**
+                 * {@inheritdoc}
+                 */
+                public $fields = [];
+            }
+        );
 
         $schema = new class() extends Schema
         {
@@ -211,15 +212,15 @@ class SchemaMapperTest extends TestCase
         $schema = new class extends Schema
         {
         };
-        $mySchema = new class extends Schema
-        {
-        };
+        $mySchema = $this->instance(
+            'Xd\MySchema',
+            new class extends Schema
+            {
+            }
+        );
         $schemaMapper = new SchemaMapper($schema);
         $value = ['foo' => 'bar'];
         $test = $this;
-
-        // Act
-        Ioc::instance('Xd\MySchema', $mySchema);
 
         // When instantiating the SchemaMapper with the specified $param as dependency
         Ioc::bind(
@@ -240,13 +241,11 @@ class SchemaMapperTest extends TestCase
             }
         );
 
+        // Act
+        $result = $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema']);
+
         // Assert
-        $this->assertEquals(
-            [
-                ['foo' => 'PARSED'],
-            ],
-            $this->callProtected($schemaMapper, 'mapToSchema', [$value, 'Xd\MySchema'])
-        );
+        $this->assertEquals([['foo' => 'PARSED']], $result);
     }
 
     public function testShouldParseToArrayGettingObjectAttributes()
