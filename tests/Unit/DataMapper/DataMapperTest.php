@@ -812,7 +812,7 @@ class DataMapperTest extends TestCase
             ->andReturn($parsedDocument);
 
         // Act
-        $result = $this->callProtected($dataMapper, 'parseToDocument', $entity);
+        $result = $this->callProtected($dataMapper, 'parseToDocument', [$entity]);
 
         // Assert
         $this->assertSame($parsedDocument, $result);

@@ -74,12 +74,6 @@ class TestCase extends PHPUnitTestCase
         $methodObj = new ReflectionMethod(get_class($obj), $method);
         $methodObj->setAccessible(true);
 
-        if (is_object($args)) {
-            $args = [$args];
-        } else {
-            $args = (array) $args;
-        }
-
         return $methodObj->invokeArgs($obj, $args);
     }
 
@@ -95,13 +89,6 @@ class TestCase extends PHPUnitTestCase
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
         $property->setAccessible(true);
-
-        if (is_string($obj)) { // static
-            $property->setValue($value);
-
-            return;
-        }
-
         $property->setValue($obj, $value);
     }
 
@@ -118,11 +105,6 @@ class TestCase extends PHPUnitTestCase
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
         $property->setAccessible(true);
-
-        if (is_string($obj)) { // static
-            return $property->getValue();
-        }
-
         return $property->getValue($obj);
     }
 
