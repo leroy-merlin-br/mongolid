@@ -135,17 +135,17 @@ class AttributesTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function getSomeDocumentAttribute()
+            public function getShortNameDocumentAttribute()
             {
-                return 'something-else';
+                return 'Other name';
             }
         };
 
-        $model->some = 'some-value';
+        $model->short_name = 'My awesome name';
 
         // Assert
-        $this->assertEquals('something-else', $model->some);
-        $this->assertEquals('something-else', $model->getDocumentAttribute('some'));
+        $this->assertEquals('Other name', $model->short_name);
+        $this->assertEquals('Other name', $model->getDocumentAttribute('short_name'));
     }
 
     public function testShouldIgnoreMutators()
@@ -155,22 +155,22 @@ class AttributesTest extends TestCase
         {
             use Attributes;
 
-            public function getSomeDocumentAttribute()
+            public function getShortNameDocumentAttribute()
             {
-                return 'something-else';
+                return 'Other name';
             }
 
-            public function setSomeDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value)
             {
                 return strtoupper($value);
             }
         };
 
-        $model->some = 'some-value';
+        $model->short_name = 'My awesome name';
 
         // Assert
-        $this->assertEquals('some-value', $model->some);
-        $this->assertEquals('some-value', $model->getDocumentAttribute('some'));
+        $this->assertEquals('My awesome name', $model->short_name);
+        $this->assertEquals('My awesome name', $model->getDocumentAttribute('short_name'));
     }
 
     public function testShouldSetAttributeFromMutator()
@@ -185,16 +185,16 @@ class AttributesTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function setSomeDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value)
             {
                 return strtoupper($value);
             }
         };
 
-        $model->some = 'some-value';
+        $model->short_name = 'My awesome name';
 
         // Assert
-        $this->assertEquals('SOME-VALUE', $model->some);
+        $this->assertSame('MY AWESOME NAME', $model->short_name);
     }
 
     /**
@@ -235,14 +235,14 @@ class AttributesTest extends TestCase
 
         $input = [
             'name' => 'Josh',
-            'notAllowedAttribute' => true,
+            'not_allowed_attribute' => true,
         ];
 
         // Act
         $model->fill($input, true);
 
         // Assert
-        $this->assertTrue($model->notAllowedAttribute);
+        $this->assertTrue($model->not_allowed_attribute);
     }
 
     public function testShouldBeCastableToArray()

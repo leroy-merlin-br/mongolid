@@ -2,6 +2,7 @@
 namespace Mongolid\Model;
 
 use Exception;
+use Illuminate\Support\Str;
 
 /**
  * This trait adds attribute getter, setters and also a useful
@@ -238,6 +239,6 @@ trait Attributes
      */
     protected function buildMutatorMethod($key, $prefix)
     {
-        return $prefix.ucfirst($key).'DocumentAttribute';
+        return $prefix.Str::camel($key).'DocumentAttribute';
     }
 }
