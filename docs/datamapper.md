@@ -127,9 +127,9 @@ class MySchema extends Mongolid\Schema\Schema
 }
 ```
 
-### Schema definition for embeded documents
+### Schema definition for embedded documents
 
-By using the `"schema.<Class>"` syntax you can create schemas and map Entities for embeded documents. For example, with the definition below:
+By using the `"schema.<Class>"` syntax you can create schemas and map Entities for embedded documents. For example, with the definition below:
 
 ```php
 class PostSchema extends Mongolid\Schema\Schema

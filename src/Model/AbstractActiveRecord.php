@@ -214,6 +214,49 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     }
 
     /**
+     * Dynamically retrieve attributes on the model.
+     *
+     * @param string $key name of the attribute
+     *
+     * @return mixed
+     */
+    public function &__get(string $key)
+    {
+        return $this->getDocumentAttribute($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param string $key   attribute name
+     * @param mixed  $value value to be set
+     */
+    public function __set(string $key, $value)
+    {
+        $this->setDocumentAttribute($key, $value);
+    }
+
+    /**
+     * Determine if an attribute exists on the model.
+     *
+     * @param string $key attribute name
+     */
+    public function __isset(string $key): bool
+    {
+        return $this->hasDocumentAttribute($key);
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param string $key attribute name
+     */
+    public function __unset(string $key)
+    {
+        $this->cleanDocumentAttribute($key);
+    }
+
+    /**
      * Handle dynamic method calls into the model.
      *
      * @param mixed $method     name of the method that is being called

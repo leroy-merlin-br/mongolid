@@ -12,6 +12,13 @@ namespace Mongolid\Model;
 interface HasAttributesInterface
 {
     /**
+     * Check if an attribute is set on the model.
+     *
+     * @param string $key the attribute to be checked
+     */
+    public function hasDocumentAttribute(string $key): bool;
+
+    /**
      * Get an attribute from the model.
      *
      * @param string $key the attribute to be accessed

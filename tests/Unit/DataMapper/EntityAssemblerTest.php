@@ -68,7 +68,7 @@ class EntityAssemblerTest extends TestCase
 
             //---------------------------
 
-            'A schema containing an embeded schema but with null field' => [
+            'A schema containing an embedded schema but with null field' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
@@ -76,7 +76,7 @@ class EntityAssemblerTest extends TestCase
                     'tests' => null,
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => StubStudent::class,
                         'fields' => [
@@ -108,7 +108,7 @@ class EntityAssemblerTest extends TestCase
 
             //---------------------------
 
-            'A stdClass with a schema containing an embeded schema with a document directly into the field' => [
+            'A stdClass with a schema containing an embedded schema with a document directly into the field' => [
                 'inputValue' => (object) [ // Data that will be used to assembly the entity
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
@@ -158,7 +158,7 @@ class EntityAssemblerTest extends TestCase
 
             //---------------------------
 
-            'A schema containing an embeded schema with multiple documents in the field' => [
+            'A schema containing an embedded schema with multiple documents in the field' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',

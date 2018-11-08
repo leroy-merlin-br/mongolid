@@ -128,7 +128,7 @@ trait HasRelationsTrait
      * Removes an embedded document from the given field. It does that by using
      * the _id of the given $obj.
      *
-     * @param string $field name of the field where the $obj is embeded
+     * @param string $field name of the field where the $obj is embedded
      * @param mixed  $obj   document, model instance or _id
      */
     public function unembed(string $field, &$obj)

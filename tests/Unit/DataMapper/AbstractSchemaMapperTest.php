@@ -317,6 +317,10 @@ class AbstractSchemaMapperTest extends TestCase
             public function getOriginalDocumentAttributes(): array
             {
             }
+
+            public function hasDocumentAttribute(string $key): bool
+            {
+            }
         };
 
         // Assert

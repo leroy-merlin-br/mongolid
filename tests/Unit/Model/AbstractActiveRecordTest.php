@@ -56,7 +56,7 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldHaveCorrectPropertiesByDefault()
     {
-        // Assert
+        // Assertions
         $this->assertAttributeEquals(
             [
                 '_id' => 'objectId',
@@ -71,7 +71,7 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldImplementModelTraits()
     {
-        // Assert
+        // Assertions
         $this->assertSame(
             [HasAttributesTrait::class, HasRelationsTrait::class],
             array_keys(class_uses(AbstractActiveRecord::class))
@@ -80,10 +80,10 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldSave()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -91,16 +91,16 @@ class AbstractActiveRecordTest extends TestCase
             ->save($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
-        // Assert
+        // Assertions
         $this->assertTrue($this->entity->save());
     }
 
     public function testShouldInsert()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -108,16 +108,16 @@ class AbstractActiveRecordTest extends TestCase
             ->insert($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
-        // Assert
+        // Assertions
         $this->assertTrue($this->entity->insert());
     }
 
     public function testShouldUpdate()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -125,16 +125,16 @@ class AbstractActiveRecordTest extends TestCase
             ->update($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
-        // Assert
+        // Assertions
         $this->assertTrue($this->entity->update());
     }
 
     public function testShouldDelete()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -142,7 +142,7 @@ class AbstractActiveRecordTest extends TestCase
             ->delete($this->entity, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
-        // Assert
+        // Assertions
         $this->assertTrue($this->entity->delete());
     }
 
@@ -172,14 +172,14 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldGetWithWhereQuery()
     {
-        // Arrage
+        // Set
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         $cursor = m::mock(CursorInterface::class);
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -187,18 +187,18 @@ class AbstractActiveRecordTest extends TestCase
             ->where($query, $projection, true)
             ->andReturn($cursor);
 
-        // Assert
+        // Assertions
         $this->assertSame($cursor, $this->entity->where($query, $projection, true));
     }
 
     public function testShouldGetAll()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
         $cursor = m::mock(CursorInterface::class);
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -206,18 +206,18 @@ class AbstractActiveRecordTest extends TestCase
             ->all()
             ->andReturn($cursor);
 
-        // Assert
+        // Assertions
         $this->assertSame($cursor, $this->entity->all());
     }
 
     public function testShouldGetFirstWithQuery()
     {
-        // Arrage
+        // Set
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -225,18 +225,18 @@ class AbstractActiveRecordTest extends TestCase
             ->first($query, $projection, true)
             ->andReturn($this->entity);
 
-        // Assert
+        // Assertions
         $this->assertSame($this->entity, $this->entity->first($query, $projection, true));
     }
 
     public function testShouldGetFirstOrFail()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -244,17 +244,17 @@ class AbstractActiveRecordTest extends TestCase
             ->firstOrFail($query, $projection, true)
             ->andReturn($this->entity);
 
-        // Assert
+        // Assertions
         $this->assertSame($this->entity, $this->entity->firstOrFail($query, $projection, true));
     }
 
     public function testShouldGetFirstOrNewAndReturnExistingModel()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $id = 123;
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -262,17 +262,17 @@ class AbstractActiveRecordTest extends TestCase
             ->first($id)
             ->andReturn($this->entity);
 
-        // Assert
+        // Assertions
         $this->assertSame($this->entity, $this->entity->firstOrNew($id));
     }
 
     public function testShouldGetFirstOrNewAndReturnNewModel()
     {
-        // Arrage
+        // Set
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class));
         $id = 123;
 
-        // Act
+        // Actions
         $dataMapper->expects()
             ->setSchema(m::type(DynamicSchema::class));
 
@@ -280,17 +280,17 @@ class AbstractActiveRecordTest extends TestCase
             ->first($id)
             ->andReturn(null);
 
-        // Assert
+        // Assertions
         $this->assertNotEquals($this->entity, $this->entity->firstOrNew($id));
     }
 
     public function testShouldGetSchemaIfFieldsIsTheClassName()
     {
-        // Arrage
+        // Set
         $this->entity->setFields('MySchemaClass');
         $schema = $this->instance('MySchemaClass', m::mock(AbstractSchema::class));
 
-        // Assert
+        // Assertions
         $this->assertSame(
             $schema,
             $this->entity->getSchema()
@@ -299,11 +299,11 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldGetSchemaIfFieldsDescribesSchemaFields()
     {
-        // Arrage
+        // Set
         $fields = ['name' => 'string', 'age' => 'int'];
         $this->entity->setFields($fields);
 
-        // Assert
+        // Assertions
         $result = $this->entity->getSchema();
         $this->assertInstanceOf(AbstractSchema::class, $result);
         $this->assertSame($fields, $result->fields);
@@ -314,18 +314,18 @@ class AbstractActiveRecordTest extends TestCase
 
     public function testShouldGetDataMapper()
     {
-        // Arrage
+        // Set
         $entity = m::mock(AbstractActiveRecord::class.'[getSchema]');
         $schema = m::mock(AbstractSchema::class.'[]');
 
-        // Act
+        // Actions
         $entity->shouldAllowMockingProtectedMethods();
 
         $entity->expects()
             ->getSchema()
             ->andReturn($schema);
 
-        // Assert
+        // Assertions
         $result = $this->callProtected($entity, 'getDataMapper');
         $this->assertInstanceOf(DataMapper::class, $result);
         $this->assertSame($schema, $result->getSchema());
@@ -429,5 +429,175 @@ class AbstractActiveRecordTest extends TestCase
         $this->assertSame(1, $this->entity->getWriteConcern());
         $this->entity->setWriteConcern(0);
         $this->assertSame(0, $this->entity->getWriteConcern());
+    }
+
+    public function testShouldHaveDynamicSetters()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+        };
+
+        $childObj = new stdClass();
+
+        // Assertions
+        $model->name = 'John';
+        $model->age = 25;
+        $model->child = $childObj;
+        $this->assertSame(
+            [
+                'name' => 'John',
+                'age' => 25,
+                'child' => $childObj,
+            ],
+            $model->getDocumentAttributes()
+        );
+    }
+
+    public function testShouldHaveDynamicGetters()
+    {
+        // Set
+        $child = new stdClass();
+        $model = new class() extends AbstractActiveRecord
+        {
+        };
+        $model->fill(
+            [
+                'name' => 'John',
+                'age' => 25,
+                'child' => $child,
+            ]
+        );
+
+        // Assertions
+        $this->assertSame('John', $model->name);
+        $this->assertSame(25, $model->age);
+        $this->assertSame($child, $model->child);
+        $this->assertSame(null, $model->nonexistant);
+    }
+
+    public function testShouldCheckIfAttributeIsSet()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+        };
+        $model->fill(['name' => 'John', 'ignored' => null]);
+
+        // Assertions
+        $this->assertTrue(isset($model->name));
+        $this->assertFalse(isset($model->nonexistant));
+        $this->assertFalse(isset($model->ignored));
+    }
+
+    public function testShouldCheckIfMutatedAttributeIsSet()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $mutable = true;
+
+            public function getNameDocumentAttribute()
+            {
+                return 'John';
+            }
+        };
+
+        // Assertions
+        $this->assertTrue(isset($model->name));
+        $this->assertFalse(isset($model->nonexistant));
+    }
+
+    public function testShouldUnsetAttributes()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+        };
+        $model->fill(
+            [
+                'name' => 'John',
+                'age' => 25,
+            ]
+        );
+
+        // Actions
+        unset($model->age);
+        $result = $model->getDocumentAttributes();
+
+        // Assertions
+        $this->assertSame(['name' => 'John'], $result);
+    }
+
+    public function testShouldGetAttributeFromMutator()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $mutable = true;
+
+            public function getShortNameDocumentAttribute()
+            {
+                return 'Other name';
+            }
+        };
+
+        // Actions
+        $model->short_name = 'My awesome name';
+        $result = $model->short_name;
+
+        // Assertions
+        $this->assertSame('Other name', $result);
+    }
+
+    public function testShouldIgnoreMutators()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+            public function getShortNameDocumentAttribute()
+            {
+                return 'Other name';
+            }
+
+            public function setShortNameDocumentAttribute($value)
+            {
+                return strtoupper($value);
+            }
+        };
+
+        $model->short_name = 'My awesome name';
+
+        // Assertions
+        $this->assertSame('My awesome name', $model->short_name);
+    }
+
+    public function testShouldSetAttributeFromMutator()
+    {
+        // Arrange
+        $model = new class() extends AbstractActiveRecord
+        {
+            /**
+             * {@inheritdoc}
+             */
+            protected $mutable = true;
+
+            public function setShortNameDocumentAttribute($value)
+            {
+                return strtoupper($value);
+            }
+        };
+
+        $model->short_name = 'My awesome name';
+        $result = $model->short_name;
+
+        // Assert
+        $this->assertSame('MY AWESOME NAME', $result);
     }
 }

@@ -62,107 +62,17 @@ trait HasAttributesTrait
     protected $mutableCache = [];
 
     /**
-     * Get an attribute from the model.
-     *
-     * @param string $key the attribute to be accessed
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function getDocumentAttribute(string $key)
+    public function hasDocumentAttribute(string $key): bool
     {
-        return $this->{$key};
+        return !is_null($this->getDocumentAttribute($key));
     }
 
     /**
-     * Get all attributes from the model.
+     * {@inheritdoc}
      */
-    public function getDocumentAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Set the model attributes using an array.
-     *
-     * @param array $input the data that will be used to fill the attributes
-     * @param bool  $force force fill
-     */
-    public function fill(array $input, bool $force = false)
-    {
-        foreach ($input as $key => $value) {
-            if ($force
-                || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
-                $this->setDocumentAttribute($key, $value);
-            }
-        }
-    }
-
-    /**
-     * Set a given attribute on the model.
-     *
-     * @param string $key name of the attribute to be unset
-     */
-    public function cleanDocumentAttribute(string $key)
-    {
-        unset($this->attributes[$key]);
-    }
-
-    /**
-     * Set a given attribute on the model.
-     *
-     * @param string $key   name of the attribute to be set
-     * @param mixed  $value value to be set
-     */
-    public function setDocumentAttribute(string $key, $value)
-    {
-        $this->attributes[$key] = $value;
-    }
-
-    /**
-     * Stores original attributes from actual data from attributes
-     * to be used in future comparisons about changes.
-     * It tries to clone the attributes (using serialize/unserialize)
-     * so modifications to objects will be correctly identified
-     * as changes.
-     *
-     * Ideally should be called once right after retrieving data from
-     * the database.
-     */
-    public function syncOriginalDocumentAttributes()
-    {
-        try {
-            $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
-        } catch (Exception $e) {
-            $this->originalAttributes = $this->getDocumentAttributes();
-        }
-    }
-
-    /**
-     * Retrieve original attributes.
-     */
-    public function getOriginalDocumentAttributes(): array
-    {
-        return $this->originalAttributes;
-    }
-
-    /**
-     * Returns the model instance as an Array.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->getDocumentAttributes();
-    }
-
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param mixed $key name of the attribute
-     *
-     * @return mixed
-     */
-    public function &__get($key)
+    public function &getDocumentAttribute(string $key)
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
@@ -178,51 +88,81 @@ trait HasAttributesTrait
     }
 
     /**
-     * Dynamically set attributes on the model.
-     *
-     * @param mixed $key   attribute name
-     * @param mixed $value value to be set
+     * {@inheritdoc}
      */
-    public function __set($key, $value)
+    public function getDocumentAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fill(array $input, bool $force = false)
+    {
+        foreach ($input as $key => $value) {
+            if ($force
+                || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
+                $this->setDocumentAttribute($key, $value);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cleanDocumentAttribute(string $key)
+    {
+        unset($this->attributes[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDocumentAttribute(string $key, $value)
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
 
-        $this->setDocumentAttribute($key, $value);
+        $this->attributes[$key] = $value;
     }
 
     /**
-     * Determine if an attribute exists on the model.
-     *
-     * @param mixed $key attribute name
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function __isset($key)
+    public function syncOriginalDocumentAttributes()
     {
-        return !is_null($this->{$key});
+        try {
+            $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
+        } catch (Exception $e) {
+            $this->originalAttributes = $this->getDocumentAttributes();
+        }
     }
 
     /**
-     * Unset an attribute on the model.
-     *
-     * @param mixed $key attribute name
+     * {@inheritdoc}
      */
-    public function __unset($key)
+    public function getOriginalDocumentAttributes(): array
     {
-        $this->cleanDocumentAttribute($key);
+        return $this->originalAttributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return $this->getDocumentAttributes();
     }
 
     /**
      * Verify if model has a mutator method defined.
      *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return bool
+     * @param string $key    attribute name
+     * @param string $prefix method prefix to be used (get, set)
      */
-    protected function hasMutatorMethod($key, $prefix)
+    protected function hasMutatorMethod(string $key, $prefix): bool
     {
         $method = $this->buildMutatorMethod($key, $prefix);
 
@@ -232,13 +172,11 @@ trait HasAttributesTrait
     /**
      * Create mutator method pattern.
      *
-     * @param mixed $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     *
-     * @return string
+     * @param string $key    attribute name
+     * @param string $prefix method prefix to be used (get, set)
      */
-    protected function buildMutatorMethod($key, $prefix)
+    protected function buildMutatorMethod(string $key, string $prefix): string
     {
-        return $prefix.Str::camel($key).'DocumentAttribute';
+        return $prefix.Str::studly($key).'DocumentAttribute';
     }
 }

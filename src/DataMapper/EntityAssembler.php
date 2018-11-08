@@ -85,7 +85,7 @@ class EntityAssembler
     /**
      * Assembly multiple documents for the given $schemaClass recursively.
      *
-     * @param mixed  $value       a value of an embeded field containing entity data to be assembled
+     * @param mixed  $value       a value of an embedded field containing entity data to be assembled
      * @param string $schemaClass the schemaClass to be used when assembling the entities within $value
      *
      * @return mixed

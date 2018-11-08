@@ -57,7 +57,7 @@ Which will translate to:
 In order to embed a document to be used in a Embeds One relationship, simply do the following:
 
 ```php
-// The object that will be embeded
+// The object that will be embedded
 $phone = new Phone();
 $phone->regionCode = '55';
 $phone->number = '1532323232';
@@ -159,7 +159,7 @@ $post->save();
 
 > **Note:** When using Mongolid models you will need to call the `save()` method after embeding or attaching objects. The changes will only persists after you call the 'save()' method.
 
-The `embed` method will include an `_id` to identify your embeded document and allow the usage of `embed` and `unembed` to update or delete embeded documents:
+The `embed` method will include an `_id` to identify your embedded document and allow the usage of `embed` and `unembed` to update or delete embedded documents:
 
 ```php
 $commentB->content = "Pretty awesome!";
@@ -213,7 +213,7 @@ This statement will perform the following:
 In order to set a reference to a document, simply set the attribute used in the relationship to the reference's `_id` or use the attach method or it's alias. For example:
 
 ```php
-// The object that will be embeded
+// The object that will be embedded
 $user = new User();
 $user->name = 'John';
 $user->save() // This will populates the $user->_id
