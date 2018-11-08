@@ -6,7 +6,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -107,9 +107,9 @@ class Manager
     /**
      * Allow document Schemas to be registered for later use.
      *
-     * @param Schema $schema schema being registered
+     * @param AbstractSchema $schema schema being registered
      */
-    public function registerSchema(Schema $schema)
+    public function registerSchema(AbstractSchema $schema)
     {
         $this->schemas[$schema->entityClass] = $schema;
     }

@@ -12,7 +12,7 @@ class DynamicSchemaTest extends TestCase
         $schema = m::mock(DynamicSchema::class.'[]');
 
         // Assert
-        $this->assertInstanceOf(Schema::class, $schema);
+        $this->assertInstanceOf(AbstractSchema::class, $schema);
     }
 
     public function testShouldBeDynamic()

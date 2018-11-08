@@ -8,15 +8,15 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
-use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use stdClass;
 
-class ActiveRecordTest extends TestCase
+class AbstractActiveRecordTest extends TestCase
 {
     /**
-     * @var ActiveRecord
+     * @var AbstractActiveRecord
      */
     protected $entity;
 
@@ -26,7 +26,7 @@ class ActiveRecordTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->entity = new class() extends ActiveRecord
+        $this->entity = new class() extends AbstractActiveRecord
         {
             /**
              * {@inheritdoc}
@@ -73,8 +73,8 @@ class ActiveRecordTest extends TestCase
     {
         // Assert
         $this->assertSame(
-            [Attributes::class, Relations::class],
-            array_keys(class_uses(ActiveRecord::class))
+            [HasAttributesTrait::class, HasRelationsTrait::class],
+            array_keys(class_uses(AbstractActiveRecord::class))
         );
     }
 
@@ -288,7 +288,7 @@ class ActiveRecordTest extends TestCase
     {
         // Arrage
         $this->entity->setFields('MySchemaClass');
-        $schema = $this->instance('MySchemaClass', m::mock(Schema::class));
+        $schema = $this->instance('MySchemaClass', m::mock(AbstractSchema::class));
 
         // Assert
         $this->assertSame(
@@ -305,7 +305,7 @@ class ActiveRecordTest extends TestCase
 
         // Assert
         $result = $this->entity->getSchema();
-        $this->assertInstanceOf(Schema::class, $result);
+        $this->assertInstanceOf(AbstractSchema::class, $result);
         $this->assertSame($fields, $result->fields);
         $this->assertSame($this->entity->dynamic, $result->dynamic);
         $this->assertSame($this->entity->getCollectionName(), $result->collection);
@@ -315,8 +315,8 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetDataMapper()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getSchema]');
-        $schema = m::mock(Schema::class.'[]');
+        $entity = m::mock(AbstractActiveRecord::class.'[getSchema]');
+        $schema = m::mock(AbstractSchema::class.'[]');
 
         // Act
         $entity->shouldAllowMockingProtectedMethods();
@@ -333,7 +333,8 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends AbstractActiveRecord
+        {
         };
 
         $this->expectException(NoCollectionNameException::class);
@@ -342,7 +343,8 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends AbstractActiveRecord
+        {
         };
 
         $this->expectException(NoCollectionNameException::class);
@@ -351,7 +353,8 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends AbstractActiveRecord
+        {
         };
 
         $this->expectException(NoCollectionNameException::class);
@@ -365,7 +368,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldAttachToAttribute()
     {
-        $entity = new class() extends ActiveRecord
+        $entity = new class() extends AbstractActiveRecord
         {
             /**
              * @var {inheritdoc}
@@ -387,7 +390,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldEmbedToAttribute()
     {
-        $this->entity = new class() extends ActiveRecord
+        $this->entity = new class() extends AbstractActiveRecord
         {
             /**
              * @var {inheritdoc}
@@ -408,7 +411,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
     {
-        $this->entity = new class() extends ActiveRecord
+        $this->entity = new class() extends AbstractActiveRecord
         {
             /**
              * @var {inheritdoc}

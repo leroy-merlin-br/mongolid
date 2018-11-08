@@ -14,8 +14,8 @@ use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\ActiveRecord;
-use Mongolid\Schema\Schema;
+use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 use stdClass;
 
@@ -205,8 +205,8 @@ class DataMapperTest extends TestCase
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $this->instance(
-            Schema::class,
-            new class() extends Schema
+            AbstractSchema::class,
+            new class() extends AbstractSchema
             {
                 /**
                  * {@inheritdoc}
@@ -270,7 +270,7 @@ class DataMapperTest extends TestCase
         $database = m::mock(Database::class);
         $dataMapper = new DataMapper($connection);
 
-        $entity = new class extends ActiveRecord
+        $entity = new class extends AbstractActiveRecord
         {
         };
         $collection = m::mock(Collection::class);
@@ -278,8 +278,8 @@ class DataMapperTest extends TestCase
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $this->instance(
-            Schema::class,
-            new class() extends Schema
+            AbstractSchema::class,
+            new class() extends AbstractSchema
             {
                 /**
                  * {@inheritdoc}
@@ -491,7 +491,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -564,7 +564,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
@@ -612,7 +612,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
@@ -648,7 +648,7 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $dataMapper = new DataMapper($connection);
         $dataMapper->setSchema(
-            new class extends Schema
+            new class extends AbstractSchema
             {
                 /**
                  * {@inheritdoc}
@@ -669,7 +669,7 @@ class DataMapperTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -708,7 +708,7 @@ class DataMapperTest extends TestCase
             DataMapper::class.'[prepareValueQuery,getCollection]',
             [$connection]
         );
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -798,7 +798,7 @@ class DataMapperTest extends TestCase
         $dataMapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connection]);
         $entity = m::mock();
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
-        $schemaMapper = m::mock(Schema::class.'[]');
+        $schemaMapper = m::mock(AbstractSchema::class.'[]');
 
         $dataMapper->shouldAllowMockingProtectedMethods();
 
@@ -828,7 +828,7 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $dataMapper = new DataMapper($connection);
         $dataMapper->schemaClass = 'MySchema';
-        $schema = $this->instance('MySchema', m::mock(Schema::class));
+        $schema = $this->instance('MySchema', m::mock(AbstractSchema::class));
 
         // Act
         $result = $this->callProtected($dataMapper, 'getSchemaMapper');
@@ -844,7 +844,7 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $dataMapper = new DataMapper($connection);
         $collection = m::mock(Collection::class);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $schema->collection = 'foobar';
 
         $dataMapper->setSchema($schema);
@@ -983,11 +983,11 @@ class DataMapperTest extends TestCase
 
     public function getWriteConcernVariations()
     {
-        $model = new class extends ActiveRecord
+        $model = new class extends AbstractActiveRecord
         {
         };
 
-        $model2 = new class extends ActiveRecord
+        $model2 = new class extends AbstractActiveRecord
         {
         };
 

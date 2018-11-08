@@ -4,14 +4,14 @@ namespace Mongolid\Model;
 use Mongolid\TestCase;
 use stdClass;
 
-class AttributesTest extends TestCase
+class HasAttributesTraitTest extends TestCase
 {
     public function testShouldHaveDynamicSetters()
     {
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
         };
 
         $childObj = new stdClass();
@@ -42,7 +42,7 @@ class AttributesTest extends TestCase
 
         $model = new class($attributes)
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct(array $attributes)
             {
@@ -62,7 +62,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class(['name' => 'John', 'ignored' => null])
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct(array $attributes)
             {
@@ -81,7 +81,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct()
             {
@@ -104,7 +104,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct()
             {
@@ -128,7 +128,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct()
             {
@@ -153,7 +153,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function getShortNameDocumentAttribute()
             {
@@ -178,7 +178,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct()
             {
@@ -209,7 +209,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class($fillable, $guarded)
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct(array $fillable, array $guarded)
             {
@@ -230,7 +230,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
         };
 
         $input = [
@@ -250,7 +250,7 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
         };
 
         $model->name = 'John';
@@ -266,9 +266,9 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface
+        $model = new class() implements HasAttributesInterface
         {
-            use Attributes;
+            use HasAttributesTrait;
         };
 
         $model->name = 'John';
@@ -284,9 +284,9 @@ class AttributesTest extends TestCase
     public function testShouldFallbackOriginalAttributesIfUnserializationFails()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface
+        $model = new class() implements HasAttributesInterface
         {
-            use Attributes;
+            use HasAttributesTrait;
 
             public function __construct()
             {

@@ -3,10 +3,10 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\HasAttributesTrait;
 use Mongolid\Model\PolymorphableInterface;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 use stdClass;
 
@@ -21,7 +21,7 @@ class EntityAssemblerTest extends TestCase
         $entityAssembler = new EntityAssembler();
         $schemas = [];
         foreach ($availableSchemas as $key => $value) {
-            $schemas[$key] = $this->instance($key, m::mock(Schema::class.'[]'));
+            $schemas[$key] = $this->instance($key, m::mock(AbstractSchema::class.'[]'));
             $schemas[$key]->entityClass = $value['entityClass'];
             $schemas[$key]->fields = $value['fields'];
         }
@@ -251,9 +251,9 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class StubStudent extends stdClass implements AttributesAccessInterface
+class StubStudent extends stdClass implements HasAttributesInterface
 {
-    use Attributes;
+    use HasAttributesTrait;
 
     public function __construct($attr = [])
     {

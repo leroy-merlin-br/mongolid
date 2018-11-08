@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
  *
  * It is supposed to be used in model classes in general
  */
-trait Attributes
+trait HasAttributesTrait
 {
     /**
      * The model's attributes.

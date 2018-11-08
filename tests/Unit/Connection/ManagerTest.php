@@ -7,7 +7,7 @@ use MongoDB\Client;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -64,7 +64,7 @@ class ManagerTest extends TestCase
     {
         // Arrange
         $manager = new Manager();
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $schema->entityClass = 'Bacon';
 
         // Assert
@@ -80,7 +80,7 @@ class ManagerTest extends TestCase
     {
         // Arrange
         $manager = new Manager();
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
 
         $schema->entityClass = 'Bacon';

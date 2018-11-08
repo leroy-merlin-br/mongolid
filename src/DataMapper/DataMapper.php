@@ -11,9 +11,9 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\HasSchemaInterface;
-use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -29,12 +29,12 @@ class DataMapper implements HasSchemaInterface
      *
      * @var string
      */
-    public $schemaClass = Schema::class;
+    public $schemaClass = AbstractSchema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass.
      *
-     * @var Schema
+     * @var AbstractSchema
      */
     protected $schema;
 
@@ -327,7 +327,7 @@ class DataMapper implements HasSchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchema(): Schema
+    public function getSchema(): AbstractSchema
     {
         return $this->schema;
     }
@@ -335,7 +335,7 @@ class DataMapper implements HasSchemaInterface
     /**
      * Set a Schema object  that describes an Entity in MongoDB.
      */
-    public function setSchema(Schema $schema)
+    public function setSchema(AbstractSchema $schema)
     {
         $this->schema = $schema;
     }
@@ -591,14 +591,14 @@ class DataMapper implements HasSchemaInterface
      */
     private function afterSuccess($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->syncOriginalDocumentAttributes();
         }
     }
 
     private function getUpdateData($entity, array $data)
     {
-        if (!$entity instanceof AttributesAccessInterface) {
+        if (!$entity instanceof HasAttributesInterface) {
             return ['$set' => $data];
         }
 

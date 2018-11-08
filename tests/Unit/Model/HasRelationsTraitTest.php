@@ -7,10 +7,10 @@ use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 
-class RelationsTest extends TestCase
+class HasRelationsTraitTest extends TestCase
 {
     /**
      * @dataProvider referenceScenarios
@@ -19,9 +19,9 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(AbstractActiveRecord::class.'[]');
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
-        $result = new class() extends Schema {
+        $result = new class() extends AbstractSchema {
         };
 
         $model->$field = $fieldValue;
@@ -51,7 +51,7 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(AbstractActiveRecord::class.'[]');
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
         $result = m::mock(CursorInterface::class);
 
@@ -81,13 +81,13 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsOne($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(AbstractActiveRecord::class.'[]');
         $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
         $model->$field = $document;
 
-        $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
+        $instantiableClass = $entity instanceof AbstractSchema ? 'stdClass' : get_class($entity);
 
         // Act
         $cursorFactory->expects()
@@ -109,13 +109,13 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsMany($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = m::mock(AbstractActiveRecord::class.'[]');
         $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
         $model->$field = $document;
 
-        $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
+        $instantiableClass = $entity instanceof AbstractSchema ? 'stdClass' : get_class($entity);
 
         // Act
         $cursorFactory->expects()
@@ -134,7 +134,7 @@ class RelationsTest extends TestCase
     {
         // Set
         $model = new class() {
-            use Relations;
+            use HasRelationsTrait;
         };
         $document = m::mock();
         $documentEmbedder = $this->instance(DocumentEmbedder::class, m::mock(DocumentEmbedder::class));
@@ -152,7 +152,7 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Schema referenced by numeric id' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => 12345,
@@ -164,7 +164,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'ActiveRecord referenced by string id' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */
@@ -180,7 +180,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Schema referenced by string objectId' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
@@ -192,7 +192,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'ActiveRecord referenced by objectId' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */
@@ -208,7 +208,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Schema referenced with series of numeric ids' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => [1, 2, 3, 4, 5],
@@ -220,7 +220,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'ActiveRecord referenced with series of string objectIds' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */
@@ -236,7 +236,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Schema referenced with series of real objectIds' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
@@ -248,7 +248,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'ActiveRecord referenced with null' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */
@@ -270,7 +270,7 @@ class RelationsTest extends TestCase
         return [
             // -------------------------
             'Embedded document referent to an Schema' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
@@ -278,7 +278,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Embedded documents referent to an Schema' => [
-                'entity' => new class() extends Schema {
+                'entity' => new class() extends AbstractSchema {
                 },
                 'field' => 'foo',
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
@@ -286,7 +286,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Embedded document referent to an ActiveRecord entity' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */
@@ -298,7 +298,7 @@ class RelationsTest extends TestCase
             ],
             // -------------------------
             'Embedded documents referent to an ActiveRecord entity' => [
-                'entity' => new class() extends ActiveRecord {
+                'entity' => new class() extends AbstractActiveRecord {
                     /**
                      * @var {inheritdoc}
                      */

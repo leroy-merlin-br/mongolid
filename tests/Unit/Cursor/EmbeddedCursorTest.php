@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\Model\ActiveRecord;
+use Mongolid\Model\AbstractActiveRecord;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\TestCase;
 use stdClass;
@@ -156,7 +156,7 @@ class EmbeddedCursorTest extends TestCase
     public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
     {
         // Arrange
-        $object = new class() extends ActiveRecord implements PolymorphableInterface {
+        $object = new class() extends AbstractActiveRecord implements PolymorphableInterface {
             public function polymorph()
             {
                 return 'Bacon';

@@ -9,9 +9,9 @@ use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
-use Mongolid\Model\ActiveRecord;
+use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
-use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use Serializable;
 use stdClass;
@@ -182,14 +182,14 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $entity = m::mock(ActiveRecord::class.'[]');
+        $entity = m::mock(AbstractActiveRecord::class.'[]');
         $entity->name = 'John Doe';
         $driverCursor = new ArrayIterator([$entity]);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Assert
         $entity = $cursor->current();
-        $this->assertInstanceOf(ActiveRecord::class, $entity);
+        $this->assertInstanceOf(AbstractActiveRecord::class, $entity);
         $this->assertEquals('John Doe', $entity->name);
     }
 
@@ -444,7 +444,7 @@ class CursorTest extends TestCase
         $driverCursor = null
     ) {
         if (!$entitySchema) {
-            $entitySchema = m::mock(Schema::class.'[]');
+            $entitySchema = m::mock(AbstractSchema::class.'[]');
         }
 
         if (!$collection) {

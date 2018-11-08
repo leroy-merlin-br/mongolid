@@ -2,9 +2,9 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Ioc;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Model\PolymorphableInterface;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 
 /**
  * EntityAssembler have the responsibility of assembling the data coming from
@@ -22,12 +22,12 @@ class EntityAssembler
     /**
      * Builds an object from the provided data.
      *
-     * @param array|object $document the attributes that will be used to compose the entity
-     * @param Schema       $schema   schema that will be used to map each field
+     * @param array|object   $document the attributes that will be used to compose the entity
+     * @param AbstractSchema $schema   schema that will be used to map each field
      *
      * @return mixed
      */
-    public function assemble($document, Schema $schema)
+    public function assemble($document, AbstractSchema $schema)
     {
         $entityClass = $schema->entityClass;
         $model = Ioc::make($entityClass);
@@ -75,7 +75,7 @@ class EntityAssembler
      */
     protected function prepareOriginalAttributes($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->syncOriginalDocumentAttributes();
         }
 

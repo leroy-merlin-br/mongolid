@@ -7,13 +7,13 @@ use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
  * It is supposed to be used in model classes in general.
  */
-trait Relations
+trait HasRelationsTrait
 {
     /**
      * Returns the referenced document as object.
@@ -34,7 +34,7 @@ trait Relations
 
         $entityInstance = Ioc::make($entity);
 
-        if ($entityInstance instanceof Schema) {
+        if ($entityInstance instanceof AbstractSchema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
@@ -65,7 +65,7 @@ trait Relations
 
         $entityInstance = Ioc::make($entity);
 
-        if ($entityInstance instanceof Schema) {
+        if ($entityInstance instanceof AbstractSchema) {
             $dataMapper = Ioc::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
@@ -98,7 +98,7 @@ trait Relations
      */
     protected function embedsMany(string $entity, string $field)
     {
-        if (is_subclass_of($entity, Schema::class)) {
+        if (is_subclass_of($entity, AbstractSchema::class)) {
             $entity = (new $entity())->entityClass;
         }
 

@@ -7,9 +7,9 @@ namespace Mongolid\Model;
  *
  * It is supposed to be used in conjunction with Attributes trait
  *
- * @see Attributes
+ * @see HasAttributesTrait
  */
-interface AttributesAccessInterface
+interface HasAttributesInterface
 {
     /**
      * Get an attribute from the model.
