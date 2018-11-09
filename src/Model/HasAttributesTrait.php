@@ -80,11 +80,28 @@ trait HasAttributesTrait
             return $this->mutableCache[$key];
         }
 
-        if (!array_key_exists($key, $this->attributes)) {
-            $this->attributes[$key] = null;
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
         }
 
+        if (!method_exists(self::class, $key) && method_exists($this, $key)) {
+             return $this->getRelationValue($key);
+        }
+
+        $this->attributes[$key] = null;
+
         return $this->attributes[$key];
+    }
+
+    private function &getRelationValue(string $method)
+    {
+        if (!$this->relationLoaded($method)) {
+            $relation = $this->$method();
+
+            $this->setRelation($method, $relation->getResults());
+        }
+
+        return $this->getRelation($method);
     }
 
     /**

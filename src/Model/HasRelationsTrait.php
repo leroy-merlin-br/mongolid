@@ -1,14 +1,10 @@
 <?php
 namespace Mongolid\Model;
 
-use MongoDB\BSON\ObjectId;
-use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CursorFactory;
-use Mongolid\Cursor\CursorInterface;
-use Mongolid\Cursor\EmbeddedCursor;
-use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema\AbstractSchema;
-use Mongolid\Util\ObjectIdUtils;
+use Mongolid\Model\Relations\EmbedsMany;
+use Mongolid\Model\Relations\EmbedsOne;
+use Mongolid\Model\Relations\ReferencesMany;
+use Mongolid\Model\Relations\ReferencesOne;
 
 /**
  * It is supposed to be used in model classes in general.
@@ -16,32 +12,22 @@ use Mongolid\Util\ObjectIdUtils;
 trait HasRelationsTrait
 {
     /**
+     * The loaded relationships for the model.
+     *
+     * @var array
+     */
+    private $relations = [];
+
+    /**
      * Returns the referenced document as object.
      *
      * @param string $entity    class of the entity or of the schema of the entity
      * @param string $field     the field where the _id is stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
-     *
-     * @return mixed
      */
-    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
+    protected function referencesOne(string $entity, string $field, bool $cacheable = true): ReferencesOne
     {
-        $referenced_id = $this->$field;
-
-        if (is_array($referenced_id) && isset($referenced_id[0])) {
-            $referenced_id = $referenced_id[0];
-        }
-
-        $entityInstance = Ioc::make($entity);
-
-        if ($entityInstance instanceof AbstractSchema) {
-            $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->setSchema($entityInstance);
-
-            return $dataMapper->first(['_id' => $referenced_id], [], $cacheable);
-        }
-
-        return $entityInstance::first(['_id' => $referenced_id], [], $cacheable);
+        return new ReferencesOne($this, $entity, $field, $cacheable);
     }
 
     /**
@@ -51,28 +37,9 @@ trait HasRelationsTrait
      * @param string $field     the field where the _ids are stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true): ReferencesMany
     {
-        $referencedIds = (array) $this->$field;
-
-        if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
-            foreach ($referencedIds as $key => $value) {
-                $referencedIds[$key] = new ObjectId($value);
-            }
-        }
-
-        $query = ['_id' => ['$in' => array_values($referencedIds)]];
-
-        $entityInstance = Ioc::make($entity);
-
-        if ($entityInstance instanceof AbstractSchema) {
-            $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->setSchema($entityInstance);
-
-            return $dataMapper->where($query, [], $cacheable);
-        }
-
-        return $entityInstance::where($query, [], $cacheable);
+        return new ReferencesMany($this, $entity, $field, $cacheable);
     }
 
     /**
@@ -80,12 +47,10 @@ trait HasRelationsTrait
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded document is stored
-     *
-     * @return mixed
      */
-    protected function embedsOne(string $entity, string $field)
+    protected function embedsOne(string $entity, string $field): EmbedsOne
     {
-        return $this->embedsMany($entity, $field)->first();
+        return new EmbedsOne($this, $entity, $field);
     }
 
     /**
@@ -93,73 +58,52 @@ trait HasRelationsTrait
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded documents are stored
-     *
-     * @return EmbeddedCursor Array with the embedded documents
      */
-    protected function embedsMany(string $entity, string $field)
+    protected function embedsMany(string $entity, string $field): EmbedsMany
     {
-        if (is_subclass_of($entity, AbstractSchema::class)) {
-            $entity = (new $entity())->entityClass;
-        }
-
-        $items = (array) $this->$field;
-        if (false === empty($items) && false === array_key_exists(0, $items)) {
-            $items = [$items];
-        }
-
-        return Ioc::make(CursorFactory::class)
-            ->createEmbeddedCursor($entity, $items);
+        return new EmbedsMany($this, $entity, $field);
     }
 
     /**
-     * Embed a new document to an attribute. It will also generate an
-     * _id for the document if it's not present.
+     * Get a specified relationship.
      *
-     * @param string $field field to where the $obj will be embedded
-     * @param mixed  $obj   document or model instance
+     * @return mixed
      */
-    public function embed(string $field, &$obj)
+    public function getRelation(string $relation)
     {
-        $embedder = Ioc::make(DocumentEmbedder::class);
-        $embedder->embed($this, $field, $obj);
+        return $this->relations[$relation];
     }
 
     /**
-     * Removes an embedded document from the given field. It does that by using
-     * the _id of the given $obj.
-     *
-     * @param string $field name of the field where the $obj is embedded
-     * @param mixed  $obj   document, model instance or _id
+     * Determine if the given relation is loaded.
      */
-    public function unembed(string $field, &$obj)
+    public function relationLoaded(string $key): bool
     {
-        $embedder = Ioc::make(DocumentEmbedder::class);
-        $embedder->unembed($this, $field, $obj);
+        return array_key_exists($key, $this->relations);
     }
 
     /**
-     * Attach document _id reference to an attribute. It will also generate an
-     * _id for the document if it's not present.
+     * Set the given relationship on the model.
      *
-     * @param string $field name of the field where the reference will be stored
-     * @param mixed  $obj   document, model instance or _id to be referenced
+     * @param  mixed $value
      */
-    public function attach(string $field, &$obj)
+    public function setRelation(string $relation, $value)
     {
-        $embedder = Ioc::make(DocumentEmbedder::class);
-        $embedder->attach($this, $field, $obj);
+        $this->relations[$relation] = $value;
     }
 
     /**
-     * Removes a document _id reference from an attribute. It will remove the
-     * _id of the given $obj from inside the given $field.
+     * Unset a loaded relationship.
      *
-     * @param string $field field where the reference is stored
-     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     * @param  string $relation
      */
-    public function detach(string $field, &$obj)
+    public function unsetRelation($relation)
     {
-        $embedder = Ioc::make(DocumentEmbedder::class);
-        $embedder->detach($this, $field, $obj);
+        unset($this->relations[$relation]);
+    }
+
+    public function getRelations(): array
+    {
+        return $this->relations;
     }
 }

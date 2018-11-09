@@ -7,43 +7,45 @@ use Mongolid\Tests\Integration\Stubs\User;
 
 class ReferencesManyRelationTest extends IntegrationTestCase
 {
-    public function testShouldRetrieveParentOfUser()
+    public function testShouldRetrieveSiblingsOfUser()
     {
         // create sibling
         $chuck = $this->createUser('Chuck');
         $john = $this->createUser('John');
-        $john->attach('siblings', $chuck);
+        $john->siblings()->attach($chuck);
 
         $this->assertSiblings([$chuck], $john);
         // hit cache
         $this->assertSiblings([$chuck], $john);
 
         $mary = $this->createUser('Mary');
-        $john->attach('siblings', $mary);
+        $john->siblings()->attach($mary);
 
         $this->assertSiblings([$chuck, $mary], $john);
         // hit cache
         $this->assertSiblings([$chuck, $mary], $john);
 
         // remove one sibling
-        $john->unembed('siblings', $chuck);
+        $john->siblings()->detach($chuck);
         $this->assertSiblings([$mary], $john);
         // hit cache
         $this->assertSiblings([$mary], $john);
 
         // replace siblings
         $bob = $this->createUser('Bob');
-        unset($john->siblings);
-        $john->attach('siblings', $bob);
+        // unset($john->siblings_ids); // TODO make this work!
+        $john->siblings()->detachAll();
+        $this->assertEmpty($john->siblings->all());
+        $john->siblings()->attach($bob);
 
         $this->assertSiblings([$bob], $john);
         // hit cache
         $this->assertSiblings([$bob], $john);
 
         // remove with unembed
-        $john->unembed('siblings', $bob);
+        $john->siblings()->detach($bob);
 
-        $this->assertEmpty($john->siblings()->all());
+        $this->assertEmpty($john->siblings->all());
     }
 
     private function createUser(string $name): User
@@ -58,7 +60,7 @@ class ReferencesManyRelationTest extends IntegrationTestCase
 
     private function assertSiblings($expected, User $model)
     {
-        $siblings = $model->siblings();
+        $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
         $this->assertEquals($expected, $siblings->all());
     }

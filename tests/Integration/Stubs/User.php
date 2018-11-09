@@ -30,11 +30,11 @@ class User extends AbstractActiveRecord
 
     public function parent()
     {
-        return $this->referencesOne(User::class, 'parent');
+        return $this->referencesOne(User::class, 'parent_id');
     }
 
     public function siblings()
     {
-        return $this->referencesMany(User::class, 'siblings');
+        return $this->referencesMany(User::class, 'siblings_ids');
     }
 }

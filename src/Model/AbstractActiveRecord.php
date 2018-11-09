@@ -1,7 +1,6 @@
 <?php
 namespace Mongolid\Model;
 
-use BadMethodCallException;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorInterface;
@@ -257,43 +256,6 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     }
 
     /**
-     * Handle dynamic method calls into the model.
-     *
-     * @param mixed $method     name of the method that is being called
-     * @param mixed $parameters parameters of $method
-     *
-     * @throws BadMethodCallException In case of invalid methods be called
-     *
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        $value = $parameters[0] ?? null;
-
-        // Alias to attach
-        if ('attachTo' == substr($method, 0, 8)) {
-            $field = lcfirst(substr($method, 8));
-
-            return $this->attach($field, $value);
-        }
-
-        // Alias to embed
-        if ('embedTo' == substr($method, 0, 7)) {
-            $field = lcfirst(substr($method, 7));
-
-            return $this->embed($field, $value);
-        }
-
-        throw new BadMethodCallException(
-            sprintf(
-                'The following method can not be reached or does not exist: %s@%s',
-                static::class,
-                $method
-            )
-        );
-    }
-
-    /**
      * Returns a DataMapper configured with the Schema and collection described
      * in this entity.
      *
@@ -373,7 +335,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Performs the given action into database.
      *
-     * @param string $action datamapper function to execute
+     * @param string $action DataMapper function to execute
      *
      * @return bool
      */

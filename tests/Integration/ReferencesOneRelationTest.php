@@ -11,7 +11,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         // create parent
         $chuck = $this->createUser('Chuck');
         $john = $this->createUser('John');
-        $john->attach('parent', $chuck);
+        $john->parent()->attach($chuck);
 
         $this->assertParent($chuck, $john);
         // hit cache
@@ -19,17 +19,18 @@ class ReferencesOneRelationTest extends IntegrationTestCase
 
         // replace parent
         $bob = $this->createUser('Bob');
-        unset($john->parent);
-        $john->attach('parent', $bob);
+        $john->parent()->detach(); //todo remove this line and ensure only one parent is attached
+        $john->parent()->attach($bob);
 
         $this->assertParent($bob, $john);
         // hit cache
         $this->assertParent($bob, $john);
 
-        // remove with unembed
-        $john->unembed('parent', $bob);
+        // remove
+        //unset($john->parent_id);// TODO make this work!
+        $john->parent()->detach();
 
-        $this->assertNull($john->parent());
+        $this->assertNull($john->parent);
     }
 
     private function createUser(string $name): User
@@ -44,7 +45,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
 
     private function assertParent($expected, User $model)
     {
-        $parent = $model->parent();
+        $parent = $model->parent;
         $this->assertInstanceOf(User::class, $parent);
         $this->assertEquals($expected, $parent);
     }
