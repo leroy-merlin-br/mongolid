@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Model\Relations\InvalidRelationException;
+use Mongolid\Model\Relations\NotARelationException;
 use Mongolid\Tests\Integration\Stubs\ReferencedUser;
 
 class ReferencesOneRelationTest extends IntegrationTestCase
@@ -69,7 +69,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $user = new ReferencedUser();
 
         // Expectations
-        $this->expectException(InvalidRelationException::class);
+        $this->expectException(NotARelationException::class);
         $this->expectExceptionMessage('Called method "invalid" is not a Relation!');
 
         // Actions

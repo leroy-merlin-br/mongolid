@@ -3,7 +3,7 @@ namespace Mongolid\Model;
 
 use Exception;
 use Illuminate\Support\Str;
-use Mongolid\Model\Relations\InvalidRelationException;
+use Mongolid\Model\Relations\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
 
 /**
@@ -101,7 +101,7 @@ trait HasAttributesTrait
             $relation = $this->$method();
 
             if (!$relation instanceof RelationInterface) {
-                throw new InvalidRelationException("Called method \"{$method}\" is not a Relation!");
+                throw new NotARelationException("Called method \"{$method}\" is not a Relation!");
             }
 
             $this->setRelation($method, $relation->getResults());
