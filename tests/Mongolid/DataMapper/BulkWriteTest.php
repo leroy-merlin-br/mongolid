@@ -97,9 +97,19 @@ class BulkWriteTest extends TestCase
             ->withNoArgs()
             ->once();
 
-        $mongoBulkWrite->shouldReceive('update')
-            ->with(['_id' => $id], ['$unset' => $data], ['upsert' => true])
-            ->once();
+        $mongoBulkWrite->expects()
+            ->update(
+                m::on(
+                    function ($actual) {
+                        $this->assertSame(['_id' => '123'], $actual);
+
+                        return true;
+                    }
+                ),
+                ['$unset' => $data],
+                ['upsert' => true]
+            );
+
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
@@ -126,9 +136,18 @@ class BulkWriteTest extends TestCase
             ->withNoArgs()
             ->once();
 
-        $mongoBulkWrite->shouldReceive('update')
-            ->with($query, ['$unset' => $data], ['upsert' => true])
-            ->once();
+        $mongoBulkWrite->expects()
+            ->update(
+                m::on(
+                    function ($actual) use ($query) {
+                        $this->assertSame($query, $actual);
+
+                        return true;
+                    }
+                ),
+                ['$unset' => $data],
+                ['upsert' => true]
+            );
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
 
