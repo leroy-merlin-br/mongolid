@@ -27,7 +27,7 @@ class EmbedsMany extends AbstractRelation
     public function remove($entity)
     {
         $this->documentEmbedder->unembed($this->parent, $this->field, $entity);
-        $this->parent->unsetRelation($this->relationName);
+        $this->parent->unsetRelation($this->relationName); // TODO better implementation of cache invalidation
     }
 
     public function removeAll()
@@ -35,7 +35,6 @@ class EmbedsMany extends AbstractRelation
         unset($this->parent->{$this->field});
         $this->parent->unsetRelation($this->relationName);
     }
-
 
     public function getResults()
     {

@@ -5,7 +5,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Model\DocumentEmbedder;
 use Mongolid\Model\HasAttributesInterface;
 
-abstract class AbstractRelation
+abstract class AbstractRelation implements RelationInterface
 {
     /**
      * @var HasAttributesInterface

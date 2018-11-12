@@ -3,6 +3,8 @@ namespace Mongolid\Model;
 
 use Exception;
 use Illuminate\Support\Str;
+use Mongolid\Model\Relations\InvalidRelationException;
+use Mongolid\Model\Relations\RelationInterface;
 
 /**
  * This trait adds attribute getter, setters and also a useful
@@ -98,7 +100,9 @@ trait HasAttributesTrait
         if (!$this->relationLoaded($method)) {
             $relation = $this->$method();
 
-            // TODO make sure that it's a relation
+            if (!$relation instanceof RelationInterface) {
+                throw new InvalidRelationException("Called method \"{$method}\" is not a Relation!");
+            }
 
             $this->setRelation($method, $relation->getResults());
         }

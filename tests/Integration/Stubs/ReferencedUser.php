@@ -47,4 +47,9 @@ class ReferencedUser extends AbstractActiveRecord
     {
         return $this->referencesMany(ReferencedUser::class, null, 'code');
     }
+
+    public function invalid()
+    {
+        return 'I am not a relation!';
+    }
 }
