@@ -98,6 +98,8 @@ trait HasAttributesTrait
         if (!$this->relationLoaded($method)) {
             $relation = $this->$method();
 
+            // TODO make sure that it's a relation
+
             $this->setRelation($method, $relation->getResults());
         }
 

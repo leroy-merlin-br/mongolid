@@ -6,7 +6,7 @@ use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\AbstractActiveRecord;
 
-class User extends AbstractActiveRecord
+class EmbeddedUser extends AbstractActiveRecord
 {
     /**
      * @var string
@@ -30,21 +30,21 @@ class User extends AbstractActiveRecord
 
     public function parent()
     {
-        return $this->referencesOne(User::class, 'parent_id');
+        return $this->embedsOne(EmbeddedUser::class);
     }
 
     public function siblings()
     {
-        return $this->referencesMany(User::class, 'siblings_ids');
+        return $this->embedsMany(EmbeddedUser::class);
     }
 
     public function son()
     {
-        return $this->referencesOne(User::class, 'son_id', 'code');
+        return $this->embedsOne(EmbeddedUser::class, 'arbitrary_field');
     }
 
     public function grandsons()
     {
-        return $this->referencesMany(User::class, 'grandsons_ids', 'code');
+        return $this->embedsMany(EmbeddedUser::class, 'other_arbitrary_field');
     }
 }

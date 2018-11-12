@@ -23,9 +23,9 @@ class ReferencesMany extends AbstractRelation
      */
     protected $key;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, bool $cacheable = true)
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, string $relationName, bool $cacheable = true)
     {
-        parent::__construct($parent, $entity, $field);
+        parent::__construct($parent, $entity, $field, $relationName);
         $this->key = $key;
         $this->documentEmbedder->setKey($key);
         $this->cacheable = $cacheable;

@@ -32,9 +32,9 @@ abstract class AbstractRelation
      */
     protected $relationName;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field)
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $relationName)
     {
-        $this->relationName = $this->guessRelationName();
+        $this->relationName = $relationName;
         $this->parent = $parent;
         $this->entity = $entity;
         $this->field = $field;
@@ -43,23 +43,4 @@ abstract class AbstractRelation
     }
 
     abstract public function getResults();
-
-    /**
-     * @return string|null
-     */
-    private function guessRelationName()
-    {
-        $functionName = __FUNCTION__;
-
-        return collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5))
-            ->pluck('function')
-            ->first(
-                function ($value) use ($functionName) {
-                    return !in_array(
-                        $value,
-                        [$functionName, '__construct', 'referencesOne', 'referencesMany', 'embedsOne', 'embedsMany']
-                    );
-                }
-            );
-    }
 }

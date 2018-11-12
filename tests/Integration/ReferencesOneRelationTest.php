@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Tests\Integration\Stubs\User;
+use Mongolid\Tests\Integration\Stubs\ReferencedUser;
 
 class ReferencesOneRelationTest extends IntegrationTestCase
 {
@@ -30,6 +30,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         //unset($john->parent_id);// TODO make this work!
         $john->parent()->detach();
 
+        $this->assertNull($john->parent_id);
         $this->assertNull($john->parent);
     }
 
@@ -40,7 +41,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john = $this->createUser('John', '369');
         $john->son()->attach($chuck);
 
-        $this->assertSame(['010'], $john->son_id); // TODO store as single code (not array)
         $this->assertSon($chuck, $john);
         // hit cache
         $this->assertSon($chuck, $john);
@@ -50,22 +50,21 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->son()->detach(); //todo remove this line and ensure only one son is attached
         $john->son()->attach($bob);
 
-        $this->assertSame(['987'], $john->son_id);
         $this->assertSon($bob, $john);
         // hit cache
         $this->assertSon($bob, $john);
 
         // remove
-        //unset($john->son_id);// TODO make this work!
+        //unset($john->arbitrary_field);// TODO make this work!
         $john->son()->detach();
 
-        $this->assertNull($john->son_id);
+        $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
     }
 
-    private function createUser(string $name, string $code = null): User
+    private function createUser(string $name, string $code = null): ReferencedUser
     {
-        $user = new User();
+        $user = new ReferencedUser();
         $user->_id = new ObjectId();
         $user->name = $name;
         if ($code) {
@@ -76,17 +75,19 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertParent($expected, User $model)
+    private function assertParent($expected, ReferencedUser $model)
     {
         $parent = $model->parent;
-        $this->assertInstanceOf(User::class, $parent);
+        $this->assertInstanceOf(ReferencedUser::class, $parent);
         $this->assertEquals($expected, $parent);
+        $this->assertEquals([$expected->_id], $model->parent_id); // TODO store as single code (not array)
     }
 
-    private function assertSon($expected, User $model)
+    private function assertSon($expected, ReferencedUser $model)
     {
         $son = $model->son;
-        $this->assertInstanceOf(User::class, $son);
+        $this->assertInstanceOf(ReferencedUser::class, $son);
         $this->assertEquals($expected, $son);
+        $this->assertSame([$expected->code], $model->arbitrary_field); // TODO store as single code (not array)
     }
 }

@@ -3,135 +3,121 @@ namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
 
-class ReferencesManyRelationTest extends IntegrationTestCase
+class EmbedsManyRelationTest extends IntegrationTestCase
 {
     public function testShouldRetrieveSiblingsOfUser()
     {
         // create sibling
         $chuck = $this->createUser('Chuck');
         $john = $this->createUser('John');
-        $john->siblings()->attach($chuck);
+        $john->siblings()->add($chuck);
 
         $this->assertSiblings([$chuck], $john);
         // hit cache
         $this->assertSiblings([$chuck], $john);
 
         $mary = $this->createUser('Mary');
-        $john->siblings()->attach($mary);
+        $john->siblings()->add($mary);
 
         $this->assertSiblings([$chuck, $mary], $john);
         // hit cache
         $this->assertSiblings([$chuck, $mary], $john);
 
         // remove one sibling
-        $john->siblings()->detach($chuck);
+        $john->siblings()->remove($chuck);
         $this->assertSiblings([$mary], $john);
         // hit cache
         $this->assertSiblings([$mary], $john);
 
         // replace siblings
         $bob = $this->createUser('Bob');
-        // unset($john->siblings_ids); // TODO make this work!
-        $john->siblings()->detachAll();
+        // unset($john->embedded_siblings); // TODO make this work!
+        $john->siblings()->removeAll();
         $this->assertEmpty($john->siblings->all());
-        $john->siblings()->attach($bob);
+        $john->siblings()->add($bob);
 
         $this->assertSiblings([$bob], $john);
         // hit cache
         $this->assertSiblings([$bob], $john);
 
         // remove with unembed
-        $john->siblings()->detach($bob);
+        $john->siblings()->remove($bob);
 
-        $this->assertEmpty($john->siblings_ids);
+        $this->assertEmpty($john->embedded_siblings);
         $this->assertEmpty($john->siblings->all());
     }
 
     public function testShouldRetrieveGrandsonsOfUser()
     {
         // create sibling
-        $chuck = $this->createUser('Chuck', '010');
-        $john = $this->createUser('John', '369');
-        $john->grandsons()->attach($chuck);
+        $chuck = $this->createUser('Chuck');
+        $john = $this->createUser('John');
+        $john->grandsons()->add($chuck);
 
-        $this->assertSame(['010'], $john->grandsons_codes);
+        $this->assertSame([$chuck], $john->other_arbitrary_field);
         $this->assertGrandsons([$chuck], $john);
         // hit cache
         $this->assertGrandsons([$chuck], $john);
 
-        $mary = $this->createUser('Mary', '222');
-        $john->grandsons()->attach($mary);
+        $mary = $this->createUser('Mary');
+        $john->grandsons()->add($mary);
 
-        $this->assertSame(['010', '222'], $john->grandsons_codes);
+        $this->assertSame([$chuck, $mary], $john->other_arbitrary_field);
         $this->assertGrandsons([$chuck, $mary], $john);
         // hit cache
         $this->assertGrandsons([$chuck, $mary], $john);
 
         // remove one sibling
-        $john->grandsons()->detach($chuck);
+        $john->grandsons()->remove($chuck);
 
-        $this->assertSame(['222'], $john->grandsons_codes);
+        $this->assertSame([$mary], $john->other_arbitrary_field);
         $this->assertGrandsons([$mary], $john);
         // hit cache
         $this->assertGrandsons([$mary], $john);
 
         // replace grandsons
-        $bob = $this->createUser('Bob', '987');
-        // unset($john->grandsons_codes); // TODO make this work!
-        $john->grandsons()->detachAll();
+        $bob = $this->createUser('Bob');
+        // unset($john->other_arbitrary_field); // TODO make this work!
+        $john->grandsons()->removeAll();
         $this->assertEmpty($john->grandsons->all());
-        $john->grandsons()->attach($bob);
+        $john->grandsons()->add($bob);
 
-        $this->assertSame(['987'], $john->grandsons_codes);
+        $this->assertSame([$bob], $john->other_arbitrary_field);
         $this->assertGrandsons([$bob], $john);
         // hit cache
         $this->assertGrandsons([$bob], $john);
 
         // remove with unembed
-        $john->grandsons()->detach($bob);
+        $john->grandsons()->remove($bob);
 
-        $this->assertEmpty($john->grandsons_codes);
+        $this->assertEmpty($john->other_arbitrary_field);
         $this->assertEmpty($john->grandsons->all());
     }
 
-    private function createUser(string $name, string $code = null): ReferencedUser
+    private function createUser(string $name): EmbeddedUser
     {
-        $user = new ReferencedUser();
+        $user = new EmbeddedUser();
         $user->_id = new ObjectId();
         $user->name = $name;
-        if ($code) {
-            $user->code = $code;
-        }
         $this->assertTrue($user->save());
 
         return $user;
     }
 
-    private function assertSiblings($expected, ReferencedUser $model)
+    private function assertSiblings($expected, EmbeddedUser $model)
     {
         $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
         $this->assertEquals($expected, $siblings->all());
-
-        foreach ($expected as $expectedModel) {
-            $ids[] = $expectedModel->_id;
-        }
-
-        $this->assertSame($ids, $model->siblings_ids);
+        $this->assertSame($expected, $model->embedded_siblings);
     }
 
-    private function assertGrandsons($expected, ReferencedUser $model)
+    private function assertGrandsons($expected, EmbeddedUser $model)
     {
         $grandsons = $model->grandsons;
         $this->assertInstanceOf(CursorInterface::class, $grandsons);
         $this->assertEquals($expected, $grandsons->all());
-
-        foreach ($expected as $expectedModel) {
-            $codes[] = $expectedModel->code;
-        }
-
-        $this->assertSame($codes, $model->grandsons_codes);
     }
 }
