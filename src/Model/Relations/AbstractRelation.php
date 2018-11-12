@@ -34,6 +34,12 @@ abstract class AbstractRelation implements RelationInterface
 
     public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $relationName)
     {
+        if ($relationName === $field) {
+            throw new InvalidFieldNameException(
+                "The field for relation \"{$relationName}\" cannot have the same name as the relation"
+            );
+        }
+
         $this->relationName = $relationName;
         $this->parent = $parent;
         $this->entity = $entity;

@@ -2,6 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Model\Relations\InvalidFieldNameException;
 use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
 
 class EmbedsOneRelationTest extends IntegrationTestCase
@@ -86,5 +87,18 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $this->assertInstanceOf(EmbeddedUser::class, $son);
         $this->assertEquals($expected, $son);
         $this->assertSame([$expected], $model->arbitrary_field); // TODO store as single array
+    }
+
+    public function testShouldCatchInvalidFieldNameOnRelations()
+    {
+        // Set
+        $user = new EmbeddedUser();
+
+        // Expectations
+        $this->expectException(InvalidFieldNameException::class);
+        $this->expectExceptionMessage('The field for relation "sameName" cannot have the same name as the relation');
+
+        // Actions
+        $user->sameName;
     }
 }

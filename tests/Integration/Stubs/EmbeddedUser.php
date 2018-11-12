@@ -47,4 +47,9 @@ class EmbeddedUser extends AbstractActiveRecord
     {
         return $this->embedsMany(EmbeddedUser::class, 'other_arbitrary_field');
     }
+
+    public function sameName()
+    {
+        $this->embedsOne(EmbeddedUser::class, 'sameName');
+    }
 }
