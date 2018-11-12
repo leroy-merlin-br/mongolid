@@ -277,13 +277,6 @@ class StubTestGrade extends stdClass
 
 class PolymorphableStudent extends stdClass implements PolymorphableInterface
 {
-    public function __construct($attr = [])
-    {
-        foreach ($attr as $key => $value) {
-            $this->$key = $value;
-        }
-    }
-
     public function polymorph()
     {
         return new StubStudent((array) $this);

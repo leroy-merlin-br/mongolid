@@ -8,7 +8,7 @@ namespace Mongolid\Model;
  *
  * See the docblock of the `polymorph` method for more details.
  *
- * @see Mongolid\DataMapper\EntityAssembler
+ * @see \Mongolid\DataMapper\EntityAssembler
  */
 interface PolymorphableInterface
 {
@@ -16,21 +16,27 @@ interface PolymorphableInterface
      * The polymorphic method is something that may be implemented in order to
      * make a model polymorphic. For example: You may have three models within
      * the same collection: `Content`, `ArticleContent` and `VideoContent`.
-     * By implementing the polymorph method it is possible to retrieve an
-     * `ArticleContent` or a `VideoContent` object object by simply querying
-     * within the `Content` model using first, find, where or all.
+     * By implementing the polymorph() method it is possible to retrieve an
+     * `ArticleContent` or a `VideoContent` object by simply querying
+     * within the `Content` model using `first()`, `where()` or `all()`, etc.
      *
-     * Example:
+     * @example
      *  public function polymorph()
      *  {
-     *      if ($this->video != null) {
-     *          $obj = new VideoContent;
-     *          $obj->fill($this->attributes();
+     *      if ($this->type === 'video') {
+     *          $video = new VideoContent();
+     *          $video->fill($this->getDocumentAttributes());
      *
-     *          return $obj;
-     *      } else {
-     *          return $this;
+     *          return $video;
      *      }
+     *      elseif ($this->type === 'article') {
+     *          $article = new ArticleContent();
+     *          $article->fill($this->getDocumentAttributes());
+     *
+     *          return $article;
+     *      }
+     *
+     *      return $this;
      *  }
      *
      * In the example above, if you call Content::first() and the content
