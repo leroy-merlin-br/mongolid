@@ -2,12 +2,9 @@
 namespace Mongolid\Model;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
-use Mongolid\Cursor\CursorFactory;
-use Mongolid\Cursor\CursorInterface;
+use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 
 class HasRelationsTraitTest extends TestCase
@@ -15,248 +12,135 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider referenceScenarios
      */
-    public function testShouldReferenceOne($entity, $field, $fieldValue, $useCache, $expectedQuery)
+    public function testShouldReferenceOne($fieldValue, $expectedQuery)
     {
         // Set
-        $expectedQuery = $expectedQuery['referencesOne'];
-        $model = m::mock(AbstractActiveRecord::class.'[]');
+        $model = new UserStub();
+        $model->refOne = $fieldValue;
+
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
-        $result = new class() extends AbstractSchema {
-        };
+        $expectedQuery = $expectedQuery['referencesOne'];
+        $expected = new RelatedStub();
 
-        $model->$field = $fieldValue;
-
-        $this->instance(get_class($entity), $entity);
-
-        // Act
+        // Expectations
         $dataMapper->expects()
-            ->first(m::type('array'), [], $useCache)
-            ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
-                $this->assertMongoQueryEquals($expectedQuery, $query);
+            ->first($expectedQuery, [], true)
+            ->andReturn($expected);
 
-                return $result;
-            });
+        // Actions
+        $result = $model->relationReferencesOne;
 
-        // Assert
-        $this->assertSame(
-            $result,
-            $this->callProtected($model, 'referencesOne', [get_class($entity), $field, $useCache])
-        );
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
      * @dataProvider referenceScenarios
      */
-    public function testShouldReferenceMany($entity, $field, $fieldValue, $useCache, $expectedQuery)
+    public function testShouldReferenceMany($fieldValue, $expectedQuery)
     {
         // Set
-        $expectedQuery = $expectedQuery['referencesMany'];
-        $model = m::mock(AbstractActiveRecord::class.'[]');
+        $model = new UserStub();
+        $model->refMany = $fieldValue;
+
         $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
-        $result = m::mock(CursorInterface::class);
+        $expectedQuery = $expectedQuery['referencesMany'];
+        $expected = new EmbeddedCursor(RelatedStub::class, []);
 
-        $model->$field = $fieldValue;
-
-        // Act
-        $this->instance(get_class($entity), $entity);
-
+        // Expectations
         $dataMapper->expects()
-            ->where(m::type('array'), [], $useCache)
-            ->andReturnUsing(function ($query) use ($result, $expectedQuery) {
-                $this->assertMongoQueryEquals($expectedQuery, $query);
+            ->where($expectedQuery, [], true)
+            ->andReturn($expected);
 
-                return $result;
-            });
+        // Actions
+        $result = $model->relationReferencesMany;
 
-        // Assert
-        $this->assertSame(
-            $result,
-            $this->callProtected($model, 'referencesMany', [get_class($entity), $field, $useCache])
+        // Assertions
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @dataProvider embedsScenarios
+     */
+    public function testShouldEmbedsOne($fieldValue, $expectedItems)
+    {
+        // Set
+        $model = new UserStub();
+        $model->embOne = $fieldValue;
+
+        // Act
+        $result = $model->relationEmbedsOne;
+        $values = array_map(
+            function ($item) {
+                return $item->getDocumentAttributes();
+            },
+            $result->all()
         );
+
+        // Assert
+        $this->assertInstanceOf(EmbeddedCursor::class, $result);
+        $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
+        $this->assertEquals($expectedItems, $values);
     }
 
     /**
      * @dataProvider embedsScenarios
      */
-    public function testShouldEmbedsOne($entity, $field, $fieldValue, $expectedItems)
+    public function testShouldEmbedsMany($fieldValue, $expectedItems)
     {
         // Set
-        $model = m::mock(AbstractActiveRecord::class.'[]');
-        $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
-        $cursor = m::mock(EmbeddedCursor::class);
-        $document = $fieldValue;
-        $model->$field = $document;
-
-        $instantiableClass = $entity instanceof AbstractSchema ? 'stdClass' : get_class($entity);
+        $model = new UserStub();
+        $model->embMany = $fieldValue;
 
         // Act
-        $cursorFactory->expects()
-            ->createEmbeddedCursor($instantiableClass, $expectedItems)
-            ->andReturn($cursor);
-
-        $cursor->expects()
-            ->first()
-            ->andReturn(new $instantiableClass());
-
-        // Assert
-        $result = $this->callProtected($model, 'embedsOne', [get_class($entity), $field]);
-        $this->assertInstanceOf($instantiableClass, $result);
-    }
-
-    /**
-     * @dataProvider embedsScenarios
-     */
-    public function testShouldEmbedsMany($entity, $field, $fieldValue, $expectedItems)
-    {
-        // Set
-        $model = m::mock(AbstractActiveRecord::class.'[]');
-        $cursorFactory = $this->instance(CursorFactory::class, m::mock(CursorFactory::class));
-        $cursor = m::mock(EmbeddedCursor::class);
-        $document = $fieldValue;
-        $model->$field = $document;
-
-        $instantiableClass = $entity instanceof AbstractSchema ? 'stdClass' : get_class($entity);
-
-        // Act
-        $cursorFactory->expects()
-            ->createEmbeddedCursor($instantiableClass, $expectedItems)
-            ->andReturn($cursor);
+        $result = $model->relationEmbedsMany;
+        $values = array_map(
+            function ($item) {
+                return $item->getDocumentAttributes();
+            },
+            $result->all()
+        );
 
         // Assert
-        $result = $this->callProtected($model, 'embedsMany', [get_class($entity), $field]);
-        $this->assertEquals($cursor, $result);
-    }
-
-    /**
-     * @dataProvider manipulativeMethods
-     */
-    public function testShouldEmbeddedUnembedAttachAndDetachDocuments($method)
-    {
-        // Set
-        $model = new class() {
-            use HasRelationsTrait;
-        };
-        $document = m::mock();
-        $documentEmbedder = $this->instance(DocumentEmbedder::class, m::mock(DocumentEmbedder::class));
-
-        // Act
-        $documentEmbedder->expects()
-            ->$method($model, 'foo', $document);
-
-        // Assert
-        $model->$method('foo', $document);
+        $this->assertInstanceOf(EmbeddedCursor::class, $result);
+        $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
+        $this->assertEquals($expectedItems, $values);
     }
 
     public function referenceScenarios()
     {
         return [
-            // -------------------------
-            'Schema referenced by numeric id' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
-                'fieldValue' => 12345,
-                'useCache' => true,
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => 12345],
-                    'referencesMany' => ['_id' => ['$in' => [12345]]],
-                ],
-            ],
-            // -------------------------
             'ActiveRecord referenced by string id' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
                 'fieldValue' => 'abc123',
-                'useCache' => true,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => 'abc123'],
                     'referencesMany' => ['_id' => ['$in' => ['abc123']]],
                 ],
             ],
-            // -------------------------
-            'Schema referenced by string objectId' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
-                'fieldValue' => ['553e3c80293fce6572ff2a40', '5571df31cf3fce544481a085'],
-                'useCache' => false,
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => '553e3c80293fce6572ff2a40'],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('553e3c80293fce6572ff2a40'), new ObjectID('5571df31cf3fce544481a085')]]],
-                ],
-            ],
-            // -------------------------
             'ActiveRecord referenced by objectId' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
                 'fieldValue' => '577afb0b4d3cec136058fa82',
-                'useCache' => true,
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
-                    'referencesMany' => ['_id' => ['$in' => ['577afb0b4d3cec136058fa82']]],
+                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
                 ],
             ],
-            // -------------------------
-            'Schema referenced with series of numeric ids' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
-                'fieldValue' => [1, 2, 3, 4, 5],
-                'useCache' => false,
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => 1],
-                    'referencesMany' => ['_id' => ['$in' => [1, 2, 3, 4, 5]]],
-                ],
-            ],
-            // -------------------------
             'ActiveRecord referenced with series of string objectIds' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
-                'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
-                'useCache' => false,
+                'fieldValue' => [new ObjectId('577afb0b4d3cec136058fa82'), new ObjectId('577afb7e4d3cec136258fa83')],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => '577afb0b4d3cec136058fa82'],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
+                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                    'referencesMany' => [
+                        '_id' => [
+                            '$in' => [
+                                new ObjectId('577afb0b4d3cec136058fa82'),
+                                new ObjectId('577afb7e4d3cec136258fa83'),
+                            ],
+                        ],
+                    ],
                 ],
             ],
-            // -------------------------
-            'Schema referenced with series of real objectIds' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
-                'fieldValue' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')],
-                'useCache' => true,
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectID('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectID('577afb0b4d3cec136058fa82'), new ObjectID('577afb7e4d3cec136258fa83')]]],
-                ],
-            ],
-            // -------------------------
+            // TODO should not hit database?
             'ActiveRecord referenced with null' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
                 'fieldValue' => null,
-                'useCache' => false,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => null],
                     'referencesMany' => ['_id' => ['$in' => []]],
@@ -268,57 +152,58 @@ class HasRelationsTraitTest extends TestCase
     public function embedsScenarios()
     {
         return [
-            // -------------------------
             'Embedded document referent to an Schema' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
-            // -------------------------
             'Embedded documents referent to an Schema' => [
-                'entity' => new class() extends AbstractSchema {
-                },
-                'field' => 'foo',
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
-            // -------------------------
             'Embedded document referent to an ActiveRecord entity' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
             ],
-            // -------------------------
             'Embedded documents referent to an ActiveRecord entity' => [
-                'entity' => new class() extends AbstractActiveRecord {
-                    /**
-                     * @var {inheritdoc}
-                     */
-                    protected $collection = 'foobar';
-                },
-                'field' => 'foo',
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
             ],
-            // -------------------------
         ];
+    }
+}
+
+class UserStub extends AbstractActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected $collection = 'users';
+
+    public function relationReferencesOne()
+    {
+        return $this->referencesOne(RelatedStub::class, 'refOne');
     }
 
-    public function manipulativeMethods()
+    public function relationReferencesMany()
     {
-        return [
-            ['embed'],
-            ['unembed'],
-            ['attach'],
-            ['detach'],
-        ];
+        return $this->referencesMany(RelatedStub::class, 'refMany');
     }
+
+    public function relationEmbedsOne()
+    {
+        return $this->embedsOne(RelatedStub::class, 'embOne');
+    }
+
+    public function relationEmbedsMany()
+    {
+        return $this->embedsMany(RelatedStub::class, 'embMany');
+    }
+}
+
+class RelatedStub extends AbstractActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected $collection = 'related';
 }

@@ -45,7 +45,7 @@ abstract class AbstractRelation
     abstract public function getResults();
 
     /**
-     * @return mixed
+     * @return string|null
      */
     private function guessRelationName()
     {

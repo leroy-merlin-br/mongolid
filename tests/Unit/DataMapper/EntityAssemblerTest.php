@@ -2,7 +2,7 @@
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Model\HasAttributesTrait;
 use Mongolid\Model\PolymorphableInterface;
@@ -40,7 +40,7 @@ class EntityAssemblerTest extends TestCase
 
             'A simple schema to a entity' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,
@@ -59,7 +59,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
                 'expectedOutput' => new StubStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,
@@ -70,7 +70,7 @@ class EntityAssemblerTest extends TestCase
 
             'A schema containing an embedded schema but with null field' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => null,
@@ -98,7 +98,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
                 'expectedOutput' => new StubStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => null,
@@ -110,11 +110,11 @@ class EntityAssemblerTest extends TestCase
 
             'A stdClass with a schema containing an embedded schema with a document directly into the field' => [
                 'inputValue' => (object) [ // Data that will be used to assembly the entity
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
-                        '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
+                        '_id' => new ObjectId('507f1f77bcf86cd7994390ea'),
                         'subject' => 'math',
                         'grade' => 7.25,
                     ],
@@ -142,12 +142,12 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
                 'expectedOutput' => new StubStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
                         new StubTestGrade([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
+                            '_id' => new ObjectId('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
                         ]),
@@ -160,17 +160,17 @@ class EntityAssemblerTest extends TestCase
 
             'A schema containing an embedded schema with multiple documents in the field' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
                         [
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
+                            '_id' => new ObjectId('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
                         ],
                         [
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390eb'),
+                            '_id' => new ObjectId('507f1f77bcf86cd7994390eb'),
                             'subject' => 'english',
                             'grade' => 9.0,
                         ],
@@ -199,17 +199,17 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
                 'expectedOutput' => new StubStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
                         new StubTestGrade([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
+                            '_id' => new ObjectId('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
                         ]),
                         new StubTestGrade([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390eb'),
+                            '_id' => new ObjectId('507f1f77bcf86cd7994390eb'),
                             'subject' => 'english',
                             'grade' => 9.0,
                         ]),
@@ -222,7 +222,7 @@ class EntityAssemblerTest extends TestCase
 
             'A simple schema with a polymorphable interface' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,
@@ -241,7 +241,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
                 'expectedOutput' => new StubStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,

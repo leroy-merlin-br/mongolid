@@ -12,7 +12,7 @@ class ObjectIdUtils
     /**
      * Checks if the given value can be a valid ObjectId.
      *
-     * @param mixed $value string to be evaluated if it can be used as a valid ObjectID
+     * @param mixed $value string to be evaluated if it can be used as a valid ObjectId
      *
      * @return bool true if is valid
      */

@@ -69,7 +69,7 @@ trait HasRelationsTrait
      *
      * @return mixed
      */
-    public function getRelation(string $relation)
+    public function &getRelation(string $relation)
     {
         return $this->relations[$relation];
     }

@@ -2,7 +2,7 @@
 namespace Mongolid\Schema;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\TestCase;
 use Mongolid\Util\SequenceService;
@@ -35,7 +35,7 @@ class AbstractSchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
     }
@@ -61,7 +61,7 @@ class AbstractSchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
 

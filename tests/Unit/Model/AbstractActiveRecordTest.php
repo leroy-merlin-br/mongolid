@@ -1,9 +1,7 @@
 <?php
 namespace Mongolid\Model;
 
-use BadMethodCallException;
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
@@ -364,64 +362,6 @@ class AbstractActiveRecordTest extends TestCase
     public function testShouldGetCollectionName()
     {
         $this->assertSame('mongolid', $this->entity->getCollectionName());
-    }
-
-    public function testShouldAttachToAttribute()
-    {
-        $entity = new class() extends AbstractActiveRecord
-        {
-            /**
-             * @var {inheritdoc}
-             */
-            protected $collection = 'collection_name';
-
-            public function class()
-            {
-                return $this->referencesOne(stdClass::class, 'courseClass');
-            }
-        };
-        $embedded = new stdClass();
-        $embedded->_id = new ObjectID();
-        $embedded->name = 'Course Class #1';
-        $entity->attachToCourseClass($embedded);
-
-        $this->assertSame([$embedded->_id], $entity->courseClass);
-    }
-
-    public function testShouldEmbedToAttribute()
-    {
-        $this->entity = new class() extends AbstractActiveRecord
-        {
-            /**
-             * @var {inheritdoc}
-             */
-            protected $collection = 'collection_name';
-
-            public function classes()
-            {
-                return $this->embedsMany(stdClass::class, 'courseClasses');
-            }
-        };
-        $embedded = new stdClass();
-        $embedded->name = 'Course Class #1';
-        $this->entity->embedToCourseClasses($embedded);
-
-        $this->assertSame('Course Class #1', $this->entity->classes()->first()->name);
-    }
-
-    public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
-    {
-        $this->entity = new class() extends AbstractActiveRecord
-        {
-            /**
-             * @var {inheritdoc}
-             */
-            protected $collection = 'collection_name';
-        };
-
-        $this->expectException(BadMethodCallException::class);
-
-        $this->entity->foobar();
     }
 
     public function testShouldGetSetWriteConcernInActiveRecordClass()

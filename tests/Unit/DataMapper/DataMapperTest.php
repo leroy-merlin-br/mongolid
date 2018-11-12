@@ -3,7 +3,7 @@ namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
@@ -949,12 +949,12 @@ class DataMapperTest extends TestCase
             // ------------------------
             'An ObjectId string' => [
                 'value' => '507f1f77bcf86cd799439011',
-                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
+                'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
             ],
             // ------------------------
             'An ObjectId string within a query' => [
                 'value' => ['_id' => '507f1f77bcf86cd799439011'],
-                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
+                'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
             ],
             // ------------------------
             'Other type of _id, sequence for example' => [
@@ -967,8 +967,8 @@ class DataMapperTest extends TestCase
                 'expectation' => [
                     '_id' => [
                         '$in' => [
-                            new ObjectID('507f1f77bcf86cd799439011'),
-                            new ObjectID('507f1f77bcf86cd799439012'),
+                            new ObjectId('507f1f77bcf86cd799439011'),
+                            new ObjectId('507f1f77bcf86cd799439012'),
                         ],
                     ],
                 ],
@@ -976,7 +976,7 @@ class DataMapperTest extends TestCase
             // ------------------------
             'Series of string _ids as the $in parameter' => [
                 'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
-                'expectation' => ['_id' => ['$nin' => [new ObjectID('507f1f77bcf86cd799439011')]]],
+                'expectation' => ['_id' => ['$nin' => [new ObjectId('507f1f77bcf86cd799439011')]]],
             ],
         ];
     }

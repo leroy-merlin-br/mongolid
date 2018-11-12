@@ -18,9 +18,11 @@
     <!-- Excluded patterns in some folders -->
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>tests/Unit/DataMapper/EntityAssemblerTest.php</exclude-pattern>
+        <exclude-pattern>tests/Unit/Model/HasRelationsTraitTest.php</exclude-pattern>
     </rule>
     <!-- Multiple classes confuses this sniff -->
     <rule ref="Squiz.Classes.ClassFileName.NoMatch">
         <exclude-pattern>tests/Unit/DataMapper/EntityAssemblerTest.php</exclude-pattern>
+        <exclude-pattern>tests/Unit/Model/HasRelationsTraitTest.php</exclude-pattern>
     </rule>
 </ruleset>
