@@ -18,9 +18,16 @@ class ReferencesMany extends AbstractRelation
      */
     protected $entityInstance;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, bool $cacheable = true)
+    /**
+     * @var string
+     */
+    protected $key;
+
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, bool $cacheable = true)
     {
         parent::__construct($parent, $entity, $field);
+        $this->key = $key;
+        $this->documentEmbedder->setKey($key);
         $this->cacheable = $cacheable;
         $this->entityInstance = Ioc::make($this->entity);
     }
@@ -59,16 +66,16 @@ class ReferencesMany extends AbstractRelation
 
     public function getResults()
     {
-        $referencedIds = (array) $this->parent->{$this->field};
+        $referencedKeys = (array) $this->parent->{$this->field};
 
-        if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
-            foreach ($referencedIds as $key => $value) {
-                $referencedIds[$key] = new ObjectId((string) $value);
+        if (ObjectIdUtils::isObjectId($referencedKeys[0] ?? '')) {
+            foreach ($referencedKeys as $key => $value) {
+                $referencedKeys[$key] = new ObjectId((string) $value);
             }
         }
 
         return $this->entityInstance->where(
-            ['_id' => ['$in' => array_values($referencedIds)]],
+            [$this->key => ['$in' => array_values($referencedKeys)]],
             [],
             $this->cacheable
         );

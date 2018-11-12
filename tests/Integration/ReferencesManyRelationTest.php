@@ -48,11 +48,61 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertEmpty($john->siblings->all());
     }
 
-    private function createUser(string $name): User
+    public function testShouldRetrieveGrandsonsOfUser()
+    {
+        // create sibling
+        $chuck = $this->createUser('Chuck', '010');
+        $john = $this->createUser('John', '369');
+        $john->grandsons()->attach($chuck);
+
+        $this->assertSame(['010'], $john->grandsons_ids);
+        $this->assertGrandsons([$chuck], $john);
+        // hit cache
+        $this->assertGrandsons([$chuck], $john);
+
+        $mary = $this->createUser('Mary', '222');
+        $john->grandsons()->attach($mary);
+
+        $this->assertSame(['010', '222'], $john->grandsons_ids);
+        $this->assertGrandsons([$chuck, $mary], $john);
+        // hit cache
+        $this->assertGrandsons([$chuck, $mary], $john);
+
+        // remove one sibling
+        $john->grandsons()->detach($chuck);
+
+        $this->assertSame(['222'], $john->grandsons_ids);
+        $this->assertGrandsons([$mary], $john);
+        // hit cache
+        $this->assertGrandsons([$mary], $john);
+
+        // replace grandsons
+        $bob = $this->createUser('Bob', '987');
+        // unset($john->grandsons_ids); // TODO make this work!
+        $john->grandsons()->detachAll();
+        $this->assertEmpty($john->grandsons->all());
+        $john->grandsons()->attach($bob);
+
+        $this->assertSame(['987'], $john->grandsons_ids);
+        $this->assertGrandsons([$bob], $john);
+        // hit cache
+        $this->assertGrandsons([$bob], $john);
+
+        // remove with unembed
+        $john->grandsons()->detach($bob);
+
+        $this->assertEmpty($john->grandsons_ids);
+        $this->assertEmpty($john->grandsons->all());
+    }
+
+    private function createUser(string $name, string $code = null): User
     {
         $user = new User();
         $user->_id = new ObjectId();
         $user->name = $name;
+        if ($code) {
+            $user->code = $code;
+        }
         $this->assertTrue($user->save());
 
         return $user;
@@ -63,5 +113,12 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
         $this->assertEquals($expected, $siblings->all());
+    }
+
+    private function assertGrandsons($expected, User $model)
+    {
+        $grandsons = $model->grandsons;
+        $this->assertInstanceOf(CursorInterface::class, $grandsons);
+        $this->assertEquals($expected, $grandsons->all());
     }
 }

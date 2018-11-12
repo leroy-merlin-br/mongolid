@@ -13,18 +13,18 @@ class ReferencesOne extends ReferencesMany
 
     public function getResults()
     {
-        $referencedId = $this->parent->{$this->field};
+        $referencedKey = $this->parent->{$this->field};
 
-        if (is_array($referencedId) && isset($referencedId[0])) {
-            $referencedId = $referencedId[0];
+        if (is_array($referencedKey) && isset($referencedKey[0])) {
+            $referencedKey = $referencedKey[0];
         }
 
-        if (ObjectIdUtils::isObjectId($referencedId)) {
-            $referencedId = new ObjectId((string) $referencedId);
+        if (ObjectIdUtils::isObjectId($referencedKey)) {
+            $referencedKey = new ObjectId((string) $referencedKey);
         }
 
         return $this->entityInstance->first(
-            ['_id' => $referencedId],
+            [$this->key => $referencedKey],
             [],
             $this->cacheable
         );

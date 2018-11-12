@@ -37,4 +37,14 @@ class User extends AbstractActiveRecord
     {
         return $this->referencesMany(User::class, 'siblings_ids');
     }
+
+    public function son()
+    {
+        return $this->referencesOne(User::class, 'son_id', 'code');
+    }
+
+    public function grandsons()
+    {
+        return $this->referencesMany(User::class, 'grandsons_ids', 'code');
+    }
 }

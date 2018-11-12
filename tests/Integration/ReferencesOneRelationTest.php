@@ -33,11 +33,44 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $this->assertNull($john->parent);
     }
 
-    private function createUser(string $name): User
+    public function testShouldRetrieveSonOfUser()
+    {
+        // create parent
+        $chuck = $this->createUser('Chuck', '010');
+        $john = $this->createUser('John', '369');
+        $john->son()->attach($chuck);
+
+        $this->assertSame(['010'], $john->son_id); // TODO store as single code (not array)
+        $this->assertSon($chuck, $john);
+        // hit cache
+        $this->assertSon($chuck, $john);
+
+        // replace son
+        $bob = $this->createUser('Bob', '987');
+        $john->son()->detach(); //todo remove this line and ensure only one son is attached
+        $john->son()->attach($bob);
+
+        $this->assertSame(['987'], $john->son_id);
+        $this->assertSon($bob, $john);
+        // hit cache
+        $this->assertSon($bob, $john);
+
+        // remove
+        //unset($john->son_id);// TODO make this work!
+        $john->son()->detach();
+
+        $this->assertNull($john->son_id);
+        $this->assertNull($john->son);
+    }
+
+    private function createUser(string $name, string $code = null): User
     {
         $user = new User();
         $user->_id = new ObjectId();
         $user->name = $name;
+        if ($code) {
+            $user->code = $code;
+        }
         $this->assertTrue($user->save());
 
         return $user;
@@ -48,5 +81,12 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $parent = $model->parent;
         $this->assertInstanceOf(User::class, $parent);
         $this->assertEquals($expected, $parent);
+    }
+
+    private function assertSon($expected, User $model)
+    {
+        $son = $model->son;
+        $this->assertInstanceOf(User::class, $son);
+        $this->assertEquals($expected, $son);
     }
 }

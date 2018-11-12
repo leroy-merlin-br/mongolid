@@ -22,12 +22,13 @@ trait HasRelationsTrait
      * Returns the referenced document as object.
      *
      * @param string $entity    class of the entity or of the schema of the entity
-     * @param string $field     the field where the _id is stored
+     * @param string $field     the field where the $key is stored
+     * @param string $key       the field that the document will be referenced by (usually _id)
      * @param bool   $cacheable retrieves a CacheableCursor instead
      */
-    protected function referencesOne(string $entity, string $field, bool $cacheable = true): ReferencesOne
+    protected function referencesOne(string $entity, string $field, string $key = '_id', bool $cacheable = true): ReferencesOne
     {
-        return new ReferencesOne($this, $entity, $field, $cacheable);
+        return new ReferencesOne($this, $entity, $field, $key, $cacheable);
     }
 
     /**
@@ -37,9 +38,9 @@ trait HasRelationsTrait
      * @param string $field     the field where the _ids are stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true): ReferencesMany
+    protected function referencesMany(string $entity, string $field, string $key = '_id', bool $cacheable = true): ReferencesMany
     {
-        return new ReferencesMany($this, $entity, $field, $cacheable);
+        return new ReferencesMany($this, $entity, $field, $key, $cacheable);
     }
 
     /**
