@@ -101,9 +101,4 @@ trait HasRelationsTrait
     {
         unset($this->relations[$relation]);
     }
-
-    public function getRelations(): array
-    {
-        return $this->relations;
-    }
 }
