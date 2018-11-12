@@ -112,6 +112,35 @@ class BulkWriteTest extends TestCase
         $bulkWrite->updateOne($id, $data, ['upsert' => true], '$unset');
     }
 
+    public function testShouldUpdateOneWithQueryOnFilterToBulkWrite()
+    {
+        // Arrange
+        $entity = m::mock(HasSchemaInterface::class);
+        $mongoBulkWrite = m::mock(new MongoBulkWrite());
+
+        $query = ['_id' => '123', 'grades.grade' => 85];
+        $data = ['grades.std' => 6];
+
+        // Expect
+        $entity->shouldReceive('getSchema')
+            ->withNoArgs()
+            ->once();
+
+        $mongoBulkWrite->shouldReceive('update')
+            ->with($query, ['$unset' => $data], ['upsert' => true])
+            ->once();
+
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
+
+        $bulkWrite->shouldReceive('getBulkWrite')
+            ->with()
+            ->once()
+            ->andReturn($mongoBulkWrite);
+
+        // Act
+        $bulkWrite->updateOne($query, $data, ['upsert' => true], '$unset');
+    }
+
     public function testShouldExecuteBulkWrite()
     {
         $entity = m::mock(HasSchemaInterface::class);

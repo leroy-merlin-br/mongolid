@@ -92,8 +92,10 @@ class BulkWrite
         array $options = ['upsert' => true],
         string $operator = '$set'
     ) {
+        $filter = is_array($id) ? $id : ['_id' => $id];
+
         return $this->getBulkWrite()->update(
-            ['_id' => $id],
+            $filter,
             [$operator => $dataToSet],
             $options
         );
