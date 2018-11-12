@@ -72,7 +72,7 @@ trait HasRelationsTrait
         $relationName = $this->guessRelationName();
         $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
 
-        return new ReferencesOne($this, $entity, $field, $key, $relationName, $cacheable);
+        return new ReferencesOne($this, $entity, $field, $relationName, $key, $cacheable);
     }
 
     /**
@@ -91,7 +91,7 @@ trait HasRelationsTrait
         $relationName = $this->guessRelationName();
         $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
 
-        return new ReferencesMany($this, $entity, $field, $key, $relationName, $cacheable);
+        return new ReferencesMany($this, $entity, $field, $relationName, $key, $cacheable);
     }
 
     /**

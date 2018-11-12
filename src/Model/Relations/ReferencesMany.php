@@ -23,7 +23,7 @@ class ReferencesMany extends AbstractRelation
      */
     protected $key;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, string $relationName, bool $cacheable = true)
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $relationName, string $key, bool $cacheable = true)
     {
         parent::__construct($parent, $entity, $field, $relationName);
         $this->key = $key;
