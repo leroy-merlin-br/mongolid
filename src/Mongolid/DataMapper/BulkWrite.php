@@ -75,24 +75,24 @@ class BulkWrite
     }
 
     /**
-     * Add an `update` operation to the Bulk, where only one record is updated, by `_id`.
+     * Add an `update` operation to the Bulk, where only one record is updated, by `_id` or `query`.
      * Be aware that working with multiple levels of nesting on `$dataToSet` may have
      * an undesired behavior that could lead to data loss on a specific key.
      *
      * @see https://docs.mongodb.com/manual/reference/operator/update/set/#set-top-level-fields
      *
-     * @param ObjectId|string $id
-     * @param array           $dataToSet
-     * @param array           $options
-     * @param string          $operator
+     * @param ObjectId|string|array $id
+     * @param array                 $dataToSet
+     * @param array                 $options
+     * @param string                $operator
      */
     public function updateOne(
-        $id,
+        $filter,
         array $dataToSet,
         array $options = ['upsert' => true],
         string $operator = '$set'
     ) {
-        $filter = is_array($id) ? $id : ['_id' => $id];
+        $filter = is_array($filter) ?: ['_id' => $filter];
 
         return $this->getBulkWrite()->update(
             $filter,
