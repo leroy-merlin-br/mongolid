@@ -68,19 +68,14 @@ class HasRelationsTraitTest extends TestCase
         $model = new UserStub();
         $model->embOne = $fieldValue;
 
+        $expectedItems = $expectedItems['embedsOne'];
+
         // Act
         $result = $model->relationEmbedsOne;
-        $values = array_map(
-            function ($item) {
-                return $item->getDocumentAttributes();
-            },
-            $result->all()
-        );
 
         // Assert
-        $this->assertInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
-        $this->assertEquals($expectedItems, $values);
+        $this->assertInstanceOf(RelatedStub::class, $result);
+        $this->assertEquals($expectedItems, $result->getDocumentAttributes());
     }
 
     /**
@@ -91,6 +86,8 @@ class HasRelationsTraitTest extends TestCase
         // Set
         $model = new UserStub();
         $model->embMany = $fieldValue;
+
+        $expectedItems = $expectedItems['embedsMany'];
 
         // Act
         $result = $model->relationEmbedsMany;
@@ -154,19 +151,34 @@ class HasRelationsTraitTest extends TestCase
         return [
             'Embedded document referent to an Schema' => [
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
-                'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
+                'expectedItems' => [
+                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
+                    'embedsMany' => [['_id' => 12345, 'name' => 'batata']],
+                ],
             ],
             'Embedded documents referent to an Schema' => [
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
-                'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'expectedItems' => [
+                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
+                    'embedsMany' => [
+                        ['_id' => 12345, 'name' => 'batata'],
+                        ['_id' => 67890, 'name' => 'bar'],
+                    ],
+                ],
             ],
             'Embedded document referent to an ActiveRecord entity' => [
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
-                'expectedItems' => [['_id' => 12345, 'name' => 'batata']],
+                'expectedItems' => [
+                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
+                    'embedsMany' => [['_id' => 12345, 'name' => 'batata']],
+                ],
             ],
             'Embedded documents referent to an ActiveRecord entity' => [
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
-                'expectedItems' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'expectedItems' => [
+                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
+                    'embedsMany' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                ],
             ],
         ];
     }

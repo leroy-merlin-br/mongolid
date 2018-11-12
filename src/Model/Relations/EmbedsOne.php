@@ -20,6 +20,6 @@ class EmbedsOne extends EmbedsMany
         }
 
         return Ioc::make(CursorFactory::class)
-            ->createEmbeddedCursor($this->entity, $items);
+            ->createEmbeddedCursor($this->entity, $items)->first();
     }
 }
