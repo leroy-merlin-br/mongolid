@@ -107,22 +107,43 @@ class HasRelationsTraitTest extends TestCase
     public function referenceScenarios()
     {
         return [
-            'ActiveRecord referenced by string id' => [
+            'referenced by string id' => [
                 'fieldValue' => 'abc123',
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => 'abc123'],
                     'referencesMany' => ['_id' => ['$in' => ['abc123']]],
                 ],
             ],
-            'ActiveRecord referenced by objectId' => [
+            'referenced by objectId represented as string' => [
                 'fieldValue' => '577afb0b4d3cec136058fa82',
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
                     'referencesMany' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
                 ],
             ],
-            'ActiveRecord referenced with series of string objectIds' => [
+            'referenced by an objectId itself' => [
+                'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
+                'expectedQuery' => [
+                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                    'referencesMany' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
+                ],
+            ],
+            'series of objectIds' => [
                 'fieldValue' => [new ObjectId('577afb0b4d3cec136058fa82'), new ObjectId('577afb7e4d3cec136258fa83')],
+                'expectedQuery' => [
+                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                    'referencesMany' => [
+                        '_id' => [
+                            '$in' => [
+                                new ObjectId('577afb0b4d3cec136058fa82'),
+                                new ObjectId('577afb7e4d3cec136258fa83'),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'series of objectIds as strings' => [
+                'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
                     'referencesMany' => [
@@ -149,31 +170,14 @@ class HasRelationsTraitTest extends TestCase
     public function embedsScenarios()
     {
         return [
-            'Embedded document referent to an Schema' => [
+            'A single embedded document' => [
                 'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
                 'expectedItems' => [
                     'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
                     'embedsMany' => [['_id' => 12345, 'name' => 'batata']],
                 ],
             ],
-            'Embedded documents referent to an Schema' => [
-                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
-                'expectedItems' => [
-                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
-                    'embedsMany' => [
-                        ['_id' => 12345, 'name' => 'batata'],
-                        ['_id' => 67890, 'name' => 'bar'],
-                    ],
-                ],
-            ],
-            'Embedded document referent to an ActiveRecord entity' => [
-                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
-                'expectedItems' => [
-                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
-                    'embedsMany' => [['_id' => 12345, 'name' => 'batata']],
-                ],
-            ],
-            'Embedded documents referent to an ActiveRecord entity' => [
+            'Many embedded documents' => [
                 'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
                 'expectedItems' => [
                     'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
