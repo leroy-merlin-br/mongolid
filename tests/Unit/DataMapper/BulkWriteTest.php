@@ -6,8 +6,8 @@ use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\HasSchemaInterface;
-use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 
 class BulkWriteTest extends TestCase
@@ -101,7 +101,7 @@ class BulkWriteTest extends TestCase
     public function testShouldExecuteBulkWrite()
     {
         $entity = m::mock(HasSchemaInterface::class);
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $entity->schema = $schema;
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
         $connection = $this->instance(Connection::class, m::mock(Connection::class));

@@ -3,9 +3,9 @@ namespace Mongolid\Cursor;
 
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Model\ActiveRecord;
+use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
-use Mongolid\Schema\Schema;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -152,15 +152,15 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Retrieve a schema based on Entity Class.
      */
-    protected function getSchemaForEntity(): Schema
+    protected function getSchemaForEntity(): AbstractSchema
     {
-        if ($this->entityClass instanceof Schema) {
+        if ($this->entityClass instanceof AbstractSchema) {
             return $this->entityClass;
         }
 
         $model = new $this->entityClass();
 
-        if ($model instanceof ActiveRecord) {
+        if ($model instanceof AbstractActiveRecord) {
             return $model->getSchema();
         }
 

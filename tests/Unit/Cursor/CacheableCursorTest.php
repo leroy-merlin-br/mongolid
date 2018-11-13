@@ -6,7 +6,7 @@ use ErrorException;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -209,7 +209,7 @@ class CacheableCursorTest extends TestCase
         $driverCursor = null
     ) {
         if (!$entitySchema) {
-            $entitySchema = m::mock(Schema::class.'[]');
+            $entitySchema = m::mock(AbstractSchema::class.'[]');
         }
 
         if (!$collection) {

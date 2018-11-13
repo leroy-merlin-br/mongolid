@@ -2,133 +2,16 @@
 namespace Mongolid\Model;
 
 use Mongolid\TestCase;
-use stdClass;
 
-class AttributesTest extends TestCase
+class HasAttributesTraitTest extends TestCase
 {
-    public function testShouldHaveDynamicSetters()
-    {
-        // Arrange
-        $model = new class()
-        {
-            use Attributes;
-        };
-
-        $childObj = new stdClass();
-
-        // Assert
-        $model->name = 'John';
-        $model->age = 25;
-        $model->child = $childObj;
-        $this->assertSame(
-            [
-                'name' => 'John',
-                'age' => 25,
-                'child' => $childObj,
-            ],
-            $model->getDocumentAttributes()
-        );
-    }
-
-    public function testShouldHaveDynamicGetters()
-    {
-        // Arrange
-        $child = new stdClass();
-        $attributes = [
-            'name' => 'John',
-            'age' => 25,
-            'child' => $child,
-        ];
-
-        $model = new class($attributes)
-        {
-            use Attributes;
-
-            public function __construct(array $attributes)
-            {
-                $this->attributes = $attributes;
-            }
-        };
-
-        // Assert
-        $this->assertEquals('John', $model->name);
-        $this->assertEquals(25, $model->age);
-        $this->assertEquals($child, $model->child);
-        $this->assertEquals(null, $model->nonexistant);
-    }
-
-    public function testShouldCheckIfAttributeIsSet()
-    {
-        // Arrange
-        $model = new class(['name' => 'John', 'ignored' => null])
-        {
-            use Attributes;
-
-            public function __construct(array $attributes)
-            {
-                $this->attributes = $attributes;
-            }
-        };
-
-        // Assert
-        $this->assertTrue(isset($model->name));
-        $this->assertFalse(isset($model->nonexistant));
-        $this->assertFalse(isset($model->ignored));
-    }
-
-    public function testShouldCheckIfMutatedAttributeIsSet()
-    {
-        // Arrange
-        $model = new class()
-        {
-            use Attributes;
-
-            public function __construct()
-            {
-                $this->mutable = true;
-            }
-
-            public function getNameDocumentAttribute()
-            {
-                return 'John';
-            }
-        };
-
-        // Assert
-        $this->assertTrue(isset($model->name));
-        $this->assertFalse(isset($model->nonexistant));
-    }
-
-    public function testShouldUnsetAttributes()
-    {
-        // Arrange
-        $model = new class()
-        {
-            use Attributes;
-
-            public function __construct()
-            {
-                $this->attributes = [
-                    'name' => 'John',
-                    'age' => 25,
-                ];
-            }
-        };
-
-        // Act
-        unset($model->age);
-        $result = $model->getDocumentAttributes();
-
-        // Assert
-        $this->assertSame(['name' => 'John'], $result);
-    }
-
     public function testShouldGetAttributeFromMutator()
     {
-        // Arrange
+        // Set
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {
@@ -141,11 +24,11 @@ class AttributesTest extends TestCase
             }
         };
 
-        $model->short_name = 'My awesome name';
+        $model->setDocumentAttribute('short_name', 'My awesome name');
+        $result = $model->getDocumentAttribute('short_name');
 
-        // Assert
-        $this->assertEquals('Other name', $model->short_name);
-        $this->assertEquals('Other name', $model->getDocumentAttribute('short_name'));
+        // Assertions
+        $this->assertSame('Other name', $result);
     }
 
     public function testShouldIgnoreMutators()
@@ -153,7 +36,8 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function getShortNameDocumentAttribute()
             {
@@ -166,11 +50,11 @@ class AttributesTest extends TestCase
             }
         };
 
-        $model->short_name = 'My awesome name';
+        $model->setDocumentAttribute('short_name', 'My awesome name');
+        $result = $model->getDocumentAttribute('short_name');
 
         // Assert
-        $this->assertEquals('My awesome name', $model->short_name);
-        $this->assertEquals('My awesome name', $model->getDocumentAttribute('short_name'));
+        $this->assertSame('My awesome name', $result);
     }
 
     public function testShouldSetAttributeFromMutator()
@@ -178,7 +62,8 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {
@@ -191,10 +76,11 @@ class AttributesTest extends TestCase
             }
         };
 
-        $model->short_name = 'My awesome name';
+        $model->setDocumentAttribute('short_name', 'My awesome name');
+        $result = $model->getDocumentAttribute('short_name');
 
         // Assert
-        $this->assertSame('MY AWESOME NAME', $model->short_name);
+        $this->assertSame('MY AWESOME NAME', $result);
     }
 
     /**
@@ -209,7 +95,8 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class($fillable, $guarded)
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct(array $fillable, array $guarded)
             {
@@ -230,7 +117,8 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
         $input = [
@@ -242,7 +130,7 @@ class AttributesTest extends TestCase
         $model->fill($input, true);
 
         // Assert
-        $this->assertTrue($model->not_allowed_attribute);
+        $this->assertTrue($model->getDocumentAttribute('not_allowed_attribute'));
     }
 
     public function testShouldBeCastableToArray()
@@ -250,14 +138,15 @@ class AttributesTest extends TestCase
         // Arrange
         $model = new class()
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
-        $model->name = 'John';
-        $model->age = 25;
+        $model->setDocumentAttribute('name', 'John');
+        $model->setDocumentAttribute('age', 25);
 
         // Assert
-        $this->assertEquals(
+        $this->assertSame(
             ['name' => 'John', 'age' => 25],
             $model->toArray()
         );
@@ -266,9 +155,10 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface
+        $model = new class() implements HasAttributesInterface
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
         $model->name = 'John';
@@ -284,9 +174,10 @@ class AttributesTest extends TestCase
     public function testShouldFallbackOriginalAttributesIfUnserializationFails()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface
+        $model = new class() implements HasAttributesInterface
         {
-            use Attributes;
+            use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {
@@ -365,5 +256,41 @@ class AttributesTest extends TestCase
                 ],
             ],
         ];
+    }
+
+
+    public function testShouldCheckIfAttributeIsSet()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+        };
+        $model->fill(['name' => 'John', 'ignored' => null]);
+
+        // Assertions
+        $this->assertTrue(isset($model->name));
+        $this->assertFalse(isset($model->nonexistant));
+        $this->assertFalse(isset($model->ignored));
+    }
+
+    public function testShouldCheckIfMutatedAttributeIsSet()
+    {
+        // Set
+        $model = new class() extends AbstractActiveRecord
+        {
+            /**
+             * {@inheritdoc}
+             */
+            public $mutable = true;
+
+            public function getNameDocumentAttribute()
+            {
+                return 'John';
+            }
+        };
+
+        // Assertions
+        $this->assertTrue(isset($model->name));
+        $this->assertFalse(isset($model->nonexistant));
     }
 }

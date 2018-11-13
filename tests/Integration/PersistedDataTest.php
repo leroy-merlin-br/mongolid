@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Tests\Integration\Stubs\User;
+use Mongolid\Tests\Integration\Stubs\ReferencedUser;
 
 class PersistedDataTest extends IntegrationTestCase
 {
@@ -131,9 +131,9 @@ class PersistedDataTest extends IntegrationTestCase
         $this->assertSame($expected, $result);
     }
 
-    private function getUser(bool $save = false): User
+    private function getUser(bool $save = false): ReferencedUser
     {
-        $user = new User();
+        $user = new ReferencedUser();
         $user->_id = $this->_id;
         $user->name = 'John Doe';
         $user->age = 25;

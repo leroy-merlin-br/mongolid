@@ -9,129 +9,130 @@ use MongoDB\BSON\ObjectId;
 class DocumentEmbedder
 {
     /**
+     * @var string
+     */
+    private $key;
+
+    public function __construct(string $key = '_id')
+    {
+        $this->setKey($key);
+    }
+
+    public function setKey(string $key): void
+    {
+        $this->key = $key;
+    }
+
+    /**
      * Embeds the given $entity into $field of $parent. This method will also
-     * consider the _id of the $entity in order to update it if it is already
+     * consider the key of the $entity in order to update it if it is already
      * present in $field.
      *
      * @param mixed  $parent the object where the $entity will be embedded
      * @param string $field  name of the field of the object where the document will be embedded
      * @param mixed  $entity entity that will be embedded within $parent
-     *
-     * @return bool Success
      */
     public function embed($parent, string $field, &$entity): bool
     {
         // In order to update the document if it exists inside the $parent
         $this->unembed($parent, $field, $entity);
 
-        $fieldValue = $parent->$field;
-        $fieldValue[] = $entity;
-        $parent->$field = array_values($fieldValue);
+        $parent->$field[] = $entity;
 
         return true;
     }
 
     /**
      * Removes the given $entity from $field of $parent. This method will
-     * consider the _id of the $entity in order to remove it.
+     * consider the key of the $entity in order to remove it.
      *
      * @param mixed  $parent the object where the $entity will be removed
      * @param string $field  name of the field of the object where the document is
      * @param mixed  $entity entity that will be removed from $parent
-     *
-     * @return bool Success
      */
     public function unembed($parent, string $field, &$entity): bool
     {
-        $fieldValue = (array) $parent->$field;
-        $id = $this->getId($entity);
+        $embeddedKey = $this->getKey($entity);
 
-        foreach ($fieldValue as $key => $document) {
-            if ($id == $this->getId($document)) {
-                unset($fieldValue[$key]);
+        foreach ((array) $parent->$field as $arrayKey => $document) {
+            if ($embeddedKey == $this->getKey($document)) {
+                unset($parent->$field[$arrayKey]);
             }
         }
 
-        $parent->$field = array_values($fieldValue);
+        $parent->$field = array_values((array) $parent->$field);
 
         return true;
     }
 
     /**
-     * Attach a new _id reference into $field of $parent.
+     * Attach a new key reference into $field of $parent.
      *
      * @param mixed        $parent the object where $entity will be referenced
-     * @param string       $field  the field where the _id reference of $entity will be stored
+     * @param string       $field  the field where the key reference of $entity will be stored
      * @param object|array $entity the object that is being attached
-     *
-     * @return bool Success
      */
     public function attach($parent, string $field, &$entity): bool
     {
-        $fieldValue = (array) $parent->$field;
-        $newId = $this->getId($entity);
+        $referencedKey = $this->getKey($entity);
 
-        foreach ($fieldValue as $id) {
-            if ($id == $newId) {
+        foreach ((array) $parent->$field as $key) {
+            if ($key == $referencedKey) {
                 return true;
             }
         }
 
-        $fieldValue[] = $newId;
-        $parent->$field = $fieldValue;
+        $parent->$field[] = $referencedKey;
 
         return true;
     }
 
     /**
-     * Removes an _id reference from $field of $parent.
+     * Removes a key reference from $field of $parent.
      *
      * @param mixed  $parent the object where $entity reference will be removed
-     * @param string $field  the field where the _id reference of $entity is stored
-     * @param mixed  $entity the object being detached or its _id
-     *
-     * @return bool Success
+     * @param string $field  the field where the key reference of $entity is stored
+     * @param mixed  $entity the object being detached or its key
      */
     public function detach($parent, string $field, &$entity): bool
     {
-        $fieldValue = (array) $parent->$field;
-        $newId = $this->getId($entity);
+        $referencedKey = $this->getKey($entity);
 
-        foreach ($fieldValue as $key => $id) {
-            if ($id == $newId) {
-                unset($fieldValue[$key]);
+        foreach ((array) $parent->$field as $arrayKey => $documentKey) {
+            if ($documentKey == $referencedKey) {
+                unset($parent->$field[$arrayKey]);
             }
         }
 
-        $parent->$field = array_values($fieldValue);
+        $parent->$field = array_values((array) $parent->$field);
 
         return true;
     }
 
     /**
-     * Gets the _id of the given object or array. If there is no _id in it a new
-     * _id will be generated and set on the object (while still returning it).
+     * Gets the key of the given object or array. If there is no key in it a new
+     * key will be generated and set on the object (while still returning it).
      *
-     * @param mixed $object the object|array that the _id will be retrieved from
+     * @param mixed $object the object|array that the key will be retrieved from
      *
      * @return ObjectId|mixed
      */
-    protected function getId(&$object)
+    protected function getKey(&$object)
     {
         if (is_array($object)) {
-            if (isset($object['_id']) && $object['_id']) {
-                return $object['_id'];
+            if (isset($object[$this->key]) && $object[$this->key]) {
+                return $object[$this->key];
             }
 
-            return $object['_id'] = new ObjectId();
+            return $object[$this->key] = new ObjectId();
         }
 
         if (is_object($object) && !$object instanceof ObjectId) {
-            if (isset($object->_id) && $object->_id) {
-                return $object->_id;
+            if (isset($object->{$this->key}) && $object->{$this->key}) {
+                return $object->{$this->key};
             }
 
-            return $object->_id = new ObjectId();
+            return $object->{$this->key} = new ObjectId();
         }
 
         return $object;

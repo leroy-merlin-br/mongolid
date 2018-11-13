@@ -11,9 +11,9 @@ use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\HasSchemaInterface;
-use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -29,12 +29,12 @@ class DataMapper implements HasSchemaInterface
      *
      * @var string
      */
-    public $schemaClass = Schema::class;
+    public $schemaClass = AbstractSchema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass.
      *
-     * @var Schema
+     * @var AbstractSchema
      */
     protected $schema;
 
@@ -69,13 +69,12 @@ class DataMapper implements HasSchemaInterface
      * is acknowledged.
      *
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($entity, array $options = [])
+    public function save($entity, array $options = []): bool
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
@@ -110,12 +109,11 @@ class DataMapper implements HasSchemaInterface
      * exists.
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity     the entity used in the operation
      * @param array $options    possible options to send to mongo driver
      * @param bool  $fireEvents whether events should be fired
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
@@ -149,11 +147,10 @@ class DataMapper implements HasSchemaInterface
      * the given _id did not exists.
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function update($entity, array $options = []): bool
     {
@@ -196,11 +193,10 @@ class DataMapper implements HasSchemaInterface
      * Removes the given document from the collection.
      *
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function delete($entity, array $options = []): bool
     {
@@ -327,7 +323,7 @@ class DataMapper implements HasSchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchema(): Schema
+    public function getSchema(): AbstractSchema
     {
         return $this->schema;
     }
@@ -335,7 +331,7 @@ class DataMapper implements HasSchemaInterface
     /**
      * Set a Schema object  that describes an Entity in MongoDB.
      */
-    public function setSchema(Schema $schema)
+    public function setSchema(AbstractSchema $schema)
     {
         $this->schema = $schema;
     }
@@ -591,14 +587,14 @@ class DataMapper implements HasSchemaInterface
      */
     private function afterSuccess($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->syncOriginalDocumentAttributes();
         }
     }
 
     private function getUpdateData($entity, array $data)
     {
-        if (!$entity instanceof AttributesAccessInterface) {
+        if (!$entity instanceof HasAttributesInterface) {
             return ['$set' => $data];
         }
 

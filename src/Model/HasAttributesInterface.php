@@ -7,10 +7,17 @@ namespace Mongolid\Model;
  *
  * It is supposed to be used in conjunction with Attributes trait
  *
- * @see Attributes
+ * @see HasAttributesTrait
  */
-interface AttributesAccessInterface
+interface HasAttributesInterface
 {
+    /**
+     * Check if an attribute is set on the model.
+     *
+     * @param string $key the attribute to be checked
+     */
+    public function hasDocumentAttribute(string $key): bool;
+
     /**
      * Get an attribute from the model.
      *

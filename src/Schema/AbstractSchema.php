@@ -11,7 +11,7 @@ use Mongolid\Util\SequenceService;
  * A schema maps to a MongoDB collection and defines the shape of the documents
  * within that collection.
  */
-abstract class Schema
+abstract class AbstractSchema
 {
     /**
      * The $dynamic property tells if the schema will accept additional fields

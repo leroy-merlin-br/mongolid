@@ -9,8 +9,8 @@ use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Model\ActiveRecord;
-use Mongolid\Schema\Schema;
+use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Schema\AbstractSchema;
 use Serializable;
 use Traversable;
 
@@ -70,13 +70,13 @@ class Cursor implements CursorInterface, Serializable
     protected $assembler;
 
     /**
-     * @param Schema     $entitySchema schema that describes the entity that will be retrieved from the database
-     * @param Collection $collection   the raw collection object that will be used to retrieve the documents
-     * @param string     $command      the command that is being called in the $collection
-     * @param array      $params       the parameters of the $command
+     * @param AbstractSchema $entitySchema schema that describes the entity that will be retrieved from the database
+     * @param Collection     $collection   the raw collection object that will be used to retrieve the documents
+     * @param string         $command      the command that is being called in the $collection
+     * @param array          $params       the parameters of the $command
      */
     public function __construct(
-        Schema $entitySchema,
+        AbstractSchema $entitySchema,
         Collection $collection,
         string $command,
         array $params
@@ -200,7 +200,7 @@ class Cursor implements CursorInterface, Serializable
     {
         $document = $this->getCursor()->current();
 
-        if ($document instanceof ActiveRecord) {
+        if ($document instanceof AbstractActiveRecord) {
             $documentToArray = $document->toArray();
             $this->entitySchema = $document->getSchema();
         } else {

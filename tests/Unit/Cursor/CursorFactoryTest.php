@@ -3,7 +3,7 @@ namespace Mongolid\Cursor;
 
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Schema\Schema;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 
 class CursorFactoryTest extends TestCase
@@ -12,7 +12,7 @@ class CursorFactoryTest extends TestCase
     {
         // Set
         $factory = new CursorFactory();
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
 
         // Assert
@@ -36,7 +36,7 @@ class CursorFactoryTest extends TestCase
     {
         // Set
         $factory = new CursorFactory();
-        $schema = m::mock(Schema::class);
+        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
 
         // Assert

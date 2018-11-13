@@ -6,8 +6,8 @@ use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\HasSchemaInterface;
-use Mongolid\Schema\Schema;
 
 /**
  * This class is meant to provide a better API for handling
@@ -32,7 +32,7 @@ class BulkWrite
     protected $bulkWrite;
 
     /**
-     * @var Schema
+     * @var AbstractSchema
      */
     protected $schema;
 

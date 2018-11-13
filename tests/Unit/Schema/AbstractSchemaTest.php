@@ -2,17 +2,17 @@
 namespace Mongolid\Schema;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\TestCase;
 use Mongolid\Util\SequenceService;
 
-class SchemaTest extends TestCase
+class AbstractSchemaTest extends TestCase
 {
     public function testShouldNotBeDynamicByDefault()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
 
         // Assert
         $this->assertAttributeEquals(false, 'dynamic', $schema);
@@ -21,7 +21,7 @@ class SchemaTest extends TestCase
     public function testMustHaveAnEntityClass()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
 
         // Assert
         $this->assertAttributeEquals('stdClass', 'entityClass', $schema);
@@ -30,12 +30,12 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $value = null;
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
     }
@@ -43,7 +43,7 @@ class SchemaTest extends TestCase
     public function testShouldNotCastRandomStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $value = 'A random string';
 
         // Assert
@@ -56,12 +56,12 @@ class SchemaTest extends TestCase
     public function testShouldCastObjectIdStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $value = '507f1f77bcf86cd799439011';
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
 
@@ -74,7 +74,7 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoAutoIncrementSequence()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $sequenceService = $this->instance(SequenceService::class, m::mock(SequenceService::class));
         $value = null;
 
@@ -91,7 +91,7 @@ class SchemaTest extends TestCase
 
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $sequenceService = $this->instance(SequenceService::class, m::mock(SequenceService::class));
         $value = 3;
 
@@ -110,7 +110,7 @@ class SchemaTest extends TestCase
     public function testShouldCastDocumentTimestamps()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $value = null;
 
         // Assertion
@@ -123,7 +123,7 @@ class SchemaTest extends TestCase
     public function testShouldRefreshUpdatedAtTimestamps()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
         $value = (new UTCDateTime(25));
 
         // Assertion
@@ -141,7 +141,7 @@ class SchemaTest extends TestCase
         $compareTimestamp = true
     ) {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(AbstractSchema::class.'[]');
 
         // Assertion
         $result = $schema->createdAtTimestamp($value);

@@ -4,9 +4,9 @@ namespace Mongolid\Tests\Integration\Stubs;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Model\ActiveRecord;
+use Mongolid\Model\AbstractActiveRecord;
 
-class User extends ActiveRecord
+class EmbeddedUser extends AbstractActiveRecord
 {
     /**
      * @var string
@@ -30,11 +30,26 @@ class User extends ActiveRecord
 
     public function parent()
     {
-        return $this->referencesOne(User::class, 'parent');
+        return $this->embedsOne(EmbeddedUser::class);
     }
 
     public function siblings()
     {
-        return $this->referencesMany(User::class, 'siblings');
+        return $this->embedsMany(EmbeddedUser::class);
+    }
+
+    public function son()
+    {
+        return $this->embedsOne(EmbeddedUser::class, 'arbitrary_field');
+    }
+
+    public function grandsons()
+    {
+        return $this->embedsMany(EmbeddedUser::class, 'other_arbitrary_field');
+    }
+
+    public function sameName()
+    {
+        $this->embedsOne(EmbeddedUser::class, 'sameName');
     }
 }

@@ -3,20 +3,20 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
-use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use stdClass;
 
-class SchemaMapperTest extends TestCase
+class AbstractSchemaMapperTest extends TestCase
 {
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
         $this->instance(
             'My\Own\Schema',
-            new class() extends Schema
+            new class() extends AbstractSchema
             {
                 /**
                  * {@inheritdoc}
@@ -30,7 +30,7 @@ class SchemaMapperTest extends TestCase
             }
         );
 
-        $schema = new class() extends Schema
+        $schema = new class() extends AbstractSchema
         {
             /**
              * {@inheritdoc}
@@ -81,7 +81,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldClearDynamicFieldsIfSchemaIsNotDynamic()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
             /**
              * {@inheritdoc}
@@ -144,7 +144,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoCastableType()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -164,7 +164,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoAnotherMappedSchemaIfTypeBeginsWithSchema()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $schemaMapper = m::mock(
@@ -188,7 +188,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknownString()
     {
         // Arrange
-        $schemaClass = new class() extends Schema
+        $schemaClass = new class() extends AbstractSchema
         {
             public function pumpkinPoint($value)
             {
@@ -209,12 +209,12 @@ class SchemaMapperTest extends TestCase
     public function testShouldMapAnArrayValueToAnotherSchema()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $mySchema = $this->instance(
             'Xd\MySchema',
-            new class extends Schema
+            new class extends AbstractSchema
             {
             }
         );
@@ -251,7 +251,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -267,7 +267,7 @@ class SchemaMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -283,11 +283,11 @@ class SchemaMapperTest extends TestCase
     public function testShouldGetAttributesWhenObjectImplementsAttributesAccessInterface()
     {
         // Arrange
-        $schema = new class extends Schema
+        $schema = new class extends AbstractSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
-        $object = new class implements AttributesAccessInterface
+        $object = new class implements HasAttributesInterface
         {
             public function getDocumentAttribute(string $key)
             {
@@ -315,6 +315,10 @@ class SchemaMapperTest extends TestCase
             }
 
             public function getOriginalDocumentAttributes(): array
+            {
+            }
+
+            public function hasDocumentAttribute(string $key): bool
             {
             }
         };

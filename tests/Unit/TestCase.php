@@ -23,7 +23,7 @@ class TestCase extends PHPUnitTestCase
     }
 
     /**
-     * Assert if two queries are equals. It will compare ObjectIDs within any
+     * Assert if two queries are equals. It will compare ObjectIds within any
      * level of the query and make sure that they are the same.
      *
      * @param mixed $expectedQuery correct query
