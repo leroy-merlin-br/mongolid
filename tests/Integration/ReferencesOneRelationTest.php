@@ -24,7 +24,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->parent()->attach($bob);
         $this->assertParent($bob, $john);
         unset($john->parent_id);
-
         $this->assertNull($john->parent_id);
         $this->assertNull($john->parent);
 
@@ -32,7 +31,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->parent()->attach($bob);
         $this->assertParent($bob, $john);
         $john->parent()->detachAll();
-
         $this->assertNull($john->parent_id);
         $this->assertNull($john->parent);
 
@@ -40,9 +38,22 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->parent()->attach($bob);
         $this->assertParent($bob, $john);
         $john->parent()->detach($bob);
-
         $this->assertNull($john->parent_id);
         $this->assertNull($john->parent);
+
+        // changing the field directly
+        $john->parent()->attach($bob);
+        $this->assertParent($bob, $john);
+        $john->parent_id = [$chuck->_id];
+        $this->assertParent($chuck, $john);
+
+        $john->parent()->detachAll();
+
+        // changing the field with fillable
+        $john->parent()->attach($bob);
+        $this->assertParent($bob, $john);
+        $john->fill(['parent_id' => [$chuck->_id]], true);
+        $this->assertParent($chuck, $john);
     }
 
     public function testShouldRetrieveSonOfUserUsingCustomKey()
@@ -62,7 +73,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->son()->attach($bob);
         $this->assertSon($bob, $john);
         unset($john->arbitrary_field);
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
 
@@ -70,7 +80,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->son()->attach($bob);
         $this->assertSon($bob, $john);
         $john->son()->detachAll();
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
 
@@ -78,9 +87,22 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $john->son()->attach($bob);
         $this->assertSon($bob, $john);
         $john->son()->detach($bob);
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
+
+        // changing the field directly
+        $john->son()->attach($bob);
+        $this->assertSon($bob, $john);
+        $john->arbitrary_field = [$chuck->code];
+        $this->assertSon($chuck, $john);
+
+        $john->son()->detachAll();
+
+        // changing the field with fillable
+        $john->son()->attach($bob);
+        $this->assertSon($bob, $john);
+        $john->fill(['arbitrary_field' => [$chuck->code]], true);
+        $this->assertSon($chuck, $john);
     }
 
     public function testShouldCatchInvalidRelations()

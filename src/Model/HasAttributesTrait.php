@@ -136,6 +136,10 @@ trait HasAttributesTrait
         }
 
         $this->attributes[$key] = $value;
+
+        if ($this->hasFieldRelation($key)) {
+            $this->unsetRelation($this->getFieldRelation($key));
+        }
     }
 
     /**

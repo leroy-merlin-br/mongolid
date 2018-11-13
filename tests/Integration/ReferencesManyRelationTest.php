@@ -26,19 +26,43 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertSiblings([$mary], $john);
 
         // replace siblings
+        $john->siblings()->detach($mary);
         $bob = $this->createUser('Bob');
-        // unset($john->siblings_ids); // TODO make this work!
-        $john->siblings()->detachAll();
-        $this->assertEmpty($john->siblings->all());
+
+        // unset
         $john->siblings()->attach($bob);
-
         $this->assertSiblings([$bob], $john);
-
-        // remove with unembed
-        $john->siblings()->detach($bob);
-
+        unset($john->siblings_ids);
         $this->assertEmpty($john->siblings_ids);
         $this->assertEmpty($john->siblings->all());
+
+        // detachAll
+        $john->siblings()->attach($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->siblings()->detachAll();
+        $this->assertEmpty($john->siblings_ids);
+        $this->assertEmpty($john->siblings->all());
+
+        // detach
+        $john->siblings()->attach($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->siblings()->detach($bob);
+        $this->assertEmpty($john->siblings_ids);
+        $this->assertEmpty($john->siblings->all());
+
+        // changing the field directly
+        $john->siblings()->attach($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->siblings_ids = [$chuck->_id];
+        $this->assertSiblings([$chuck], $john);
+
+        $john->siblings()->detachAll();
+
+        // changing the field with fillable
+        $john->siblings()->attach($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->fill(['siblings_ids' => [$chuck->_id]], true);
+        $this->assertSiblings([$chuck], $john);
     }
 
     public function testShouldRetrieveGrandsonsOfUserUsingCustomKey()
@@ -64,20 +88,43 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertGrandsons([$mary], $john);
 
         // replace grandsons
+        $john->grandsons()->detach($mary);
         $bob = $this->createUser('Bob', '987');
-        // unset($john->grandsons_codes); // TODO make this work!
-        $john->grandsons()->detachAll();
-        $this->assertEmpty($john->grandsons->all());
+
+        // unset
         $john->grandsons()->attach($bob);
-
-        $this->assertSame(['987'], $john->grandsons_codes);
         $this->assertGrandsons([$bob], $john);
-
-        // remove with unembed
-        $john->grandsons()->detach($bob);
-
+        unset($john->grandsons_codes);
         $this->assertEmpty($john->grandsons_codes);
         $this->assertEmpty($john->grandsons->all());
+
+        // detachAll
+        $john->grandsons()->attach($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->grandsons()->detachAll();
+        $this->assertEmpty($john->grandsons_codes);
+        $this->assertEmpty($john->grandsons->all());
+
+        // detach
+        $john->grandsons()->attach($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->grandsons()->detach($bob);
+        $this->assertEmpty($john->grandsons_codes);
+        $this->assertEmpty($john->grandsons->all());
+
+        // changing the field directly
+        $john->grandsons()->attach($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->grandsons_codes = [$chuck->code];
+        $this->assertGrandsons([$chuck], $john);
+
+        $john->grandsons()->detachAll();
+
+        // changing the field with fillable
+        $john->grandsons()->attach($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->fill(['grandsons_codes' => [$chuck->code]], true);
+        $this->assertGrandsons([$chuck], $john);
     }
 
     private function createUser(string $name, string $code = null): ReferencedUser

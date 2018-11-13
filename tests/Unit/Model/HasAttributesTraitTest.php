@@ -11,6 +11,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class()
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {
@@ -36,6 +37,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class()
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function getShortNameDocumentAttribute()
             {
@@ -61,6 +63,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class()
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {
@@ -93,6 +96,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class($fillable, $guarded)
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct(array $fillable, array $guarded)
             {
@@ -114,6 +118,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class()
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
         $input = [
@@ -134,6 +139,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class()
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
         $model->setDocumentAttribute('name', 'John');
@@ -152,6 +158,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class() implements HasAttributesInterface
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
         };
 
         $model->name = 'John';
@@ -170,6 +177,7 @@ class HasAttributesTraitTest extends TestCase
         $model = new class() implements HasAttributesInterface
         {
             use HasAttributesTrait;
+            use HasRelationsTrait;
 
             public function __construct()
             {

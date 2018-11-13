@@ -32,7 +32,6 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->parent()->add($bob);
         $this->assertParent($bob, $john);
         $john->parent()->removeAll();
-
         $this->assertNull($john->embedded_parent);
         $this->assertNull($john->parent);
 
@@ -40,9 +39,22 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->parent()->add($bob);
         $this->assertParent($bob, $john);
         $john->parent()->remove($bob);
-
         $this->assertNull($john->embedded_parent);
         $this->assertNull($john->parent);
+
+        // changing the field directly
+        $john->parent()->add($bob);
+        $this->assertParent($bob, $john);
+        $john->embedded_parent = [$chuck];
+        $this->assertParent($chuck, $john);
+
+        $john->parent()->removeAll();
+
+        // changing the field with fillable
+        $john->parent()->add($bob);
+        $this->assertParent($bob, $john);
+        $john->fill(['embedded_parent' => [$chuck]], true);
+        $this->assertParent($chuck, $john);
     }
 
     public function testShouldRetrieveSonOfUserUsingCustomKey()
@@ -62,7 +74,6 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
         unset($john->arbitrary_field);
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
 
@@ -70,7 +81,6 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
         $john->son()->removeAll();
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
 
@@ -78,9 +88,22 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
         $john->son()->remove($bob);
-
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
+
+        // changing the field directly
+        $john->son()->add($bob);
+        $this->assertSon($bob, $john);
+        $john->arbitrary_field = [$chuck];
+        $this->assertSon($chuck, $john);
+
+        $john->son()->removeAll();
+
+        // changing the field with fillable
+        $john->son()->add($bob);
+        $this->assertSon($bob, $john);
+        $john->fill(['arbitrary_field' => [$chuck]], true);
+        $this->assertSon($chuck, $john);
     }
 
     public function testShouldCatchInvalidFieldNameOnRelations()

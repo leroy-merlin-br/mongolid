@@ -49,6 +49,20 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $john->siblings()->remove($bob);
         $this->assertEmpty($john->embedded_siblings);
         $this->assertEmpty($john->siblings->all());
+
+        // changing the field directly
+        $john->siblings()->add($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->embedded_siblings = [$chuck];
+        $this->assertSiblings([$chuck], $john);
+
+        $john->siblings()->removeAll();
+
+        // changing the field with fillable
+        $john->siblings()->add($bob);
+        $this->assertSiblings([$bob], $john);
+        $john->fill(['embedded_siblings' => [$chuck]], true);
+        $this->assertSiblings([$chuck], $john);
     }
 
     public function testShouldRetrieveGrandsonsOfUserUsingCustomKey()
@@ -97,6 +111,20 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $john->grandsons()->remove($bob);
         $this->assertEmpty($john->other_arbitrary_field);
         $this->assertEmpty($john->grandsons->all());
+
+        // changing the field directly
+        $john->grandsons()->add($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->other_arbitrary_field = [$chuck];
+        $this->assertGrandsons([$chuck], $john);
+
+        $john->grandsons()->removeAll();
+
+        // changing the field with fillable
+        $john->grandsons()->add($bob);
+        $this->assertGrandsons([$bob], $john);
+        $john->fill(['other_arbitrary_field' => [$chuck]], true);
+        $this->assertGrandsons([$chuck], $john);
     }
 
     private function createUser(string $name): EmbeddedUser
