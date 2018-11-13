@@ -18,7 +18,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
 
         // replace parent
         $bob = $this->createUser('Bob');
-        $john->parent()->detach(); //todo remove this line and ensure only one parent is attached
 
         // unset
         $john->parent()->attach($bob);
@@ -67,7 +66,6 @@ class ReferencesOneRelationTest extends IntegrationTestCase
 
         // replace son
         $bob = $this->createUser('Bob', '987');
-        $john->son()->detach(); //todo remove this line and ensure only one son is attached
 
         // unset
         $john->son()->attach($bob);

@@ -3,6 +3,12 @@ namespace Mongolid\Model\Relations;
 
 class EmbedsOne extends EmbedsMany
 {
+    public function add($entity): void
+    {
+        $this->removeAll();
+        parent::add($entity);
+    }
+
     public function remove($entity = null): void
     {
         $this->removeAll();

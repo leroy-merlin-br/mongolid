@@ -6,6 +6,12 @@ use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesOne extends ReferencesMany
 {
+    public function attach($entity): void
+    {
+        $this->detachAll();
+        parent::attach($entity);
+    }
+
     public function detach($entity = null): void
     {
         $this->detachAll();

@@ -18,7 +18,6 @@ class EmbedsOneRelationTest extends IntegrationTestCase
 
         // replace parent
         $bob = $this->createUser('Bob');
-        $john->parent()->remove(); //todo remove this line and ensure only one parent is added
 
         // unset
         $john->parent()->add($bob);
@@ -68,7 +67,6 @@ class EmbedsOneRelationTest extends IntegrationTestCase
 
         // replace son
         $bob = $this->createUser('Bob');
-        $john->son()->remove(); //todo remove this line and ensure only one son is added
 
         // unset
         $john->son()->add($bob);
