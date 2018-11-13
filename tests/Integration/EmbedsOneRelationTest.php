@@ -44,7 +44,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->parent()->add($bob);
         $this->assertParent($bob, $john);
-        $john->embedded_parent = [$chuck];
+        $john->embedded_parent = [$chuck->getDocumentAttributes()];
         $this->assertParent($chuck, $john);
 
         $john->parent()->removeAll();
@@ -52,7 +52,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->parent()->add($bob);
         $this->assertParent($bob, $john);
-        $john->fill(['embedded_parent' => [$chuck]], true);
+        $john->fill(['embedded_parent' => [$chuck->getDocumentAttributes()]], true);
         $this->assertParent($chuck, $john);
     }
 
@@ -92,7 +92,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
-        $john->arbitrary_field = [$chuck];
+        $john->arbitrary_field = [$chuck->getDocumentAttributes()];
         $this->assertSon($chuck, $john);
 
         $john->son()->removeAll();
@@ -100,7 +100,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
-        $john->fill(['arbitrary_field' => [$chuck]], true);
+        $john->fill(['arbitrary_field' => [$chuck->getDocumentAttributes()]], true);
         $this->assertSon($chuck, $john);
     }
 
@@ -132,13 +132,13 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $parent = $model->parent;
         $this->assertInstanceOf(EmbeddedUser::class, $parent);
         $this->assertEquals($expected, $parent);
-        $this->assertSame([$expected], $model->embedded_parent); // TODO store as single array
+        $this->assertSame([$expected->getDocumentAttributes()], $model->embedded_parent); // TODO store as single array
 
         // hit cache
         $parent = $model->parent;
         $this->assertInstanceOf(EmbeddedUser::class, $parent);
         $this->assertEquals($expected, $parent);
-        $this->assertSame([$expected], $model->embedded_parent);
+        $this->assertSame([$expected->getDocumentAttributes()], $model->embedded_parent);
     }
 
     private function assertSon($expected, EmbeddedUser $model)
@@ -146,12 +146,12 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $son = $model->son;
         $this->assertInstanceOf(EmbeddedUser::class, $son);
         $this->assertEquals($expected, $son);
-        $this->assertSame([$expected], $model->arbitrary_field); // TODO store as single array
+        $this->assertSame([$expected->getDocumentAttributes()], $model->arbitrary_field); // TODO store as single array
 
         // hit cache
         $son = $model->son;
         $this->assertInstanceOf(EmbeddedUser::class, $son);
         $this->assertEquals($expected, $son);
-        $this->assertSame([$expected], $model->arbitrary_field);
+        $this->assertSame([$expected->getDocumentAttributes()], $model->arbitrary_field);
     }
 }

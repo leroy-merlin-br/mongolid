@@ -255,6 +255,25 @@ class HasAttributesTraitTest extends TestCase
                     'name' => 'John',
                 ],
             ],
+
+            // -----------------------------
+            'ignore nulls but not falsy ones' => [
+                'fillable' => ['name', 'surname', 'sex', 'age', 'has_sex'],
+                'guarded' => [],
+                'input' => [
+                    'name' => 'John',
+                    'surname' => '',
+                    'sex' => null,
+                    'age' => 0,
+                    'has_sex' => false,
+                ],
+                'expected' => [
+                    'name' => 'John',
+                    'surname' => '',
+                    'age' => 0,
+                    'has_sex' => false,
+                ],
+            ],
         ];
     }
 

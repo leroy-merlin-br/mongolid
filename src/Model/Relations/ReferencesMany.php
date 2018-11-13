@@ -50,6 +50,29 @@ class ReferencesMany extends AbstractRelation
     }
 
     /**
+     * Attach many documents at once.
+     *
+     * @param array $entities model
+     */
+    public function attachMany(array $entities): void
+    {
+        foreach ($entities as $entity) {
+            $this->attach($entity);
+        }
+    }
+
+    /**
+     * Replace attached documents.
+     *
+     * @param array $entities
+     */
+    public function replace(array $entities): void
+    {
+        $this->detachAll();
+        $this->attachMany($entities);
+    }
+
+    /**
      * Removes a document _id reference from an attribute. It will remove the
      * _id of the given $entity from inside the given $field.
      *

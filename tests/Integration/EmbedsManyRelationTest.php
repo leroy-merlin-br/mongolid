@@ -53,7 +53,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->siblings()->add($bob);
         $this->assertSiblings([$bob], $john);
-        $john->embedded_siblings = [$chuck];
+        $john->embedded_siblings = [$chuck->getDocumentAttributes()];
         $this->assertSiblings([$chuck], $john);
 
         $john->siblings()->removeAll();
@@ -61,7 +61,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->siblings()->add($bob);
         $this->assertSiblings([$bob], $john);
-        $john->fill(['embedded_siblings' => [$chuck]], true);
+        $john->fill(['embedded_siblings' => [$chuck->getDocumentAttributes()]], true);
         $this->assertSiblings([$chuck], $john);
     }
 
@@ -72,19 +72,15 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $john = $this->createUser('John');
         $john->grandsons()->add($chuck);
 
-        $this->assertSame([$chuck], $john->other_arbitrary_field);
         $this->assertGrandsons([$chuck], $john);
 
         $mary = $this->createUser('Mary');
         $john->grandsons()->add($mary);
 
-        $this->assertSame([$chuck, $mary], $john->other_arbitrary_field);
         $this->assertGrandsons([$chuck, $mary], $john);
 
         // remove one grandson
         $john->grandsons()->remove($chuck);
-
-        $this->assertSame([$mary], $john->other_arbitrary_field);
         $this->assertGrandsons([$mary], $john);
 
         // replace grandsons
@@ -115,7 +111,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->grandsons()->add($bob);
         $this->assertGrandsons([$bob], $john);
-        $john->other_arbitrary_field = [$chuck];
+        $john->other_arbitrary_field = [$chuck->getDocumentAttributes()];
         $this->assertGrandsons([$chuck], $john);
 
         $john->grandsons()->removeAll();
@@ -123,7 +119,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->grandsons()->add($bob);
         $this->assertGrandsons([$bob], $john);
-        $john->fill(['other_arbitrary_field' => [$chuck]], true);
+        $john->fill(['other_arbitrary_field' => [$chuck->getDocumentAttributes()]], true);
         $this->assertGrandsons([$chuck], $john);
     }
 
@@ -137,29 +133,41 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertSiblings($expected, EmbeddedUser $model)
+    private function assertSiblings($expectedSiblings, EmbeddedUser $model)
     {
+        $expected = [];
+        foreach ($expectedSiblings as $sibling) {
+            $expected[] = $sibling->getDocumentAttributes();
+        }
+
         $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
-        $this->assertEquals($expected, $siblings->all());
+        $this->assertEquals($expectedSiblings, $siblings->all());
         $this->assertSame($expected, $model->embedded_siblings);
 
         // hit cache
         $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
-        $this->assertEquals($expected, $siblings->all());
+        $this->assertEquals($expectedSiblings, $siblings->all());
         $this->assertSame($expected, $model->embedded_siblings);
     }
 
-    private function assertGrandsons($expected, EmbeddedUser $model)
+    private function assertGrandsons($expectedGrandsons, EmbeddedUser $model)
     {
+        $expected = [];
+        foreach ($expectedGrandsons as $grandson) {
+            $expected[] = $grandson->getDocumentAttributes();
+        }
+
         $grandsons = $model->grandsons;
         $this->assertInstanceOf(CursorInterface::class, $grandsons);
-        $this->assertEquals($expected, $grandsons->all());
+        $this->assertEquals($expectedGrandsons, $grandsons->all());
+        $this->assertSame($expected, $model->other_arbitrary_field);
 
         // hit cache
         $grandsons = $model->grandsons;
         $this->assertInstanceOf(CursorInterface::class, $grandsons);
-        $this->assertEquals($expected, $grandsons->all());
+        $this->assertEquals($expectedGrandsons, $grandsons->all());
+        $this->assertSame($expected, $model->other_arbitrary_field);
     }
 }

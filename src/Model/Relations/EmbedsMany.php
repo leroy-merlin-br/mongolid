@@ -8,7 +8,7 @@ use Mongolid\Cursor\EmbeddedCursor;
 class EmbedsMany extends AbstractRelation
 {
     /**
-     * Embed a new document to an attribute. It will also generate an
+     * Embed a new document. It will also generate an
      * _id for the document if it's not present.
      *
      * @param mixed $entity model
@@ -17,6 +17,29 @@ class EmbedsMany extends AbstractRelation
     {
         $this->documentEmbedder->embed($this->parent, $this->field, $entity);
         $this->pristine = false;
+    }
+
+    /**
+     * Embed many documents at once.
+     *
+     * @param array $entities model
+     */
+    public function addMany(array $entities): void
+    {
+        foreach ($entities as $entity) {
+            $this->add($entity);
+        }
+    }
+
+    /**
+     * Replace embedded documents.
+     *
+     * @param array $entities
+     */
+    public function replace(array $entities): void
+    {
+        $this->removeAll();
+        $this->addMany($entities);
     }
 
     /**

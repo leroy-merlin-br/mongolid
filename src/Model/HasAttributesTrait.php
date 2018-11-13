@@ -98,7 +98,12 @@ trait HasAttributesTrait
      */
     public function getDocumentAttributes(): array
     {
-        return $this->attributes;
+        return array_filter(
+            $this->attributes ?? [],
+            function ($value) {
+                return !is_null($value);
+            }
+        );
     }
 
     /**
