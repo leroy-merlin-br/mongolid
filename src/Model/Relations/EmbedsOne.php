@@ -1,25 +1,33 @@
 <?php
 namespace Mongolid\Model\Relations;
 
-use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CursorFactory;
-
 class EmbedsOne extends EmbedsMany
 {
-    public function remove($entity = null)
+    /**
+     * Cached result.
+     *
+     * @var mixed
+     */
+    private $document;
+
+    public function remove($entity = null): void
     {
         $this->removeAll();
     }
 
-    public function getResults()
+    public function &getResults()
     {
-        $items = (array) $this->parent->{$this->field};
+        if (!$this->pristine()) {
+            $items = (array) $this->parent->{$this->field};
 
-        if (!empty($items) && !array_key_exists(0, $items)) {
-            $items = [$items];
+            if (!empty($items) && !array_key_exists(0, $items)) {
+                $items = [$items];
+            }
+
+            $this->document = $this->createCursor($items)->first();
+            $this->pristine = true;
         }
 
-        return Ioc::make(CursorFactory::class)
-            ->createEmbeddedCursor($this->entity, $items)->first();
+        return $this->document;
     }
 }

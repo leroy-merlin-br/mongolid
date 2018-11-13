@@ -156,7 +156,6 @@ class HasRelationsTraitTest extends TestCase
                     ],
                 ],
             ],
-            // TODO should not hit database?
             'ActiveRecord referenced with null' => [
                 'fieldValue' => null,
                 'expectedQuery' => [

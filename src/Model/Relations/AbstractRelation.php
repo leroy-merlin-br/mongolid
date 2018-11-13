@@ -28,19 +28,12 @@ abstract class AbstractRelation implements RelationInterface
     protected $documentEmbedder;
 
     /**
-     * @var string
+     * @var bool
      */
-    protected $relationName;
+    protected $pristine = false;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $relationName)
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field)
     {
-        if ($relationName === $field) {
-            throw new InvalidFieldNameException(
-                "The field for relation \"{$relationName}\" cannot have the same name as the relation"
-            );
-        }
-
-        $this->relationName = $relationName;
         $this->parent = $parent;
         $this->entity = $entity;
         $this->field = $field;
@@ -48,5 +41,10 @@ abstract class AbstractRelation implements RelationInterface
         $this->documentEmbedder = Ioc::make(DocumentEmbedder::class);
     }
 
-    abstract public function getResults();
+    abstract public function &getResults();
+
+    protected function pristine(): bool
+    {
+        return $this->pristine;
+    }
 }

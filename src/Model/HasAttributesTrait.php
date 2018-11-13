@@ -3,8 +3,6 @@ namespace Mongolid\Model;
 
 use Exception;
 use Illuminate\Support\Str;
-use Mongolid\Model\Relations\NotARelationException;
-use Mongolid\Model\Relations\RelationInterface;
 
 /**
  * This trait adds attribute getter, setters and also a useful
@@ -16,20 +14,6 @@ use Mongolid\Model\Relations\RelationInterface;
  */
 trait HasAttributesTrait
 {
-    /**
-     * The model's attributes.
-     *
-     * @var array
-     */
-    private $attributes = [];
-
-    /**
-     * The model attribute's original state.
-     *
-     * @var array
-     */
-    private $originalAttributes = [];
-
     /**
      * Once you put at least one string in this array, only
      * the attributes specified here will be changed
@@ -64,6 +48,20 @@ trait HasAttributesTrait
     protected $mutableCache = [];
 
     /**
+     * The model's attributes.
+     *
+     * @var array
+     */
+    private $attributes = [];
+
+    /**
+     * The model attribute's original state.
+     *
+     * @var array
+     */
+    private $originalAttributes = [];
+
+    /**
      * {@inheritdoc}
      */
     public function hasDocumentAttribute(string $key): bool
@@ -87,27 +85,12 @@ trait HasAttributesTrait
         }
 
         if (!method_exists(self::class, $key) && method_exists($this, $key)) {
-             return $this->getRelationValue($key);
+            return $this->getRelationResults($key);
         }
 
         $this->attributes[$key] = null;
 
         return $this->attributes[$key];
-    }
-
-    private function &getRelationValue(string $method)
-    {
-        if (!$this->relationLoaded($method)) {
-            $relation = $this->$method();
-
-            if (!$relation instanceof RelationInterface) {
-                throw new NotARelationException("Called method \"{$method}\" is not a Relation!");
-            }
-
-            $this->setRelation($method, $relation->getResults());
-        }
-
-        return $this->getRelation($method);
     }
 
     /**

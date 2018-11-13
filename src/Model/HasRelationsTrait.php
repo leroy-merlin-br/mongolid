@@ -4,8 +4,11 @@ namespace Mongolid\Model;
 use Illuminate\Support\Str;
 use Mongolid\Model\Relations\EmbedsMany;
 use Mongolid\Model\Relations\EmbedsOne;
+use Mongolid\Model\Relations\InvalidFieldNameException;
+use Mongolid\Model\Relations\NotARelationException;
 use Mongolid\Model\Relations\ReferencesMany;
 use Mongolid\Model\Relations\ReferencesOne;
+use Mongolid\Model\Relations\RelationInterface;
 
 /**
  * It is supposed to be used on model classes in general.
@@ -15,16 +18,14 @@ trait HasRelationsTrait
     /**
      * The loaded relationships for the model.
      *
-     * @var array
+     * @var RelationInterface[]
      */
     private $relations = [];
 
     /**
      * Get a specified relationship.
-     *
-     * @return mixed
      */
-    public function &getRelation(string $relation)
+    public function &getRelation(string $relation): RelationInterface
     {
         return $this->relations[$relation];
     }
@@ -39,11 +40,11 @@ trait HasRelationsTrait
 
     /**
      * Set the given relationship on the model.
-     *
-     * @param mixed $value
+     * Field is only used for validation.
      */
-    public function setRelation(string $relation, $value): void
+    public function setRelation(string $relation, RelationInterface $value, string $field): void
     {
+        $this->validateField($relation, $field);
         $this->relations[$relation] = $value;
     }
 
@@ -53,6 +54,15 @@ trait HasRelationsTrait
     public function unsetRelation(string $relation): void
     {
         unset($this->relations[$relation]);
+    }
+
+    public function &getRelationResults(string $relation)
+    {
+        if (!$this->relationLoaded($relation) && !$this->$relation() instanceof RelationInterface) {
+            throw new NotARelationException("Called method \"{$relation}\" is not a Relation!");
+        }
+
+        return $this->getRelation($relation)->getResults();
     }
 
     /**
@@ -70,9 +80,15 @@ trait HasRelationsTrait
         bool $cacheable = true
     ): ReferencesOne {
         $relationName = $this->guessRelationName();
-        $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
 
-        return new ReferencesOne($this, $entity, $field, $relationName, $key, $cacheable);
+        if (!$this->relationLoaded($relationName)) {
+            $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
+
+            $relation = new ReferencesOne($this, $entity, $field, $key, $cacheable);
+            $this->setRelation($relationName, $relation, $field);
+        }
+
+        return $this->getRelation($relationName);
     }
 
     /**
@@ -89,9 +105,15 @@ trait HasRelationsTrait
         bool $cacheable = true
     ): ReferencesMany {
         $relationName = $this->guessRelationName();
-        $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
 
-        return new ReferencesMany($this, $entity, $field, $relationName, $key, $cacheable);
+        if (!$this->relationLoaded($relationName)) {
+            $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
+
+            $relation = new ReferencesMany($this, $entity, $field, $key, $cacheable);
+            $this->setRelation($relationName, $relation, $field);
+        }
+
+        return $this->getRelation($relationName);
     }
 
     /**
@@ -103,9 +125,15 @@ trait HasRelationsTrait
     protected function embedsOne(string $entity, string $field = null): EmbedsOne
     {
         $relationName = $this->guessRelationName();
-        $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-        return new EmbedsOne($this, $entity, $field, $relationName);
+        if (!$this->relationLoaded($relationName)) {
+            $field = $field ?: $this->inferFieldForEmbed($relationName);
+
+            $relation = new EmbedsOne($this, $entity, $field);
+            $this->setRelation($relationName, $relation, $field);
+        }
+
+        return $this->getRelation($relationName);
     }
 
     /**
@@ -117,9 +145,15 @@ trait HasRelationsTrait
     protected function embedsMany(string $entity, string $field = null): EmbedsMany
     {
         $relationName = $this->guessRelationName();
-        $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-        return new EmbedsMany($this, $entity, $field, $relationName);
+        if (!$this->relationLoaded($relationName)) {
+            $field = $field ?: $this->inferFieldForEmbed($relationName);
+
+            $relation = new EmbedsMany($this, $entity, $field);
+            $this->setRelation($relationName, $relation, $field);
+        }
+
+        return $this->getRelation($relationName);
     }
 
     /**
@@ -142,7 +176,6 @@ trait HasRelationsTrait
     {
         [$method, $relationType, $relation] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
-        // TODO validate that the relation has different name from field?
         return $relation['function'];
     }
 
@@ -153,9 +186,9 @@ trait HasRelationsTrait
      * referenced key used.
      *
      * @example a `parent` relation on a `code` field
-     * would be infered as `parent_code`.
+     * would be inferred as `parent_code`.
      * @example a `addresses` relation on `_id` field
-     * would be infered as `addresses_ids`.
+     * would be inferred as `addresses_ids`.
      */
     private function inferFieldForReference(string $relationName, string $key, bool $plural): string
     {
@@ -170,13 +203,26 @@ trait HasRelationsTrait
      * This is useful for storing the relation on
      * a field based on the relation name.
      *
-     * @example a `comments` relation on would be infered as `embedded_comments`.
-     * @example a `tag` relation on would be infered as `embedded_tag`.
+     * @example a `comments` relation on would be inferred as `embedded_comments`.
+     * @example a `tag` relation on would be inferred as `embedded_tag`.
      */
     private function inferFieldForEmbed(string $relationName): string
     {
         $relationName = Str::snake($relationName);
 
         return 'embedded_'.$relationName;
+    }
+
+    /**
+     * Ensure that fieldName is not the same as the relationName.
+     * Otherwise, we would ran into trouble using magic accessors for relations.
+     */
+    private function validateField(string $relationName, string $fieldName): void
+    {
+        if ($relationName === $fieldName) {
+            throw new InvalidFieldNameException(
+                "The field for relation \"{$relationName}\" cannot have the same name as the relation"
+            );
+        }
     }
 }

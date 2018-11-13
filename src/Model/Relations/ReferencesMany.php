@@ -3,6 +3,7 @@ namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -23,9 +24,16 @@ class ReferencesMany extends AbstractRelation
      */
     protected $key;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $relationName, string $key, bool $cacheable = true)
+    /**
+     * Cached results
+     *
+     * @var CursorInterface
+     */
+    private $cursor;
+
+    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, bool $cacheable = true)
     {
-        parent::__construct($parent, $entity, $field, $relationName);
+        parent::__construct($parent, $entity, $field);
         $this->key = $key;
         $this->documentEmbedder->setKey($key);
         $this->cacheable = $cacheable;
@@ -37,10 +45,10 @@ class ReferencesMany extends AbstractRelation
      *
      * @param mixed $entity model instance or _id to be referenced
      */
-    public function attach($entity)
+    public function attach($entity): void
     {
         $this->documentEmbedder->attach($this->parent, $this->field, $entity);
-        $this->parent->unsetRelation($this->relationName);
+        $this->pristine = false;
     }
 
     /**
@@ -49,35 +57,40 @@ class ReferencesMany extends AbstractRelation
      *
      * @param mixed $entity document, model instance or _id that have been referenced by $field
      */
-    public function detach($entity)
+    public function detach($entity): void
     {
         $this->documentEmbedder->detach($this->parent, $this->field, $entity);
-        $this->parent->unsetRelation($this->relationName);
+        $this->pristine = false;
     }
 
     /**
      * Removes all document references from relation.
      */
-    public function detachAll()
+    public function detachAll(): void
     {
         unset($this->parent->{$this->field});
-        $this->parent->unsetRelation($this->relationName);
+        $this->pristine = false;
     }
 
-    public function getResults()
+    public function &getResults()
     {
-        $referencedKeys = (array) $this->parent->{$this->field};
+        if (!$this->pristine()) {
+            $referencedKeys = (array) $this->parent->{$this->field};
 
-        if (ObjectIdUtils::isObjectId($referencedKeys[0] ?? '')) {
-            foreach ($referencedKeys as $key => $value) {
-                $referencedKeys[$key] = new ObjectId((string) $value);
+            if (ObjectIdUtils::isObjectId($referencedKeys[0] ?? '')) {
+                foreach ($referencedKeys as $key => $value) {
+                    $referencedKeys[$key] = new ObjectId((string) $value);
+                }
             }
+
+            $this->cursor = $this->entityInstance->where(
+                [$this->key => ['$in' => array_values($referencedKeys)]],
+                [],
+                $this->cacheable
+            );
+            $this->pristine = true;
         }
 
-        return $this->entityInstance->where(
-            [$this->key => ['$in' => array_values($referencedKeys)]],
-            [],
-            $this->cacheable
-        );
+        return $this->cursor;
     }
 }
