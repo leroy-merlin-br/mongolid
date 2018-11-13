@@ -37,7 +37,9 @@ class DocumentEmbedder
         // In order to update the document if it exists inside the $parent
         $this->unembed($parent, $field, $entity);
 
-        $parent->$field[] = $entity;
+        $values = $parent->$field;
+        $values[] = $entity;
+        $parent->$field = $values;
 
         return true;
     }
@@ -82,7 +84,9 @@ class DocumentEmbedder
             }
         }
 
-        $parent->$field[] = $referencedKey;
+        $values = $parent->$field;
+        $values[] = $referencedKey;
+        $parent->$field = $values;
 
         return true;
     }
