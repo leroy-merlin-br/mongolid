@@ -29,5 +29,34 @@ class AttributesKeyTest extends IntegrationTestCase
             $user->getDocumentAttributes()
         );
         $this->assertSame([], $user->getOriginalDocumentAttributes());
+
+        // Save and refetch from database
+        $this->assertTrue($user->save());
+        $user = $user->first();
+
+        $this->assertSame('John', $user->name);
+        $this->assertSame('john@doe.com', $user->email);
+        $this->assertSame(['my', 'attributes'], $user->attributes);
+        $this->assertSame(['my', 'original', 'attributes'], $user->originalAttributes);
+        $this->assertSame(
+            [
+                '_id' => $user->_id,
+                'name' => 'John',
+                'email' => 'john@doe.com',
+                'attributes' => ['my', 'attributes'],
+                'originalAttributes' => ['my', 'original', 'attributes'],
+            ],
+            $user->getDocumentAttributes()
+        );
+        $this->assertEquals(
+            [
+                '_id' => $user->_id,
+                'name' => 'John',
+                'email' => 'john@doe.com',
+                'attributes' => ['my', 'attributes'],
+                'originalAttributes' => ['my', 'original', 'attributes'],
+            ],
+            $user->getOriginalDocumentAttributes()
+        );
     }
 }
