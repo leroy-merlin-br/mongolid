@@ -79,7 +79,7 @@ class DataMapper implements HasSchemaInterface
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
         // listeners to cancel save operations if validations fail or whatever.
-        if (!$this->fireEvent('saving', $entity, true)) {
+        if (false === $this->fireEvent('saving', $entity, true)) {
             return false;
         }
 
@@ -117,7 +117,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
-        if ($fireEvents && !$this->fireEvent('inserting', $entity, true)) {
+        if ($fireEvents && false === $this->fireEvent('inserting', $entity, true)) {
             return false;
         }
 
@@ -154,7 +154,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function update($entity, array $options = []): bool
     {
-        if (!$this->fireEvent('updating', $entity, true)) {
+        if (false === $this->fireEvent('updating', $entity, true)) {
             return false;
         }
 
@@ -200,7 +200,7 @@ class DataMapper implements HasSchemaInterface
      */
     public function delete($entity, array $options = []): bool
     {
-        if (!$this->fireEvent('deleting', $entity, true)) {
+        if (false === $this->fireEvent('deleting', $entity, true)) {
             return false;
         }
 
