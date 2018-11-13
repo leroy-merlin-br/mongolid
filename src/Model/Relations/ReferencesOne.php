@@ -6,39 +6,27 @@ use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesOne extends ReferencesMany
 {
-    /**
-     * Cached result
-     *
-     * @var mixed
-     */
-    private $document;
-
     public function detach($entity = null): void
     {
         $this->detachAll();
     }
 
-    public function &getResults()
+    public function get()
     {
-        if (!$this->pristine()) {
-            $referencedKey = $this->parent->{$this->field};
+        $referencedKey = $this->parent->{$this->field};
 
-            if (is_array($referencedKey) && isset($referencedKey[0])) {
-                $referencedKey = $referencedKey[0];
-            }
-
-            if (ObjectIdUtils::isObjectId($referencedKey)) {
-                $referencedKey = new ObjectId((string) $referencedKey);
-            }
-
-            $this->document = $this->entityInstance->first(
-                [$this->key => $referencedKey],
-                [],
-                $this->cacheable
-            );
-            $this->pristine = true;
+        if (is_array($referencedKey) && isset($referencedKey[0])) {
+            $referencedKey = $referencedKey[0];
         }
 
-        return $this->document;
+        if (ObjectIdUtils::isObjectId($referencedKey)) {
+            $referencedKey = new ObjectId((string) $referencedKey);
+        }
+
+        return $this->entityInstance->first(
+            [$this->key => $referencedKey],
+            [],
+            $this->cacheable
+        );
     }
 }

@@ -3,18 +3,10 @@ namespace Mongolid\Model\Relations;
 
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
-use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EmbeddedCursor;
 
 class EmbedsMany extends AbstractRelation
 {
-    /**
-     * Cached results.
-     *
-     * @var EmbeddedCursor
-     */
-    private $cursor;
-
     /**
      * Embed a new document to an attribute. It will also generate an
      * _id for the document if it's not present.
@@ -45,23 +37,18 @@ class EmbedsMany extends AbstractRelation
         $this->pristine = false;
     }
 
-    public function &getResults()
+    public function get()
     {
-        if (!$this->pristine()) {
-            $items = (array) $this->parent->{$this->field};
+        $items = (array) $this->parent->{$this->field};
 
-            if (!empty($items) && !array_key_exists(0, $items)) {
-                $items = [$items];
-            }
-
-            $this->cursor = $this->createCursor($items);
-            $this->pristine = true;
+        if (!empty($items) && !array_key_exists(0, $items)) {
+            $items = [$items];
         }
 
-        return $this->cursor;
+        return $this->createCursor($items);
     }
 
-    protected function createCursor($items): CursorInterface
+    protected function createCursor($items): EmbeddedCursor
     {
         return Ioc::make(CursorFactory::class)
             ->createEmbeddedCursor($this->entity, $items);

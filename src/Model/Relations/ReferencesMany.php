@@ -3,7 +3,6 @@ namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -24,21 +23,20 @@ class ReferencesMany extends AbstractRelation
      */
     protected $key;
 
-    /**
-     * Cached results
-     *
-     * @var CursorInterface
-     */
-    private $cursor;
-
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field, string $key, bool $cacheable = true)
-    {
+    public function __construct(
+        HasAttributesInterface $parent,
+        string $entity,
+        string $field,
+        string $key,
+        bool $cacheable = true
+    ) {
         parent::__construct($parent, $entity, $field);
         $this->key = $key;
         $this->documentEmbedder->setKey($key);
         $this->cacheable = $cacheable;
         $this->entityInstance = Ioc::make($this->entity);
     }
+
     /**
      * Attach document _id reference to an attribute. It will also generate an
      * _id for the document if it's not present.
@@ -72,25 +70,20 @@ class ReferencesMany extends AbstractRelation
         $this->pristine = false;
     }
 
-    public function &getResults()
+    public function get()
     {
-        if (!$this->pristine()) {
-            $referencedKeys = (array) $this->parent->{$this->field};
+        $referencedKeys = (array) $this->parent->{$this->field};
 
-            if (ObjectIdUtils::isObjectId($referencedKeys[0] ?? '')) {
-                foreach ($referencedKeys as $key => $value) {
-                    $referencedKeys[$key] = new ObjectId((string) $value);
-                }
+        if (ObjectIdUtils::isObjectId($referencedKeys[0] ?? '')) {
+            foreach ($referencedKeys as $key => $value) {
+                $referencedKeys[$key] = new ObjectId((string) $value);
             }
-
-            $this->cursor = $this->entityInstance->where(
-                [$this->key => ['$in' => array_values($referencedKeys)]],
-                [],
-                $this->cacheable
-            );
-            $this->pristine = true;
         }
 
-        return $this->cursor;
+        return $this->entityInstance->where(
+            [$this->key => ['$in' => array_values($referencedKeys)]],
+            [],
+            $this->cacheable
+        );
     }
 }

@@ -32,6 +32,13 @@ abstract class AbstractRelation implements RelationInterface
      */
     protected $pristine = false;
 
+    /**
+     * Cached results.
+     *
+     * @var mixed
+     */
+    protected $results;
+
     public function __construct(HasAttributesInterface $parent, string $entity, string $field)
     {
         $this->parent = $parent;
@@ -41,7 +48,27 @@ abstract class AbstractRelation implements RelationInterface
         $this->documentEmbedder = Ioc::make(DocumentEmbedder::class);
     }
 
-    abstract public function &getResults();
+    /**
+     * Retrieve Relation Results.
+     *
+     * @return mixed
+     */
+    abstract public function get();
+
+    /**
+     * Retrieve cached Relation Results.
+     *
+     * @return mixed
+     */
+    public function &getResults()
+    {
+        if (!$this->pristine()) {
+            $this->results = $this->get();
+            $this->pristine = true;
+        }
+
+        return $this->results;
+    }
 
     protected function pristine(): bool
     {

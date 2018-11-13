@@ -3,31 +3,22 @@ namespace Mongolid\Model\Relations;
 
 class EmbedsOne extends EmbedsMany
 {
-    /**
-     * Cached result.
-     *
-     * @var mixed
-     */
-    private $document;
-
     public function remove($entity = null): void
     {
         $this->removeAll();
     }
 
-    public function &getResults()
+    /**
+     * @return mixed
+     */
+    public function get()
     {
-        if (!$this->pristine()) {
-            $items = (array) $this->parent->{$this->field};
+        $items = (array) $this->parent->{$this->field};
 
-            if (!empty($items) && !array_key_exists(0, $items)) {
-                $items = [$items];
-            }
-
-            $this->document = $this->createCursor($items)->first();
-            $this->pristine = true;
+        if (!empty($items) && !array_key_exists(0, $items)) {
+            $items = [$items];
         }
 
-        return $this->document;
+        return $this->createCursor($items)->first();
     }
 }
