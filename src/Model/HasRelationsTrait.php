@@ -16,11 +16,18 @@ use Mongolid\Model\Relations\RelationInterface;
 trait HasRelationsTrait
 {
     /**
-     * The loaded relationships for the model.
+     * Relation cache.
      *
      * @var RelationInterface[]
      */
     private $relations = [];
+
+    /**
+     * The bound between relations and fields.
+     *
+     * @var array
+     */
+    private $fieldRelations = [];
 
     /**
      * Get a specified relationship.
@@ -40,12 +47,12 @@ trait HasRelationsTrait
 
     /**
      * Set the given relationship on the model.
-     * Field is only used for validation.
      */
     public function setRelation(string $relation, RelationInterface $value, string $field): void
     {
         $this->validateField($relation, $field);
         $this->relations[$relation] = $value;
+        $this->fieldRelations[$field] = $relation;
     }
 
     /**
@@ -63,6 +70,16 @@ trait HasRelationsTrait
         }
 
         return $this->getRelation($relation)->getResults();
+    }
+
+    public function hasFieldRelation(string $field): bool
+    {
+        return isset($this->fieldRelations[$field]);
+    }
+
+    public function getFieldRelation(string $field): string
+    {
+        return $this->fieldRelations[$field];
     }
 
     /**

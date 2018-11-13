@@ -120,6 +120,10 @@ trait HasAttributesTrait
     public function cleanDocumentAttribute(string $key)
     {
         unset($this->attributes[$key]);
+
+        if ($this->hasFieldRelation($key)) {
+            $this->unsetRelation($this->getFieldRelation($key));
+        }
     }
 
     /**

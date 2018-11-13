@@ -15,21 +15,31 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->parent()->add($chuck);
 
         $this->assertParent($chuck, $john);
-        // hit cache
-        $this->assertParent($chuck, $john);
 
         // replace parent
         $bob = $this->createUser('Bob');
         $john->parent()->remove(); //todo remove this line and ensure only one parent is added
-        $john->parent()->add($bob);
 
+        // unset
+        $john->parent()->add($bob);
         $this->assertParent($bob, $john);
-        // hit cache
+        unset($john->embedded_parent);
+
+        $this->assertNull($john->embedded_parent);
+        $this->assertNull($john->parent);
+
+        // remove all
+        $john->parent()->add($bob);
         $this->assertParent($bob, $john);
+        $john->parent()->removeAll();
+
+        $this->assertNull($john->embedded_parent);
+        $this->assertNull($john->parent);
 
         // remove
-        //unset($john->embedded_parent);// TODO make this work!
-        $john->parent()->removeAll();
+        $john->parent()->add($bob);
+        $this->assertParent($bob, $john);
+        $john->parent()->remove($bob);
 
         $this->assertNull($john->embedded_parent);
         $this->assertNull($john->parent);
@@ -43,24 +53,47 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $john->son()->add($chuck);
 
         $this->assertSon($chuck, $john);
-        // hit cache
-        $this->assertSon($chuck, $john);
 
         // replace son
         $bob = $this->createUser('Bob');
         $john->son()->remove(); //todo remove this line and ensure only one son is added
+
+        // unset
         $john->son()->add($bob);
-
         $this->assertSon($bob, $john);
-        // hit cache
-        $this->assertSon($bob, $john);
+        unset($john->arbitrary_field);
 
-        // remove
-        //unset($john->arbitrary_field);// TODO make this work!
+        $this->assertNull($john->arbitrary_field);
+        $this->assertNull($john->son);
+
+        // remove all
+        $john->son()->add($bob);
+        $this->assertSon($bob, $john);
         $john->son()->removeAll();
 
         $this->assertNull($john->arbitrary_field);
         $this->assertNull($john->son);
+
+        // remove
+        $john->son()->add($bob);
+        $this->assertSon($bob, $john);
+        $john->son()->remove($bob);
+
+        $this->assertNull($john->arbitrary_field);
+        $this->assertNull($john->son);
+    }
+
+    public function testShouldCatchInvalidFieldNameOnRelations()
+    {
+        // Set
+        $user = new EmbeddedUser();
+
+        // Expectations
+        $this->expectException(InvalidFieldNameException::class);
+        $this->expectExceptionMessage('The field for relation "sameName" cannot have the same name as the relation');
+
+        // Actions
+        $user->sameName;
     }
 
     private function createUser(string $name): EmbeddedUser
@@ -79,6 +112,12 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $this->assertInstanceOf(EmbeddedUser::class, $parent);
         $this->assertEquals($expected, $parent);
         $this->assertSame([$expected], $model->embedded_parent); // TODO store as single array
+
+        // hit cache
+        $parent = $model->parent;
+        $this->assertInstanceOf(EmbeddedUser::class, $parent);
+        $this->assertEquals($expected, $parent);
+        $this->assertSame([$expected], $model->embedded_parent);
     }
 
     private function assertSon($expected, EmbeddedUser $model)
@@ -87,18 +126,11 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $this->assertInstanceOf(EmbeddedUser::class, $son);
         $this->assertEquals($expected, $son);
         $this->assertSame([$expected], $model->arbitrary_field); // TODO store as single array
-    }
 
-    public function testShouldCatchInvalidFieldNameOnRelations()
-    {
-        // Set
-        $user = new EmbeddedUser();
-
-        // Expectations
-        $this->expectException(InvalidFieldNameException::class);
-        $this->expectExceptionMessage('The field for relation "sameName" cannot have the same name as the relation');
-
-        // Actions
-        $user->sameName;
+        // hit cache
+        $son = $model->son;
+        $this->assertInstanceOf(EmbeddedUser::class, $son);
+        $this->assertEquals($expected, $son);
+        $this->assertSame([$expected], $model->arbitrary_field);
     }
 }
