@@ -49,7 +49,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $this->assertEmpty($john->siblings->all());
     }
 
-    public function testShouldRetrieveGrandsonsOfUser()
+    public function testShouldRetrieveGrandsonsOfUserUsingCustomKey()
     {
         // create sibling
         $chuck = $this->createUser('Chuck');

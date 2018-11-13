@@ -65,8 +65,6 @@ class Manager
      * persist and query your models.
      *
      * @param Connection $connection connection instance to be used in database interactions
-     *
-     * @return bool Success
      */
     public function setConnection(Connection $connection): bool
     {

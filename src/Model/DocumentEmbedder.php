@@ -31,8 +31,6 @@ class DocumentEmbedder
      * @param mixed  $parent the object where the $entity will be embedded
      * @param string $field  name of the field of the object where the document will be embedded
      * @param mixed  $entity entity that will be embedded within $parent
-     *
-     * @return bool Success
      */
     public function embed($parent, string $field, &$entity): bool
     {
@@ -51,8 +49,6 @@ class DocumentEmbedder
      * @param mixed  $parent the object where the $entity will be removed
      * @param string $field  name of the field of the object where the document is
      * @param mixed  $entity entity that will be removed from $parent
-     *
-     * @return bool Success
      */
     public function unembed($parent, string $field, &$entity): bool
     {
@@ -75,8 +71,6 @@ class DocumentEmbedder
      * @param mixed        $parent the object where $entity will be referenced
      * @param string       $field  the field where the key reference of $entity will be stored
      * @param object|array $entity the object that is being attached
-     *
-     * @return bool Success
      */
     public function attach($parent, string $field, &$entity): bool
     {
@@ -94,13 +88,11 @@ class DocumentEmbedder
     }
 
     /**
-     * Removes an key reference from $field of $parent.
+     * Removes a key reference from $field of $parent.
      *
      * @param mixed  $parent the object where $entity reference will be removed
      * @param string $field  the field where the key reference of $entity is stored
      * @param mixed  $entity the object being detached or its key
-     *
-     * @return bool Success
      */
     public function detach($parent, string $field, &$entity): bool
     {

@@ -31,8 +31,6 @@ interface CacheComponentInterface
      * memory if so.
      *
      * @param string $key cache key of the item
-     *
-     * @return bool has cache key
      */
     public function has(string $key): bool;
 }

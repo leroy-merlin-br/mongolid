@@ -8,7 +8,7 @@ use Mongolid\Model\Relations\ReferencesMany;
 use Mongolid\Model\Relations\ReferencesOne;
 
 /**
- * It is supposed to be used in model classes in general.
+ * It is supposed to be used on model classes in general.
  */
 trait HasRelationsTrait
 {

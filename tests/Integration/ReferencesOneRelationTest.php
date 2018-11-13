@@ -35,7 +35,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         $this->assertNull($john->parent);
     }
 
-    public function testShouldRetrieveSonOfUser()
+    public function testShouldRetrieveSonOfUserUsingCustomKey()
     {
         // create parent
         $chuck = $this->createUser('Chuck', '010');

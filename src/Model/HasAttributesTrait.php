@@ -12,7 +12,7 @@ use Mongolid\Model\Relations\RelationInterface;
  * properties to make sure that only the correct attributes
  * will be set.
  *
- * It is supposed to be used in model classes in general
+ * It is supposed to be used on model classes in general
  */
 trait HasAttributesTrait
 {

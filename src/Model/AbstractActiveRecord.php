@@ -157,7 +157,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     }
 
     /**
-     * Returns the a valid instance from Ioc.
+     * Returns a valid instance from Ioc.
      *
      * @throws NoCollectionNameException Throws exception when has no collection filled
      */
@@ -174,8 +174,6 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
 
     /**
      * Saves this object into database.
-     *
-     * @return bool Success
      */
     public function save()
     {
@@ -184,8 +182,6 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
 
     /**
      * Insert this object into database.
-     *
-     * @return bool Success
      */
     public function insert()
     {
@@ -194,8 +190,6 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
 
     /**
      * Updates this object in database.
-     *
-     * @return bool Success
      */
     public function update()
     {
@@ -204,8 +198,6 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
 
     /**
      * Deletes this object in database.
-     *
-     * @return bool Success
      */
     public function delete()
     {
@@ -258,10 +250,8 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Returns a DataMapper configured with the Schema and collection described
      * in this entity.
-     *
-     * @return DataMapper
      */
-    public function getDataMapper()
+    public function getDataMapper(): DataMapper
     {
         $dataMapper = Ioc::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
@@ -271,30 +261,26 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
 
     /**
      * Getter for the $collection attribute.
-     *
-     * @return string
      */
-    public function getCollectionName()
+    public function getCollectionName(): ?string
     {
         return $this->collection ?: $this->getSchema()->collection;
     }
 
     /**
-     * Getter for $writeConcern variable.
-     *
-     * @return mixed
+     * Getter for $writeConcern attribute.
      */
-    public function getWriteConcern()
+    public function getWriteConcern(): int
     {
         return $this->writeConcern;
     }
 
     /**
-     * Setter for $writeConcern variable.
+     * Setter for $writeConcern attribute.
      *
-     * @param mixed $writeConcern level of write concern to the transation
+     * @param int $writeConcern level of write concern for the transation
      */
-    public function setWriteConcern($writeConcern)
+    public function setWriteConcern(int $writeConcern)
     {
         $this->writeConcern = $writeConcern;
     }
@@ -336,10 +322,8 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      * Performs the given action into database.
      *
      * @param string $action DataMapper function to execute
-     *
-     * @return bool
      */
-    protected function execute(string $action)
+    protected function execute(string $action): bool
     {
         if (!$this->getCollectionName()) {
             return false;

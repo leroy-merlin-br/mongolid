@@ -35,7 +35,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         $this->assertNull($john->parent);
     }
 
-    public function testShouldRetrieveSonOfUser()
+    public function testShouldRetrieveSonOfUserUsingCustomKey()
     {
         // create parent
         $chuck = $this->createUser('Chuck');

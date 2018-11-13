@@ -69,13 +69,12 @@ class DataMapper implements HasSchemaInterface
      * is acknowledged.
      *
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($entity, array $options = [])
+    public function save($entity, array $options = []): bool
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
@@ -110,12 +109,11 @@ class DataMapper implements HasSchemaInterface
      * exists.
      *
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity     the entity used in the operation
      * @param array $options    possible options to send to mongo driver
      * @param bool  $fireEvents whether events should be fired
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function insert($entity, array $options = [], bool $fireEvents = true): bool
     {
@@ -149,11 +147,10 @@ class DataMapper implements HasSchemaInterface
      * the given _id did not exists.
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function update($entity, array $options = []): bool
     {
@@ -196,11 +193,10 @@ class DataMapper implements HasSchemaInterface
      * Removes the given document from the collection.
      *
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
+     * Return is always false if write concern is Unacknowledged.
      *
      * @param mixed $entity  the entity used in the operation
      * @param array $options possible options to send to mongo driver
-     *
-     * @return bool Success (but always false if write concern is Unacknowledged)
      */
     public function delete($entity, array $options = []): bool
     {
