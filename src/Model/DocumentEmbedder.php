@@ -2,6 +2,7 @@
 namespace Mongolid\Model;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Schema\HasSchemaInterface;
 
 /**
  * Document embedder is a service that will embed documents within each other.
@@ -32,13 +33,14 @@ class DocumentEmbedder
      * @param string $field  name of the field of the object where the document will be embedded
      * @param mixed  $entity entity that will be embedded within $parent
      */
-    public function embed($parent, string $field, &$entity): bool
+    public function embed($parent, string $field, HasSchemaInterface &$entity): bool
     {
         // In order to update the document if it exists inside the $parent
         $this->unembed($parent, $field, $entity);
 
+        $data = $entity->parseToDocument($entity);
         $fieldValue = $parent->$field;
-        $fieldValue[] = $entity->getDocumentAttributes();
+        $fieldValue[] = $data;
         $parent->$field = array_values($fieldValue);
 
         return true;

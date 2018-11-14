@@ -173,6 +173,16 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     }
 
     /**
+     * Parses an object with SchemaMapper.
+     *
+     * @param mixed $entity the object to be parsed
+     */
+    public function parseToDocument($entity): array
+    {
+        return $this->getDataMapper()->parseToDocument($entity);
+    }
+
+    /**
      * Saves this object into database.
      */
     public function save()

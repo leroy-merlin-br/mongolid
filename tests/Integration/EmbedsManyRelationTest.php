@@ -2,6 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
 
@@ -53,7 +54,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->siblings()->add($bob);
         $this->assertSiblings([$bob], $john);
-        $john->embedded_siblings = [$chuck->getDocumentAttributes()];
+        $john->embedded_siblings = [$chuck->toArray()];
         $this->assertSiblings([$chuck], $john);
 
         $john->siblings()->removeAll();
@@ -61,7 +62,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->siblings()->add($bob);
         $this->assertSiblings([$bob], $john);
-        $john->fill(['embedded_siblings' => [$chuck->getDocumentAttributes()]], true);
+        $john->fill(['embedded_siblings' => [$chuck->toArray()]], true);
         $this->assertSiblings([$chuck], $john);
     }
 
@@ -111,7 +112,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field directly
         $john->grandsons()->add($bob);
         $this->assertGrandsons([$bob], $john);
-        $john->other_arbitrary_field = [$chuck->getDocumentAttributes()];
+        $john->other_arbitrary_field = [$chuck->toArray()];
         $this->assertGrandsons([$chuck], $john);
 
         $john->grandsons()->removeAll();
@@ -119,7 +120,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->grandsons()->add($bob);
         $this->assertGrandsons([$bob], $john);
-        $john->fill(['other_arbitrary_field' => [$chuck->getDocumentAttributes()]], true);
+        $john->fill(['other_arbitrary_field' => [$chuck->toArray()]], true);
         $this->assertGrandsons([$chuck], $john);
     }
 
@@ -137,7 +138,8 @@ class EmbedsManyRelationTest extends IntegrationTestCase
     {
         $expected = [];
         foreach ($expectedSiblings as $sibling) {
-            $expected[] = $sibling->getDocumentAttributes();
+            $expected[] = $sibling->toArray();
+            $this->assertInstanceOf(UTCDateTime::class, $sibling->created_at);
         }
 
         $siblings = $model->siblings;
@@ -156,7 +158,8 @@ class EmbedsManyRelationTest extends IntegrationTestCase
     {
         $expected = [];
         foreach ($expectedGrandsons as $grandson) {
-            $expected[] = $grandson->getDocumentAttributes();
+            $expected[] = $grandson->toArray();
+            $this->assertInstanceOf(UTCDateTime::class, $grandson->created_at);
         }
 
         $grandsons = $model->grandsons;

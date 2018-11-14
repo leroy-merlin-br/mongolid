@@ -340,10 +340,8 @@ class DataMapper implements HasSchemaInterface
      * Parses an object with SchemaMapper and the given Schema.
      *
      * @param mixed $entity the object to be parsed
-     *
-     * @return array Document
      */
-    protected function parseToDocument($entity)
+    public function parseToDocument($entity): array
     {
         $schemaMapper = $this->getSchemaMapper();
         $parsedDocument = $schemaMapper->map($entity);
