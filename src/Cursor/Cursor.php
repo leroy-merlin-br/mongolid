@@ -2,6 +2,7 @@
 namespace Mongolid\Cursor;
 
 use IteratorIterator;
+use LogicException as BaseLogicException;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
@@ -182,9 +183,9 @@ class Cursor implements CursorInterface, Serializable
     {
         try {
             $this->getCursor()->rewind();
-        } catch (LogicException $e) {
+        } catch (LogicException | BaseLogicException $e) {
             $this->fresh();
-            $this->getCursor()->rewind();
+            $this->getCursor();
         }
 
         $this->position = 0;
@@ -296,36 +297,6 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Actually returns a Traversable object with the DriverCursor within.
-     * If it does not exists yet, create it using the $collection, $command and
-     * $params given.
-     */
-    protected function getCursor(): Traversable
-    {
-        if (!$this->cursor) {
-            $driverCursor = $this->collection->{$this->command}(...$this->params);
-            $this->cursor = new IteratorIterator($driverCursor);
-            $this->cursor->rewind();
-        }
-
-        return $this->cursor;
-    }
-
-    /**
-     * Retrieves an EntityAssembler instance.
-     *
-     * @return EntityAssembler
-     */
-    protected function getAssembler()
-    {
-        if (!$this->assembler) {
-            $this->assembler = Ioc::make(EntityAssembler::class);
-        }
-
-        return $this->assembler;
-    }
-
-    /**
      * Serializes this object storing the collection name instead of the actual
      * MongoDb\Collection (which is unserializable).
      *
@@ -357,5 +328,35 @@ class Cursor implements CursorInterface, Serializable
         }
 
         $this->collection = $collectionObject;
+    }
+
+    /**
+     * Actually returns a Traversable object with the DriverCursor within.
+     * If it does not exists yet, create it using the $collection, $command and
+     * $params given.
+     */
+    protected function getCursor(): Traversable
+    {
+        if (!$this->cursor) {
+            $driverCursor = $this->collection->{$this->command}(...$this->params);
+            $this->cursor = new IteratorIterator($driverCursor);
+            $this->cursor->rewind();
+        }
+
+        return $this->cursor;
+    }
+
+    /**
+     * Retrieves an EntityAssembler instance.
+     *
+     * @return EntityAssembler
+     */
+    protected function getAssembler()
+    {
+        if (!$this->assembler) {
+            $this->assembler = Ioc::make(EntityAssembler::class);
+        }
+
+        return $this->assembler;
     }
 }
