@@ -6,8 +6,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CacheableCursor;
-use Mongolid\Cursor\Cursor;
+use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
@@ -92,7 +91,7 @@ class DataMapper implements HasSchemaInterface
         );
 
         $result = $queryResult->isAcknowledged() &&
-            ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
+                  ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
 
         if ($result) {
             $this->afterSuccess($entity);
@@ -235,19 +234,17 @@ class DataMapper implements HasSchemaInterface
         array $projection = [],
         bool $cacheable = false
     ): CursorInterface {
-        $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
-
-        $cursor = new $cursorClass(
-            $this->schema,
-            $this->getCollection(),
-            'find',
-            [
-                $this->prepareValueQuery($query),
-                ['projection' => $this->prepareProjection($projection)],
-            ]
-        );
-
-        return $cursor;
+        return Ioc::make(CursorFactory::class)
+            ->createCursor(
+                $this->schema,
+                $this->getCollection(),
+                'find',
+                [
+                    $this->prepareValueQuery($query),
+                    ['projection' => $this->prepareProjection($projection)],
+                ],
+                $cacheable
+            );
     }
 
     /**
