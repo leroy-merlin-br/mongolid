@@ -38,7 +38,6 @@ class RewindableCursorTest extends IntegrationTestCase
         }
     }
 
-
     private function createUser(string $name): ReferencedUser
     {
         $user = new ReferencedUser();

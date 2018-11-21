@@ -1,12 +1,12 @@
 <?php
 namespace Mongolid\Cursor;
 
-use IteratorIterator;
 use LogicException as BaseLogicException;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
+use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\DataMapper\EntityAssembler;
@@ -306,6 +306,7 @@ class Cursor implements CursorInterface, Serializable
     {
         $properties = get_object_vars($this);
         $properties['collection'] = $this->collection->getCollectionName();
+        unset($properties['cursor']);
 
         return serialize($properties);
     }
@@ -339,7 +340,7 @@ class Cursor implements CursorInterface, Serializable
     {
         if (!$this->cursor) {
             $driverCursor = $this->collection->{$this->command}(...$this->params);
-            $this->cursor = new IteratorIterator($driverCursor);
+            $this->cursor = new CachingIterator($driverCursor);
             $this->cursor->rewind();
         }
 

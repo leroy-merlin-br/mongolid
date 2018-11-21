@@ -3,9 +3,9 @@ namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use ErrorException;
-use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
+use MongoDB\Model\CachingIterator;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 use Mongolid\Util\CacheComponentInterface;
@@ -171,7 +171,7 @@ class CacheableCursorTest extends TestCase
 
         // Assert
         $this->assertEquals(
-            new IteratorIterator(new ArrayIterator($documentsFromDb)),
+            new CachingIterator(new ArrayIterator($documentsFromDb)),
             $this->callProtected($cursor, 'getCursor')
         );
     }

@@ -2,12 +2,13 @@
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use ArrayObject;
 use Iterator;
-use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
+use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\AbstractActiveRecord;
 use Mongolid\Schema\AbstractSchema;
@@ -122,7 +123,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -140,7 +141,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -148,12 +149,13 @@ class CursorTest extends TestCase
         // Act
         $driverCursor->expects()
             ->rewind()
-            ->twice()
-            ->andReturnUsing(function () use ($cursor) {
-                if ($this->getProtected($cursor, 'cursor')) {
-                    throw new LogicException('Cursor already initialized', 1);
+            ->andReturnUsing(
+                function () use ($cursor) {
+                    if ($this->getProtected($cursor, 'cursor')) {
+                        throw new LogicException('Cursor already initialized', 1);
+                    }
                 }
-            });
+            );
 
         // Assert
         $cursor->rewind();
@@ -164,16 +166,13 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->expects()
-            ->current()
-            ->andReturn(['name' => 'John Doe']);
+        $entity = $cursor->current();
 
         // Assert
-        $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('John Doe', 'name', $entity);
     }
@@ -197,19 +196,13 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->expects()
-            ->rewind();
-
-        $driverCursor->expects()
-            ->current()
-            ->andReturn(['name' => 'John Doe']);
+        $entity = $cursor->first();
 
         // Assert
-        $entity = $cursor->first();
         $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertAttributeEquals('John Doe', 'name', $entity);
     }
@@ -218,26 +211,21 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = new CachingIterator(new ArrayObject());
+
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $driverCursor->expects()
-            ->rewind();
-
-        $driverCursor->expects()
-            ->current()
-            ->andReturn(null);
+        $result = $cursor->first();
 
         // Assert
-        $result = $cursor->first();
         $this->assertNull($result);
     }
 
     public function testShouldRefreshTheCursor()
     {
         // Arrange
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = new CachingIterator(new ArrayObject());
         $cursor = $this->getCursor();
         $this->setProtected($cursor, 'cursor', $driverCursor);
 
@@ -261,7 +249,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
@@ -279,7 +267,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
@@ -328,14 +316,14 @@ class CursorTest extends TestCase
 
         // Assert
         $result = $this->callProtected($cursor, 'getCursor');
-        $this->assertInstanceOf(IteratorIterator::class, $result);
+        $this->assertInstanceOf(CachingIterator::class, $result);
     }
 
     public function testShouldReturnAllResults()
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
@@ -375,7 +363,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
+        $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Act
@@ -479,7 +467,8 @@ class CursorTest extends TestCase
         /*
          * Emulates a MongoDB\Collection non serializable behavior.
          */
-        return new class() implements Serializable {
+        return new class() implements Serializable
+        {
             public function serialize()
             {
                 throw new Exception('Unable to serialize', 1);
