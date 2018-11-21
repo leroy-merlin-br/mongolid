@@ -97,7 +97,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
-     * @return AbstractActiveRecord
+     * @return static|null
      */
     public static function first(
         $query = [],
@@ -121,7 +121,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @throws ModelNotFoundException If no document was found
      *
-     * @return AbstractActiveRecord
+     * @return static|null
      */
     public static function firstOrFail(
         $query = [],
@@ -142,7 +142,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param mixed $id document id
      *
-     * @return AbstractActiveRecord
+     * @return static|null
      */
     public static function firstOrNew($id)
     {

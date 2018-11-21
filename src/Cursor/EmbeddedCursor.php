@@ -134,7 +134,7 @@ class EmbeddedCursor implements CursorInterface
     public function current()
     {
         if (!$this->valid()) {
-            return;
+            return null;
         }
 
         $document = $this->items[$this->position];

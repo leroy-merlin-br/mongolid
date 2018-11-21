@@ -199,7 +199,9 @@ class Cursor implements CursorInterface, Serializable
      */
     public function current()
     {
-        $document = $this->getCursor()->current();
+        if (!$document = $this->getCursor()->current()) {
+            return null;
+        }
 
         if ($document instanceof AbstractActiveRecord) {
             $documentToArray = $document->toArray();
@@ -222,13 +224,8 @@ class Cursor implements CursorInterface, Serializable
     public function first()
     {
         $this->rewind();
-        $document = $this->getCursor()->current();
 
-        if (!$document) {
-            return;
-        }
-
-        return $this->getAssembler()->assemble($document, $this->entitySchema);
+        return $this->current();
     }
 
     /**
@@ -341,7 +338,6 @@ class Cursor implements CursorInterface, Serializable
         if (!$this->cursor) {
             $driverCursor = $this->collection->{$this->command}(...$this->params);
             $this->cursor = new CachingIterator($driverCursor);
-            $this->cursor->rewind();
         }
 
         return $this->cursor;

@@ -264,7 +264,7 @@ class DataMapper implements HasSchemaInterface
      * @param array $projection fields to project in Mongo query
      * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
-     * @return mixed First document matching query as an $this->schema->entityClass object
+     * @return static|null First document matching query as an $this->schema->entityClass object
      */
     public function first(
         $query = [],
@@ -303,7 +303,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @throws ModelNotFoundException If no document was found
      *
-     * @return mixed First document matching query as an $this->schema->entityClass object
+     * @return static|null First document matching query as an $this->schema->entityClass object
      */
     public function firstOrFail(
         $query = [],

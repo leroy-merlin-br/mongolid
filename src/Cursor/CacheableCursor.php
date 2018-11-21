@@ -90,7 +90,7 @@ class CacheableCursor extends Cursor
         $cacheComponent->put($cacheKey, $this->documents, 0.6);
 
         // Drops the unserializable DriverCursor.
-        $this->cursor = null;
+        $this->fresh();
 
         // Return the documents iterator
         return $this->documents = new ArrayIterator($this->documents);
@@ -158,15 +158,9 @@ class CacheableCursor extends Cursor
         return $this->getOriginalCursor();
     }
 
-    /**
-     * Serializes this object. Drops the unserializable DriverCursor. In order
-     * to make the CacheableCursor object serializable.
-     *
-     * @return string serialized object
-     */
     public function serialize()
     {
-        $this->documents = $this->cursor = null;
+        $this->documents = null;
 
         return parent::serialize();
     }
