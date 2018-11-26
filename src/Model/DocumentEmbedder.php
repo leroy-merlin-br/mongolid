@@ -37,9 +37,8 @@ class DocumentEmbedder
         // In order to update the document if it exists inside the $parent
         $this->unembed($parent, $field, $model);
 
-        $data = $model->parseToDocument($model);
         $fieldValue = $parent->$field;
-        $fieldValue[] = $data;
+        $fieldValue[] = $model;
         $parent->$field = array_values($fieldValue);
 
         return true;

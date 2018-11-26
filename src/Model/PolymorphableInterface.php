@@ -7,8 +7,6 @@ namespace Mongolid\Model;
  * method and retrieve the object returned from it.
  *
  * See the docblock of the `polymorph` method for more details.
- *
- * @see \Mongolid\Query\ModelAssembler
  */
 interface PolymorphableInterface
 {

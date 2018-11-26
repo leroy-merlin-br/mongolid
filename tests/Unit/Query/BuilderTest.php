@@ -39,21 +39,14 @@ class BuilderTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
-
-        $model->_id = null;
 
         // Act
         $builder->shouldAllowMockingProtectedMethods();
-
-        $builder->expects()
-            ->parseToDocument($model)
-            ->andReturn($parsedObject);
 
         $builder->expects()
             ->getCollection()
@@ -62,7 +55,7 @@ class BuilderTest extends TestCase
         $collection->expects()
             ->replaceOne(
                 ['_id' => 123],
-                $parsedObject,
+                $model,
                 ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
@@ -97,11 +90,10 @@ class BuilderTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
         $model->_id = null;
@@ -110,15 +102,11 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->parseToDocument($model)
-            ->andReturn($parsedObject);
-
-        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
         $collection->expects()
-            ->insertOne($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
+            ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->expects()
@@ -148,11 +136,10 @@ class BuilderTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
         $model->_id = null;
@@ -161,15 +148,11 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->parseToDocument($model)
-            ->andReturn($parsedObject);
-
-        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
         $collection->expects()
-            ->insertOne($parsedObject, ['writeConcern' => new WriteConcern($writeConcern)])
+            ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
         $operationResult->expects()
@@ -202,21 +185,6 @@ class BuilderTest extends TestCase
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
-
-        $this->instance(
-            AbstractSchema::class,
-            new class() extends AbstractSchema
-            {
-                /**
-                 * {@inheritdoc}
-                 */
-                public $fields = [
-                    '_id' => 'objectId',
-                ];
-            }
-        );
-
-        $model->_id = 123;
 
         // Expect
         $connection->expects()
@@ -271,24 +239,17 @@ class BuilderTest extends TestCase
 
         $model = new class extends AbstractModel
         {
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                '_id' => 'objectId',
+                'unchanged' => 'string',
+            ];
         };
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
-
-        $this->instance(
-            AbstractSchema::class,
-            new class() extends AbstractSchema
-            {
-                /**
-                 * {@inheritdoc}
-                 */
-                public $fields = [
-                    '_id' => 'objectId',
-                    'unchanged' => 'string',
-                ];
-            }
-        );
 
         $model->unchanged = 'unchanged';
         $model->notOnSchema = 'to be deleted';
@@ -313,7 +274,7 @@ class BuilderTest extends TestCase
         $collection->expects()
             ->updateOne(
                 ['_id' => 123],
-                ['$set' => ['_id' => 123], '$unset' => ['name' => '', 'notOnSchema' => '']],
+                ['$set' => ['_id' => 123], '$unset' => ['name' => '']],
                 $options
             )->andReturn($operationResult);
 
@@ -347,10 +308,9 @@ class BuilderTest extends TestCase
     ) {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
@@ -360,16 +320,12 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->parseToDocument($model)
-            ->andReturn($parsedObject);
-
-        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
         $collection->expects()
             ->insertOne(
-                $parsedObject,
+                $model,
                 ['writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
@@ -403,21 +359,14 @@ class BuilderTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $model->_id = null;
-
         // Act
         $builder->shouldAllowMockingProtectedMethods();
-
-        $builder->expects()
-            ->parseToDocument($model)
-            ->andReturn($parsedObject);
 
         $builder->expects()
             ->getCollection()
@@ -457,17 +406,13 @@ class BuilderTest extends TestCase
     ) {
         // Arrange
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
         $model = m::mock(ModelInterface::class);
 
         $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $builder->expects()
-            ->parseToDocument($model)
-            ->never();
-
         $builder->allows()
             ->getCollection()
             ->andReturn($collection);
@@ -550,18 +495,12 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $object = new class extends AbstractModel
         {
         };
-
-        $class = get_class($object);
-        $schema->modelClass = $class;
-        $builder->setSchema($schema);
-
         $builder->shouldAllowMockingProtectedMethods();
 
         // Act
@@ -575,13 +514,12 @@ class BuilderTest extends TestCase
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
-            ->andReturn(['name' => 'John Doe']);
+            ->andReturn($object);
 
         $result = $builder->first($query);
 
         // Assert
-        $this->assertInstanceOf($class, $result);
-        $this->assertSame('John Doe', $result->name);
+        $this->assertSame($object, $result);
     }
 
     public function testFirstWithNullShouldNotHitTheDatabase()
@@ -602,17 +540,12 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $object = new class extends AbstractModel
         {
         };
-
-        $class = get_class($object);
-        $schema->modelClass = $class;
-        $builder->setSchema($schema);
 
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -627,13 +560,12 @@ class BuilderTest extends TestCase
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
-            ->andReturn(['name' => 'John Doe']);
+            ->andReturn($object);
 
         $result = $builder->firstOrFail($query);
 
         // Assert
-        $this->assertInstanceOf($class, $result);
-        $this->assertSame('John Doe', $result->name);
+        $this->assertSame($object, $result);
     }
 
     public function testFirstOrFailWithNullShouldFail()
@@ -732,37 +664,6 @@ class BuilderTest extends TestCase
 
         // Assert
         $this->assertNull($result);
-    }
-
-    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
-    {
-        // Arrange
-        $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getSchemaMapper]', [$connection]);
-        $model = m::mock(ModelInterface::class);
-        $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
-        $schemaMapper = m::mock(SchemaMapper::class, [m::mock(AbstractSchema::class)]);
-
-        $builder->shouldAllowMockingProtectedMethods();
-
-        // Expect
-        $builder->expects()
-            ->getSchemaMapper()
-            ->andReturn($schemaMapper);
-
-        $schemaMapper->expects()
-            ->map($model)
-            ->andReturn($parsedDocument);
-
-        // Act
-        $result = $this->callProtected($builder, 'parseToDocument', [$model]);
-
-        // Assert
-        $this->assertSame($parsedDocument, $result);
-        $this->assertSame(
-            'bacon', // Since this was the parsedDocument _id
-            $model->_id
-        );
     }
 
     public function testShouldGetSchemaMapper()
@@ -928,11 +829,26 @@ class BuilderTest extends TestCase
     {
         $model = new class extends AbstractModel
         {
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                '_id' => 'objectId',
+            ];
         };
 
         $model2 = new class extends AbstractModel
         {
+            /**
+             * {@inheritdoc}
+             */
+            public $fields = [
+                '_id' => 'objectId',
+            ];
         };
+
+        $model->_id = 123;
+        $model2->_id = 123;
 
         return [
             'acknowledged write concern ' => [

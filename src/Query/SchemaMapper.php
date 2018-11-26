@@ -10,8 +10,6 @@ use Mongolid\Schema\AbstractSchema;
  * When instantiating a SchemaMapper you should provide a Schema. When calling
  * 'map' the Schema provided will be used to format the data to the correct
  * format.
- *
- * This class is meant to do the opposite of the ModelAssembler
  */
 class SchemaMapper
 {

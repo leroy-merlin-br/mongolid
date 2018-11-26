@@ -39,7 +39,7 @@ class ConnectionTest extends TestCase
 
     public function testShouldGetRawConnection()
     {
-        // Arrange
+        // Set
         $server = 'mongodb://my-server/my_db';
         $options = ['some', 'uri', 'options'];
         $driverOptions = ['some', 'driver', 'options'];
@@ -51,11 +51,11 @@ class ConnectionTest extends TestCase
             ],
         ];
 
-        // Act
+        // Actions
         $connection = new Connection($server, $options, $driverOptions);
         $rawConnection = $connection->getRawConnection();
 
-        // Assert
+        // Assertions
         $this->assertAttributeEquals($expectedParameters['uri'], 'uri', $rawConnection);
         $this->assertAttributeEquals($expectedParameters['typeMap'], 'typeMap', $rawConnection);
     }

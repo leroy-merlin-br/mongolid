@@ -7,6 +7,7 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
+use Mongolid\Query\SchemaMapper;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 
@@ -140,16 +141,6 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * Parses an object with SchemaMapper.
-     *
-     * @param mixed $model the object to be parsed
-     */
-    public function parseToDocument($model): array
-    {
-        return $this->getBuilder()->parseToDocument($model);
-    }
-
-    /**
      * Saves this object into database.
      */
     public function save(): bool
@@ -278,6 +269,27 @@ abstract class AbstractModel implements ModelInterface
         $schema->collection = $this->collection;
 
         return $schema;
+    }
+
+    public function bsonSerialize()
+    {
+        $schemaMapper = Ioc::make(SchemaMapper::class, ['schema' => $this->getSchema()]);
+
+        $parsedDocument = $schemaMapper->map($this);
+
+        foreach ($parsedDocument as $field => $value) {
+            $this->setDocumentAttribute($field, $value);
+        }
+
+        return $parsedDocument;
+    }
+
+    public function bsonUnserialize(array $data)
+    {
+        unset($data['__pclass']);
+        $this->fill($data);
+
+        $this->syncOriginalDocumentAttributes();
     }
 
     /**

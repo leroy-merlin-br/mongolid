@@ -41,7 +41,7 @@ class DocumentEmbedderTest extends TestCase
             }
 
             $expectedDocArray = (array) $expectedDoc;
-            $resultDocArray = (array) $result[$index];
+            $resultDocArray = is_int($result[$index]) ? [$result[$index]] : $result[$index]->toArray();
             foreach ($expectedDocArray as $field => $value) {
                 if ($value instanceof Any) {
                     $this->assertTrue(isset($resultDocArray[$field]));
@@ -109,6 +109,17 @@ class DocumentEmbedderTest extends TestCase
                 'expectation' => [
                     new ObjectId('507f191e810c19729de860ea'),
                 ],
+            ],
+
+            // ------------------------------
+            'attaching object with integer _id' => [
+                'originalField' => [6],
+                'model' => [
+                    '_id' => 7,
+                    'name' => 'John Doe',
+                ],
+                'method' => 'attach',
+                'expectation' => [6, 7],
             ],
 
             // ------------------------------

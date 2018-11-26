@@ -206,7 +206,37 @@ class EmbeddedCursorTest extends TestCase
 
     public function testShouldGetAllItems()
     {
-        // Arrange
+        // Set
+        $modelA = new class extends AbstractModel
+        {
+        };
+        $modelA->name = 'A';
+        $modelA->syncOriginalDocumentAttributes();
+        $modelB = clone $modelA;
+        $modelB->name = 'B';
+        $modelB->syncOriginalDocumentAttributes();
+
+        $items = [
+            $modelA,
+            $modelB,
+        ];
+        $cursor = $this->getCursor(get_class($modelA), $items);
+        $this->setProtected($cursor, 'position', 1);
+
+        $expected = [
+            $modelA,
+            $modelB,
+        ];
+
+        // Assert
+        $result = $cursor->all();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testShouldGetAllItemsWithBackwardsCompatibility()
+    {
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],

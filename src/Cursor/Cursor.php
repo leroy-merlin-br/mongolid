@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Cursor;
 
+use Iterator;
 use LogicException as BaseLogicException;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
@@ -13,7 +14,6 @@ use Mongolid\Model\AbstractModel;
 use Mongolid\Query\ModelAssembler;
 use Mongolid\Schema\AbstractSchema;
 use Serializable;
-use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -333,7 +333,7 @@ class Cursor implements CursorInterface, Serializable
      * If it does not exists yet, create it using the $collection, $command and
      * $params given.
      */
-    protected function getCursor(): Traversable
+    protected function getCursor(): Iterator
     {
         if (!$this->cursor) {
             $driverCursor = $this->collection->{$this->command}(...$this->params);
@@ -345,10 +345,8 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Retrieves an ModelAssembler instance.
-     *
-     * @return ModelAssembler
      */
-    protected function getAssembler()
+    protected function getAssembler(): ModelAssembler
     {
         if (!$this->assembler) {
             $this->assembler = Ioc::make(ModelAssembler::class);

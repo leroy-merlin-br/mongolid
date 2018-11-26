@@ -44,13 +44,6 @@ class Builder
     protected $connection;
 
     /**
-     * Have the responsibility of assembling the data coming from the database into actual entities.
-     *
-     * @var ModelAssembler
-     */
-    protected $assembler;
-
-    /**
      * In order to dispatch events when necessary.
      *
      * @var EventTriggerService
@@ -81,11 +74,12 @@ class Builder
             return false;
         }
 
-        $data = $this->parseToDocument($model);
+        // TODO rework this
+        $model->bsonSerialize();
 
         $queryResult = $this->getCollection()->replaceOne(
-            ['_id' => $data['_id']],
-            $data,
+            ['_id' => $model->_id],
+            $model,
             $this->mergeOptions($options, ['upsert' => true])
         );
 
@@ -119,10 +113,8 @@ class Builder
             return false;
         }
 
-        $data = $this->parseToDocument($model);
-
         $queryResult = $this->getCollection()->insertOne(
-            $data,
+            $model,
             $this->mergeOptions($options)
         );
 
@@ -166,12 +158,11 @@ class Builder
             return $result;
         }
 
-        $data = $this->parseToDocument($model);
-
-        $updateData = $this->getUpdateData($model, $data);
+        // TODO review this
+        $updateData = $this->getUpdateData($model, $model->bsonSerialize());
 
         $queryResult = $this->getCollection()->updateOne(
-            ['_id' => $data['_id']],
+            ['_id' => $model->_id],
             $updateData,
             $this->mergeOptions($options)
         );
@@ -202,10 +193,8 @@ class Builder
             return false;
         }
 
-        $data = $this->parseToDocument($model);
-
         $queryResult = $this->getCollection()->deleteOne(
-            ['_id' => $data['_id']],
+            ['_id' => $model->_id],
             $this->mergeOptions($options)
         );
 
@@ -264,18 +253,10 @@ class Builder
             return null;
         }
 
-        $document = $this->getCollection()->findOne(
+        return $this->getCollection()->findOne(
             $this->prepareValueQuery($query),
             ['projection' => $this->prepareProjection($projection)]
         );
-
-        if (!$document) {
-            return null;
-        }
-
-        $model = $this->getAssembler()->assemble($document, $this->schema);
-
-        return $model;
     }
 
     /**
@@ -301,7 +282,7 @@ class Builder
     /**
      * {@inheritdoc}
      */
-    public function getSchema(): AbstractSchema
+    public function getSchema(): ?AbstractSchema
     {
         return $this->schema;
     }
@@ -312,25 +293,6 @@ class Builder
     public function setSchema(AbstractSchema $schema): void
     {
         $this->schema = $schema;
-    }
-
-    /**
-     * Parses an object with SchemaMapper and the given Schema.
-     *
-     * @param ModelInterface $model the object to be parsed
-     */
-    public function parseToDocument(ModelInterface $model): array
-    {
-        $schemaMapper = $this->getSchemaMapper();
-        $parsedDocument = $schemaMapper->map($model);
-
-        if (is_object($model)) {
-            foreach ($parsedDocument as $field => $value) {
-                $model->$field = $value;
-            }
-        }
-
-        return $parsedDocument;
     }
 
     /**
@@ -352,7 +314,7 @@ class Builder
     {
         $connection = $this->connection;
         $database = $connection->defaultDatabase;
-        $collection = $this->schema->collection;
+        $collection = $this->getSchema()->collection;
 
         return $connection->getRawConnection()->$database->$collection;
     }
@@ -411,18 +373,6 @@ class Builder
         }
 
         return $value;
-    }
-
-    /**
-     * Retrieves an ModelAssembler instance.
-     */
-    protected function getAssembler(): ModelAssembler
-    {
-        if (!$this->assembler) {
-            $this->assembler = Ioc::make(ModelAssembler::class);
-        }
-
-        return $this->assembler;
     }
 
     /**
