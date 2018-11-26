@@ -1,12 +1,6 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\Container\Ioc;
-use Mongolid\Model\AbstractModel;
-use Mongolid\Query\ModelAssembler;
-use Mongolid\Schema\AbstractSchema;
-use Mongolid\Schema\DynamicSchema;
-
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
  * By doing this we can use 'sort', 'skip', 'limit' and others after calling 'where'.
@@ -15,13 +9,6 @@ use Mongolid\Schema\DynamicSchema;
  */
 class EmbeddedCursor implements CursorInterface
 {
-    /**
-     * Model class that will be returned while iterating.
-     *
-     * @var string
-     */
-    public $modelClass;
-
     /**
      * The actual array of embedded documents.
      *
@@ -37,13 +24,11 @@ class EmbeddedCursor implements CursorInterface
     private $position = 0;
 
     /**
-     * @param string $modelClass class of the objects that will be retrieved by the cursor
-     * @param array  $items      the items array
+     * @param array $items
      */
-    public function __construct(string $modelClass, array $items)
+    public function __construct(array $items)
     {
         $this->items = $items;
-        $this->modelClass = $modelClass;
     }
 
     /**
@@ -133,38 +118,7 @@ class EmbeddedCursor implements CursorInterface
      */
     public function current()
     {
-        if (!$this->valid()) {
-            return null;
-        }
-
-        $document = $this->items[$this->position];
-
-        if ($document instanceof $this->modelClass) {
-            return $document;
-        }
-
-        $schema = $this->getSchemaForModel();
-        $modelAssembler = Ioc::make(ModelAssembler::class, compact('schema'));
-
-        return $modelAssembler->assemble($document, $schema);
-    }
-
-    /**
-     * Retrieve a schema based on Model Class.
-     */
-    protected function getSchemaForModel(): AbstractSchema
-    {
-        if ($this->modelClass instanceof AbstractSchema) {
-            return $this->modelClass;
-        }
-
-        $model = new $this->modelClass();
-
-        if ($model instanceof AbstractModel) {
-            return $model->getSchema();
-        }
-
-        return new DynamicSchema();
+        return $this->items[$this->position] ?? null;
     }
 
     /**

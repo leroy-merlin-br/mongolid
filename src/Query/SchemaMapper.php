@@ -3,7 +3,7 @@ namespace Mongolid\Query;
 
 use Mongolid\Container\Ioc;
 use Mongolid\Model\HasAttributesInterface;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 
 /**
  * The SchemaMapper will map an object or an array of data to a Schema object.
@@ -16,7 +16,7 @@ class SchemaMapper
     /**
      * The actual schema to maps the data.
      *
-     * @var AbstractSchema
+     * @var DynamicSchema
      */
     public $schema;
 
@@ -30,9 +30,9 @@ class SchemaMapper
     protected $castableTypes = ['int', 'integer', 'bool', 'boolean', 'float', 'double', 'real', 'string'];
 
     /**
-     * @param AbstractSchema $schema schema that will be used to map each field
+     * @param DynamicSchema $schema schema that will be used to map each field
      */
-    public function __construct(AbstractSchema $schema)
+    public function __construct(DynamicSchema $schema)
     {
         $this->schema = $schema;
     }

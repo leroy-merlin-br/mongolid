@@ -21,10 +21,10 @@ class EmbedsOne extends EmbedsMany
      */
     public function get()
     {
-        $items = (array) $this->parent->{$this->field};
+        $items = $this->parent->{$this->field} ?? [];
 
-        if (!empty($items) && !array_key_exists(0, $items)) {
-            $items = [$items];
+        if (is_object($items)) {
+            return $items;
         }
 
         return $this->createCursor($items)->first();

@@ -10,9 +10,7 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Model\AbstractModel;
-use Mongolid\Query\ModelAssembler;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 use Serializable;
 
 /**
@@ -64,20 +62,13 @@ class Cursor implements CursorInterface, Serializable
     protected $position = 0;
 
     /**
-     * Have the responsibility of assembling the data coming from the database into actual entities.
-     *
-     * @var ModelAssembler
-     */
-    protected $assembler;
-
-    /**
-     * @param AbstractSchema $modelSchema schema that describes the model that will be retrieved from the database
-     * @param Collection     $collection  the raw collection object that will be used to retrieve the documents
-     * @param string         $command     the command that is being called in the $collection
-     * @param array          $params      the parameters of the $command
+     * @param DynamicSchema $modelSchema schema that describes the model that will be retrieved from the database
+     * @param Collection    $collection  the raw collection object that will be used to retrieve the documents
+     * @param string        $command     the command that is being called in the $collection
+     * @param array         $params      the parameters of the $command
      */
     public function __construct(
-        AbstractSchema $modelSchema,
+        DynamicSchema $modelSchema,
         Collection $collection,
         string $command,
         array $params
@@ -199,21 +190,9 @@ class Cursor implements CursorInterface, Serializable
      */
     public function current()
     {
-        if (!$document = $this->getCursor()->current()) {
-            return null;
-        }
+        $cursor = $this->getCursor();
 
-        if ($document instanceof AbstractModel) {
-            $documentToArray = $document->toArray();
-            $this->modelSchema = $document->getSchema();
-        } else {
-            $documentToArray = (array) $document;
-        }
-
-        return $this->getAssembler()->assemble(
-            $documentToArray,
-            $this->modelSchema
-        );
+        return $cursor->valid() ? $cursor->current() : null;
     }
 
     /**
@@ -341,17 +320,5 @@ class Cursor implements CursorInterface, Serializable
         }
 
         return $this->cursor;
-    }
-
-    /**
-     * Retrieves an ModelAssembler instance.
-     */
-    protected function getAssembler(): ModelAssembler
-    {
-        if (!$this->assembler) {
-            $this->assembler = Ioc::make(ModelAssembler::class);
-        }
-
-        return $this->assembler;
     }
 }

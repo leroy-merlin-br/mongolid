@@ -45,7 +45,7 @@ class HasRelationsTraitTest extends TestCase
 
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
         $expectedQuery = $expectedQuery['referencesMany'];
-        $expected = new EmbeddedCursor(RelatedStub::class, []);
+        $expected = new EmbeddedCursor([]);
 
         // Expectations
         $builder->expects()
@@ -75,7 +75,7 @@ class HasRelationsTraitTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(RelatedStub::class, $result);
-        $this->assertEquals($expectedItems, $result->getDocumentAttributes());
+        $this->assertEquals($expectedItems, $result);
     }
 
     /**
@@ -91,17 +91,11 @@ class HasRelationsTraitTest extends TestCase
 
         // Act
         $result = $model->relationEmbedsMany;
-        $values = array_map(
-            function ($item) {
-                return $item->getDocumentAttributes();
-            },
-            $result->all()
-        );
 
         // Assert
         $this->assertInstanceOf(EmbeddedCursor::class, $result);
         $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
-        $this->assertEquals($expectedItems, $values);
+        $this->assertEquals($expectedItems, $result->all());
     }
 
     public function referenceScenarios()
@@ -168,19 +162,29 @@ class HasRelationsTraitTest extends TestCase
 
     public function embedsScenarios()
     {
+        $model1 = new RelatedStub();
+        $model1->_id = 12345;
+        $model1->name = 'John';
+        $model1->syncOriginalDocumentAttributes();
+
+        $model2 = new RelatedStub();
+        $model2->_id = 67890;
+        $model2->name = 'Bob';
+        $model2->syncOriginalDocumentAttributes();
+
         return [
             'A single embedded document' => [
-                'fieldValue' => ['_id' => 12345, 'name' => 'batata'],
+                'fieldValue' => $model1,
                 'expectedItems' => [
-                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
-                    'embedsMany' => [['_id' => 12345, 'name' => 'batata']],
+                    'embedsOne' => $model1,
+                    'embedsMany' => [$model1],
                 ],
             ],
             'Many embedded documents' => [
-                'fieldValue' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                'fieldValue' => [$model1, $model2],
                 'expectedItems' => [
-                    'embedsOne' => ['_id' => 12345, 'name' => 'batata'],
-                    'embedsMany' => [['_id' => 12345, 'name' => 'batata'], ['_id' => 67890, 'name' => 'bar']],
+                    'embedsOne' => $model1,
+                    'embedsMany' => [$model1, $model2],
                 ],
             ],
         ];

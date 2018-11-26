@@ -11,7 +11,6 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\AbstractModel;
-use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use Serializable;
@@ -168,24 +167,6 @@ class CursorTest extends TestCase
         $object = new class extends AbstractModel
         {
         };
-        $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
-        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
-
-        // Act
-        $model = $cursor->current();
-
-        // Assert
-        $this->assertInstanceOf(get_class($object), $model);
-        $this->assertSame('John Doe', $model->name);
-    }
-
-    public function testShouldGetCurrentUsingModelClasses()
-    {
-        // Arrange
-        $collection = m::mock(Collection::class);
-        $object = new class extends AbstractModel
-        {
-        };
         $object->name = 'John Doe';
         $driverCursor = new ArrayIterator([$object]);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
@@ -203,7 +184,8 @@ class CursorTest extends TestCase
         $object = new class extends AbstractModel
         {
         };
-        $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
+        $object->name = 'John Doe';
+        $driverCursor = new CachingIterator(new ArrayObject([$object]));
         $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
 
         // Act
@@ -330,17 +312,19 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = new CachingIterator(
-            new ArrayObject(
-                [
-                    ['name' => 'bob', 'occupation' => 'coder'],
-                    ['name' => 'jef', 'occupation' => 'tester'],
-                ]
-            )
-        );
         $object = new class extends AbstractModel
         {
         };
+        $class = get_class($object);
+        $bob = new $class();
+        $bob->name = 'bob';
+        $bob->occupation = 'coder';
+
+        $jef = new $class();
+        $jef->name = 'jef';
+        $jef->occupation = 'tester';
+
+        $driverCursor = new CachingIterator(new ArrayObject([$bob, $jef]));
         $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
 
         // Actions
@@ -348,7 +332,7 @@ class CursorTest extends TestCase
 
         // Assertions
         $this->assertCount(2, $result);
-        $this->assertContainsOnlyInstancesOf(get_class($object), $result);
+        $this->assertContainsOnlyInstancesOf($class, $result);
 
         $firstModel = $result[0];
         $this->assertSame('bob', $firstModel->name);
@@ -432,7 +416,7 @@ class CursorTest extends TestCase
         $driverCursor = null
     ) {
         if (!$modelSchema) {
-            $modelSchema = m::mock(AbstractSchema::class.'[]');
+            $modelSchema = m::mock(DynamicSchema::class.'[]');
         }
 
         if (!$collection) {

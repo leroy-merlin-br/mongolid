@@ -6,7 +6,6 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
-use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use stdClass;
@@ -286,7 +285,7 @@ class AbstractModelTest extends TestCase
     {
         // Set
         $this->model->setFields('MySchemaClass');
-        $schema = $this->instance('MySchemaClass', m::mock(AbstractSchema::class));
+        $schema = $this->instance('MySchemaClass', m::mock(DynamicSchema::class));
 
         // Assertions
         $this->assertSame(
@@ -303,7 +302,7 @@ class AbstractModelTest extends TestCase
 
         // Assertions
         $result = $this->model->getSchema();
-        $this->assertInstanceOf(AbstractSchema::class, $result);
+        $this->assertInstanceOf(DynamicSchema::class, $result);
         $this->assertSame($fields, $result->fields);
         $this->assertSame($this->model->dynamic, $result->dynamic);
         $this->assertSame($this->model->getCollectionName(), $result->collection);
@@ -314,7 +313,7 @@ class AbstractModelTest extends TestCase
     {
         // Set
         $model = m::mock(AbstractModel::class.'[getSchema]');
-        $schema = m::mock(AbstractSchema::class.'[]');
+        $schema = m::mock(DynamicSchema::class.'[]');
 
         // Actions
         $model->shouldAllowMockingProtectedMethods();

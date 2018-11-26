@@ -11,7 +11,7 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -27,12 +27,12 @@ class Builder
      *
      * @var string
      */
-    public $schemaClass = AbstractSchema::class;
+    public $schemaClass = DynamicSchema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass.
      *
-     * @var AbstractSchema
+     * @var DynamicSchema
      */
     protected $schema;
 
@@ -282,7 +282,7 @@ class Builder
     /**
      * {@inheritdoc}
      */
-    public function getSchema(): ?AbstractSchema
+    public function getSchema(): ?DynamicSchema
     {
         return $this->schema;
     }
@@ -290,7 +290,7 @@ class Builder
     /**
      * Set a Schema object  that describes an Model in MongoDB.
      */
-    public function setSchema(AbstractSchema $schema): void
+    public function setSchema(DynamicSchema $schema): void
     {
         $this->schema = $schema;
     }

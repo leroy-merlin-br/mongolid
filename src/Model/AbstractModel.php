@@ -8,7 +8,6 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\Query\SchemaMapper;
-use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 
 /**
@@ -52,7 +51,7 @@ abstract class AbstractModel implements ModelInterface
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
-     * @see  \Mongolid\Schema\AbstractSchema::$fields
+     * @see  \Mongolid\Schema\DynamicSchema::$fields
      *
      * @var string|string[]
      */
@@ -256,7 +255,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchema(): AbstractSchema
+    public function getSchema(): DynamicSchema
     {
         if ($schema = $this->instantiateSchemaInFields()) {
             return $schema;
@@ -296,10 +295,10 @@ abstract class AbstractModel implements ModelInterface
      * Will check if the current value of $fields property is the name of a
      * Schema class and instantiate it if possible.
      */
-    protected function instantiateSchemaInFields(): ?AbstractSchema
+    protected function instantiateSchemaInFields(): ?DynamicSchema
     {
         if (is_string($this->fields)) {
-            if (is_subclass_of($instance = Ioc::make($this->fields), AbstractSchema::class)) {
+            if (is_subclass_of($instance = Ioc::make($this->fields), DynamicSchema::class)) {
                 return $instance;
             }
         }

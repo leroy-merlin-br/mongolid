@@ -7,7 +7,7 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 
 /**
  * This class is meant to provide a better API for handling
@@ -30,7 +30,7 @@ class BulkWrite
     protected $bulkWrite;
 
     /**
-     * @var AbstractSchema
+     * @var DynamicSchema
      */
     protected $schema;
 

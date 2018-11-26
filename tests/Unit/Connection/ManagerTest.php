@@ -7,7 +7,7 @@ use MongoDB\Client;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Query\Builder;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 
 class ManagerTest extends TestCase
@@ -63,7 +63,7 @@ class ManagerTest extends TestCase
     {
         // Arrange
         $manager = new Manager();
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
         $schema->modelClass = 'Bacon';
 
         // Assert
@@ -79,7 +79,7 @@ class ManagerTest extends TestCase
     {
         // Arrange
         $manager = new Manager();
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
 
         $schema->modelClass = 'Bacon';

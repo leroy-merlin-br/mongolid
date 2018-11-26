@@ -62,17 +62,17 @@ class EmbedsMany extends AbstractRelation
      */
     public function get()
     {
-        $items = (array) $this->parent->{$this->field};
+        $items = $this->parent->{$this->field} ?? [];
 
-        if (!empty($items) && !array_key_exists(0, $items)) {
+        if (is_object($items)) {
             $items = [$items];
         }
 
         return $this->createCursor($items);
     }
 
-    protected function createCursor($items): EmbeddedCursor
+    protected function createCursor(array $items): EmbeddedCursor
     {
-        return new EmbeddedCursor($this->model, $items);
+        return new EmbeddedCursor($items);
     }
 }

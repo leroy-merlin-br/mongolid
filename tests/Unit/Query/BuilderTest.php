@@ -15,7 +15,7 @@ use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AbstractModel;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 
 class BuilderTest extends TestCase
@@ -437,7 +437,7 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -576,7 +576,7 @@ class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $builder->setSchema(
-            new class extends AbstractSchema
+            new class extends DynamicSchema
             {
                 /**
                  * {@inheritdoc}
@@ -597,7 +597,7 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -636,7 +636,7 @@ class BuilderTest extends TestCase
             Builder::class.'[prepareValueQuery,getCollection]',
             [$connection]
         );
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -674,7 +674,7 @@ class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $builder->schemaClass = 'MySchema';
-        $schema = $this->instance('MySchema', m::mock(AbstractSchema::class));
+        $schema = $this->instance('MySchema', m::mock(DynamicSchema::class));
 
         // Act
         $result = $this->callProtected($builder, 'getSchemaMapper');
@@ -690,7 +690,7 @@ class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
-        $schema = m::mock(AbstractSchema::class);
+        $schema = m::mock(DynamicSchema::class);
         $schema->collection = 'foobar';
 
         $builder->setSchema($schema);

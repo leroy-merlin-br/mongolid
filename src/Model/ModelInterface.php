@@ -2,12 +2,12 @@
 namespace Mongolid\Model;
 
 use MongoDB\BSON\Persistable;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 
 interface ModelInterface extends HasAttributesInterface, Persistable
 {
     /**
      * Returns a Schema object that describes an Model in MongoDB.
      */
-    public function getSchema(): AbstractSchema;
+    public function getSchema(): DynamicSchema;
 }

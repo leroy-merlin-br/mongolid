@@ -4,25 +4,19 @@ namespace Mongolid\Query;
 use Mockery as m;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\HasAttributesInterface;
-use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use stdClass;
 
-class AbstractSchemaMapperTest extends TestCase
+class SchemaMapperTest extends TestCase
 {
     public function testShouldMapToFieldsOfSchema()
     {
         // Arrange
         $this->instance(
             'My\Own\Schema',
-            new class() extends AbstractSchema
+            new class() extends DynamicSchema
             {
-                /**
-                 * {@inheritdoc}
-                 */
-                public $dynamic = true;
-
                 /**
                  * {@inheritdoc}
                  */
@@ -30,13 +24,8 @@ class AbstractSchemaMapperTest extends TestCase
             }
         );
 
-        $schema = new class() extends AbstractSchema
+        $schema = new class() extends DynamicSchema
         {
-            /**
-             * {@inheritdoc}
-             */
-            public $dynamic = true;
-
             /**
              * {@inheritdoc}
              */
@@ -81,7 +70,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldClearDynamicFieldsIfSchemaIsNotDynamic()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
             /**
              * {@inheritdoc}
@@ -90,7 +79,13 @@ class AbstractSchemaMapperTest extends TestCase
                 'name' => 'string',
                 'age' => 'int',
             ];
+
+            /**
+             * {@inheritdoc}
+             */
+            public $dynamic = false;
         };
+
         $schemaMapper = new SchemaMapper($schema);
         $data = [
             'name' => 'John',
@@ -144,7 +139,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoCastableType()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -164,7 +159,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldParseFieldIntoAnotherMappedSchemaIfTypeBeginsWithSchema()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $schemaMapper = m::mock(
@@ -188,7 +183,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldParseFieldUsingAMethodInSchemaIfTypeIsAnUnknownString()
     {
         // Arrange
-        $schemaClass = new class() extends AbstractSchema
+        $schemaClass = new class() extends DynamicSchema
         {
             public function pumpkinPoint($value)
             {
@@ -209,12 +204,12 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldMapAnArrayValueToAnotherSchema()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $mySchema = $this->instance(
             'Xd\MySchema',
-            new class extends AbstractSchema
+            new class extends DynamicSchema
             {
             }
         );
@@ -251,7 +246,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldParseToArrayGettingObjectAttributes()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -267,7 +262,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldParseToArrayIfIsAnArray()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);
@@ -283,7 +278,7 @@ class AbstractSchemaMapperTest extends TestCase
     public function testShouldGetAttributesWhenObjectImplementsAttributesAccessInterface()
     {
         // Arrange
-        $schema = new class extends AbstractSchema
+        $schema = new class extends DynamicSchema
         {
         };
         $schemaMapper = new SchemaMapper($schema);

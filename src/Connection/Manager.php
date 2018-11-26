@@ -6,7 +6,7 @@ use Mongolid\Container\Ioc;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Query\Builder;
-use Mongolid\Schema\AbstractSchema;
+use Mongolid\Schema\DynamicSchema;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -95,9 +95,9 @@ class Manager
     /**
      * Allow document Schemas to be registered for later use.
      *
-     * @param AbstractSchema $schema schema being registered
+     * @param DynamicSchema $schema schema being registered
      */
-    public function registerSchema(AbstractSchema $schema)
+    public function registerSchema(DynamicSchema $schema)
     {
         $this->schemas[$schema->modelClass] = $schema;
     }
