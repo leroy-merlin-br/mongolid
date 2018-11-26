@@ -180,6 +180,7 @@ class BuilderTest extends TestCase
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
         $builder = new Builder($connection);
+        $builder->setSchema($model->getSchema());
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -247,6 +248,7 @@ class BuilderTest extends TestCase
                 'unchanged' => 'string',
             ];
         };
+        $builder->setSchema($model->getSchema());
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
@@ -851,7 +853,7 @@ class BuilderTest extends TestCase
         $model2->_id = 123;
 
         return [
-            'acknowledged write concern ' => [
+            'acknowledged write concern' => [
                 'object' => $model,
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
