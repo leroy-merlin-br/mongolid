@@ -182,11 +182,11 @@ class AbstractActiveRecordTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->where($query, $projection, true)
+            ->where($query, $projection)
             ->andReturn($cursor);
 
         // Assertions
-        $this->assertSame($cursor, $this->entity->where($query, $projection, true));
+        $this->assertSame($cursor, $this->entity->where($query, $projection));
     }
 
     public function testShouldGetAll()
@@ -220,11 +220,11 @@ class AbstractActiveRecordTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->first($query, $projection, true)
+            ->first($query, $projection)
             ->andReturn($this->entity);
 
         // Assertions
-        $this->assertSame($this->entity, $this->entity->first($query, $projection, true));
+        $this->assertSame($this->entity, $this->entity->first($query, $projection));
     }
 
     public function testShouldGetFirstOrFail()
@@ -239,11 +239,11 @@ class AbstractActiveRecordTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->firstOrFail($query, $projection, true)
+            ->firstOrFail($query, $projection)
             ->andReturn($this->entity);
 
         // Assertions
-        $this->assertSame($this->entity, $this->entity->firstOrFail($query, $projection, true));
+        $this->assertSame($this->entity, $this->entity->firstOrFail($query, $projection));
     }
 
     public function testShouldGetFirstOrNewAndReturnExistingModel()

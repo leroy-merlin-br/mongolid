@@ -9,11 +9,6 @@ use Mongolid\Util\ObjectIdUtils;
 class ReferencesMany extends AbstractRelation
 {
     /**
-     * @var bool
-     */
-    protected $cacheable;
-
-    /**
      * @var HasAttributesInterface
      */
     protected $entityInstance;
@@ -27,13 +22,11 @@ class ReferencesMany extends AbstractRelation
         HasAttributesInterface $parent,
         string $entity,
         string $field,
-        string $key,
-        bool $cacheable = true
+        string $key
     ) {
         parent::__construct($parent, $entity, $field);
         $this->key = $key;
         $this->documentEmbedder->setKey($key);
-        $this->cacheable = $cacheable;
         $this->entityInstance = Ioc::make($this->entity);
     }
 
@@ -103,10 +96,6 @@ class ReferencesMany extends AbstractRelation
             }
         }
 
-        return $this->entityInstance->where(
-            [$this->key => ['$in' => array_values($referencedKeys)]],
-            [],
-            $this->cacheable
-        );
+        return $this->entityInstance->where([$this->key => ['$in' => array_values($referencedKeys)]]);
     }
 }

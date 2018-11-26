@@ -29,10 +29,6 @@ class ReferencesOne extends ReferencesMany
             $referencedKey = new ObjectId((string) $referencedKey);
         }
 
-        return $this->entityInstance->first(
-            [$this->key => $referencedKey],
-            [],
-            $this->cacheable
-        );
+        return $this->entityInstance->first([$this->key => $referencedKey]);
     }
 }

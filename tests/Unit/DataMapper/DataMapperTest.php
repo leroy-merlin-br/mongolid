@@ -10,7 +10,6 @@ use MongoDB\Database;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
@@ -506,21 +505,17 @@ class DataMapperTest extends TestCase
         // Expect
         $dataMapper->expects()
             ->prepareValueQuery($query)
-            ->twice()
             ->andReturn($preparedQuery);
 
         $dataMapper->expects()
             ->getCollection()
-            ->twice()
             ->andReturn($collection);
 
         // Act
         $result = $dataMapper->where($query, $projection);
-        $cacheableResult = $dataMapper->where($query, [], true);
 
         // Assert
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertNotInstanceOf(CacheableCursor::class, $result);
         $this->assertAttributeEquals($schema, 'entitySchema', $result);
         $this->assertAttributeEquals($collection, 'collection', $result);
         $this->assertAttributeEquals('find', 'command', $result);
@@ -528,15 +523,6 @@ class DataMapperTest extends TestCase
             [$preparedQuery, ['projection' => $projection]],
             'params',
             $result
-        );
-
-        $this->assertInstanceOf(CacheableCursor::class, $cacheableResult);
-        $this->assertAttributeEquals($schema, 'entitySchema', $cacheableResult);
-        $this->assertAttributeEquals($collection, 'collection', $cacheableResult);
-        $this->assertAttributeEquals(
-            [$preparedQuery, ['projection' => []]],
-            'params',
-            $cacheableResult
         );
     }
 
@@ -738,57 +724,6 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertNull($result);
-    }
-
-    public function testShouldGetFirstTroughACacheableCursor()
-    {
-        // Arrange
-        $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[where]', [$connection]);
-        $query = 123;
-        $entity = new stdClass();
-        $cursor = m::mock(CacheableCursor::class);
-
-        // Expect
-        $dataMapper->expects()
-            ->where($query, [], true)
-            ->andReturn($cursor);
-
-        $cursor->expects()
-            ->first()
-            ->andReturn($entity);
-
-        // Act
-        $result = $dataMapper->first($query, [], true);
-
-        // Assert
-        $this->assertSame($entity, $result);
-    }
-
-    public function testShouldGetFirstTroughACacheableCursorProjectingFields()
-    {
-        // Arrange
-        $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[where]', [$connection]);
-        $query = 123;
-        $entity = new stdClass();
-        $cursor = m::mock(CacheableCursor::class);
-        $projection = ['project' => true, '_id' => false];
-
-        // Expect
-        $dataMapper->expects()
-            ->where($query, $projection, true)
-            ->andReturn($cursor);
-
-        $cursor->expects()
-            ->first()
-            ->andReturn($entity);
-
-        // Act
-        $result = $dataMapper->first($query, $projection, true);
-
-        // Assert
-        $this->assertSame($entity, $result);
     }
 
     public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()

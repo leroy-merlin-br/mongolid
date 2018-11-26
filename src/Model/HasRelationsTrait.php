@@ -85,23 +85,21 @@ trait HasRelationsTrait
     /**
      * Create a ReferencesOne Relation.
      *
-     * @param string      $entity    class of the entity or of the schema of the entity
-     * @param string|null $field     the field where the $key is stored
-     * @param string      $key       the field that the document will be referenced by (usually _id)
-     * @param bool        $cacheable retrieves a CacheableCursor instead
+     * @param string      $entity class of the entity or of the schema of the entity
+     * @param string|null $field  the field where the $key is stored
+     * @param string      $key    the field that the document will be referenced by (usually _id)
      */
     protected function referencesOne(
         string $entity,
         string $field = null,
-        string $key = '_id',
-        bool $cacheable = true
+        string $key = '_id'
     ): ReferencesOne {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
 
-            $relation = new ReferencesOne($this, $entity, $field, $key, $cacheable);
+            $relation = new ReferencesOne($this, $entity, $field, $key);
             $this->setRelation($relationName, $relation, $field);
         }
 
@@ -113,20 +111,18 @@ trait HasRelationsTrait
      *
      * @param string      $entity    class of the entity or of the schema of the entity
      * @param string|null $field     the field where the _ids are stored
-     * @param bool        $cacheable retrieves a CacheableCursor instead
      */
     protected function referencesMany(
         string $entity,
         string $field = null,
-        string $key = '_id',
-        bool $cacheable = true
+        string $key = '_id'
     ): ReferencesMany {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
 
-            $relation = new ReferencesMany($this, $entity, $field, $key, $cacheable);
+            $relation = new ReferencesMany($this, $entity, $field, $key);
             $this->setRelation($relationName, $relation, $field);
         }
 

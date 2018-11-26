@@ -68,18 +68,10 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param array $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves a CacheableCursor instead
      */
-    public static function where(
-        array $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ): CursorInterface {
-        return self::getDataMapperInstance()->where(
-            $query,
-            $projection,
-            $useCache
-        );
+    public static function where(array $query = [], array $projection = []): CursorInterface
+    {
+        return self::getDataMapperInstance()->where($query, $projection);
     }
 
     /**
@@ -95,20 +87,12 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
      * @return static|null
      */
-    public static function first(
-        $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->first(
-            $query,
-            $projection,
-            $useCache
-        );
+    public static function first($query = [], array $projection = [])
+    {
+        return self::getDataMapperInstance()->first($query, $projection);
     }
 
     /**
@@ -117,22 +101,14 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
      * @throws ModelNotFoundException If no document was found
      *
      * @return static|null
      */
-    public static function firstOrFail(
-        $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->firstOrFail(
-            $query,
-            $projection,
-            $useCache
-        );
+    public static function firstOrFail($query = [], array $projection = [])
+    {
+        return self::getDataMapperInstance()->firstOrFail($query, $projection);
     }
 
     /**
@@ -146,12 +122,10 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      */
     public static function firstOrNew($id)
     {
-        if ($entity = self::getDataMapperInstance()->first($id)) {
-            return $entity;
+        if (!$entity = self::getDataMapperInstance()->first($id)) {
+            $entity = new static();
+            $entity->_id = $id;
         }
-
-        $entity = new static();
-        $entity->_id = $id;
 
         return $entity;
     }

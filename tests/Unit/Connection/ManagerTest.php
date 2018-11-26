@@ -9,7 +9,6 @@ use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
-use Mongolid\Util\CacheComponentInterface;
 
 class ManagerTest extends TestCase
 {
@@ -113,7 +112,6 @@ class ManagerTest extends TestCase
         // Assertion
         $this->assertAttributeEquals($manager, 'singleton', Manager::class);
         $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
-        $this->assertAttributeInstanceOf(CacheComponentInterface::class, 'cacheComponent', $manager);
 
         $container = $manager->container;
         $this->callProtected($manager, 'init');

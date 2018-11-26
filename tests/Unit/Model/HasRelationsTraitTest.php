@@ -24,7 +24,7 @@ class HasRelationsTraitTest extends TestCase
 
         // Expectations
         $dataMapper->expects()
-            ->first($expectedQuery, [], true)
+            ->first($expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
@@ -49,7 +49,7 @@ class HasRelationsTraitTest extends TestCase
 
         // Expectations
         $dataMapper->expects()
-            ->where($expectedQuery, [], true)
+            ->where($expectedQuery, [])
             ->andReturn($expected);
 
         // Actions

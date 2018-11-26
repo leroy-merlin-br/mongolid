@@ -227,13 +227,9 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve documents
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves a CacheableCursor instead
      */
-    public function where(
-        $query = [],
-        array $projection = [],
-        bool $cacheable = false
-    ): CursorInterface {
+    public function where($query = [], array $projection = []): CursorInterface
+    {
         return Ioc::make(CursorFactory::class)
             ->createCursor(
                 $this->schema,
@@ -242,8 +238,7 @@ class DataMapper implements HasSchemaInterface
                 [
                     $this->prepareValueQuery($query),
                     ['projection' => $this->prepareProjection($projection)],
-                ],
-                $cacheable
+                ]
             );
     }
 
@@ -262,21 +257,13 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
      * @return static|null First document matching query as an $this->schema->entityClass object
      */
-    public function first(
-        $query = [],
-        array $projection = [],
-        bool $cacheable = false
-    ) {
+    public function first($query = [], array $projection = [])
+    {
         if (null === $query) {
             return null;
-        }
-
-        if ($cacheable) {
-            return $this->where($query, $projection, true)->first();
         }
 
         $document = $this->getCollection()->findOne(
@@ -299,18 +286,14 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no document was found
      *
      * @return static|null First document matching query as an $this->schema->entityClass object
      */
-    public function firstOrFail(
-        $query = [],
-        array $projection = [],
-        bool $cacheable = false
-    ) {
-        if ($result = $this->first($query, $projection, $cacheable)) {
+    public function firstOrFail($query = [], array $projection = [])
+    {
+        if ($result = $this->first($query, $projection)) {
             return $result;
         }
 
