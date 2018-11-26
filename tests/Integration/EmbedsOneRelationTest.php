@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Model\Relations\InvalidFieldNameException;
+use Mongolid\Model\Exception\InvalidFieldNameException;
 use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
 
 class EmbedsOneRelationTest extends IntegrationTestCase

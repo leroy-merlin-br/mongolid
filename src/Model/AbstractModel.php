@@ -4,21 +4,20 @@ namespace Mongolid\Model;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\DataMapper\DataMapper;
-use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Exception\NoCollectionNameException;
+use Mongolid\Model\Exception\ModelNotFoundException;
+use Mongolid\Model\Exception\NoCollectionNameException;
+use Mongolid\Query\Builder;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
-use Mongolid\Schema\HasSchemaInterface;
 
 /**
- * The Mongolid\Model\ActiveRecord base class will ensure to enable your entity to
+ * The Mongolid\Model\Model base class will ensure to enable your model to
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
- * The Mongolid\Schema\Schema that describes the entity will be generated on the go
+ * The Mongolid\Schema\Schema that describes the model will be generated on the go
  * based on the $fields.
  */
-abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchemaInterface
+abstract class AbstractModel implements ModelInterface
 {
     use HasAttributesTrait;
     use HasRelationsTrait;
@@ -34,7 +33,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     public $dynamic = true;
 
     /**
-     * Name of the collection where this kind of Entity is going to be saved or
+     * Name of the collection where this kind of Model is going to be saved or
      * retrieved from.
      *
      * @var string
@@ -71,7 +70,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      */
     public static function where(array $query = [], array $projection = []): CursorInterface
     {
-        return self::getDataMapperInstance()->where($query, $projection);
+        return self::getBuilderInstance()->where($query, $projection);
     }
 
     /**
@@ -79,55 +78,49 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      */
     public static function all(): CursorInterface
     {
-        return self::getDataMapperInstance()->all();
+        return self::getBuilderInstance()->all();
     }
 
     /**
-     * Gets the first entity of this kind that matches the query.
+     * Gets the first model of this kind that matches the query.
      *
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     *
-     * @return static|null
      */
-    public static function first($query = [], array $projection = [])
+    public static function first($query = [], array $projection = []): ?ModelInterface
     {
-        return self::getDataMapperInstance()->first($query, $projection);
+        return self::getBuilderInstance()->first($query, $projection);
     }
 
     /**
-     * Gets the first entity of this kind that matches the query. If no
+     * Gets the first model of this kind that matches the query. If no
      * document was found, throws ModelNotFoundException.
      *
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
      * @throws ModelNotFoundException If no document was found
-     *
-     * @return static|null
      */
-    public static function firstOrFail($query = [], array $projection = [])
+    public static function firstOrFail($query = [], array $projection = []): ?ModelInterface
     {
-        return self::getDataMapperInstance()->firstOrFail($query, $projection);
+        return self::getBuilderInstance()->firstOrFail($query, $projection);
     }
 
     /**
-     * Gets the first entity of this kind that matches the query. If no
-     * document was found, a new entity will be returned with the
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, a new model will be returned with the
      * _if field filled.
      *
      * @param mixed $id document id
-     *
-     * @return static|null
      */
-    public static function firstOrNew($id)
+    public static function firstOrNew($id): ?ModelInterface
     {
-        if (!$entity = self::getDataMapperInstance()->first($id)) {
-            $entity = new static();
-            $entity->_id = $id;
+        if (!$model = self::getBuilderInstance()->first($id)) {
+            $model = new static();
+            $model->_id = $id;
         }
 
-        return $entity;
+        return $model;
     }
 
     /**
@@ -135,7 +128,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @throws NoCollectionNameException Throws exception when has no collection filled
      */
-    private static function getDataMapperInstance(): DataMapper
+    private static function getBuilderInstance(): Builder
     {
         $instance = new static();
 
@@ -143,23 +136,23 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
             throw new NoCollectionNameException();
         }
 
-        return $instance->getDataMapper();
+        return $instance->getBuilder();
     }
 
     /**
      * Parses an object with SchemaMapper.
      *
-     * @param mixed $entity the object to be parsed
+     * @param mixed $model the object to be parsed
      */
-    public function parseToDocument($entity): array
+    public function parseToDocument($model): array
     {
-        return $this->getDataMapper()->parseToDocument($entity);
+        return $this->getBuilder()->parseToDocument($model);
     }
 
     /**
      * Saves this object into database.
      */
-    public function save()
+    public function save(): bool
     {
         return $this->execute('save');
     }
@@ -167,7 +160,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Insert this object into database.
      */
-    public function insert()
+    public function insert(): bool
     {
         return $this->execute('insert');
     }
@@ -175,7 +168,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Updates this object in database.
      */
-    public function update()
+    public function update(): bool
     {
         return $this->execute('update');
     }
@@ -183,7 +176,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Deletes this object in database.
      */
-    public function delete()
+    public function delete(): bool
     {
         return $this->execute('delete');
     }
@@ -206,7 +199,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      * @param string $key   attribute name
      * @param mixed  $value value to be set
      */
-    public function __set(string $key, $value)
+    public function __set(string $key, $value): void
     {
         $this->setDocumentAttribute($key, $value);
     }
@@ -226,21 +219,21 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param string $key attribute name
      */
-    public function __unset(string $key)
+    public function __unset(string $key): void
     {
         $this->cleanDocumentAttribute($key);
     }
 
     /**
-     * Returns a DataMapper configured with the Schema and collection described
-     * in this entity.
+     * Returns a Builder configured with the Schema and collection described
+     * in this model.
      */
-    public function getDataMapper(): DataMapper
+    public function getBuilder(): Builder
     {
-        $dataMapper = Ioc::make(DataMapper::class);
-        $dataMapper->setSchema($this->getSchema());
+        $builder = Ioc::make(Builder::class);
+        $builder->setSchema($this->getSchema());
 
-        return $dataMapper;
+        return $builder;
     }
 
     /**
@@ -264,7 +257,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
      *
      * @param int $writeConcern level of write concern for the transation
      */
-    public function setWriteConcern(int $writeConcern)
+    public function setWriteConcern(int $writeConcern): void
     {
         $this->writeConcern = $writeConcern;
     }
@@ -279,7 +272,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
         }
 
         $schema = new DynamicSchema();
-        $schema->entityClass = static::class;
+        $schema->modelClass = static::class;
         $schema->fields = $this->fields;
         $schema->dynamic = $this->dynamic;
         $schema->collection = $this->collection;
@@ -290,22 +283,22 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
     /**
      * Will check if the current value of $fields property is the name of a
      * Schema class and instantiate it if possible.
-     *
-     * @return AbstractSchema|null
      */
-    protected function instantiateSchemaInFields()
+    protected function instantiateSchemaInFields(): ?AbstractSchema
     {
         if (is_string($this->fields)) {
             if (is_subclass_of($instance = Ioc::make($this->fields), AbstractSchema::class)) {
                 return $instance;
             }
         }
+
+        return null;
     }
 
     /**
      * Performs the given action into database.
      *
-     * @param string $action DataMapper function to execute
+     * @param string $action Builder function to execute
      */
     protected function execute(string $action): bool
     {
@@ -317,7 +310,7 @@ abstract class AbstractActiveRecord implements HasAttributesInterface, HasSchema
             'writeConcern' => new WriteConcern($this->getWriteConcern()),
         ];
 
-        if ($result = $this->getDataMapper()->$action($this, $options)) {
+        if ($result = $this->getBuilder()->$action($this, $options)) {
             $this->syncOriginalDocumentAttributes();
         }
 

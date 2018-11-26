@@ -1,21 +1,23 @@
 <?php
 namespace Mongolid\Model\Relations;
 
+use Mongolid\Model\ModelInterface;
+
 class EmbedsOne extends EmbedsMany
 {
-    public function add($entity): void
+    public function add(ModelInterface $model): void
     {
         $this->removeAll();
-        parent::add($entity);
+        parent::add($model);
     }
 
-    public function remove($entity = null): void
+    public function remove(ModelInterface $model = null): void
     {
         $this->removeAll();
     }
 
     /**
-     * @return mixed
+     * @return ModelInterface|null
      */
     public function get()
     {

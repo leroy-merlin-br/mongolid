@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid\Cursor;
 
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\TestCase;
 use stdClass;
@@ -109,19 +109,23 @@ class EmbeddedCursorTest extends TestCase
     public function testShouldGetCurrent()
     {
         // Arrange
+        $object = new class extends AbstractModel
+        {
+        };
+        $class = get_class($object);
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor(stdClass::class, $items);
+        $cursor = $this->getCursor($class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
         // Assert
-        $entity = $cursor->current();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('B', 'name', $entity);
+        $model = $cursor->current();
+        $this->assertInstanceOf($class, $model);
+        $this->assertSame('B', $model->name);
     }
 
     public function testShouldNotGetCurrentWhenCursorIsInvalid()
@@ -133,11 +137,11 @@ class EmbeddedCursorTest extends TestCase
         $this->setProtected($cursor, 'position', 1);
 
         // Assert
-        $entity = $cursor->current();
-        $this->assertNull($entity);
+        $model = $cursor->current();
+        $this->assertNull($model);
     }
 
-    public function testShouldGetCurrentUsingEntityClass()
+    public function testShouldGetCurrentUsingModelClass()
     {
         // Arrange
         $object = new stdClass();
@@ -148,30 +152,34 @@ class EmbeddedCursorTest extends TestCase
         $this->setProtected($cursor, 'position', 0);
 
         // Assert
-        $entity = $cursor->current();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('A', 'name', $entity);
+        $model = $cursor->current();
+        $this->assertInstanceOf(stdClass::class, $model);
+        $this->assertAttributeEquals('A', 'name', $model);
     }
 
-    public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
+    public function testShouldGetCurrentUsingModelClassAndMorphingIt()
     {
         // Arrange
-        $object = new class() extends AbstractActiveRecord implements PolymorphableInterface {
+        $object = new class() extends AbstractModel implements PolymorphableInterface
+        {
             public function polymorph()
             {
-                return 'Bacon';
+                return $this;
             }
         };
+        $object->name = 'John';
+        $object->syncOriginalDocumentAttributes();
 
         $class = get_class($object);
         $items = [$object->getDocumentAttributes()];
         $cursor = $this->getCursor($class, $items);
 
-        $this->setProtected($cursor, 'position', 0);
+        // Actions
+        $model = $cursor->current();
 
-        // Assert
-        $entity = $cursor->current();
-        $this->assertEquals('Bacon', $entity);
+        // Assertions
+        $this->assertEquals($object, $model);
+        $this->assertSame('John', $model->name);
     }
 
     public function testShouldGetFirst()
@@ -182,14 +190,18 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'B'],
             ['name' => 'C'],
         ];
-        $cursor = $this->getCursor(stdClass::class, $items);
+        $object = new class extends AbstractModel
+        {
+        };
+        $class = get_class($object);
+        $cursor = $this->getCursor($class, $items);
 
         $this->setProtected($cursor, 'position', 1);
 
         // Assert
-        $entity = $cursor->first();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('A', 'name', $entity);
+        $model = $cursor->first();
+        $this->assertInstanceOf($class, $model);
+        $this->assertSame('A', $model->name);
     }
 
     public function testShouldGetAllItems()
@@ -199,19 +211,22 @@ class EmbeddedCursorTest extends TestCase
             ['name' => 'A'],
             ['name' => 'B'],
         ];
-        $cursor = $this->getCursor(stdClass::class, $items);
 
+        $modelA = new class extends AbstractModel
+        {
+        };
+        $modelA->name = 'A';
+        $modelA->syncOriginalDocumentAttributes();
+        $modelB = clone $modelA;
+        $modelB->name = 'B';
+        $modelB->syncOriginalDocumentAttributes();
+
+        $cursor = $this->getCursor(get_class($modelA), $items);
         $this->setProtected($cursor, 'position', 1);
 
-        $entityA = new stdClass();
-        $entityA->name = 'A';
-
-        $entityB = new stdClass();
-        $entityB->name = 'B';
-
         $expected = [
-            $entityA,
-            $entityB,
+            $modelA,
+            $modelB,
         ];
 
         // Assert
@@ -274,13 +289,6 @@ class EmbeddedCursorTest extends TestCase
         $this->assertTrue($cursor->valid());
         $this->setProtected($cursor, 'position', 8);
         $this->assertFalse($cursor->valid());
-    }
-
-    protected function getCursor(
-        $entityClass = stdClass::class,
-        $items = []
-    ) {
-        return new EmbeddedCursor($entityClass, $items);
     }
 
     public function getDocumentsToSort()
@@ -365,5 +373,12 @@ class EmbeddedCursorTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    protected function getCursor(
+        $modelClass = stdClass::class,
+        $items = []
+    ) {
+        return new EmbeddedCursor($modelClass, $items);
     }
 }

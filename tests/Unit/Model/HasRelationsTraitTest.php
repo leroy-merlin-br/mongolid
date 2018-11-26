@@ -4,7 +4,7 @@ namespace Mongolid\Model;
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\EmbeddedCursor;
-use Mongolid\DataMapper\DataMapper;
+use Mongolid\Query\Builder;
 use Mongolid\TestCase;
 
 class HasRelationsTraitTest extends TestCase
@@ -18,12 +18,12 @@ class HasRelationsTraitTest extends TestCase
         $model = new UserStub();
         $model->refOne = $fieldValue;
 
-        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
+        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
         $expectedQuery = $expectedQuery['referencesOne'];
         $expected = new RelatedStub();
 
         // Expectations
-        $dataMapper->expects()
+        $builder->expects()
             ->first($expectedQuery, [])
             ->andReturn($expected);
 
@@ -43,12 +43,12 @@ class HasRelationsTraitTest extends TestCase
         $model = new UserStub();
         $model->refMany = $fieldValue;
 
-        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
+        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
         $expectedQuery = $expectedQuery['referencesMany'];
         $expected = new EmbeddedCursor(RelatedStub::class, []);
 
         // Expectations
-        $dataMapper->expects()
+        $builder->expects()
             ->where($expectedQuery, [])
             ->andReturn($expected);
 
@@ -156,7 +156,7 @@ class HasRelationsTraitTest extends TestCase
                     ],
                 ],
             ],
-            'ActiveRecord referenced with null' => [
+            'Model referenced with null' => [
                 'fieldValue' => null,
                 'expectedQuery' => [
                     'referencesOne' => ['_id' => null],
@@ -187,7 +187,7 @@ class HasRelationsTraitTest extends TestCase
     }
 }
 
-class UserStub extends AbstractActiveRecord
+class UserStub extends AbstractModel
 {
     /**
      * {@inheritdoc}
@@ -215,7 +215,7 @@ class UserStub extends AbstractActiveRecord
     }
 }
 
-class RelatedStub extends AbstractActiveRecord
+class RelatedStub extends AbstractModel
 {
     /**
      * {@inheritdoc}

@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use InvalidArgumentException;
 use Mockery as m;
@@ -12,13 +12,13 @@ use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
+use Mongolid\Model\Exception\ModelNotFoundException;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
-use stdClass;
 
-class DataMapperTest extends TestCase
+class BuilderTest extends TestCase
 {
     public function testShouldBeAbleToConstructWithSchema()
     {
@@ -26,36 +26,36 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
 
         // Act
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
         // Assert
-        $this->assertAttributeEquals($connection, 'connection', $dataMapper);
+        $this->assertAttributeEquals($connection, 'connection', $builder);
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldSave($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $entity->_id = null;
+        $model->_id = null;
 
         // Act
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->andReturn($parsedObject);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -78,42 +78,42 @@ class DataMapperTest extends TestCase
             ->getUpsertedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('saving', $entity, true);
+        $this->expectEventToBeFired('saving', $model, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('saved', $entity, false);
+            $this->expectEventToBeFired('saved', $model, false);
         } else {
-            $this->expectEventNotToBeFired('saved', $entity);
+            $this->expectEventNotToBeFired('saved', $model);
         }
 
         // Assert
-        $this->assertSame($expected, $dataMapper->save($entity, $options));
+        $this->assertSame($expected, $builder->save($model, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsert($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $entity->_id = null;
+        $model->_id = null;
 
         // Act
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->andReturn($parsedObject);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -129,42 +129,42 @@ class DataMapperTest extends TestCase
             ->getInsertedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('inserting', $entity, true);
+        $this->expectEventToBeFired('inserting', $model, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('inserted', $entity, false);
+            $this->expectEventToBeFired('inserted', $model, false);
         } else {
-            $this->expectEventNotToBeFired('inserted', $entity);
+            $this->expectEventNotToBeFired('inserted', $model);
         }
 
         // Assert
-        $this->assertSame($expected, $dataMapper->insert($entity, $options));
+        $this->assertSame($expected, $builder->insert($model, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsertWithoutFiringEvents($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
 
-        $entity->_id = null;
+        $model->_id = null;
 
         // Act
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->andReturn($parsedObject);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -180,23 +180,23 @@ class DataMapperTest extends TestCase
             ->getInsertedCount()
             ->andReturn(1);
 
-        $this->expectEventNotToBeFired('inserting', $entity);
-        $this->expectEventNotToBeFired('inserted', $entity);
+        $this->expectEventNotToBeFired('inserting', $model);
+        $this->expectEventNotToBeFired('inserted', $model);
 
         // Assert
-        $this->assertSame($expected, $dataMapper->insert($entity, $options, false));
+        $this->assertSame($expected, $builder->insert($model, $options, false));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldUpdate($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connection = m::mock(Connection::class);
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -216,7 +216,7 @@ class DataMapperTest extends TestCase
             }
         );
 
-        $entity->_id = 123;
+        $model->_id = 123;
 
         // Expect
         $connection->expects()
@@ -246,16 +246,16 @@ class DataMapperTest extends TestCase
             ->getModifiedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updating', $model, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('updated', $entity, false);
+            $this->expectEventToBeFired('updated', $model, false);
         } else {
-            $this->expectEventNotToBeFired('updated', $entity);
+            $this->expectEventNotToBeFired('updated', $model);
         }
 
         // Act
-        $result = $dataMapper->update($entity, $options);
+        $result = $builder->update($model, $options);
 
         // Assert
         $this->assertSame($expected, $result);
@@ -267,9 +267,9 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
-        $entity = new class extends AbstractActiveRecord
+        $model = new class extends AbstractModel
         {
         };
         $collection = m::mock(Collection::class);
@@ -290,12 +290,12 @@ class DataMapperTest extends TestCase
             }
         );
 
-        $entity->unchanged = 'unchanged';
-        $entity->notOnSchema = 'to be deleted';
-        $entity->name = 'John';
-        $entity->syncOriginalDocumentAttributes();
-        $entity->_id = 123;
-        unset($entity->name);
+        $model->unchanged = 'unchanged';
+        $model->notOnSchema = 'to be deleted';
+        $model->name = 'John';
+        $model->syncOriginalDocumentAttributes();
+        $model->_id = 123;
+        unset($model->name);
 
         // Expect
         $connection->expects()
@@ -325,12 +325,12 @@ class DataMapperTest extends TestCase
             ->getModifiedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updating', $model, true);
 
-        $this->expectEventToBeFired('updated', $entity, false);
+        $this->expectEventToBeFired('updated', $model, false);
 
         // Act
-        $result = $dataMapper->update($entity, $options);
+        $result = $builder->update($model, $options);
 
         // Assert
         $this->assertTrue($result);
@@ -340,30 +340,30 @@ class DataMapperTest extends TestCase
      * @dataProvider getWriteConcernVariations
      */
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
-        $entity,
+        $model,
         $writeConcern,
         $shouldFireEventAfter,
         $expected
     ) {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $entity->_id = null;
+        $model->_id = null;
 
         // Act
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->andReturn($parsedObject);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -381,45 +381,45 @@ class DataMapperTest extends TestCase
             ->getInsertedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updating', $model, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('updated', $entity, false);
+            $this->expectEventToBeFired('updated', $model, false);
         } else {
-            $this->expectEventNotToBeFired('updated', $entity);
+            $this->expectEventNotToBeFired('updated', $model);
         }
 
-        $this->expectEventNotToBeFired('inserting', $entity);
-        $this->expectEventNotToBeFired('inserted', $entity);
+        $this->expectEventNotToBeFired('inserting', $model);
+        $this->expectEventNotToBeFired('inserted', $model);
 
         // Assert
-        $this->assertSame($expected, $dataMapper->update($entity, $options));
+        $this->assertSame($expected, $builder->update($model, $options));
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldDelete($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        $entity->_id = null;
+        $model->_id = null;
 
         // Act
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->andReturn($parsedObject);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -435,16 +435,16 @@ class DataMapperTest extends TestCase
             ->getDeletedCount()
             ->andReturn(1);
 
-        $this->expectEventToBeFired('deleting', $entity, true);
+        $this->expectEventToBeFired('deleting', $model, true);
 
         if ($shouldFireEventAfter) {
-            $this->expectEventToBeFired('deleted', $entity, false);
+            $this->expectEventToBeFired('deleted', $model, false);
         } else {
-            $this->expectEventNotToBeFired('deleted', $entity);
+            $this->expectEventNotToBeFired('deleted', $model);
         }
 
         // Assert
-        $this->assertSame($expected, $dataMapper->delete($entity, $options));
+        $this->assertSame($expected, $builder->delete($model, $options));
     }
 
     /**
@@ -457,18 +457,18 @@ class DataMapperTest extends TestCase
     ) {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[parseToDocument,getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
-        $entity = m::mock();
+        $model = m::mock(ModelInterface::class);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $dataMapper->expects()
-            ->parseToDocument($entity)
+        $builder->expects()
+            ->parseToDocument($model)
             ->never();
 
-        $dataMapper->allows()
+        $builder->allows()
             ->getCollection()
             ->andReturn($collection);
 
@@ -476,10 +476,10 @@ class DataMapperTest extends TestCase
             ->never();
 
         /* "Mocks" the fireEvent to return false and bail the operation */
-        $this->expectEventToBeFired($eventName, $entity, true, false);
+        $this->expectEventToBeFired($eventName, $model, true, false);
 
         // Act
-        $result = $dataMapper->$operation($entity);
+        $result = $builder->$operation($model);
 
         // Assert
         $this->assertFalse($result);
@@ -489,7 +489,7 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(AbstractSchema::class);
 
         $collection = m::mock(Collection::class);
@@ -497,26 +497,26 @@ class DataMapperTest extends TestCase
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, '_id' => false];
 
-        $schema->entityClass = 'stdClass';
-        $dataMapper->setSchema($schema);
+        $schema->modelClass = 'stdClass';
+        $builder->setSchema($schema);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $dataMapper->expects()
+        $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
         // Act
-        $result = $dataMapper->where($query, $projection);
+        $result = $builder->where($query, $projection);
 
         // Assert
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertAttributeEquals($schema, 'entitySchema', $result);
+        $this->assertAttributeEquals($schema, 'modelSchema', $result);
         $this->assertAttributeEquals($collection, 'collection', $result);
         $this->assertAttributeEquals('find', 'command', $result);
         $this->assertAttributeEquals(
@@ -530,16 +530,16 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[where]', [$connection]);
+        $builder = m::mock(Builder::class.'[where]', [$connection]);
         $mongolidCursor = m::mock(Cursor::class);
 
         // Expect
-        $dataMapper->expects()
+        $builder->expects()
             ->where([])
             ->andReturn($mongolidCursor);
 
         // Act
-        $result = $dataMapper->all();
+        $result = $builder->all();
 
         // Assert
         $this->assertSame($mongolidCursor, $result);
@@ -549,23 +549,27 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
+        $object = new class extends AbstractModel
+        {
+        };
 
-        $schema->entityClass = 'stdClass';
-        $dataMapper->setSchema($schema);
+        $class = get_class($object);
+        $schema->modelClass = $class;
+        $builder->setSchema($schema);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Act
-        $dataMapper->expects()
+        $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -573,21 +577,21 @@ class DataMapperTest extends TestCase
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn(['name' => 'John Doe']);
 
-        $result = $dataMapper->first($query);
+        $result = $builder->first($query);
 
         // Assert
-        $this->assertInstanceOf(stdClass::class, $result);
-        $this->assertAttributeEquals('John Doe', 'name', $result);
+        $this->assertInstanceOf($class, $result);
+        $this->assertSame('John Doe', $result->name);
     }
 
     public function testFirstWithNullShouldNotHitTheDatabase()
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
         // Act
-        $result = $dataMapper->first(null);
+        $result = $builder->first(null);
 
         // Assert
         $this->assertNull($result);
@@ -597,23 +601,27 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(AbstractSchema::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
+        $object = new class extends AbstractModel
+        {
+        };
 
-        $schema->entityClass = 'stdClass';
-        $dataMapper->setSchema($schema);
+        $class = get_class($object);
+        $schema->modelClass = $class;
+        $builder->setSchema($schema);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Act
-        $dataMapper->expects()
+        $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -621,25 +629,25 @@ class DataMapperTest extends TestCase
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn(['name' => 'John Doe']);
 
-        $result = $dataMapper->firstOrFail($query);
+        $result = $builder->firstOrFail($query);
 
         // Assert
-        $this->assertInstanceOf(stdClass::class, $result);
-        $this->assertAttributeEquals('John Doe', 'name', $result);
+        $this->assertInstanceOf($class, $result);
+        $this->assertSame('John Doe', $result->name);
     }
 
     public function testFirstOrFailWithNullShouldFail()
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
-        $dataMapper->setSchema(
+        $builder = new Builder($connection);
+        $builder->setSchema(
             new class extends AbstractSchema
             {
                 /**
                  * {@inheritdoc}
                  */
-                public $entityClass = 'User';
+                public $modelClass = 'User';
             }
         );
 
@@ -647,31 +655,31 @@ class DataMapperTest extends TestCase
         $this->expectExceptionMessage('No query results for model [User].');
 
         // Act
-        $dataMapper->firstOrFail(null);
+        $builder->firstOrFail(null);
     }
 
     public function testShouldGetNullIfFirstCantFindAnything()
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $schema = m::mock(AbstractSchema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
 
-        $schema->entityClass = 'stdClass';
-        $dataMapper->setSchema($schema);
+        $schema->modelClass = 'stdClass';
+        $builder->setSchema($schema);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $dataMapper->expects()
+        $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -680,7 +688,7 @@ class DataMapperTest extends TestCase
             ->andReturn(null);
 
         // Act
-        $result = $dataMapper->first($query);
+        $result = $builder->first($query);
 
         // Assert
         $this->assertNull($result);
@@ -690,8 +698,8 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(
-            DataMapper::class.'[prepareValueQuery,getCollection]',
+        $builder = m::mock(
+            Builder::class.'[prepareValueQuery,getCollection]',
             [$connection]
         );
         $schema = m::mock(AbstractSchema::class);
@@ -701,17 +709,17 @@ class DataMapperTest extends TestCase
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false];
 
-        $schema->entityClass = 'stdClass';
-        $dataMapper->setSchema($schema);
+        $schema->modelClass = 'stdClass';
+        $builder->setSchema($schema);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $dataMapper->expects()
+        $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $dataMapper->expects()
+        $builder->expects()
             ->getCollection()
             ->andReturn($collection);
 
@@ -720,7 +728,7 @@ class DataMapperTest extends TestCase
             ->andReturn(null);
 
         // Act
-        $result = $dataMapper->first($query, $projection);
+        $result = $builder->first($query, $projection);
 
         // Assert
         $this->assertNull($result);
@@ -730,30 +738,30 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = m::mock(DataMapper::class.'[getSchemaMapper]', [$connection]);
-        $entity = m::mock();
+        $builder = m::mock(Builder::class.'[getSchemaMapper]', [$connection]);
+        $model = m::mock(ModelInterface::class);
         $parsedDocument = ['a_field' => 123, '_id' => 'bacon'];
-        $schemaMapper = m::mock(AbstractSchema::class.'[]');
+        $schemaMapper = m::mock(SchemaMapper::class, [m::mock(AbstractSchema::class)]);
 
-        $dataMapper->shouldAllowMockingProtectedMethods();
+        $builder->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $dataMapper->expects()
+        $builder->expects()
             ->getSchemaMapper()
             ->andReturn($schemaMapper);
 
         $schemaMapper->expects()
-            ->map($entity)
+            ->map($model)
             ->andReturn($parsedDocument);
 
         // Act
-        $result = $this->callProtected($dataMapper, 'parseToDocument', [$entity]);
+        $result = $this->callProtected($builder, 'parseToDocument', [$model]);
 
         // Assert
         $this->assertSame($parsedDocument, $result);
         $this->assertSame(
             'bacon', // Since this was the parsedDocument _id
-            $entity->_id
+            $model->_id
         );
     }
 
@@ -761,12 +769,12 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
-        $dataMapper->schemaClass = 'MySchema';
+        $builder = new Builder($connection);
+        $builder->schemaClass = 'MySchema';
         $schema = $this->instance('MySchema', m::mock(AbstractSchema::class));
 
         // Act
-        $result = $this->callProtected($dataMapper, 'getSchemaMapper');
+        $result = $this->callProtected($builder, 'getSchemaMapper');
 
         // Assert
         $this->assertInstanceOf(SchemaMapper::class, $result);
@@ -777,12 +785,12 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
         $schema = m::mock(AbstractSchema::class);
         $schema->collection = 'foobar';
 
-        $dataMapper->setSchema($schema);
+        $builder->setSchema($schema);
         $connection->defaultDatabase = 'grimory';
         $connection->grimory = (object) ['foobar' => $collection];
 
@@ -792,7 +800,7 @@ class DataMapperTest extends TestCase
             ->andReturn($connection);
 
         // Act
-        $result = $this->callProtected($dataMapper, 'getCollection');
+        $result = $this->callProtected($builder, 'getCollection');
 
         // Assert
         $this->assertSame($collection, $result);
@@ -805,10 +813,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
         // Act
-        $result = $this->callProtected($dataMapper, 'prepareValueQuery', [$value]);
+        $result = $this->callProtected($builder, 'prepareValueQuery', [$value]);
 
         // Assert
         $this->assertMongoQueryEquals($expectation, $result);
@@ -821,10 +829,10 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
 
         // Act
-        $result = $this->callProtected($dataMapper, 'prepareProjection', [$data]);
+        $result = $this->callProtected($builder, 'prepareProjection', [$data]);
 
         // Assert
         $this->assertSame($expectation, $result);
@@ -834,7 +842,7 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $dataMapper = new DataMapper($connection);
+        $builder = new Builder($connection);
         $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
 
         // Expectations
@@ -842,7 +850,7 @@ class DataMapperTest extends TestCase
         $this->expectExceptionMessage("Invalid projection: 'invalid-key' => 'invalid-value'");
 
         // Act
-        $this->callProtected($dataMapper, 'prepareProjection', [$data]);
+        $this->callProtected($builder, 'prepareProjection', [$data]);
     }
 
     public function eventsToBailOperations()
@@ -918,34 +926,22 @@ class DataMapperTest extends TestCase
 
     public function getWriteConcernVariations()
     {
-        $model = new class extends AbstractActiveRecord
+        $model = new class extends AbstractModel
         {
         };
 
-        $model2 = new class extends AbstractActiveRecord
+        $model2 = new class extends AbstractModel
         {
         };
 
         return [
-            'acknowledged write concern with plain object' => [
-                'object' => new stdClass(),
-                'writeConcern' => 1,
-                'shouldFireEventAfter' => true,
-                'expected' => true,
-            ],
-            'acknowledged write concern with attributesAccessInterface' => [
+            'acknowledged write concern ' => [
                 'object' => $model,
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
             ],
-            'unacknowledged write concern with plain object' => [
-                'object' => new stdClass(),
-                'writeConcern' => 0,
-                'shouldFireEventAfter' => false,
-                'expected' => false,
-            ],
-            'unacknowledged write concern with attributesAccessInterface' => [
+            'unacknowledged write concern' => [
                 'object' => $model2,
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
@@ -988,21 +984,21 @@ class DataMapperTest extends TestCase
         return Ioc::make(EventTriggerService::class);
     }
 
-    protected function expectEventToBeFired($event, $entity, bool $halt, $return = true)
+    protected function expectEventToBeFired($event, $model, bool $halt, $return = true)
     {
-        $event = 'mongolid.'.$event.': '.get_class($entity);
+        $event = 'mongolid.'.$event.': '.get_class($model);
 
         $this->getEventService()->expects()
-            ->fire($event, $entity, $halt)
+            ->fire($event, $model, $halt)
             ->andReturn($return);
     }
 
-    protected function expectEventNotToBeFired($event, $entity)
+    protected function expectEventNotToBeFired($event, $model)
     {
-        $event = 'mongolid.'.$event.': '.get_class($entity);
+        $event = 'mongolid.'.$event.': '.get_class($model);
 
         $this->getEventService()->expects()
-            ->fire($event, $entity, m::any())
+            ->fire($event, $model, m::any())
             ->never();
     }
 }

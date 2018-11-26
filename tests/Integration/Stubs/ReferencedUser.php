@@ -4,9 +4,9 @@ namespace Mongolid\Tests\Integration\Stubs;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
 
-class ReferencedUser extends AbstractActiveRecord
+class ReferencedUser extends AbstractModel
 {
     /**
      * @var string

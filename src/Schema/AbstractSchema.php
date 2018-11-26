@@ -6,6 +6,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Util\SequenceService;
+use stdClass;
 
 /**
  * A schema maps to a MongoDB collection and defines the shape of the documents
@@ -53,7 +54,7 @@ abstract class AbstractSchema
      *
      * @var string
      */
-    public $entityClass = 'stdClass';
+    public $modelClass = stdClass::class;
 
     /**
      * Filters any field in the $fields that has it's value specified as a
@@ -92,7 +93,7 @@ abstract class AbstractSchema
         }
 
         return Ioc::make(SequenceService::class)
-            ->getNextValue($this->collection ?: $this->entityClass);
+            ->getNextValue($this->collection ?: $this->modelClass);
     }
 
     /**

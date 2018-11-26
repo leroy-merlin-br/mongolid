@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Exception;
+namespace Mongolid\Model\Exception;
 
 use Mongolid\TestCase;
 

@@ -2,17 +2,18 @@
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesOne extends ReferencesMany
 {
-    public function attach($entity): void
+    public function attach(ModelInterface $model): void
     {
         $this->detachAll();
-        parent::attach($entity);
+        parent::attach($model);
     }
 
-    public function detach($entity = null): void
+    public function detach(ModelInterface $model = null): void
     {
         $this->detachAll();
     }
@@ -29,6 +30,6 @@ class ReferencesOne extends ReferencesMany
             $referencedKey = new ObjectId((string) $referencedKey);
         }
 
-        return $this->entityInstance->first([$this->key => $referencedKey]);
+        return $this->modelInstance->first([$this->key => $referencedKey]);
     }
 }

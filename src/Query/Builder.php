@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
@@ -9,19 +9,18 @@ use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\Exception\ModelNotFoundException;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\AbstractSchema;
-use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
- * The DataMapper class will abstract how an Entity is persisted and retrieved
+ * This class will abstract how a Model is persisted and retrieved
  * from the database.
- * The DataMapper will always use a Schema trough the SchemaMapper to parse the
+ * The Builder will always use a Schema trough the SchemaMapper to parse the
  * document in and out of the database.
  */
-class DataMapper implements HasSchemaInterface
+class Builder
 {
     /**
      * Name of the schema class to be used.
@@ -47,7 +46,7 @@ class DataMapper implements HasSchemaInterface
     /**
      * Have the responsibility of assembling the data coming from the database into actual entities.
      *
-     * @var EntityAssembler
+     * @var ModelAssembler
      */
     protected $assembler;
 
@@ -70,19 +69,19 @@ class DataMapper implements HasSchemaInterface
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param mixed $entity  the entity used in the operation
-     * @param array $options possible options to send to mongo driver
+     * @param ModelInterface $model   the model used in the operation
+     * @param array          $options possible options to send to mongo driver
      */
-    public function save($entity, array $options = []): bool
+    public function save(ModelInterface $model, array $options = []): bool
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
         // listeners to cancel save operations if validations fail or whatever.
-        if (false === $this->fireEvent('saving', $entity, true)) {
+        if (false === $this->fireEvent('saving', $model, true)) {
             return false;
         }
 
-        $data = $this->parseToDocument($entity);
+        $data = $this->parseToDocument($model);
 
         $queryResult = $this->getCollection()->replaceOne(
             ['_id' => $data['_id']],
@@ -94,9 +93,9 @@ class DataMapper implements HasSchemaInterface
                   ($queryResult->getModifiedCount() || $queryResult->getUpsertedCount());
 
         if ($result) {
-            $this->afterSuccess($entity);
+            $this->afterSuccess($model);
 
-            $this->fireEvent('saved', $entity);
+            $this->fireEvent('saved', $model);
         }
 
         return $result;
@@ -110,17 +109,17 @@ class DataMapper implements HasSchemaInterface
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param mixed $entity     the entity used in the operation
-     * @param array $options    possible options to send to mongo driver
-     * @param bool  $fireEvents whether events should be fired
+     * @param ModelInterface $model      the model used in the operation
+     * @param array          $options    possible options to send to mongo driver
+     * @param bool           $fireEvents whether events should be fired
      */
-    public function insert($entity, array $options = [], bool $fireEvents = true): bool
+    public function insert(ModelInterface $model, array $options = [], bool $fireEvents = true): bool
     {
-        if ($fireEvents && false === $this->fireEvent('inserting', $entity, true)) {
+        if ($fireEvents && false === $this->fireEvent('inserting', $model, true)) {
             return false;
         }
 
-        $data = $this->parseToDocument($entity);
+        $data = $this->parseToDocument($model);
 
         $queryResult = $this->getCollection()->insertOne(
             $data,
@@ -130,10 +129,10 @@ class DataMapper implements HasSchemaInterface
         $result = $queryResult->isAcknowledged() && $queryResult->getInsertedCount();
 
         if ($result) {
-            $this->afterSuccess($entity);
+            $this->afterSuccess($model);
 
             if ($fireEvents) {
-                $this->fireEvent('inserted', $entity);
+                $this->fireEvent('inserted', $model);
             }
         }
 
@@ -148,28 +147,28 @@ class DataMapper implements HasSchemaInterface
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param mixed $entity  the entity used in the operation
-     * @param array $options possible options to send to mongo driver
+     * @param ModelInterface $model   the model used in the operation
+     * @param array          $options possible options to send to mongo driver
      */
-    public function update($entity, array $options = []): bool
+    public function update(ModelInterface $model, array $options = []): bool
     {
-        if (false === $this->fireEvent('updating', $entity, true)) {
+        if (false === $this->fireEvent('updating', $model, true)) {
             return false;
         }
 
-        if (!$entity->_id) {
-            if ($result = $this->insert($entity, $options, false)) {
-                $this->afterSuccess($entity);
+        if (!$model->_id) {
+            if ($result = $this->insert($model, $options, false)) {
+                $this->afterSuccess($model);
 
-                $this->fireEvent('updated', $entity);
+                $this->fireEvent('updated', $model);
             }
 
             return $result;
         }
 
-        $data = $this->parseToDocument($entity);
+        $data = $this->parseToDocument($model);
 
-        $updateData = $this->getUpdateData($entity, $data);
+        $updateData = $this->getUpdateData($model, $data);
 
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
@@ -180,9 +179,9 @@ class DataMapper implements HasSchemaInterface
         $result = $queryResult->isAcknowledged() && $queryResult->getModifiedCount();
 
         if ($result) {
-            $this->afterSuccess($entity);
+            $this->afterSuccess($model);
 
-            $this->fireEvent('updated', $entity);
+            $this->fireEvent('updated', $model);
         }
 
         return $result;
@@ -194,16 +193,16 @@ class DataMapper implements HasSchemaInterface
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param mixed $entity  the entity used in the operation
-     * @param array $options possible options to send to mongo driver
+     * @param ModelInterface $model   the model used in the operation
+     * @param array          $options possible options to send to mongo driver
      */
-    public function delete($entity, array $options = []): bool
+    public function delete(ModelInterface $model, array $options = []): bool
     {
-        if (false === $this->fireEvent('deleting', $entity, true)) {
+        if (false === $this->fireEvent('deleting', $model, true)) {
             return false;
         }
 
-        $data = $this->parseToDocument($entity);
+        $data = $this->parseToDocument($model);
 
         $queryResult = $this->getCollection()->deleteOne(
             ['_id' => $data['_id']],
@@ -213,7 +212,7 @@ class DataMapper implements HasSchemaInterface
         if ($queryResult->isAcknowledged() &&
             $queryResult->getDeletedCount()
         ) {
-            $this->fireEvent('deleted', $entity);
+            $this->fireEvent('deleted', $model);
 
             return true;
         }
@@ -222,7 +221,7 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Retrieve a database cursor that will return $this->schema->entityClass
+     * Retrieve a database cursor that will return $this->schema->modelClass
      * objects that upon iteration.
      *
      * @param mixed $query      mongoDB query to retrieve documents
@@ -243,7 +242,7 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieve a database cursor that will return all documents as
-     * $this->schema->entityClass objects upon iteration.
+     * $this->schema->modelClass objects upon iteration.
      */
     public function all(): CursorInterface
     {
@@ -251,13 +250,13 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Retrieve one $this->schema->entityClass objects that matches the given
+     * Retrieve one $this->schema->modelClass objects that matches the given
      * query.
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
      *
-     * @return static|null First document matching query as an $this->schema->entityClass object
+     * @return static|null First document matching query as an $this->schema->modelClass object
      */
     public function first($query = [], array $projection = [])
     {
@@ -280,7 +279,7 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Retrieve one $this->schema->entityClass objects that matches the given
+     * Retrieve one $this->schema->modelClass objects that matches the given
      * query. If no document was found, throws ModelNotFoundException.
      *
      * @param mixed $query      mongoDB query to retrieve the document
@@ -288,7 +287,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @throws ModelNotFoundException If no document was found
      *
-     * @return static|null First document matching query as an $this->schema->entityClass object
+     * @return static|null First document matching query as an $this->schema->modelClass object
      */
     public function firstOrFail($query = [], array $projection = [])
     {
@@ -296,7 +295,7 @@ class DataMapper implements HasSchemaInterface
             return $result;
         }
 
-        throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
+        throw (new ModelNotFoundException())->setModel($this->schema->modelClass);
     }
 
     /**
@@ -308,9 +307,9 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Set a Schema object  that describes an Entity in MongoDB.
+     * Set a Schema object  that describes an Model in MongoDB.
      */
-    public function setSchema(AbstractSchema $schema)
+    public function setSchema(AbstractSchema $schema): void
     {
         $this->schema = $schema;
     }
@@ -318,16 +317,16 @@ class DataMapper implements HasSchemaInterface
     /**
      * Parses an object with SchemaMapper and the given Schema.
      *
-     * @param mixed $entity the object to be parsed
+     * @param ModelInterface $model the object to be parsed
      */
-    public function parseToDocument($entity): array
+    public function parseToDocument(ModelInterface $model): array
     {
         $schemaMapper = $this->getSchemaMapper();
-        $parsedDocument = $schemaMapper->map($entity);
+        $parsedDocument = $schemaMapper->map($model);
 
-        if (is_object($entity)) {
+        if (is_object($model)) {
             foreach ($parsedDocument as $field => $value) {
-                $entity->$field = $value;
+                $model->$field = $value;
             }
         }
 
@@ -336,10 +335,8 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Returns a SchemaMapper with the $schema or $schemaClass instance.
-     *
-     * @return SchemaMapper
      */
-    protected function getSchemaMapper()
+    protected function getSchemaMapper(): SchemaMapper
     {
         if (!$this->schema) {
             $this->schema = Ioc::make($this->schemaClass);
@@ -417,14 +414,12 @@ class DataMapper implements HasSchemaInterface
     }
 
     /**
-     * Retrieves an EntityAssembler instance.
-     *
-     * @return EntityAssembler
+     * Retrieves an ModelAssembler instance.
      */
-    protected function getAssembler()
+    protected function getAssembler(): ModelAssembler
     {
         if (!$this->assembler) {
-            $this->assembler = Ioc::make(EntityAssembler::class);
+            $this->assembler = Ioc::make(ModelAssembler::class);
         }
 
         return $this->assembler;
@@ -433,19 +428,19 @@ class DataMapper implements HasSchemaInterface
     /**
      * Triggers an event. May return if that event had success.
      *
-     * @param string $event  identification of the event
-     * @param mixed  $entity event payload
-     * @param bool   $halt   true if the return of the event handler will be used in a conditional
+     * @param string $event identification of the event
+     * @param mixed  $model event payload
+     * @param bool   $halt  true if the return of the event handler will be used in a conditional
      *
      * @return mixed event handler return
      */
-    protected function fireEvent(string $event, $entity, bool $halt = false)
+    protected function fireEvent(string $event, ModelInterface $model, bool $halt = false)
     {
-        $event = "mongolid.{$event}: ".get_class($entity);
+        $event = "mongolid.{$event}: ".get_class($model);
 
         $this->eventService ?: $this->eventService = Ioc::make(EventTriggerService::class);
 
-        return $this->eventService->fire($event, $entity, $halt);
+        return $this->eventService->fire($event, $model, $halt);
     }
 
     /**
@@ -520,7 +515,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108
      */
-    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
+    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = ''): void
     {
         foreach ($newData as $k => $v) {
             if (!isset($oldData[$k])) { // new field
@@ -552,31 +547,23 @@ class DataMapper implements HasSchemaInterface
      *
      * @return array
      */
-    private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = [])
+    private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = []): array
     {
         return array_merge($defaultOptions, $toMergeOptions);
     }
 
     /**
      * Perform actions on object before firing the after event.
-     *
-     * @param mixed $entity
      */
-    private function afterSuccess($entity)
+    private function afterSuccess(ModelInterface $model): void
     {
-        if ($entity instanceof HasAttributesInterface) {
-            $entity->syncOriginalDocumentAttributes();
-        }
+        $model->syncOriginalDocumentAttributes();
     }
 
-    private function getUpdateData($entity, array $data)
+    private function getUpdateData($model, array $data): array
     {
-        if (!$entity instanceof HasAttributesInterface) {
-            return ['$set' => $data];
-        }
-
         $changes = [];
-        $this->calculateChanges($changes, $data, $entity->getOriginalDocumentAttributes());
+        $this->calculateChanges($changes, $data, $model->getOriginalDocumentAttributes());
 
         return $changes;
     }

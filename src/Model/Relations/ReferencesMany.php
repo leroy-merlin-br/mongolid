@@ -4,6 +4,7 @@ namespace Mongolid\Model\Relations;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesMany extends AbstractRelation
@@ -11,7 +12,7 @@ class ReferencesMany extends AbstractRelation
     /**
      * @var HasAttributesInterface
      */
-    protected $entityInstance;
+    protected $modelInstance;
 
     /**
      * @var string
@@ -20,44 +21,42 @@ class ReferencesMany extends AbstractRelation
 
     public function __construct(
         HasAttributesInterface $parent,
-        string $entity,
+        string $model,
         string $field,
         string $key
     ) {
-        parent::__construct($parent, $entity, $field);
+        parent::__construct($parent, $model, $field);
         $this->key = $key;
         $this->documentEmbedder->setKey($key);
-        $this->entityInstance = Ioc::make($this->entity);
+        $this->modelInstance = Ioc::make($this->model);
     }
 
     /**
-     * Attach document _id reference to an attribute. It will also generate an
-     * _id for the document if it's not present.
-     *
-     * @param mixed $entity model instance or _id to be referenced
+     * Attach model reference. It will also generate an
+     * _id for the model if it's not present.
      */
-    public function attach($entity): void
+    public function attach(ModelInterface $model): void
     {
-        $this->documentEmbedder->attach($this->parent, $this->field, $entity);
+        $this->documentEmbedder->attach($this->parent, $this->field, $model);
         $this->pristine = false;
     }
 
     /**
-     * Attach many documents at once.
+     * Attach many models at once.
      *
-     * @param array $entities model
+     * @param ModelInterface[] $entities
      */
     public function attachMany(array $entities): void
     {
-        foreach ($entities as $entity) {
-            $this->attach($entity);
+        foreach ($entities as $model) {
+            $this->attach($model);
         }
     }
 
     /**
      * Replace attached documents.
      *
-     * @param array $entities
+     * @param ModelInterface[] $entities
      */
     public function replace(array $entities): void
     {
@@ -66,19 +65,16 @@ class ReferencesMany extends AbstractRelation
     }
 
     /**
-     * Removes a document _id reference from an attribute. It will remove the
-     * _id of the given $entity from inside the given $field.
-     *
-     * @param mixed $entity document, model instance or _id that have been referenced by $field
+     * Removes model reference from an attribute.
      */
-    public function detach($entity): void
+    public function detach(ModelInterface $model): void
     {
-        $this->documentEmbedder->detach($this->parent, $this->field, $entity);
+        $this->documentEmbedder->detach($this->parent, $this->field, $model);
         $this->pristine = false;
     }
 
     /**
-     * Removes all document references from relation.
+     * Removes all model references from relation.
      */
     public function detachAll(): void
     {
@@ -96,6 +92,6 @@ class ReferencesMany extends AbstractRelation
             }
         }
 
-        return $this->entityInstance->where([$this->key => ['$in' => array_values($referencedKeys)]]);
+        return $this->modelInstance->where([$this->key => ['$in' => array_values($referencedKeys)]]);
     }
 }

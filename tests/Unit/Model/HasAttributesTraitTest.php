@@ -281,7 +281,7 @@ class HasAttributesTraitTest extends TestCase
     public function testShouldCheckIfAttributeIsSet()
     {
         // Set
-        $model = new class() extends AbstractActiveRecord
+        $model = new class() extends AbstractModel
         {
         };
         $model->fill(['name' => 'John', 'ignored' => null]);
@@ -295,7 +295,7 @@ class HasAttributesTraitTest extends TestCase
     public function testShouldCheckIfMutatedAttributeIsSet()
     {
         // Set
-        $model = new class() extends AbstractActiveRecord
+        $model = new class() extends AbstractModel
         {
             /**
              * {@inheritdoc}

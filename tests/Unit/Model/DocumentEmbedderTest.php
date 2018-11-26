@@ -4,8 +4,6 @@ namespace Mongolid\Model;
 use Mockery as m;
 use Mockery\Matcher\Any;
 use MongoDB\BSON\ObjectId;
-use Mongolid\Connection\Connection;
-use Mongolid\DataMapper\DataMapper;
 use Mongolid\TestCase;
 
 class DocumentEmbedderTest extends TestCase
@@ -13,25 +11,26 @@ class DocumentEmbedderTest extends TestCase
     /**
      * @dataProvider getEmbedOptions
      */
-    public function testShouldEmbed($originalField, $entityFields, $method, $expectation)
+    public function testShouldEmbed($originalField, $modelFields, $method, $expectation)
     {
         // Arrange
-        $connection = new Connection();
-        $parent = new DataMapper($connection);
+        $parent = new class extends AbstractModel
+        {
+        };
         $parent->foo = $originalField;
 
-        if (is_array($entityFields)) {
-            $entity = new class extends AbstractActiveRecord
+        if (is_array($modelFields)) {
+            $model = new class extends AbstractModel
             {
             };
-            $entity->fill($entityFields);
+            $model->fill($modelFields);
         } else {
-            $entity = $entityFields;
+            $model = $modelFields;
         }
         $embedder = new DocumentEmbedder();
 
         // Assert
-        $embedder->$method($parent, 'foo', $entity);
+        $embedder->$method($parent, 'foo', $model);
 
         $result = $parent->foo;
         foreach ($expectation as $index => $expectedDoc) {
@@ -59,7 +58,7 @@ class DocumentEmbedderTest extends TestCase
             // ------------------------------
             'embedding object without _id' => [
                 'originalField' => null,
-                'entity' => [
+                'model' => [
                     'name' => 'John Doe',
                 ],
                 'method' => 'embed',
@@ -71,7 +70,7 @@ class DocumentEmbedderTest extends TestCase
             // ------------------------------
             'embedding object with _id' => [
                 'originalField' => null,
-                'entity' => [
+                'model' => [
                     '_id' => (new ObjectId('507f191e810c19729de860ea')),
                     'name' => 'John Doe',
                 ],
@@ -89,7 +88,7 @@ class DocumentEmbedderTest extends TestCase
                         'name' => 'Bob',
                     ],
                 ],
-                'entity' => [
+                'model' => [
                     '_id' => (new ObjectId('507f191e810c19729de860ea')),
                     'name' => 'John Doe',
                 ],
@@ -102,7 +101,7 @@ class DocumentEmbedderTest extends TestCase
             // ------------------------------
             'attaching object with _id' => [
                 'originalField' => null,
-                'entity' => [
+                'model' => [
                     '_id' => new ObjectId('507f191e810c19729de860ea'),
                     'name' => 'John Doe',
                 ],
@@ -118,7 +117,7 @@ class DocumentEmbedderTest extends TestCase
                     new ObjectId('507f191e810c19729de860ea'),
                     new ObjectId('507f191e810c19729de86011'),
                 ],
-                'entity' => [
+                'model' => [
                     '_id' => new ObjectId('507f191e810c19729de860ea'),
                     'name' => 'John Doe',
                 ],
@@ -132,7 +131,7 @@ class DocumentEmbedderTest extends TestCase
             // ------------------------------
             'attaching object without _id' => [
                 'originalField' => null,
-                'entity' => [
+                'model' => [
                     'name' => 'John Doe',
                 ],
                 'method' => 'attach',
@@ -145,7 +144,7 @@ class DocumentEmbedderTest extends TestCase
                     (new ObjectId('507f191e810c19729de860ea')),
                     (new ObjectId('507f191e810c19729de86011')),
                 ],
-                'entity' => [
+                'model' => [
                     '_id' => (new ObjectId('507f191e810c19729de860ea')),
                     'name' => 'John Doe',
                 ],
@@ -158,7 +157,7 @@ class DocumentEmbedderTest extends TestCase
             // ------------------------------
             'attaching an _id' => [
                 'originalField' => null,
-                'entity' => new ObjectId('507f191e810c19729de860ea'),
+                'model' => new ObjectId('507f191e810c19729de860ea'),
                 'method' => 'attach',
                 'expectation' => [
                     (new ObjectId('507f191e810c19729de860ea')),
@@ -171,7 +170,7 @@ class DocumentEmbedderTest extends TestCase
                     6,
                     7,
                 ],
-                'entity' => 6,
+                'model' => 6,
                 'method' => 'detach',
                 'expectation' => [
                     7,

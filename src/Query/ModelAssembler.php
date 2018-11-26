@@ -1,36 +1,34 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use Mongolid\Container\Ioc;
-use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema\AbstractSchema;
 
 /**
- * EntityAssembler have the responsibility of assembling the data coming from
+ * ModelAssembler have the responsibility of assembling the data coming from
  * the database into actual entities. Since the entities need to be assembled
  * whenever they are being built with data from the database, from a cursor or
  * from an embedded field, this service is a reusable tool to turn field array of
- * attributes into the actual Entity.
+ * attributes into the actual Model.
  *
  * This class is meant to do the opposite of the SchemaMapper.
  *
  * @see http://martinfowler.com/eaaCatalog/dataTransferObject.html
  */
-class EntityAssembler
+class ModelAssembler
 {
     /**
      * Builds an object from the provided data.
      *
-     * @param array|object   $document the attributes that will be used to compose the entity
+     * @param array|object   $document the attributes that will be used to compose the model
      * @param AbstractSchema $schema   schema that will be used to map each field
-     *
-     * @return mixed
      */
-    public function assemble($document, AbstractSchema $schema)
+    public function assemble($document, AbstractSchema $schema): ModelInterface
     {
-        $entityClass = $schema->entityClass;
-        $model = Ioc::make($entityClass);
+        $modelClass = $schema->modelClass;
+        $model = Ioc::make($modelClass);
 
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
@@ -42,50 +40,48 @@ class EntityAssembler
             $model->$field = $value;
         }
 
-        $entity = $this->morphingTime($model);
+        $model = $this->morphingTime($model);
 
-        return $this->prepareOriginalAttributes($entity);
+        return $this->prepareOriginalAttributes($model);
     }
 
     /**
-     * Returns the return of polymorph method of the given entity if available.
+     * Returns the return of polymorph method of the given model if available.
      *
      * @see \Mongolid\Model\PolymorphableInterface::polymorph
      * @see https://i.ytimg.com/vi/TFGN9kAjdis/maxresdefault.jpg
      *
-     * @param mixed $entity the entity that may or may not have a polymorph method
+     * @param mixed $model the model that may or may not have a polymorph method
      *
-     * @return mixed the result of $entity->polymorph or the $entity itself
+     * @return mixed the result of $model->polymorph or the $model itself
      */
-    protected function morphingTime($entity)
+    protected function morphingTime(ModelInterface $model): ModelInterface
     {
-        if ($entity instanceof PolymorphableInterface) {
-            return $entity->polymorph();
+        if ($model instanceof PolymorphableInterface) {
+            return $model->polymorph();
         }
 
-        return $entity;
+        return $model;
     }
 
     /**
-     * Stores original attributes from Entity if needed.
+     * Stores original attributes from Model if needed.
      *
-     * @param mixed $entity the entity that may have the attributes stored
+     * @param mixed $model the model that may have the attributes stored
      *
-     * @return mixed the entity with original attributes
+     * @return mixed the model with original attributes
      */
-    protected function prepareOriginalAttributes($entity)
+    protected function prepareOriginalAttributes(ModelInterface $model)
     {
-        if ($entity instanceof HasAttributesInterface) {
-            $entity->syncOriginalDocumentAttributes();
-        }
+        $model->syncOriginalDocumentAttributes();
 
-        return $entity;
+        return $model;
     }
 
     /**
      * Assembly multiple documents for the given $schemaClass recursively.
      *
-     * @param mixed  $value       a value of an embedded field containing entity data to be assembled
+     * @param mixed  $value       a value of an embedded field containing model data to be assembled
      * @param string $schemaClass the schemaClass to be used when assembling the entities within $value
      *
      * @return mixed

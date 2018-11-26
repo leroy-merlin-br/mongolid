@@ -18,13 +18,13 @@ class AbstractSchemaTest extends TestCase
         $this->assertAttributeEquals(false, 'dynamic', $schema);
     }
 
-    public function testMustHaveAnEntityClass()
+    public function testMustHaveAnModelClass()
     {
         // Arrange
         $schema = m::mock(AbstractSchema::class.'[]');
 
         // Assert
-        $this->assertAttributeEquals('stdClass', 'entityClass', $schema);
+        $this->assertAttributeEquals('stdClass', 'modelClass', $schema);
     }
 
     public function testShouldCastNullIntoObjectId()

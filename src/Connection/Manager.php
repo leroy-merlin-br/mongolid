@@ -3,9 +3,9 @@ namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Query\Builder;
 use Mongolid\Schema\AbstractSchema;
 
 /**
@@ -43,8 +43,7 @@ class Manager
     protected $connection;
 
     /**
-     * Stores the schemas that have been registered for later use. This may be
-     * useful when using Mongolid DataMapper pattern.
+     * Stores the schemas that have been registered for later use.
      *
      * @var array
      */
@@ -88,7 +87,7 @@ class Manager
     {
         $this->init();
         $eventService = new EventTriggerService();
-        $eventService->registerEventDispatcher($eventTrigger);
+        $eventService->registerEventBuilder($eventTrigger);
 
         $this->container->instance(EventTriggerService::class, $eventService);
     }
@@ -100,26 +99,26 @@ class Manager
      */
     public function registerSchema(AbstractSchema $schema)
     {
-        $this->schemas[$schema->entityClass] = $schema;
+        $this->schemas[$schema->modelClass] = $schema;
     }
 
     /**
-     * Retrieves a DataMapper for the given $entityClass. This can only be done
-     * if the Schema for that entity has been previously registered with
+     * Retrieves a Builder for the given $modelClass. This can only be done
+     * if the Schema for that model has been previously registered with
      * registerSchema() method.
      *
-     * @param string $entityClass class of the entity that needs to be mapped
-     *
-     * @return DataMapper|null dataMapper configured for the $entityClass
+     * @param string $modelClass class of the model that needs to be mapped
      */
-    public function getMapper(string $entityClass)
+    public function getBuilder(string $modelClass): ?Builder
     {
-        if (isset($this->schemas[$entityClass])) {
-            $dataMapper = Ioc::make(DataMapper::class);
-            $dataMapper->setSchema($this->schemas[$entityClass] ?? null);
+        if (isset($this->schemas[$modelClass])) {
+            $builder = Ioc::make(Builder::class);
+            $builder->setSchema($this->schemas[$modelClass] ?? null);
 
-            return $dataMapper;
+            return $builder;
         }
+
+        return null;
     }
 
     /**

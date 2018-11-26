@@ -4,9 +4,9 @@ namespace Mongolid\Connection;
 use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
-use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Query\Builder;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
 
@@ -52,7 +52,7 @@ class ManagerTest extends TestCase
             ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
                 $test->assertEquals(EventTriggerService::class, $class);
-                $test->assertAttributeEquals($eventTrigger, 'dispatcher', $eventService);
+                $test->assertAttributeEquals($eventTrigger, 'builder', $eventService);
             });
 
         // Assert
@@ -64,7 +64,7 @@ class ManagerTest extends TestCase
         // Arrange
         $manager = new Manager();
         $schema = m::mock(AbstractSchema::class);
-        $schema->entityClass = 'Bacon';
+        $schema->modelClass = 'Bacon';
 
         // Assert
         $manager->registerSchema($schema);
@@ -80,16 +80,16 @@ class ManagerTest extends TestCase
         // Arrange
         $manager = new Manager();
         $schema = m::mock(AbstractSchema::class);
-        $dataMapper = $this->instance(DataMapper::class, m::mock(DataMapper::class)->makePartial());
+        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
 
-        $schema->entityClass = 'Bacon';
+        $schema->modelClass = 'Bacon';
 
         // Act
         $manager->registerSchema($schema);
-        $result = $manager->getMapper('Bacon');
+        $result = $manager->getBuilder('Bacon');
 
         // Assert
-        $this->assertEquals($dataMapper, $result);
+        $this->assertEquals($builder, $result);
         $this->assertAttributeEquals($schema, 'schema', $result);
     }
 
@@ -99,7 +99,7 @@ class ManagerTest extends TestCase
         $manager = new Manager();
 
         // Assert
-        $result = $manager->getMapper('Unknow');
+        $result = $manager->getBuilder('Unknown');
         $this->assertNull($result);
     }
 

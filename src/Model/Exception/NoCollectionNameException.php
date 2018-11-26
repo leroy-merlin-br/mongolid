@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Exception;
+namespace Mongolid\Model\Exception;
 
 use Exception;
 
@@ -13,5 +13,5 @@ class NoCollectionNameException extends Exception
      *
      * @var string
      */
-    protected $message = 'Collection name not especified into ActiveRecord instance';
+    protected $message = 'Collection name not specified into Model instance';
 }

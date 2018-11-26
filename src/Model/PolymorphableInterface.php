@@ -3,12 +3,12 @@ namespace Mongolid\Model;
 
 /**
  * If a model implements the PolymorphableInterface it means that, whenever the
- * entity is being "recovered" from the database, it will call the polymorph
+ * model is being "recovered" from the database, it will call the polymorph
  * method and retrieve the object returned from it.
  *
  * See the docblock of the `polymorph` method for more details.
  *
- * @see \Mongolid\DataMapper\EntityAssembler
+ * @see \Mongolid\Query\ModelAssembler
  */
 interface PolymorphableInterface
 {
@@ -43,7 +43,7 @@ interface PolymorphableInterface
      * returned have the key video set, then the object returned will be
      * a VideoContent instead of a Content.
      *
-     * @return mixed
+     * @return PolymorphableInterface
      */
     public function polymorph();
 }

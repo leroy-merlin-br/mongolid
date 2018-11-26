@@ -9,8 +9,8 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
+use Mongolid\Query\ModelAssembler;
 use Mongolid\Schema\AbstractSchema;
 use Serializable;
 use Traversable;
@@ -24,11 +24,11 @@ use Traversable;
 class Cursor implements CursorInterface, Serializable
 {
     /**
-     * Schema that describes the entity that will be retrieved when iterating through the cursor.
+     * Schema that describes the model that will be retrieved when iterating through the cursor.
      *
      * @var string
      */
-    public $entitySchema;
+    public $modelSchema;
 
     /**
      * @var Collection
@@ -66,24 +66,24 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Have the responsibility of assembling the data coming from the database into actual entities.
      *
-     * @var EntityAssembler
+     * @var ModelAssembler
      */
     protected $assembler;
 
     /**
-     * @param AbstractSchema $entitySchema schema that describes the entity that will be retrieved from the database
-     * @param Collection     $collection   the raw collection object that will be used to retrieve the documents
-     * @param string         $command      the command that is being called in the $collection
-     * @param array          $params       the parameters of the $command
+     * @param AbstractSchema $modelSchema schema that describes the model that will be retrieved from the database
+     * @param Collection     $collection  the raw collection object that will be used to retrieve the documents
+     * @param string         $command     the command that is being called in the $collection
+     * @param array          $params      the parameters of the $command
      */
     public function __construct(
-        AbstractSchema $entitySchema,
+        AbstractSchema $modelSchema,
         Collection $collection,
         string $command,
         array $params
     ) {
         $this->cursor = null;
-        $this->entitySchema = $entitySchema;
+        $this->modelSchema = $modelSchema;
         $this->collection = $collection;
         $this->command = $command;
         $this->params = $params;
@@ -203,16 +203,16 @@ class Cursor implements CursorInterface, Serializable
             return null;
         }
 
-        if ($document instanceof AbstractActiveRecord) {
+        if ($document instanceof AbstractModel) {
             $documentToArray = $document->toArray();
-            $this->entitySchema = $document->getSchema();
+            $this->modelSchema = $document->getSchema();
         } else {
             $documentToArray = (array) $document;
         }
 
         return $this->getAssembler()->assemble(
             $documentToArray,
-            $this->entitySchema
+            $this->modelSchema
         );
     }
 
@@ -344,14 +344,14 @@ class Cursor implements CursorInterface, Serializable
     }
 
     /**
-     * Retrieves an EntityAssembler instance.
+     * Retrieves an ModelAssembler instance.
      *
-     * @return EntityAssembler
+     * @return ModelAssembler
      */
     protected function getAssembler()
     {
         if (!$this->assembler) {
-            $this->assembler = Ioc::make(EntityAssembler::class);
+            $this->assembler = Ioc::make(ModelAssembler::class);
         }
 
         return $this->assembler;

@@ -1,13 +1,13 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use Mockery as m;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\AbstractSchema;
-use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\TestCase;
 
 class BulkWriteTest extends TestCase
@@ -15,14 +15,14 @@ class BulkWriteTest extends TestCase
     public function testShouldConstructBulkWriteObject()
     {
         // Arrange
-        $entity = m::mock(HasSchemaInterface::class);
+        $model = m::mock(ModelInterface::class);
 
         // Expect
-        $entity->expects()
+        $model->expects()
             ->getSchema();
 
         // Act
-        $bulkWrite = new BulkWrite($entity);
+        $bulkWrite = new BulkWrite($model);
 
         // Assert
         $this->assertInstanceOf(BulkWrite::class, $bulkWrite);
@@ -31,15 +31,15 @@ class BulkWriteTest extends TestCase
     public function testShouldSetAndGetMongoBulkWrite()
     {
         // Arrange
-        $entity = m::mock(HasSchemaInterface::class);
+        $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = new MongoBulkWrite();
 
         // Expect
-        $entity->expects()
+        $model->expects()
             ->getSchema();
 
         // Act
-        $bulkWrite = new BulkWrite($entity);
+        $bulkWrite = new BulkWrite($model);
         $bulkWrite->setBulkWrite($mongoBulkWrite);
 
         // Assert
@@ -49,20 +49,20 @@ class BulkWriteTest extends TestCase
     public function testShouldAddUpdateOneOperationToBulkWrite()
     {
         // Arrange
-        $entity = m::mock(HasSchemaInterface::class);
+        $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
 
         $id = '123';
         $data = ['name' => 'John'];
 
         // Expect
-        $entity->expects()
+        $model->expects()
             ->getSchema();
 
         $mongoBulkWrite->expects()
             ->update(['_id' => $id], ['$set' => $data], ['upsert' => true]);
 
-        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$model]);
 
         $bulkWrite->expects()
             ->getBulkWrite()
@@ -75,20 +75,20 @@ class BulkWriteTest extends TestCase
     public function testShouldUpdateOneWithUnsetOperationToBulkWrite()
     {
         // Arrange
-        $entity = m::mock(HasSchemaInterface::class);
+        $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
 
         $id = '123';
         $data = ['name' => 'John'];
 
         // Expect
-        $entity->expects()
+        $model->expects()
             ->getSchema();
 
         $mongoBulkWrite->expects()
             ->update(['_id' => $id], ['$unset' => $data], ['upsert' => true]);
 
-        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$model]);
 
         $bulkWrite->expects()
             ->getBulkWrite()
@@ -100,9 +100,9 @@ class BulkWriteTest extends TestCase
 
     public function testShouldExecuteBulkWrite()
     {
-        $entity = m::mock(HasSchemaInterface::class);
+        $model = m::mock(ModelInterface::class);
         $schema = m::mock(AbstractSchema::class);
-        $entity->schema = $schema;
+        $model->schema = $schema;
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
         $manager = m::mock(new Manager());
@@ -112,7 +112,7 @@ class BulkWriteTest extends TestCase
         $namespace = 'foo.bar';
 
         // Expect
-        $entity->expects()
+        $model->expects()
             ->getSchema()
             ->andReturn($schema);
 
@@ -124,7 +124,7 @@ class BulkWriteTest extends TestCase
             ->executeBulkWrite($namespace, $mongoBulkWrite, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
-        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$entity]);
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$model]);
 
         $bulkWrite->expects()
             ->getBulkWrite()

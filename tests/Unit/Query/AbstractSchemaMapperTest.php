@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use Mockery as m;
 use Mongolid\Container\Ioc;

@@ -15,7 +15,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @var string
      */
-    protected $entity;
+    protected $model;
 
     /**
      * @var string
@@ -39,10 +39,10 @@ abstract class AbstractRelation implements RelationInterface
      */
     protected $results;
 
-    public function __construct(HasAttributesInterface $parent, string $entity, string $field)
+    public function __construct(HasAttributesInterface $parent, string $model, string $field)
     {
         $this->parent = $parent;
-        $this->entity = $entity;
+        $this->model = $model;
         $this->field = $field;
 
         $this->documentEmbedder = Ioc::make(DocumentEmbedder::class);

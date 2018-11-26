@@ -1,53 +1,51 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
-use Mongolid\Model\HasAttributesInterface;
-use Mongolid\Model\HasAttributesTrait;
+use Mongolid\Model\AbstractModel;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\TestCase;
-use stdClass;
 
-class EntityAssemblerTest extends TestCase
+class ModelAssemblerTest extends TestCase
 {
     /**
-     * @dataProvider entityAssemblerFixture
+     * @dataProvider modelAssemblerFixture
      */
-    public function testShouldAssembleEntityForTheGivenSchema($inputValue, $availableSchemas, $inputSchema, $expectedOutput)
+    public function testShouldAssembleModelForTheGivenSchema($inputValue, $availableSchemas, $inputSchema, $expectedOutput)
     {
         // Arrange
-        $entityAssembler = new EntityAssembler();
+        $modelAssembler = new ModelAssembler();
         $schemas = [];
         foreach ($availableSchemas as $key => $value) {
             $schemas[$key] = $this->instance($key, m::mock(AbstractSchema::class.'[]'));
-            $schemas[$key]->entityClass = $value['entityClass'];
+            $schemas[$key]->modelClass = $value['modelClass'];
             $schemas[$key]->fields = $value['fields'];
         }
 
         // Act
-        $result = $entityAssembler->assemble($inputValue, $schemas[$inputSchema]);
+        $result = $modelAssembler->assemble($inputValue, $schemas[$inputSchema]);
 
         // Assert
         $this->assertEquals($expectedOutput, $result);
     }
 
-    public function entityAssemblerFixture()
+    public function modelAssemblerFixture()
     {
         return [
             //---------------------------
 
-            'A simple schema to a entity' => [
-                'inputValue' => [ // Data that will be used to assembly the entity
+            'A simple schema to a model' => [
+                'inputValue' => [ // Data that will be used to assembly the model
                     '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => StubStudent::class,
+                        'modelClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -69,7 +67,7 @@ class EntityAssemblerTest extends TestCase
             //---------------------------
 
             'A schema containing an embedded schema but with null field' => [
-                'inputValue' => [ // Data that will be used to assembly the entity
+                'inputValue' => [ // Data that will be used to assembly the model
                     '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -78,7 +76,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => StubStudent::class,
+                        'modelClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -88,7 +86,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => StubTestGrade::class,
+                        'modelClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -109,7 +107,7 @@ class EntityAssemblerTest extends TestCase
             //---------------------------
 
             'A stdClass with a schema containing an embedded schema with a document directly into the field' => [
-                'inputValue' => (object) [ // Data that will be used to assembly the entity
+                'inputValue' => (object) [ // Data that will be used to assembly the model
                     '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -120,9 +118,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => StubStudent::class,
+                        'modelClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -132,7 +130,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => StubTestGrade::class,
+                        'modelClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -159,7 +157,7 @@ class EntityAssemblerTest extends TestCase
             //---------------------------
 
             'A schema containing an embedded schema with multiple documents in the field' => [
-                'inputValue' => [ // Data that will be used to assembly the entity
+                'inputValue' => [ // Data that will be used to assembly the model
                     '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -177,9 +175,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => StubStudent::class,
+                        'modelClass' => StubStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -189,7 +187,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => StubTestGrade::class,
+                        'modelClass' => StubTestGrade::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -221,15 +219,15 @@ class EntityAssemblerTest extends TestCase
             //---------------------------
 
             'A simple schema with a polymorphable interface' => [
-                'inputValue' => [ // Data that will be used to assembly the entity
+                'inputValue' => [ // Data that will be used to assembly the model
                     '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'grade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => PolymorphableStudent::class,
+                        'modelClass' => PolymorphableStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -251,10 +249,8 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class StubStudent extends stdClass implements HasAttributesInterface
+class StubStudent extends AbstractModel
 {
-    use HasAttributesTrait;
-
     public function __construct($attr = [])
     {
         foreach ($attr as $key => $value) {
@@ -265,20 +261,22 @@ class StubStudent extends stdClass implements HasAttributesInterface
     }
 }
 
-class StubTestGrade extends stdClass
+class StubTestGrade extends AbstractModel
 {
     public function __construct($attr = [])
     {
         foreach ($attr as $key => $value) {
             $this->$key = $value;
         }
+
+        $this->syncOriginalDocumentAttributes();
     }
 }
 
-class PolymorphableStudent extends stdClass implements PolymorphableInterface
+class PolymorphableStudent extends AbstractModel implements PolymorphableInterface
 {
     public function polymorph()
     {
-        return new StubStudent((array) $this);
+        return new StubStudent($this->getDocumentAttributes());
     }
 }

@@ -2,18 +2,17 @@
 namespace Mongolid\Model\Relations;
 
 use Mongolid\Cursor\EmbeddedCursor;
+use Mongolid\Model\ModelInterface;
 
 class EmbedsMany extends AbstractRelation
 {
     /**
      * Embed a new document. It will also generate an
      * _id for the document if it's not present.
-     *
-     * @param mixed $entity model
      */
-    public function add($entity): void
+    public function add(ModelInterface $model): void
     {
-        $this->documentEmbedder->embed($this->parent, $this->field, $entity);
+        $this->documentEmbedder->embed($this->parent, $this->field, $model);
         $this->pristine = false;
     }
 
@@ -24,8 +23,8 @@ class EmbedsMany extends AbstractRelation
      */
     public function addMany(array $entities): void
     {
-        foreach ($entities as $entity) {
-            $this->add($entity);
+        foreach ($entities as $model) {
+            $this->add($model);
         }
     }
 
@@ -42,13 +41,13 @@ class EmbedsMany extends AbstractRelation
 
     /**
      * Removes an embedded document from the given field. It does that by using
-     * the _id of given $entity.
+     * the _id of given $model.
      *
-     * @param mixed $entity model or _id
+     * @param mixed $model model or _id
      */
-    public function remove($entity): void
+    public function remove(ModelInterface $model): void
     {
-        $this->documentEmbedder->unembed($this->parent, $this->field, $entity);
+        $this->documentEmbedder->unembed($this->parent, $this->field, $model);
         $this->pristine = false;
     }
 
@@ -58,6 +57,9 @@ class EmbedsMany extends AbstractRelation
         $this->pristine = false;
     }
 
+    /**
+     * @return EmbeddedCursor
+     */
     public function get()
     {
         $items = (array) $this->parent->{$this->field};
@@ -71,6 +73,6 @@ class EmbedsMany extends AbstractRelation
 
     protected function createCursor($items): EmbeddedCursor
     {
-        return new EmbeddedCursor($this->entity, $items);
+        return new EmbeddedCursor($this->model, $items);
     }
 }

@@ -2,8 +2,8 @@
 namespace Mongolid\Cursor;
 
 use Mongolid\Container\Ioc;
-use Mongolid\DataMapper\EntityAssembler;
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
+use Mongolid\Query\ModelAssembler;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 
@@ -16,11 +16,11 @@ use Mongolid\Schema\DynamicSchema;
 class EmbeddedCursor implements CursorInterface
 {
     /**
-     * Entity class that will be returned while iterating.
+     * Model class that will be returned while iterating.
      *
      * @var string
      */
-    public $entityClass;
+    public $modelClass;
 
     /**
      * The actual array of embedded documents.
@@ -37,13 +37,13 @@ class EmbeddedCursor implements CursorInterface
     private $position = 0;
 
     /**
-     * @param string $entityClass class of the objects that will be retrieved by the cursor
-     * @param array  $items       the items array
+     * @param string $modelClass class of the objects that will be retrieved by the cursor
+     * @param array  $items      the items array
      */
-    public function __construct(string $entityClass, array $items)
+    public function __construct(string $modelClass, array $items)
     {
         $this->items = $items;
-        $this->entityClass = $entityClass;
+        $this->modelClass = $modelClass;
     }
 
     /**
@@ -139,28 +139,28 @@ class EmbeddedCursor implements CursorInterface
 
         $document = $this->items[$this->position];
 
-        if ($document instanceof $this->entityClass) {
+        if ($document instanceof $this->modelClass) {
             return $document;
         }
 
-        $schema = $this->getSchemaForEntity();
-        $entityAssembler = Ioc::make(EntityAssembler::class, compact('schema'));
+        $schema = $this->getSchemaForModel();
+        $modelAssembler = Ioc::make(ModelAssembler::class, compact('schema'));
 
-        return $entityAssembler->assemble($document, $schema);
+        return $modelAssembler->assemble($document, $schema);
     }
 
     /**
-     * Retrieve a schema based on Entity Class.
+     * Retrieve a schema based on Model Class.
      */
-    protected function getSchemaForEntity(): AbstractSchema
+    protected function getSchemaForModel(): AbstractSchema
     {
-        if ($this->entityClass instanceof AbstractSchema) {
-            return $this->entityClass;
+        if ($this->modelClass instanceof AbstractSchema) {
+            return $this->modelClass;
         }
 
-        $model = new $this->entityClass();
+        $model = new $this->modelClass();
 
-        if ($model instanceof AbstractActiveRecord) {
+        if ($model instanceof AbstractModel) {
             return $model->getSchema();
         }
 

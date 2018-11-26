@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use Mongolid\Container\Ioc;
 use Mongolid\Model\HasAttributesInterface;
@@ -11,7 +11,7 @@ use Mongolid\Schema\AbstractSchema;
  * 'map' the Schema provided will be used to format the data to the correct
  * format.
  *
- * This class is meant to do the opposite of the EntityAssembler
+ * This class is meant to do the opposite of the ModelAssembler
  */
 class SchemaMapper
 {

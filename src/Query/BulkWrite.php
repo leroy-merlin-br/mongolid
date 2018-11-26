@@ -1,13 +1,13 @@
 <?php
-namespace Mongolid\DataMapper;
+namespace Mongolid\Query;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
+use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\AbstractSchema;
-use Mongolid\Schema\HasSchemaInterface;
 
 /**
  * This class is meant to provide a better API for handling
@@ -15,9 +15,7 @@ use Mongolid\Schema\HasSchemaInterface;
  *
  * It's an incomplete and highly opinionated abstraction
  * but yet flexible, since you are able to access the
- * driver's API and can work with both ActiveRecord and
- * DataMapper, since this class relies on the Schema and
- * both classes implements HasSchemaInterface.
+ * driver's API.
  */
 class BulkWrite
 {
@@ -36,10 +34,10 @@ class BulkWrite
      */
     protected $schema;
 
-    public function __construct(HasSchemaInterface $entity)
+    public function __construct(ModelInterface $model)
     {
         $this->setBulkWrite(new MongoBulkWrite(['ordered' => false]));
-        $this->schema = $entity->getSchema();
+        $this->schema = $model->getSchema();
     }
 
     /**
@@ -92,7 +90,7 @@ class BulkWrite
 
     /**
      * Execute the BulkWrite, using connection.
-     * The collection is inferred from entity's collection name.
+     * The collection is inferred from model's collection name.
      *
      * @param int $writeConcern
      *

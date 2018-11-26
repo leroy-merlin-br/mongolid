@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Model\Relations\NotARelationException;
+use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Tests\Integration\Stubs\ReferencedUser;
 
 class ReferencesOneRelationTest extends IntegrationTestCase

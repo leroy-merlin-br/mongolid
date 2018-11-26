@@ -10,12 +10,11 @@ use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
-use Mongolid\Model\AbstractActiveRecord;
+use Mongolid\Model\AbstractModel;
 use Mongolid\Schema\AbstractSchema;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use Serializable;
-use stdClass;
 use Traversable;
 
 class CursorTest extends TestCase
@@ -166,45 +165,53 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
+        $object = new class extends AbstractModel
+        {
+        };
         $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $entity = $cursor->current();
+        $model = $cursor->current();
 
         // Assert
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('John Doe', 'name', $entity);
+        $this->assertInstanceOf(get_class($object), $model);
+        $this->assertSame('John Doe', $model->name);
     }
 
-    public function testShouldGetCurrentUsingActiveRecordClasses()
+    public function testShouldGetCurrentUsingModelClasses()
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $entity = m::mock(AbstractActiveRecord::class.'[]');
-        $entity->name = 'John Doe';
-        $driverCursor = new ArrayIterator([$entity]);
+        $object = new class extends AbstractModel
+        {
+        };
+        $object->name = 'John Doe';
+        $driverCursor = new ArrayIterator([$object]);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
 
         // Assert
-        $entity = $cursor->current();
-        $this->assertInstanceOf(AbstractActiveRecord::class, $entity);
-        $this->assertEquals('John Doe', $entity->name);
+        $model = $cursor->current();
+        $this->assertInstanceOf(AbstractModel::class, $model);
+        $this->assertEquals('John Doe', $model->name);
     }
 
     public function testShouldGetFirst()
     {
         // Arrange
         $collection = m::mock(Collection::class);
+        $object = new class extends AbstractModel
+        {
+        };
         $driverCursor = new CachingIterator(new ArrayObject([['name' => 'John Doe']]));
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
 
         // Act
-        $entity = $cursor->first();
+        $model = $cursor->first();
 
         // Assert
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('John Doe', 'name', $entity);
+        $this->assertInstanceOf(get_class($object), $model);
+        $this->assertSame('John Doe', $model->name);
     }
 
     public function testShouldGetFirstWhenEmpty()
@@ -323,40 +330,33 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $driverCursor = new CachingIterator(
+            new ArrayObject(
+                [
+                    ['name' => 'bob', 'occupation' => 'coder'],
+                    ['name' => 'jef', 'occupation' => 'tester'],
+                ]
+            )
+        );
+        $object = new class extends AbstractModel
+        {
+        };
+        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
 
-        // Act
-        $driverCursor->expects()
-            ->rewind();
-
-        $driverCursor->expects()
-            ->valid()
-            ->times(3)
-            ->andReturn(true, true, false);
-
-        $driverCursor->expects('next')
-            ->twice()
-            ->andReturn(true, false);
-
-        $driverCursor->expects()
-            ->current()
-            ->twice()
-            ->andReturn(
-                ['name' => 'bob', 'occupation' => 'coder'],
-                ['name' => 'jef', 'occupation' => 'tester']
-            );
-
+        // Actions
         $result = $cursor->all();
 
-        // Assert
-        $this->assertEquals(
-            [
-                (object) ['name' => 'bob', 'occupation' => 'coder'],
-                (object) ['name' => 'jef', 'occupation' => 'tester'],
-            ],
-            $result
-        );
+        // Assertions
+        $this->assertCount(2, $result);
+        $this->assertContainsOnlyInstancesOf(get_class($object), $result);
+
+        $firstModel = $result[0];
+        $this->assertSame('bob', $firstModel->name);
+        $this->assertSame('coder', $firstModel->occupation);
+
+        $nextModel = $result[1];
+        $this->assertSame('jef', $nextModel->name);
+        $this->assertSame('tester', $nextModel->occupation);
     }
 
     public function testShouldReturnResultsToArray()
@@ -425,14 +425,14 @@ class CursorTest extends TestCase
     }
 
     protected function getCursor(
-        $entitySchema = null,
+        $modelSchema = null,
         $collection = null,
         $command = 'find',
         $params = [[]],
         $driverCursor = null
     ) {
-        if (!$entitySchema) {
-            $entitySchema = m::mock(AbstractSchema::class.'[]');
+        if (!$modelSchema) {
+            $modelSchema = m::mock(AbstractSchema::class.'[]');
         }
 
         if (!$collection) {
@@ -440,12 +440,12 @@ class CursorTest extends TestCase
         }
 
         if (!$driverCursor) {
-            return new Cursor($entitySchema, $collection, $command, $params);
+            return new Cursor($modelSchema, $collection, $command, $params);
         }
 
         $mock = m::mock(
             Cursor::class.'[getCursor]',
-            [$entitySchema, $collection, $command, $params]
+            [$modelSchema, $collection, $command, $params]
         );
 
         $mock->shouldAllowMockingProtectedMethods();

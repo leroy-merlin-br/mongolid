@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Model\Relations;
+namespace Mongolid\Model\Exception;
 
 use LogicException;
 

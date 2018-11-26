@@ -11,17 +11,17 @@ class EventTriggerService
      *
      * @var EventTriggerInterface
      */
-    protected $dispatcher;
+    protected $builder;
 
     /**
      * Registers a object that will have the responsibility of firing events to
      * the rest of the application.
      *
-     * @param EventTriggerInterface $dispatcher event trigger object
+     * @param EventTriggerInterface $builder event trigger object
      */
-    public function registerEventDispatcher(EventTriggerInterface $dispatcher)
+    public function registerEventBuilder(EventTriggerInterface $builder)
     {
-        $this->dispatcher = $dispatcher;
+        $this->builder = $builder;
     }
 
     /**
@@ -38,8 +38,8 @@ class EventTriggerService
      */
     public function fire(string $event, $payload, bool $halt = false)
     {
-        if ($this->dispatcher) {
-            return $this->dispatcher->fire($event, $payload, $halt);
+        if ($this->builder) {
+            return $this->builder->fire($event, $payload, $halt);
         }
 
         return true;
