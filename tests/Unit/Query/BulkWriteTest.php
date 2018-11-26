@@ -86,7 +86,17 @@ class BulkWriteTest extends TestCase
             ->getSchema();
 
         $mongoBulkWrite->expects()
-            ->update(['_id' => $id], ['$unset' => $data], ['upsert' => true]);
+            ->update(
+                m::on(
+                    function ($actual) {
+                        $this->assertSame(['_id' => '123'], $actual);
+
+                        return true;
+                    }
+                ),
+                ['$unset' => $data],
+                ['upsert' => true]
+            );
 
         $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$model]);
 
@@ -96,6 +106,42 @@ class BulkWriteTest extends TestCase
 
         // Act
         $bulkWrite->updateOne($id, $data, ['upsert' => true], '$unset');
+    }
+
+    public function testShouldUpdateOneWithQueryOnFilterToBulkWrite()
+    {
+        // Arrange
+        $model = m::mock(ModelInterface::class);
+        $mongoBulkWrite = m::mock(new MongoBulkWrite());
+
+        $query = ['_id' => '123', 'grades.grade' => 85];
+        $data = ['grades.std' => 6];
+
+        // Expect
+        $model->expects()
+            ->getSchema();
+
+        $mongoBulkWrite->expects()
+            ->update(
+                m::on(
+                    function ($actual) use ($query) {
+                        $this->assertSame($query, $actual);
+
+                        return true;
+                    }
+                ),
+                ['$unset' => $data],
+                ['upsert' => true]
+            );
+
+        $bulkWrite = m::mock(BulkWrite::class.'[getBulkWrite]', [$model]);
+
+        $bulkWrite->expects()
+            ->getBulkWrite()
+            ->andReturn($mongoBulkWrite);
+
+        // Act
+        $bulkWrite->updateOne($query, $data, ['upsert' => true], '$unset');
     }
 
     public function testShouldExecuteBulkWrite()
