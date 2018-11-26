@@ -1,8 +1,6 @@
 <?php
 namespace Mongolid\Model\Relations;
 
-use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
 
 class EmbedsMany extends AbstractRelation
@@ -73,7 +71,6 @@ class EmbedsMany extends AbstractRelation
 
     protected function createCursor($items): EmbeddedCursor
     {
-        return Ioc::make(CursorFactory::class)
-            ->createEmbeddedCursor($this->entity, $items);
+        return new EmbeddedCursor($this->entity, $items);
     }
 }

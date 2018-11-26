@@ -109,8 +109,8 @@ trait HasRelationsTrait
     /**
      * Create a ReferencesMany Relation.
      *
-     * @param string      $entity    class of the entity or of the schema of the entity
-     * @param string|null $field     the field where the _ids are stored
+     * @param string      $entity class of the entity or of the schema of the entity
+     * @param string|null $field  the field where the _ids are stored
      */
     protected function referencesMany(
         string $entity,

@@ -6,7 +6,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Cursor\CursorFactory;
+use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
@@ -230,16 +230,15 @@ class DataMapper implements HasSchemaInterface
      */
     public function where($query = [], array $projection = []): CursorInterface
     {
-        return Ioc::make(CursorFactory::class)
-            ->createCursor(
-                $this->schema,
-                $this->getCollection(),
-                'find',
-                [
-                    $this->prepareValueQuery($query),
-                    ['projection' => $this->prepareProjection($projection)],
-                ]
-            );
+        return new Cursor(
+            $this->schema,
+            $this->getCollection(),
+            'find',
+            [
+                $this->prepareValueQuery($query),
+                ['projection' => $this->prepareProjection($projection)],
+            ]
+        );
     }
 
     /**
