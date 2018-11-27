@@ -14,12 +14,9 @@ class EmbeddedUser extends AbstractModel
     protected $collection = 'users';
 
     /**
-     * @var array
+     * @var bool
      */
-    protected $fields = [
-        '_id' => 'objectId',
-        'created_at' => 'createdAtTimestamp',
-    ];
+    protected $timestamps = true;
 
     public function collection(): Collection
     {

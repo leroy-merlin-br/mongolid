@@ -7,15 +7,12 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
-use Mongolid\Query\SchemaMapper;
-use Mongolid\Schema\DynamicSchema;
+use Mongolid\Query\ModelMapper;
 
 /**
  * The Mongolid\Model\Model base class will ensure to enable your model to
  * have methods to interact with the database. It means that 'save', 'insert',
  * 'update', 'where', 'first' and 'all' are available within every instance.
- * The Mongolid\Schema\Schema that describes the model will be generated on the go
- * based on the $fields.
  */
 abstract class AbstractModel implements ModelInterface
 {
@@ -24,13 +21,21 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * The $dynamic property tells if the object will accept additional fields
-     * that are not specified in the $fields property. This is useful if you
-     * does not have a strict document format or if you want to take full
-     * advantage of the "schemaless" nature of MongoDB.
+     * that are not specified in the $fillable or $guarded properties.
+     * This is useful if you does not have a strict document format or
+     * if you want to take full advantage of the "schemaless" nature of MongoDB.
      *
      * @var bool
      */
-    public $dynamic = true;
+    protected $dynamic = true;
+
+    /**
+     * Whether the model should manage the `created_at` and `updated_at`
+     * timestamps automatically.
+     *
+     * @var bool
+     */
+    protected $timestamps = true;
 
     /**
      * Name of the collection where this kind of Model is going to be saved or
@@ -48,20 +53,6 @@ abstract class AbstractModel implements ModelInterface
     protected $writeConcern = 1;
 
     /**
-     * Describes the Schema fields of the model. Optionally you can set it to
-     * the name of a Schema class to be used.
-     *
-     * @see  \Mongolid\Schema\DynamicSchema::$fields
-     *
-     * @var string|string[]
-     */
-    protected $fields = [
-        '_id' => 'objectId',
-        'created_at' => 'createdAtTimestamp',
-        'updated_at' => 'updatedAtTimestamp',
-    ];
-
-    /**
      * Gets a cursor of this kind of entities that matches the query from the
      * database.
      *
@@ -70,7 +61,7 @@ abstract class AbstractModel implements ModelInterface
      */
     public static function where(array $query = [], array $projection = []): CursorInterface
     {
-        return self::getBuilderInstance()->where($query, $projection);
+        return self::getBuilderInstance()->where(new static(), $query, $projection);
     }
 
     /**
@@ -78,7 +69,7 @@ abstract class AbstractModel implements ModelInterface
      */
     public static function all(): CursorInterface
     {
-        return self::getBuilderInstance()->all();
+        return self::getBuilderInstance()->all(new static());
     }
 
     /**
@@ -86,10 +77,12 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
+     *
+     * @return ModelInterface|null
      */
-    public static function first($query = [], array $projection = []): ?ModelInterface
+    public static function first($query = [], array $projection = [])
     {
-        return self::getBuilderInstance()->first($query, $projection);
+        return self::getBuilderInstance()->first(new static(), $query, $projection);
     }
 
     /**
@@ -100,10 +93,12 @@ abstract class AbstractModel implements ModelInterface
      * @param array $projection fields to project in Mongo query
      *
      * @throws ModelNotFoundException If no document was found
+     *
+     * @return ModelInterface|null
      */
-    public static function firstOrFail($query = [], array $projection = []): ?ModelInterface
+    public static function firstOrFail($query = [], array $projection = [])
     {
-        return self::getBuilderInstance()->firstOrFail($query, $projection);
+        return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection);
     }
 
     /**
@@ -112,10 +107,12 @@ abstract class AbstractModel implements ModelInterface
      * _if field filled.
      *
      * @param mixed $id document id
+     *
+     * @return ModelInterface|null
      */
-    public static function firstOrNew($id): ?ModelInterface
+    public static function firstOrNew($id)
     {
-        if (!$model = self::getBuilderInstance()->first($id)) {
+        if (!$model = self::first($id)) {
             $model = new static();
             $model->_id = $id;
         }
@@ -125,16 +122,10 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * Returns a valid instance from Ioc.
-     *
-     * @throws NoCollectionNameException Throws exception when has no collection filled
      */
     private static function getBuilderInstance(): Builder
     {
         $instance = new static();
-
-        if (!$instance->getCollectionName()) {
-            throw new NoCollectionNameException();
-        }
 
         return $instance->getBuilder();
     }
@@ -215,23 +206,15 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * Returns a Builder configured with the Schema and collection described
-     * in this model.
+     * {@inheritdoc}
      */
-    public function getBuilder(): Builder
+    public function getCollectionName(): string
     {
-        $builder = Ioc::make(Builder::class);
-        $builder->setSchema($this->getSchema());
+        if (!$this->collection) {
+            throw new NoCollectionNameException();
+        }
 
-        return $builder;
-    }
-
-    /**
-     * Getter for the $collection attribute.
-     */
-    public function getCollectionName(): ?string
-    {
-        return $this->collection ?: $this->getSchema()->collection;
+        return $this->collection;
     }
 
     /**
@@ -245,42 +228,17 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Setter for $writeConcern attribute.
      *
-     * @param int $writeConcern level of write concern for the transation
+     * @param int $writeConcern level of write concern for the transaction
      */
     public function setWriteConcern(int $writeConcern): void
     {
         $this->writeConcern = $writeConcern;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSchema(): DynamicSchema
-    {
-        if ($schema = $this->instantiateSchemaInFields()) {
-            return $schema;
-        }
-
-        $schema = new DynamicSchema();
-        $schema->modelClass = static::class;
-        $schema->fields = $this->fields;
-        $schema->dynamic = $this->dynamic;
-        $schema->collection = $this->collection;
-
-        return $schema;
-    }
-
     public function bsonSerialize()
     {
-        $schemaMapper = Ioc::make(SchemaMapper::class, ['schema' => $this->getSchema()]);
-
-        $parsedDocument = $schemaMapper->map($this);
-
-        foreach ($parsedDocument as $field => $value) {
-            $this->setDocumentAttribute($field, $value);
-        }
-
-        return $parsedDocument;
+        return Ioc::make(ModelMapper::class)
+            ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
     public function bsonUnserialize(array $data)
@@ -292,31 +250,12 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * Will check if the current value of $fields property is the name of a
-     * Schema class and instantiate it if possible.
-     */
-    protected function instantiateSchemaInFields(): ?DynamicSchema
-    {
-        if (is_string($this->fields)) {
-            if (is_subclass_of($instance = Ioc::make($this->fields), DynamicSchema::class)) {
-                return $instance;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Performs the given action into database.
      *
      * @param string $action Builder function to execute
      */
     protected function execute(string $action): bool
     {
-        if (!$this->getCollectionName()) {
-            return false;
-        }
-
         $options = [
             'writeConcern' => new WriteConcern($this->getWriteConcern()),
         ];
@@ -326,5 +265,14 @@ abstract class AbstractModel implements ModelInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns a Builder configured with the collection described
+     * in this model.
+     */
+    private function getBuilder(): Builder
+    {
+        return Ioc::make(Builder::class);
     }
 }

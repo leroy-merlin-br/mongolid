@@ -24,7 +24,7 @@ class HasRelationsTraitTest extends TestCase
 
         // Expectations
         $builder->expects()
-            ->first($expectedQuery, [])
+            ->first(m::type(RelatedStub::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
@@ -49,7 +49,7 @@ class HasRelationsTraitTest extends TestCase
 
         // Expectations
         $builder->expects()
-            ->where($expectedQuery, [])
+            ->where(m::type(RelatedStub::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions

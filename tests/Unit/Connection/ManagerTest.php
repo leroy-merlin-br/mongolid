@@ -6,8 +6,6 @@ use Mockery as m;
 use MongoDB\Client;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Query\Builder;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 
 class ManagerTest extends TestCase
@@ -57,50 +55,6 @@ class ManagerTest extends TestCase
 
         // Assert
         $manager->setEventTrigger($eventTrigger);
-    }
-
-    public function testShouldRegisterSchema()
-    {
-        // Arrange
-        $manager = new Manager();
-        $schema = m::mock(DynamicSchema::class);
-        $schema->modelClass = 'Bacon';
-
-        // Assert
-        $manager->registerSchema($schema);
-        $this->assertAttributeEquals(
-            ['Bacon' => $schema],
-            'schemas',
-            $manager
-        );
-    }
-
-    public function testShouldGetDataMapperForEntitiesWithRegisteredSchemas()
-    {
-        // Arrange
-        $manager = new Manager();
-        $schema = m::mock(DynamicSchema::class);
-        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
-
-        $schema->modelClass = 'Bacon';
-
-        // Act
-        $manager->registerSchema($schema);
-        $result = $manager->getBuilder('Bacon');
-
-        // Assert
-        $this->assertEquals($builder, $result);
-        $this->assertAttributeEquals($schema, 'schema', $result);
-    }
-
-    public function testShouldNotGetDataMapperForUnknownEntities()
-    {
-        // Arrange
-        $manager = new Manager();
-
-        // Assert
-        $result = $manager->getBuilder('Unknown');
-        $this->assertNull($result);
     }
 
     public function testShouldInitializeOnce()

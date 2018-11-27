@@ -11,31 +11,14 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
  * This class will abstract how a Model is persisted and retrieved
  * from the database.
- * The Builder will always use a Schema trough the SchemaMapper to parse the
- * document in and out of the database.
  */
 class Builder
 {
-    /**
-     * Name of the schema class to be used.
-     *
-     * @var string
-     */
-    public $schemaClass = DynamicSchema::class;
-
-    /**
-     * Schema object. Will be set after the $schemaClass.
-     *
-     * @var DynamicSchema
-     */
-    protected $schema;
-
     /**
      * Connection that is going to be used to interact with the database.
      *
@@ -74,10 +57,9 @@ class Builder
             return false;
         }
 
-        // TODO rework this
         $model->bsonSerialize();
 
-        $queryResult = $this->getCollection()->replaceOne(
+        $queryResult = $this->getCollection($model)->replaceOne(
             ['_id' => $model->_id],
             $model,
             $this->mergeOptions($options, ['upsert' => true])
@@ -113,7 +95,7 @@ class Builder
             return false;
         }
 
-        $queryResult = $this->getCollection()->insertOne(
+        $queryResult = $this->getCollection($model)->insertOne(
             $model,
             $this->mergeOptions($options)
         );
@@ -133,7 +115,7 @@ class Builder
 
     /**
      * Updates the given object into database. Returns success if write concern
-     * is acknowledged. Since it's an update, it will fail if the document with
+     * is acknowledged. Since it's an update, it will fail if the model with
      * the given _id did not exists.
      *
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
@@ -158,10 +140,9 @@ class Builder
             return $result;
         }
 
-        // TODO review this
         $updateData = $this->getUpdateData($model, $model->bsonSerialize());
 
-        $queryResult = $this->getCollection()->updateOne(
+        $queryResult = $this->getCollection($model)->updateOne(
             ['_id' => $model->_id],
             $updateData,
             $this->mergeOptions($options)
@@ -193,7 +174,7 @@ class Builder
             return false;
         }
 
-        $queryResult = $this->getCollection()->deleteOne(
+        $queryResult = $this->getCollection($model)->deleteOne(
             ['_id' => $model->_id],
             $this->mergeOptions($options)
         );
@@ -210,17 +191,16 @@ class Builder
     }
 
     /**
-     * Retrieve a database cursor that will return $this->schema->modelClass
-     * objects that upon iteration.
+     * Retrieve a database cursor that will return models that upon iteration.
      *
-     * @param mixed $query      mongoDB query to retrieve documents
-     * @param array $projection fields to project in Mongo query
+     * @param ModelInterface $model      Model to query from collection
+     * @param mixed          $query      MongoDB query to retrieve documents
+     * @param array          $projection fields to project in MongoDB query
      */
-    public function where($query = [], array $projection = []): CursorInterface
+    public function where(ModelInterface $model, $query = [], array $projection = []): CursorInterface
     {
         return new Cursor(
-            $this->schema,
-            $this->getCollection(),
+            $this->getCollection($model),
             'find',
             [
                 $this->prepareValueQuery($query),
@@ -230,91 +210,65 @@ class Builder
     }
 
     /**
-     * Retrieve a database cursor that will return all documents as
-     * $this->schema->modelClass objects upon iteration.
+     * Retrieve a database cursor that will return all models upon iteration.
+     *
+     * @param ModelInterface $model Model to query from collection
      */
-    public function all(): CursorInterface
+    public function all(ModelInterface $model): CursorInterface
     {
-        return $this->where([]);
+        return $this->where($model, []);
     }
 
     /**
-     * Retrieve one $this->schema->modelClass objects that matches the given
-     * query.
+     * Retrieve first model that matches given query.
      *
-     * @param mixed $query      mongoDB query to retrieve the document
-     * @param array $projection fields to project in Mongo query
+     * @param ModelInterface $model      Model to query from collection
+     * @param mixed          $query      MongoDB query to retrieve the model
+     * @param array          $projection fields to project in MongoDB query
      *
-     * @return static|null First document matching query as an $this->schema->modelClass object
+     * @return ModelInterface|array|null
      */
-    public function first($query = [], array $projection = [])
+    public function first(ModelInterface $model, $query = [], array $projection = [])
     {
         if (null === $query) {
             return null;
         }
 
-        return $this->getCollection()->findOne(
+        return $this->getCollection($model)->findOne(
             $this->prepareValueQuery($query),
             ['projection' => $this->prepareProjection($projection)]
         );
     }
 
     /**
-     * Retrieve one $this->schema->modelClass objects that matches the given
-     * query. If no document was found, throws ModelNotFoundException.
+     * Retrieve one model that matches given query.
+     * If no model was found, throws an exception.
      *
-     * @param mixed $query      mongoDB query to retrieve the document
-     * @param array $projection fields to project in Mongo query
+     * @param ModelInterface $model      Model to query from collection
+     * @param mixed          $query      MongoDB query to retrieve the model
+     * @param array          $projection fields to project in MongoDB query
      *
-     * @throws ModelNotFoundException If no document was found
+     * @throws ModelNotFoundException If no model was found
      *
-     * @return static|null First document matching query as an $this->schema->modelClass object
+     * @return ModelInterface|null
      */
-    public function firstOrFail($query = [], array $projection = [])
+    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [])
     {
-        if ($result = $this->first($query, $projection)) {
+        if ($result = $this->first($model, $query, $projection)) {
             return $result;
         }
 
-        throw (new ModelNotFoundException())->setModel($this->schema->modelClass);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSchema(): ?DynamicSchema
-    {
-        return $this->schema;
-    }
-
-    /**
-     * Set a Schema object  that describes an Model in MongoDB.
-     */
-    public function setSchema(DynamicSchema $schema): void
-    {
-        $this->schema = $schema;
-    }
-
-    /**
-     * Returns a SchemaMapper with the $schema or $schemaClass instance.
-     */
-    protected function getSchemaMapper(): SchemaMapper
-    {
-        if (!$this->schema) {
-            $this->schema = Ioc::make($this->schemaClass);
-        }
-
-        return Ioc::make(SchemaMapper::class, ['schema' => $this->schema]);
+        throw (new ModelNotFoundException())->setModel(get_class($model));
     }
 
     /**
      * Retrieves the Collection object.
      */
-    protected function getCollection(): Collection
+    protected function getCollection(ModelInterface $model): Collection
     {
         $connection = $this->connection;
         $database = $connection->defaultDatabase;
-        $collection = $this->getSchema()->collection;
+        $collection = $model->getCollectionName();
 
         return $connection->getRawConnection()->$database->$collection;
     }
@@ -324,7 +278,7 @@ class Builder
      * This method will take care of converting a single value into a query for
      * an _id, including when a objectId is passed as a string.
      *
-     * @param mixed $value the _id of the document
+     * @param mixed $value the _id of the model
      *
      * @return array Query for the given _id
      */

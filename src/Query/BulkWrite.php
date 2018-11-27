@@ -7,7 +7,6 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\DynamicSchema;
 
 /**
  * This class is meant to provide a better API for handling
@@ -30,14 +29,14 @@ class BulkWrite
     protected $bulkWrite;
 
     /**
-     * @var DynamicSchema
+     * @var ModelInterface
      */
-    protected $schema;
+    private $model;
 
     public function __construct(ModelInterface $model)
     {
         $this->setBulkWrite(new MongoBulkWrite(['ordered' => false]));
-        $this->schema = $model->getSchema();
+        $this->model = $model;
     }
 
     /**
@@ -71,7 +70,7 @@ class BulkWrite
      *
      * @see https://docs.mongodb.com/manual/reference/operator/update/set/#set-top-level-fields
      *
-     * @param ObjectId|string|array $id
+     * @param ObjectId|string|array $filter
      * @param array                 $dataToSet
      * @param array                 $options
      */
@@ -94,16 +93,16 @@ class BulkWrite
      * Execute the BulkWrite, using connection.
      * The collection is inferred from model's collection name.
      *
-     * @param int $writeConcern
+     * @throws \Mongolid\Model\Exception\NoCollectionNameException
      *
      * @return \MongoDB\Driver\WriteResult
      */
-    public function execute($writeConcern = 1)
+    public function execute(int $writeConcern = 1)
     {
         $connection = Ioc::make(Connection::class);
         $manager = $connection->getRawManager();
 
-        $namespace = $connection->defaultDatabase.'.'.$this->schema->collection;
+        $namespace = $connection->defaultDatabase.'.'.$this->model->getCollectionName();
 
         return $manager->executeBulkWrite(
             $namespace,

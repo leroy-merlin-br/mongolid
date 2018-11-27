@@ -15,12 +15,11 @@ use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AbstractModel;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 
 class BuilderTest extends TestCase
 {
-    public function testShouldBeAbleToConstructWithSchema()
+    public function testShouldBeAbleToConstruct()
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -49,7 +48,7 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -102,7 +101,7 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -148,7 +147,7 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -180,7 +179,6 @@ class BuilderTest extends TestCase
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
         $builder = new Builder($connection);
-        $builder->setSchema($model->getSchema());
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
@@ -197,7 +195,7 @@ class BuilderTest extends TestCase
             ->andReturn($database);
 
         $database->expects()
-            ->selectCollection('')
+            ->selectCollection('models')
             ->andReturn($collection);
 
         $collection->expects()
@@ -243,18 +241,32 @@ class BuilderTest extends TestCase
             /**
              * {@inheritdoc}
              */
-            public $fields = [
-                '_id' => 'objectId',
-                'unchanged' => 'string',
+            protected $collection = 'models';
+
+            /**
+             * {@inheritdoc}
+             */
+            public $fillable = [
+                'name',
+                'unchanged',
             ];
+
+            /**
+             * {@inheritdoc}
+             */
+            protected $dynamic = false;
+
+            /**
+             * {@inheritdoc}
+             */
+            protected $timestamps = false;
         };
-        $builder->setSchema($model->getSchema());
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $model->unchanged = 'unchanged';
-        $model->notOnSchema = 'to be deleted';
+        $model->notOnFillable = 'to be deleted';
         $model->name = 'John';
         $model->syncOriginalDocumentAttributes();
         $model->_id = 123;
@@ -270,13 +282,13 @@ class BuilderTest extends TestCase
             ->andReturn($database);
 
         $database->expects()
-            ->selectCollection('')
+            ->selectCollection('models')
             ->andReturn($collection);
 
         $collection->expects()
             ->updateOne(
                 ['_id' => 123],
-                ['$set' => ['_id' => 123], '$unset' => ['name' => '']],
+                ['$set' => ['_id' => 123], '$unset' => ['name' => '', 'notOnFillable' => '']],
                 $options
             )->andReturn($operationResult);
 
@@ -322,7 +334,7 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -371,7 +383,7 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -416,7 +428,7 @@ class BuilderTest extends TestCase
 
         // Expect
         $builder->allows()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects($dbOperation)
@@ -437,15 +449,12 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(DynamicSchema::class);
 
+        $model = m::mock(ModelInterface::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, '_id' => false];
-
-        $schema->modelClass = 'stdClass';
-        $builder->setSchema($schema);
 
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -455,15 +464,14 @@ class BuilderTest extends TestCase
             ->andReturn($preparedQuery);
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         // Act
-        $result = $builder->where($query, $projection);
+        $result = $builder->where($model, $query, $projection);
 
         // Assert
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertAttributeEquals($schema, 'modelSchema', $result);
         $this->assertAttributeEquals($collection, 'collection', $result);
         $this->assertAttributeEquals('find', 'command', $result);
         $this->assertAttributeEquals(
@@ -479,14 +487,15 @@ class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[where]', [$connection]);
         $mongolidCursor = m::mock(Cursor::class);
+        $model = m::mock(ModelInterface::class);
 
         // Expect
         $builder->expects()
-            ->where([])
+            ->where($model, [])
             ->andReturn($mongolidCursor);
 
         // Act
-        $result = $builder->all();
+        $result = $builder->all($model);
 
         // Assert
         $this->assertSame($mongolidCursor, $result);
@@ -502,6 +511,10 @@ class BuilderTest extends TestCase
         $preparedQuery = ['_id' => 123];
         $object = new class extends AbstractModel
         {
+            /**
+             * {@inheritdoc}
+             */
+            protected $collection = 'models';
         };
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -511,14 +524,14 @@ class BuilderTest extends TestCase
             ->andReturn($preparedQuery);
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($object)
             ->andReturn($collection);
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn($object);
 
-        $result = $builder->first($query);
+        $result = $builder->first($object, $query);
 
         // Assert
         $this->assertSame($object, $result);
@@ -531,7 +544,7 @@ class BuilderTest extends TestCase
         $builder = new Builder($connection);
 
         // Act
-        $result = $builder->first(null);
+        $result = $builder->first(m::mock(ModelInterface::class), null);
 
         // Assert
         $this->assertNull($result);
@@ -557,14 +570,14 @@ class BuilderTest extends TestCase
             ->andReturn($preparedQuery);
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($object)
             ->andReturn($collection);
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn($object);
 
-        $result = $builder->firstOrFail($query);
+        $result = $builder->firstOrFail($object, $query);
 
         // Assert
         $this->assertSame($object, $result);
@@ -575,21 +588,15 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
-        $builder->setSchema(
-            new class extends DynamicSchema
-            {
-                /**
-                 * {@inheritdoc}
-                 */
-                public $modelClass = 'User';
-            }
-        );
+        $model = new class extends AbstractModel
+        {
+        };
 
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [User].');
+        $this->expectExceptionMessage('No query results for model ['.get_class($model).'].');
 
         // Act
-        $builder->firstOrFail(null);
+        $builder->firstOrFail($model, null);
     }
 
     public function testShouldGetNullIfFirstCantFindAnything()
@@ -597,14 +604,10 @@ class BuilderTest extends TestCase
         // Arrange
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $schema = m::mock(DynamicSchema::class);
-
+        $model = m::mock(ModelInterface::class);
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-
-        $schema->modelClass = 'stdClass';
-        $builder->setSchema($schema);
 
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -614,7 +617,7 @@ class BuilderTest extends TestCase
             ->andReturn($preparedQuery);
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -622,7 +625,7 @@ class BuilderTest extends TestCase
             ->andReturn(null);
 
         // Act
-        $result = $builder->first($query);
+        $result = $builder->first($model, $query);
 
         // Assert
         $this->assertNull($result);
@@ -636,15 +639,12 @@ class BuilderTest extends TestCase
             Builder::class.'[prepareValueQuery,getCollection]',
             [$connection]
         );
-        $schema = m::mock(DynamicSchema::class);
+        $model = m::mock(ModelInterface::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false];
-
-        $schema->modelClass = 'stdClass';
-        $builder->setSchema($schema);
 
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -654,7 +654,7 @@ class BuilderTest extends TestCase
             ->andReturn($preparedQuery);
 
         $builder->expects()
-            ->getCollection()
+            ->getCollection($model)
             ->andReturn($collection);
 
         $collection->expects()
@@ -662,26 +662,10 @@ class BuilderTest extends TestCase
             ->andReturn(null);
 
         // Act
-        $result = $builder->first($query, $projection);
+        $result = $builder->first($model, $query, $projection);
 
         // Assert
         $this->assertNull($result);
-    }
-
-    public function testShouldGetSchemaMapper()
-    {
-        // Arrange
-        $connection = m::mock(Connection::class);
-        $builder = new Builder($connection);
-        $builder->schemaClass = 'MySchema';
-        $schema = $this->instance('MySchema', m::mock(DynamicSchema::class));
-
-        // Act
-        $result = $this->callProtected($builder, 'getSchemaMapper');
-
-        // Assert
-        $this->assertInstanceOf(SchemaMapper::class, $result);
-        $this->assertSame($schema, $result->schema);
     }
 
     public function testShouldGetRawCollection()
@@ -690,20 +674,22 @@ class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
-        $schema = m::mock(DynamicSchema::class);
-        $schema->collection = 'foobar';
+        $model = m::mock(ModelInterface::class);
 
-        $builder->setSchema($schema);
         $connection->defaultDatabase = 'grimory';
-        $connection->grimory = (object) ['foobar' => $collection];
+        $connection->grimory = (object) ['models' => $collection];
 
         // Expect
         $connection->expects()
             ->getRawConnection()
             ->andReturn($connection);
 
+        $model->expects()
+            ->getCollectionName()
+            ->andReturn('models');
+
         // Act
-        $result = $this->callProtected($builder, 'getCollection');
+        $result = $this->callProtected($builder, 'getCollection', [$model]);
 
         // Assert
         $this->assertSame($collection, $result);
@@ -834,9 +820,12 @@ class BuilderTest extends TestCase
             /**
              * {@inheritdoc}
              */
-            public $fields = [
-                '_id' => 'objectId',
-            ];
+            protected $timestamps = false;
+
+            /**
+             * {@inheritdoc}
+             */
+            protected $collection = 'models';
         };
 
         $model2 = new class extends AbstractModel
@@ -844,9 +833,12 @@ class BuilderTest extends TestCase
             /**
              * {@inheritdoc}
              */
-            public $fields = [
-                '_id' => 'objectId',
-            ];
+            protected $timestamps = false;
+
+            /**
+             * {@inheritdoc}
+             */
+            protected $collection = 'models';
         };
 
         $model->_id = 123;

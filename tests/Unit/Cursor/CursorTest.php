@@ -11,7 +11,6 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\AbstractModel;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use Serializable;
 use Traversable;
@@ -91,7 +90,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $cursor = $this->getCursor(null, $collection);
+        $cursor = $this->getCursor($collection);
 
         // Act
         $collection->expects()
@@ -106,7 +105,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $cursor = $this->getCursor(null, $collection);
+        $cursor = $this->getCursor($collection);
 
         // Act
         $collection->expects()
@@ -122,7 +121,7 @@ class CursorTest extends TestCase
         // Arrange
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
@@ -140,7 +139,7 @@ class CursorTest extends TestCase
         // Arrange
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
@@ -169,7 +168,7 @@ class CursorTest extends TestCase
         };
         $object->name = 'John Doe';
         $driverCursor = new ArrayIterator([$object]);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Assert
         $model = $cursor->current();
@@ -186,7 +185,7 @@ class CursorTest extends TestCase
         };
         $object->name = 'John Doe';
         $driverCursor = new CachingIterator(new ArrayObject([$object]));
-        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Act
         $model = $cursor->first();
@@ -202,7 +201,7 @@ class CursorTest extends TestCase
         $collection = m::mock(Collection::class);
         $driverCursor = new CachingIterator(new ArrayObject());
 
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Act
         $result = $cursor->first();
@@ -239,7 +238,7 @@ class CursorTest extends TestCase
         // Arrange
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
 
@@ -257,7 +256,7 @@ class CursorTest extends TestCase
         // Arrange
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->expects()
@@ -272,7 +271,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
+        $cursor = $this->getCursor($collection, 'find', [['bacon' => true]]);
         $driverCursor = m::mock(Traversable::class);
         $driverIterator = m::mock(Iterator::class);
 
@@ -325,7 +324,7 @@ class CursorTest extends TestCase
         $jef->occupation = 'tester';
 
         $driverCursor = new CachingIterator(new ArrayObject([$bob, $jef]));
-        $cursor = $this->getCursor($object->getSchema(), $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Actions
         $result = $cursor->all();
@@ -348,7 +347,7 @@ class CursorTest extends TestCase
         // Arrange
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
+        $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Act
         $driverCursor->expects()
@@ -388,8 +387,7 @@ class CursorTest extends TestCase
     {
         // Arrange
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
-        $schema = new DynamicSchema();
-        $cursor = $this->getCursor($schema, null, 'find', [[]]);
+        $cursor = $this->getCursor(null, 'find', [[]]);
         $driverCollection = $this->getDriverCollection();
 
         $this->setProtected($cursor, 'collection', $driverCollection);
@@ -409,27 +407,22 @@ class CursorTest extends TestCase
     }
 
     protected function getCursor(
-        $modelSchema = null,
         $collection = null,
         $command = 'find',
         $params = [[]],
         $driverCursor = null
     ) {
-        if (!$modelSchema) {
-            $modelSchema = m::mock(DynamicSchema::class.'[]');
-        }
-
         if (!$collection) {
             $collection = m::mock(Collection::class);
         }
 
         if (!$driverCursor) {
-            return new Cursor($modelSchema, $collection, $command, $params);
+            return new Cursor($collection, $command, $params);
         }
 
         $mock = m::mock(
             Cursor::class.'[getCursor]',
-            [$modelSchema, $collection, $command, $params]
+            [$collection, $command, $params]
         );
 
         $mock->shouldAllowMockingProtectedMethods();

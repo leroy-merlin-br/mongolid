@@ -7,7 +7,6 @@ use MongoDB\Driver\Manager;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 
 class BulkWriteTest extends TestCase
@@ -16,10 +15,6 @@ class BulkWriteTest extends TestCase
     {
         // Arrange
         $model = m::mock(ModelInterface::class);
-
-        // Expect
-        $model->expects()
-            ->getSchema();
 
         // Act
         $bulkWrite = new BulkWrite($model);
@@ -34,10 +29,6 @@ class BulkWriteTest extends TestCase
         $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = new MongoBulkWrite();
 
-        // Expect
-        $model->expects()
-            ->getSchema();
-
         // Act
         $bulkWrite = new BulkWrite($model);
         $bulkWrite->setBulkWrite($mongoBulkWrite);
@@ -48,17 +39,14 @@ class BulkWriteTest extends TestCase
 
     public function testShouldAddUpdateOneOperationToBulkWrite()
     {
-        // Arrange
+        // Set
         $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
 
         $id = '123';
         $data = ['name' => 'John'];
 
-        // Expect
-        $model->expects()
-            ->getSchema();
-
+        // Expectations
         $mongoBulkWrite->expects()
             ->update(['_id' => $id], ['$set' => $data], ['upsert' => true]);
 
@@ -68,23 +56,20 @@ class BulkWriteTest extends TestCase
             ->getBulkWrite()
             ->andReturn($mongoBulkWrite);
 
-        // Act
+        // Actions
         $bulkWrite->updateOne($id, $data);
     }
 
     public function testShouldUpdateOneWithUnsetOperationToBulkWrite()
     {
-        // Arrange
+        // Set
         $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
 
         $id = '123';
         $data = ['name' => 'John'];
 
-        // Expect
-        $model->expects()
-            ->getSchema();
-
+        // Expectations
         $mongoBulkWrite->expects()
             ->update(
                 m::on(
@@ -104,7 +89,7 @@ class BulkWriteTest extends TestCase
             ->getBulkWrite()
             ->andReturn($mongoBulkWrite);
 
-        // Act
+        // Actions
         $bulkWrite->updateOne($id, $data, ['upsert' => true], '$unset');
     }
 
@@ -118,9 +103,6 @@ class BulkWriteTest extends TestCase
         $data = ['grades.std' => 6];
 
         // Expect
-        $model->expects()
-            ->getSchema();
-
         $mongoBulkWrite->expects()
             ->update(
                 m::on(
@@ -147,24 +129,21 @@ class BulkWriteTest extends TestCase
     public function testShouldExecuteBulkWrite()
     {
         $model = m::mock(ModelInterface::class);
-        $schema = m::mock(DynamicSchema::class);
-        $model->schema = $schema;
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
         $manager = m::mock(new Manager());
 
         $connection->defaultDatabase = 'foo';
-        $schema->collection = 'bar';
         $namespace = 'foo.bar';
 
         // Expect
-        $model->expects()
-            ->getSchema()
-            ->andReturn($schema);
-
         $connection->expects()
             ->getRawManager()
             ->andReturn($manager);
+
+        $model->expects()
+            ->getCollectionName()
+            ->andReturn('bar');
 
         $manager->expects()
             ->executeBulkWrite($namespace, $mongoBulkWrite, ['writeConcern' => new WriteConcern(1)])

@@ -6,7 +6,6 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
-use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
 use stdClass;
 
@@ -34,11 +33,6 @@ class AbstractModelTest extends TestCase
             {
                 unset($this->collection);
             }
-
-            public function setFields($value)
-            {
-                $this->fields = $value;
-            }
         };
     }
 
@@ -49,21 +43,6 @@ class AbstractModelTest extends TestCase
     {
         unset($this->model);
         parent::tearDown();
-    }
-
-    public function testShouldHaveCorrectPropertiesByDefault()
-    {
-        // Assertions
-        $this->assertAttributeEquals(
-            [
-                '_id' => 'objectId',
-                'created_at' => 'createdAtTimestamp',
-                'updated_at' => 'updatedAtTimestamp',
-            ],
-            'fields',
-            $this->model
-        );
-        $this->assertTrue($this->model->dynamic);
     }
 
     public function testShouldImplementModelTraits()
@@ -82,9 +61,6 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
             ->save($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
@@ -98,9 +74,6 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Actions
-        $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
         $builder->expects()
             ->insert($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
@@ -116,9 +89,6 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
             ->update($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
@@ -133,9 +103,6 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
             ->delete($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
@@ -143,28 +110,56 @@ class AbstractModelTest extends TestCase
         $this->assertTrue($this->model->delete());
     }
 
-    public function testSaveShouldReturnFalseIfCollectionIsNull()
+    public function testSaveShouldThrowExceptionIfCollectionIsNull()
     {
+        // Set
         $this->model->unsetCollection();
-        $this->assertFalse($this->model->save());
+
+        // Expectations
+        $this->expectException(NoCollectionNameException::class);
+        $this->expectExceptionMessage('Collection name not specified into Model instance');
+
+        // Actions
+        $this->model->save();
     }
 
-    public function testUpdateShouldReturnFalseIfCollectionIsNull()
+    public function testUpdateShouldThrowExceptionIfCollectionIsNull()
     {
+        // Set
         $this->model->unsetCollection();
-        $this->assertFalse($this->model->update());
+
+        // Expectations
+        $this->expectException(NoCollectionNameException::class);
+        $this->expectExceptionMessage('Collection name not specified into Model instance');
+
+        // Actions
+        $this->model->update();
     }
 
-    public function testInsertShouldReturnFalseIfCollectionIsNull()
+    public function testInsertShouldThrowExceptionIfCollectionIsNull()
     {
+        // Set
         $this->model->unsetCollection();
-        $this->assertFalse($this->model->insert());
+
+        // Expectations
+        $this->expectException(NoCollectionNameException::class);
+        $this->expectExceptionMessage('Collection name not specified into Model instance');
+
+        // Actions
+        $this->model->insert();
     }
 
-    public function testDeleteShouldReturnFalseIfCollectionIsNull()
+    public function testDeleteShouldThrowExceptionIfCollectionIsNull()
     {
+        // Set
         $this->model->unsetCollection();
-        $this->assertFalse($this->model->delete());
+
+        // Expectations
+        $this->expectException(NoCollectionNameException::class);
+        $this->expectExceptionMessage('Collection name not specified into Model instance');
+
+        // Actions
+        $this->model->delete();
     }
 
     public function testShouldGetWithWhereQuery()
@@ -178,10 +173,7 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->where($query, $projection)
+            ->where(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($cursor);
 
         // Assertions
@@ -197,10 +189,7 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->all()
+            ->all(m::type(get_class($this->model)))
             ->andReturn($cursor);
 
         // Assertions
@@ -216,10 +205,7 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->first($query, $projection)
+            ->first(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
         // Assertions
@@ -235,10 +221,7 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->firstOrFail($query, $projection)
+            ->firstOrFail(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
         // Assertions
@@ -253,10 +236,7 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->first($id)
+            ->first(m::type(get_class($this->model)), $id, [])
             ->andReturn($this->model);
 
         // Assertions
@@ -271,61 +251,25 @@ class AbstractModelTest extends TestCase
 
         // Actions
         $builder->expects()
-            ->setSchema(m::type(DynamicSchema::class));
-
-        $builder->expects()
-            ->first($id)
+            ->first(m::type(get_class($this->model)), $id, [])
             ->andReturn(null);
 
         // Assertions
         $this->assertNotEquals($this->model, $this->model->firstOrNew($id));
     }
 
-    public function testShouldGetSchemaIfFieldsIsTheClassName()
+    public function testShouldGetBuilder()
     {
         // Set
-        $this->model->setFields('MySchemaClass');
-        $schema = $this->instance('MySchemaClass', m::mock(DynamicSchema::class));
-
-        // Assertions
-        $this->assertSame(
-            $schema,
-            $this->model->getSchema()
-        );
-    }
-
-    public function testShouldGetSchemaIfFieldsDescribesSchemaFields()
-    {
-        // Set
-        $fields = ['name' => 'string', 'age' => 'int'];
-        $this->model->setFields($fields);
-
-        // Assertions
-        $result = $this->model->getSchema();
-        $this->assertInstanceOf(DynamicSchema::class, $result);
-        $this->assertSame($fields, $result->fields);
-        $this->assertSame($this->model->dynamic, $result->dynamic);
-        $this->assertSame($this->model->getCollectionName(), $result->collection);
-        $this->assertSame(get_class($this->model), $result->modelClass);
-    }
-
-    public function testShouldGetDataMapper()
-    {
-        // Set
-        $model = m::mock(AbstractModel::class.'[getSchema]');
-        $schema = m::mock(DynamicSchema::class.'[]');
+        $model = new class extends AbstractModel
+        {
+        };
 
         // Actions
-        $model->shouldAllowMockingProtectedMethods();
-
-        $model->expects()
-            ->getSchema()
-            ->andReturn($schema);
+        $result = $this->callProtected($model, 'getBuilder');
 
         // Assertions
-        $result = $this->callProtected($model, 'getBuilder');
         $this->assertInstanceOf(Builder::class, $result);
-        $this->assertSame($schema, $result->getSchema());
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()

@@ -14,11 +14,9 @@ class ReferencedUser extends AbstractModel
     protected $collection = 'users';
 
     /**
-     * @var array
+     * @var bool
      */
-    protected $fields = [
-        '_id' => 'objectId',
-    ];
+    protected $timestamps = false;
 
     public function collection(): Collection
     {

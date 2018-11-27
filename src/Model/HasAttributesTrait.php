@@ -17,7 +17,7 @@ trait HasAttributesTrait
     /**
      * Once you put at least one string in this array, only
      * the attributes specified here will be changed
-     * with the setDocumentAttributes method.
+     * with the setDocumentAttribute method.
      *
      * @var array
      */

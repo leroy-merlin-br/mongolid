@@ -10,7 +10,6 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
-use Mongolid\Schema\DynamicSchema;
 use Serializable;
 
 /**
@@ -21,13 +20,6 @@ use Serializable;
  */
 class Cursor implements CursorInterface, Serializable
 {
-    /**
-     * Schema that describes the model that will be retrieved when iterating through the cursor.
-     *
-     * @var string
-     */
-    public $modelSchema;
-
     /**
      * @var Collection
      */
@@ -62,19 +54,16 @@ class Cursor implements CursorInterface, Serializable
     protected $position = 0;
 
     /**
-     * @param DynamicSchema $modelSchema schema that describes the model that will be retrieved from the database
-     * @param Collection    $collection  the raw collection object that will be used to retrieve the documents
-     * @param string        $command     the command that is being called in the $collection
-     * @param array         $params      the parameters of the $command
+     * @param Collection $collection the raw collection object that will be used to retrieve the documents
+     * @param string     $command    the command that is being called in the $collection
+     * @param array      $params     the parameters of the $command
      */
     public function __construct(
-        DynamicSchema $modelSchema,
         Collection $collection,
         string $command,
         array $params
     ) {
         $this->cursor = null;
-        $this->modelSchema = $modelSchema;
         $this->collection = $collection;
         $this->command = $command;
         $this->params = $params;

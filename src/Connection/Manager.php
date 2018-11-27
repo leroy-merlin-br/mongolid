@@ -5,8 +5,6 @@ use Illuminate\Container\Container;
 use Mongolid\Container\Ioc;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Query\Builder;
-use Mongolid\Schema\DynamicSchema;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -41,13 +39,6 @@ class Manager
      * @var Connection
      */
     protected $connection;
-
-    /**
-     * Stores the schemas that have been registered for later use.
-     *
-     * @var array
-     */
-    protected $schemas = [];
 
     /**
      * Main entry point to opening a connection and start using Mongolid in
@@ -90,35 +81,6 @@ class Manager
         $eventService->registerEventBuilder($eventTrigger);
 
         $this->container->instance(EventTriggerService::class, $eventService);
-    }
-
-    /**
-     * Allow document Schemas to be registered for later use.
-     *
-     * @param DynamicSchema $schema schema being registered
-     */
-    public function registerSchema(DynamicSchema $schema)
-    {
-        $this->schemas[$schema->modelClass] = $schema;
-    }
-
-    /**
-     * Retrieves a Builder for the given $modelClass. This can only be done
-     * if the Schema for that model has been previously registered with
-     * registerSchema() method.
-     *
-     * @param string $modelClass class of the model that needs to be mapped
-     */
-    public function getBuilder(string $modelClass): ?Builder
-    {
-        if (isset($this->schemas[$modelClass])) {
-            $builder = Ioc::make(Builder::class);
-            $builder->setSchema($this->schemas[$modelClass] ?? null);
-
-            return $builder;
-        }
-
-        return null;
     }
 
     /**

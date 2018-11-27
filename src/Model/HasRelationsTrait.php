@@ -85,18 +85,18 @@ trait HasRelationsTrait
     /**
      * Create a ReferencesOne Relation.
      *
-     * @param string      $model class of the model or of the schema of the model
-     * @param string|null $field the field where the $key is stored
-     * @param string      $key   the field that the document will be referenced by (usually _id)
+     * @param string      $modelClass class of the referenced model
+     * @param string|null $field      the field where the $key is stored
+     * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    protected function referencesOne(string $model, string $field = null, string $key = '_id'): ReferencesOne
+    protected function referencesOne(string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
     {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
 
-            $relation = new ReferencesOne($this, $model, $field, $key);
+            $relation = new ReferencesOne($this, $modelClass, $field, $key);
             $this->setRelation($relationName, $relation, $field);
         }
 
@@ -106,17 +106,18 @@ trait HasRelationsTrait
     /**
      * Create a ReferencesMany Relation.
      *
-     * @param string      $model class of the model or of the schema of the model
-     * @param string|null $field the field where the _ids are stored
+     * @param string      $modelClass class of the referenced model
+     * @param string|null $field      the field where the _ids are stored
+     * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    protected function referencesMany(string $model, string $field = null, string $key = '_id'): ReferencesMany
+    protected function referencesMany(string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
     {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
 
-            $relation = new ReferencesMany($this, $model, $field, $key);
+            $relation = new ReferencesMany($this, $modelClass, $field, $key);
             $this->setRelation($relationName, $relation, $field);
         }
 
@@ -126,17 +127,17 @@ trait HasRelationsTrait
     /**
      * Create a EmbedsOne Relation.
      *
-     * @param string|null $model class of the model or of the schema of the model
-     * @param string      $field field where the embedded document is stored
+     * @param string      $modelClass class of the embedded model
+     * @param string|null $field      field where the embedded document is stored
      */
-    protected function embedsOne(string $model, string $field = null): EmbedsOne
+    protected function embedsOne(string $modelClass, string $field = null): EmbedsOne
     {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-            $relation = new EmbedsOne($this, $model, $field);
+            $relation = new EmbedsOne($this, $modelClass, $field);
             $this->setRelation($relationName, $relation, $field);
         }
 
@@ -146,17 +147,17 @@ trait HasRelationsTrait
     /**
      * Create a EmbedsMany Relation.
      *
-     * @param string|null $model class of the model or of the schema of the model
-     * @param string      $field field where the embedded documents are stored
+     * @param string      $modelClass class of the embedded model
+     * @param string|null $field      field where the embedded documents are stored
      */
-    protected function embedsMany(string $model, string $field = null): EmbedsMany
+    protected function embedsMany(string $modelClass, string $field = null): EmbedsMany
     {
         $relationName = $this->guessRelationName();
 
         if (!$this->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-            $relation = new EmbedsMany($this, $model, $field);
+            $relation = new EmbedsMany($this, $modelClass, $field);
             $this->setRelation($relationName, $relation, $field);
         }
 
