@@ -31,10 +31,8 @@ Now you are ready to create your own models :smile:
 
 ## Basic Usage
 
-> **Note:** Mongolid does support [**DataMapper** pattern](./datamapper.md), but in order to understand it let's begin with the **ActiveRecord** pattern:
-
 ```php
-class Post extends Mongolid\Model\ActiveRecord
+class Post extends \Mongolid\Model\AbstractModel
 {
 }
 ```
@@ -44,7 +42,7 @@ Note that we did not tell Mongolid which collection to use for our `Post` model.
 You may specify a collection by defining a `collection` property on your model:
 
 ```php
-class Post extends ActiveRecord {
+class Post extends \Mongolid\Model\AbstractModel {
 
     protected $collection = 'posts';
 
@@ -192,16 +190,16 @@ $post->delete();
 
 ## Mass Assignment
 
-If you are extending `Mongolid\Model\ActiveRecord` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
+If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
 
-`Mongolid\Model\ActiveRecord` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
+`Mongolid\Model\AbstractModel` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 
 **Defining Fillable Attributes On A Model**
 
 ```php
-class Post extends ActiveRecord {
+class Post extends \Mongolid\Model\AbstractModel {
 
     protected $fillable = ['title', 'category', 'body'];
 
@@ -215,7 +213,7 @@ The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of 
 **Defining Guarded Attributes On A Model**
 
 ```php
-class Post extends ActiveRecord {
+class Post extends \Mongolid\Model\AbstractModel {
 
     protected $guarded = ['_id', 'votes'];
 

@@ -2,7 +2,7 @@
 
 > Easy, powerful and ultrafast ODM for PHP7 build on top of the [new mongodb driver](https://docs.mongodb.org/ecosystem/drivers/php/).
 
-Mongolid supports both **ActiveRecord** and **DataMapper** patterns. **You choose! (:**
+Mongolid supports **ActiveRecord** pattern.
 
 [![Build Status](https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master)](https://travis-ci.org/leroy-merlin-br/mongolid)
 [![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master)

@@ -1,7 +1,7 @@
 {
     "name": "leroy-merlin-br/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
-    "keywords": ["odm", "mongodb", "mongo", "nosql", "active record", "data mapper", "laravel"],
+    "keywords": ["odm", "mongodb", "mongo", "nosql", "active record", "laravel"],
     "license": "MIT",
     "authors": [
         {

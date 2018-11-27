@@ -8,7 +8,6 @@ nav:
     - 'Home': 'index.md'
     - 'Basics': 'basics.md'
     - 'Relationships': 'relationships.md'
-    - 'DataMapper Pattern': 'datamapper.md'
     - 'API Documentation': 'api-docs.md'
     - 'Troubleshooting': 'troubleshooting.md'
     - 'Additional information': 'info.md'

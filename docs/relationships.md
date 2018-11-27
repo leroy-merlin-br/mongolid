@@ -18,8 +18,7 @@ A Embeds One relationship is a very basic relation. For example, a `User` model 
 **Defining A Embeds One Relation**
 
 ```php
-// models/Person.php
-class Person extends ActiveRecord {
+class Person extends \Mongolid\Model\AbstractModel {
     // This model is saved in the collection people
     protected $collection = 'people';
 
@@ -30,8 +29,7 @@ class Person extends ActiveRecord {
     }
 }
 
-// models/Phone.php
-class Phone extends ActiveRecord {
+class Phone extends \Mongolid\Model\AbstractModel {
     // This model will be embedded only
     protected $collection = null;
 
@@ -106,8 +104,7 @@ $user->embed($phone); // Will update
 An example of a Embeds Many relation is a blog post that "has many" comments. We can model this relation like so:
 
 ```php
-// models/Post.php
-class Post extends ActiveRecord {
+class Post extends \Mongolid\Model\AbstractModel {
     protected $collection = 'posts';
 
     public function comments()
@@ -117,8 +114,7 @@ class Post extends ActiveRecord {
 
 }
 
-// models/Comment.php
-class Comment extends ActiveRecord {
+class Comment extends \Mongolid\Model\AbstractModel {
     // This model will be embedded only
     protected $collection = null;
 }
@@ -181,8 +177,7 @@ In general, use references when embedding would result in duplication of data an
 **Defining A References One Relation**
 
 ```php
-// models/Post.php
-class Post extends ActiveRecord {
+class Post extends \Mongolid\Model\AbstractModel {
     protected $collection = 'posts';
 
     public function author()
@@ -192,8 +187,7 @@ class Post extends ActiveRecord {
 
 }
 
-// models/User.php
-class User extends ActiveRecord {
+class User extends \Mongolid\Model\AbstractModel {
     protected $collection = 'users';
 }
 ```
@@ -248,8 +242,7 @@ In general, use references when embedding would result in duplication of data an
 **Defining A References Many Relation**
 
 ```php
-// models/User.php
-class User extends ActiveRecord {
+class User extends \Mongolid\Model\AbstractModel {
     protected $collection = 'users';
 
     public function questions()
@@ -259,8 +252,7 @@ class User extends ActiveRecord {
 
 }
 
-// models/Question.php
-class Question extends ActiveRecord {
+class Question extends \Mongolid\Model\AbstractModel {
     protected $collection = 'questions';
 }
 ```
