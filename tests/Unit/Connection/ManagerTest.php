@@ -50,7 +50,7 @@ class ManagerTest extends TestCase
             ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
                 $test->assertSame(EventTriggerService::class, $class);
-                $test->assertAttributeSame($eventTrigger, 'builder', $eventService);
+                $test->assertAttributeSame($eventTrigger, 'dispatcher', $eventService);
             });
 
         // Actions

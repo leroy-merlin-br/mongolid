@@ -11,7 +11,7 @@ class EventTriggerService
      *
      * @var EventTriggerInterface
      */
-    protected $builder;
+    protected $dispatcher;
 
     /**
      * Registers a object that will have the responsibility of firing events to
@@ -19,9 +19,9 @@ class EventTriggerService
      *
      * @param EventTriggerInterface $builder event trigger object
      */
-    public function registerEventBuilder(EventTriggerInterface $builder)
+    public function registerEventDispatcher(EventTriggerInterface $builder)
     {
-        $this->builder = $builder;
+        $this->dispatcher = $builder;
     }
 
     /**
@@ -38,8 +38,8 @@ class EventTriggerService
      */
     public function fire(string $event, $payload, bool $halt = false)
     {
-        if ($this->builder) {
-            return $this->builder->fire($event, $payload, $halt);
+        if ($this->dispatcher) {
+            return $this->dispatcher->fire($event, $payload, $halt);
         }
 
         return true;

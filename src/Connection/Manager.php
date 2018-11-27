@@ -78,7 +78,7 @@ class Manager
     {
         $this->init();
         $eventService = new EventTriggerService();
-        $eventService->registerEventBuilder($eventTrigger);
+        $eventService->registerEventDispatcher($eventTrigger);
 
         $this->container->instance(EventTriggerService::class, $eventService);
     }
