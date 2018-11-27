@@ -9,29 +9,37 @@ class ObjectIdUtilsTest extends TestCase
     /**
      * @dataProvider objectIdStringScenarios
      */
-    public function testShouldEvaluateIfValueIsAnObjectid($value, $expectation)
+    public function testShouldEvaluateIfValueIsAnObjectId($value, bool $expectation)
     {
-        $this->assertEquals($expectation, ObjectIdUtils::isObjectId($value));
+        // Actions
+        $result = ObjectIdUtils::isObjectId($value);
+
+        // Assertions
+        $this->assertSame($expectation, $result);
     }
 
-    public function objectIdStringScenarios()
+    public function objectIdStringScenarios(): array
     {
         return [
-            // [Value, Expectation],
-            ['577a68c44d3cec1f6c7796a2', true],
-            ['577a68d24d3cec1f817796a5', true],
-            ['577a68d14d3cec1f6d7796a3', true],
-            ['507f1f77bcf86cd799439011', true],
-            ['507f191e810c19729de860ea', true],
-            [new ObjectId(), true],
-            ['1', false],
-            ['507f191e810c197', false],
-            ['123456', false],
-            ['abcdefgh1234567890123456', false],
-            ['+07f191e810c19729de860ea', false],
-            [1234567, false],
-            [0.5, false],
-            [['key' => 'value'], false],
+            ['value' => '577a68c44d3cec1f6c7796a2', 'expectation' => true],
+            ['value' => '577a68d24d3cec1f817796a5', 'expectation' => true],
+            ['value' => '577a68d14d3cec1f6d7796a3', 'expectation' => true],
+            ['value' => '507f1f77bcf86cd799439011', 'expectation' => true],
+            ['value' => '507f191e810c19729de860ea', 'expectation' => true],
+            ['value' => new ObjectId(), 'expectation' => true],
+            ['value' => new ObjectId('577a68c44d3cec1f6c7796a2'), 'expectation' => true],
+            ['value' => 1, 'expectation' => false],
+            ['value' => '507f191e810c197', 'expectation' => false],
+            ['value' => 123456, 'expectation' => false],
+            ['value' => 'abcdefgh1234567890123456', 'expectation' => false],
+            ['value' => '+07f191e810c19729de860ea', 'expectation' => false],
+            ['value' => 1234567, 'expectation' => false],
+            ['value' => 0.5, 'expectation' => false],
+            ['value' => null, 'expectation' => false],
+            ['value' => true, 'expectation' => false],
+            ['value' => false, 'expectation' => false],
+            ['value' => ['key' => 'value'], 'expectation' => false],
+            ['value' => ['577a68c44d3cec1f6c7796a2'], 'expectation' => false],
         ];
     }
 }

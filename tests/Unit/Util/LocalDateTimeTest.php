@@ -36,53 +36,61 @@ class LocalDateTimeTest extends TestCase
      */
     protected function tearDown()
     {
-        unset($this->date, $this->format);
+        unset($this->date);
         parent::tearDown();
     }
 
     public function testGetShouldRetrievesDateUsingTimezone()
     {
-        $this->assertEquals(
-            $this->date,
-            LocalDateTime::get(new UTCDateTime($this->date))
-        );
+        // Set
+        $date = new UTCDateTime($this->date);
+
+        // Actions
+        $result = LocalDateTime::get($date);
+
+        // Assertions
+        $this->assertEquals($this->date, $result);
     }
 
     public function testFormatShouldRetrievesDateWithDefaultFormat()
     {
-        $this->date->setTimezone(
-            new DateTimeZone(date_default_timezone_get())
-        );
+        // Set
+        $timezone = new DateTimeZone(date_default_timezone_get());
+        $this->date->setTimezone($timezone);
 
-        $this->assertEquals(
-            $this->date->format($this->format),
-            LocalDateTime::format(new UTCDateTime($this->date))
-        );
+        // Actions
+        $result = LocalDateTime::format(new UTCDateTime($this->date));
+
+        // Assertions
+        $this->assertSame($this->date->format($this->format), $result);
     }
 
     public function testFormatShouldRetrieesDateUsingGivenFormat()
     {
-        $this->date->setTimezone(
-            new DateTimeZone(date_default_timezone_get())
-        );
-
+        // Set
+        $timezone = new DateTimeZone(date_default_timezone_get());
+        $this->date->setTimezone($timezone);
         $format = 'Y-m-d H:i:s';
 
-        $this->assertEquals(
-            $this->date->format($format),
-            LocalDateTime::format(new UTCDateTime($this->date), $format)
-        );
+        // Actions
+        $result = LocalDateTime::format(new UTCDateTime($this->date), $format);
+
+        // Assertions
+        $this->assertSame($this->date->format($format), $result);
     }
 
     public function testTimestampShouldRetrievesTimestampUsingTimezone()
     {
-        $dateTimestamp = $this->date->getTimestamp();
-        $mongoDateTimestamp = LocalDateTime::timestamp(
-            new UTCDateTime($this->date)
-        );
+        // Set
+        $timestamp = $this->date->getTimestamp();
+        $date = new UTCDateTime($this->date);
 
-        $this->assertEquals(
-            DateTime::createFromFormat($dateTimestamp, $this->format),
+        // Actions
+        $mongoDateTimestamp = LocalDateTime::timestamp($date);
+
+        // Assertions
+        $this->assertSame(
+            DateTime::createFromFormat($timestamp, $this->format),
             DateTime::createFromFormat($mongoDateTimestamp, $this->format)
         );
     }

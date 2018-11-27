@@ -17,27 +17,31 @@ class IocTest extends TestCase
 
     public function testShouldCallMethodsProperlyWithNoArguments()
     {
+        // Set
         $container = m::mock(Container::class);
+        Ioc::setContainer($container);
 
+        // Expectations
         $container->expects()
             ->method()
             ->andReturn(true);
 
-        Ioc::setContainer($container);
-
+        // Actions
         Ioc::method();
     }
 
     public function testShouldCallMethodsProperlyWithArguments()
     {
+        // Set
         $container = m::mock(Container::class);
+        Ioc::setContainer($container);
 
+        // Expectations
         $container->expects()
             ->method(1, 2, 3)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
-
+        // Actions
         Ioc::method(1, 2, 3);
     }
 }

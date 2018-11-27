@@ -29,7 +29,7 @@ class TestCase extends PHPUnitTestCase
      * @param mixed $expectedQuery correct query
      * @param mixed $query         query being evaluated
      */
-    public function assertMongoQueryEquals($expectedQuery, $query)
+    protected function assertMongoQueryEquals($expectedQuery, $query)
     {
         $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
 
@@ -46,7 +46,7 @@ class TestCase extends PHPUnitTestCase
                 );
 
                 if (method_exists($value, '__toString')) {
-                    $this->assertEquals(
+                    $this->assertSame(
                         (string) $expectedQuery[$key],
                         (string) $query[$key],
                         'Object within the query is not equals'
@@ -84,7 +84,7 @@ class TestCase extends PHPUnitTestCase
      * @param string $property property name
      * @param mixed  $value    value to be set
      */
-    protected function setProtected($obj, $property, $value)
+    protected function setProtected($obj, $property, $value): void
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);

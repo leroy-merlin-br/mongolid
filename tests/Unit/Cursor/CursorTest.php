@@ -3,6 +3,7 @@ namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use ArrayObject;
+use Exception;
 use Iterator;
 use Mockery as m;
 use MongoDB\Collection;
@@ -19,12 +20,14 @@ class CursorTest extends TestCase
 {
     public function testShouldLimitDocumentQuantity()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
 
-        // Assert
+        // Actions
         $cursor->limit(10);
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [[], ['limit' => 10]],
             'params',
             $cursor
@@ -33,12 +36,14 @@ class CursorTest extends TestCase
 
     public function testShouldSortDocumentsOfCursor()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
 
-        // Assert
+        // Actions
         $cursor->sort(['name' => 1]);
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [[], ['sort' => ['name' => 1]]],
             'params',
             $cursor
@@ -47,12 +52,14 @@ class CursorTest extends TestCase
 
     public function testShouldSkipDocuments()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
 
-        // Assert
+        // Actions
         $cursor->skip(5);
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [[], ['skip' => 5]],
             'params',
             $cursor
@@ -61,12 +68,14 @@ class CursorTest extends TestCase
 
     public function testShouldSetNoCursorTimeoutToTrue()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
 
-        // Assert
+        // Actions
         $cursor->disableTimeout();
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [[], ['noCursorTimeout' => true]],
             'params',
             $cursor
@@ -75,75 +84,86 @@ class CursorTest extends TestCase
 
     public function testShouldSetReadPreferenceParameterAccordingly()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
         $mode = ReadPreference::RP_SECONDARY;
+
+        // Actions
         $cursor->setReadPreference($mode);
         $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
+        $result = $readPreferenceParameter->getMode();
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
-        $this->assertSame($readPreferenceParameter->getMode(), $mode);
+        $this->assertSame($mode, $result);
     }
 
     public function testShouldCountDocuments()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor($collection);
 
-        // Act
+        // Expectations
         $collection->expects()
             ->count([])
             ->andReturn(5);
 
-        // Assert
-        $this->assertEquals(5, $cursor->count());
+        // Actions
+        $result = $cursor->count();
+
+        // Assertions
+        $this->assertSame(5, $result);
     }
 
     public function testShouldCountDocumentsWithCountFunction()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor($collection);
 
-        // Act
+        // Expectations
         $collection->expects()
             ->count([])
             ->andReturn(5);
 
-        // Assert
-        $this->assertEquals(5, count($cursor));
+        // Actions
+        $result = count($cursor);
+
+        // Assertions
+        $this->assertSame(5, $result);
     }
 
     public function testShouldRewind()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
-        // Act
+        // Expectations
         $driverCursor->expects()
             ->rewind();
 
-        // Assert
+        // Actions
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+
+        // Assertions
+        $this->assertAttributeSame(0, 'position', $cursor);
     }
 
     public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
 
-        // Act
+        // Expectations
         $driverCursor->expects()
             ->rewind()
             ->andReturnUsing(
@@ -154,14 +174,16 @@ class CursorTest extends TestCase
                 }
             );
 
-        // Assert
+        // Actions
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+
+        // Assertions
+        $this->assertAttributeSame(0, 'position', $cursor);
     }
 
     public function testShouldGetCurrent()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $object = new class extends AbstractModel
         {
@@ -170,15 +192,17 @@ class CursorTest extends TestCase
         $driverCursor = new ArrayIterator([$object]);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
-        // Assert
+        // Actions
         $model = $cursor->current();
+
+        // Assertions
         $this->assertInstanceOf(AbstractModel::class, $model);
-        $this->assertEquals('John Doe', $model->name);
+        $this->assertSame('John Doe', $model->name);
     }
 
     public function testShouldGetFirst()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $object = new class extends AbstractModel
         {
@@ -187,95 +211,104 @@ class CursorTest extends TestCase
         $driverCursor = new CachingIterator(new ArrayObject([$object]));
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
-        // Act
+        // Actions
         $model = $cursor->first();
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(get_class($object), $model);
         $this->assertSame('John Doe', $model->name);
     }
 
     public function testShouldGetFirstWhenEmpty()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = new CachingIterator(new ArrayObject());
 
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
-        // Act
+        // Actions
         $result = $cursor->first();
 
-        // Assert
+        // Assertions
         $this->assertNull($result);
     }
 
     public function testShouldRefreshTheCursor()
     {
-        // Arrange
+        // Set
         $driverCursor = new CachingIterator(new ArrayObject());
         $cursor = $this->getCursor();
         $this->setProtected($cursor, 'cursor', $driverCursor);
 
-        // Assert
+        // Actions
         $cursor->fresh();
-        $this->assertAttributeEquals(null, 'cursor', $cursor);
+
+        // Assertions
+        $this->assertAttributeSame(null, 'cursor', $cursor);
     }
 
     public function testShouldImplementKeyMethodFromIterator()
     {
-        // Arrange
+        // Set
         $cursor = $this->getCursor();
-
         $this->setProtected($cursor, 'position', 7);
 
-        // Assertion
-        $this->assertEquals(7, $cursor->key());
+        // Actions
+        $result = $cursor->key();
+
+        // Assertions
+        $this->assertSame(7, $result);
     }
 
     public function testShouldImplementNextMethodFromIterator()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
 
-        // Act
+        // Expectations
         $driverCursor->expects()
             ->next();
 
-        // Assert
+        // Actions
         $cursor->next();
-        $this->assertEquals(8, $cursor->key());
+
+        // Assertions
+        $this->assertSame(8, $cursor->key());
     }
 
     public function testShouldImplementValidMethodFromIterator()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
-        // Act
+        // Expectations
         $driverCursor->expects()
             ->valid()
             ->andReturn(true);
 
-        // Assert
-        $this->assertTrue($cursor->valid());
+        // Actions
+        $result = $cursor->valid();
+
+        // Assertions
+        $this->assertTrue($result);
     }
 
     public function testShouldWrapMongoDriverCursorWithIterator()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor($collection, 'find', [['bacon' => true]]);
         $driverCursor = m::mock(Traversable::class);
         $driverIterator = m::mock(Iterator::class);
 
-        // Act
+        // Expectations
         $collection->expects()
             ->find(['bacon' => true])
             ->andReturn($driverCursor);
@@ -302,14 +335,16 @@ class CursorTest extends TestCase
             ->key()
             ->andReturn(true);
 
-        // Assert
+        // Actions
         $result = $this->callProtected($cursor, 'getCursor');
+
+        // Assertions
         $this->assertInstanceOf(CachingIterator::class, $result);
     }
 
     public function testShouldReturnAllResults()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $object = new class extends AbstractModel
         {
@@ -344,12 +379,12 @@ class CursorTest extends TestCase
 
     public function testShouldReturnResultsToArray()
     {
-        // Arrange
+        // Set
         $collection = m::mock(Collection::class);
         $driverCursor = m::mock(CachingIterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
-        // Act
+        // Expectations
         $driverCursor->expects()
             ->rewind();
 
@@ -371,10 +406,11 @@ class CursorTest extends TestCase
                 ['name' => 'jef', 'occupation' => 'tester']
             );
 
+        // Actions
         $result = $cursor->toArray();
 
-        // Assert
-        $this->assertEquals(
+        // Assertions
+        $this->assertSame(
             [
                 ['name' => 'bob', 'occupation' => 'coder'],
                 ['name' => 'jef', 'occupation' => 'tester'],
@@ -385,24 +421,26 @@ class CursorTest extends TestCase
 
     public function testShouldSerializeAnActiveCursor()
     {
-        // Arrange
+        // Set
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
         $cursor = $this->getCursor(null, 'find', [[]]);
         $driverCollection = $this->getDriverCollection();
 
         $this->setProtected($cursor, 'collection', $driverCollection);
 
-        // Act
-        $connection->expects()
-            ->getRawConnection()
-            ->andReturn($connection);
-
         $connection->defaultDatabase = 'db';
         $connection->db = $connection;
         $connection->my_collection = $driverCollection; // Return the same driver Collection
 
-        // Assert
+        // Expectations
+        $connection->expects()
+            ->getRawConnection()
+            ->andReturn($connection);
+
+        // Actions
         $result = unserialize(serialize($cursor));
+
+        // Assertions
         $this->assertEquals($cursor, $result);
     }
 
@@ -411,7 +449,7 @@ class CursorTest extends TestCase
         $command = 'find',
         $params = [[]],
         $driverCursor = null
-    ) {
+    ): Cursor {
         if (!$collection) {
             $collection = m::mock(Collection::class);
         }
@@ -439,7 +477,7 @@ class CursorTest extends TestCase
      * Since the MongoDB\Collection is not serializable. This method will
      * emulate an unserializable collection from mongoDb driver.
      */
-    protected function getDriverCollection()
+    protected function getDriverCollection(): Serializable
     {
         /*
          * Emulates a MongoDB\Collection non serializable behavior.
@@ -455,7 +493,7 @@ class CursorTest extends TestCase
             {
             }
 
-            public function getCollectionName()
+            public function getCollectionName(): string
             {
                 return 'my_collection';
             }

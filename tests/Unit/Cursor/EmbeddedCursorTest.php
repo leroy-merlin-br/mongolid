@@ -9,7 +9,7 @@ class EmbeddedCursorTest extends TestCase
 {
     public function testShouldLimitDocumentQuantity()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
@@ -17,9 +17,11 @@ class EmbeddedCursorTest extends TestCase
         ];
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
+        // Actions
         $cursor->limit(2);
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [
                 ['name' => 'A'],
                 ['name' => 'B'],
@@ -34,21 +36,19 @@ class EmbeddedCursorTest extends TestCase
      */
     public function testShouldSortDocuments($items, $parameters, $expected)
     {
-        // Arrange
+        // Set
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
+        // Actions
         $cursor->sort($parameters);
-        $this->assertAttributeSame(
-            $expected,
-            'items',
-            $cursor
-        );
+
+        // Assertions
+        $this->assertAttributeSame($expected, 'items', $cursor);
     }
 
     public function testShouldSkipDocuments()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
@@ -56,9 +56,11 @@ class EmbeddedCursorTest extends TestCase
         ];
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
+        // Actions
         $cursor->skip(2);
-        $this->assertAttributeEquals(
+
+        // Assertions
+        $this->assertAttributeSame(
             [
                 ['name' => 'C'],
             ],
@@ -69,7 +71,7 @@ class EmbeddedCursorTest extends TestCase
 
     public function testShouldCountDocuments()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
@@ -77,13 +79,16 @@ class EmbeddedCursorTest extends TestCase
         ];
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
-        $this->assertEquals(3, $cursor->count());
+        // Actions
+        $result = $cursor->count();
+
+        // Assertions
+        $this->assertSame(3, $result);
     }
 
     public function testShouldCountDocumentsWithCountFunction()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
@@ -91,23 +96,28 @@ class EmbeddedCursorTest extends TestCase
         ];
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
-        $this->assertEquals(3, count($cursor));
+        // Actions
+        $result = count($cursor);
+
+        // Assertions
+        $this->assertSame(3, $result);
     }
 
     public function testShouldRewind()
     {
-        // Arrange
+        // Set
         $cursor = new EmbeddedCursor([]);
 
-        // Assert
+        // Actions
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+
+        // Assertions
+        $this->assertAttributeSame(0, 'position', $cursor);
     }
 
     public function testShouldGetCurrent()
     {
-        // Arrange
+        // Set
         $object = new class extends AbstractModel
         {
         };
@@ -130,28 +140,32 @@ class EmbeddedCursorTest extends TestCase
 
         $this->setProtected($cursor, 'position', 1);
 
-        // Assert
+        // Actions
         $model = $cursor->current();
+
+        // Assertions
         $this->assertInstanceOf($class, $model);
         $this->assertSame('B', $model->name);
     }
 
     public function testShouldNotGetCurrentWhenCursorIsInvalid()
     {
-        // Arrange
+        // Set
         $items = [];
         $cursor = new EmbeddedCursor($items);
 
         $this->setProtected($cursor, 'position', 1);
 
-        // Assert
+        // Actions
         $model = $cursor->current();
+
+        // Assertions
         $this->assertNull($model);
     }
 
     public function testShouldGetCurrentUsingModelClass()
     {
-        // Arrange
+        // Set
         $object = new stdClass();
         $object->name = 'A';
         $items = [$object];
@@ -159,15 +173,17 @@ class EmbeddedCursorTest extends TestCase
 
         $this->setProtected($cursor, 'position', 0);
 
-        // Assert
+        // Actions
         $model = $cursor->current();
+
+        // Assertions
         $this->assertInstanceOf(stdClass::class, $model);
-        $this->assertAttributeEquals('A', 'name', $model);
+        $this->assertAttributeSame('A', 'name', $model);
     }
 
     public function testShouldGetCurrentUsingModelClassMorphingIt()
     {
-        // Arrange
+        // Set
         $object = new class() extends AbstractModel
         {
         };
@@ -179,7 +195,6 @@ class EmbeddedCursorTest extends TestCase
         $model->name = 'John';
         $model->syncOriginalDocumentAttributes();
 
-        $class = get_class($object);
         $items = [$model];
         $cursor = new EmbeddedCursor($items);
 
@@ -187,13 +202,13 @@ class EmbeddedCursorTest extends TestCase
         $result = $cursor->current();
 
         // Assertions
-        $this->assertEquals($model, $result);
+        $this->assertSame($model, $result);
         $this->assertSame('John', $result->name);
     }
 
     public function testShouldGetFirst()
     {
-        // Arrange
+        // Set
         $object = new class extends AbstractModel
         {
         };
@@ -213,8 +228,10 @@ class EmbeddedCursorTest extends TestCase
 
         $this->setProtected($cursor, 'position', 1);
 
-        // Assert
+        // Actions
         $model = $cursor->first();
+
+        // Assertions
         $this->assertInstanceOf($class, $model);
         $this->assertSame('A', $model->name);
     }
@@ -243,55 +260,60 @@ class EmbeddedCursorTest extends TestCase
             $modelB,
         ];
 
-        // Assert
+        // Actions
         $result = $cursor->all();
 
-        $this->assertEquals($expected, $result);
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     public function testShouldGetAllInArrayFormat()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
             ['name' => 'C'],
         ];
         $cursor = new EmbeddedCursor($items);
-
         $this->setProtected($cursor, 'position', 1);
 
-        // Assert
+        // Actions
         $result = $cursor->toArray();
-        $this->assertEquals($items, $result);
+
+        // Assertions
+        $this->assertSame($items, $result);
     }
 
     public function testShouldImplementKeyMethodFromIterator()
     {
-        // Arrange
+        // Set
         $cursor = new EmbeddedCursor([]);
-
         $this->setProtected($cursor, 'position', 7);
 
-        // Assertion
-        $this->assertEquals(7, $cursor->key());
+        // Actions
+        $result = $cursor->key();
+
+        // Assertions
+        $this->assertSame(7, $result);
     }
 
     public function testShouldImplementNextMethodFromIterator()
     {
-        // Arrange
+        // Set
         $cursor = new EmbeddedCursor([]);
-
         $this->setProtected($cursor, 'position', 7);
 
-        // Assertion
+        // Actions
         $cursor->next();
-        $this->assertAttributeEquals(8, 'position', $cursor);
+
+        // Assertions
+        $this->assertAttributeSame(8, 'position', $cursor);
     }
 
     public function testShouldImplementValidMethodFromIterator()
     {
-        // Arrange
+        // Set
         $items = [
             ['name' => 'A'],
             ['name' => 'B'],
@@ -299,13 +321,21 @@ class EmbeddedCursorTest extends TestCase
         ];
         $cursor = new EmbeddedCursor($items);
 
-        // Assert
-        $this->assertTrue($cursor->valid());
+        // Actions
+        $result = $cursor->valid();
+
+        // Assertions
+        $this->assertTrue($result);
+
+        // Actions
         $this->setProtected($cursor, 'position', 8);
-        $this->assertFalse($cursor->valid());
+        $result = $cursor->valid();
+
+        // Assertions
+        $this->assertFalse($result);
     }
 
-    public function getDocumentsToSort()
+    public function getDocumentsToSort(): array
     {
         $age24 = (object) ['age' => 24];
 

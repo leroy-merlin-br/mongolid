@@ -21,14 +21,14 @@ class BuilderTest extends TestCase
 {
     public function testShouldBeAbleToConstruct()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
 
-        // Act
+        // Actions
         $builder = new Builder($connection);
 
-        // Assert
-        $this->assertAttributeEquals($connection, 'connection', $builder);
+        // Assertions
+        $this->assertAttributeSame($connection, 'connection', $builder);
     }
 
     /**
@@ -36,17 +36,16 @@ class BuilderTest extends TestCase
      */
     public function testShouldSave($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
 
-        // Act
-        $builder->shouldAllowMockingProtectedMethods();
-
+        // Expectations
         $builder->expects()
             ->getCollection($model)
             ->andReturn($collection);
@@ -78,8 +77,11 @@ class BuilderTest extends TestCase
             $this->expectEventNotToBeFired('saved', $model);
         }
 
-        // Assert
-        $this->assertSame($expected, $builder->save($model, $options));
+        // Actions
+        $result = $builder->save($model, $options);
+
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -87,9 +89,10 @@ class BuilderTest extends TestCase
      */
     public function testShouldInsert($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
@@ -97,9 +100,7 @@ class BuilderTest extends TestCase
 
         $model->_id = null;
 
-        // Act
-        $builder->shouldAllowMockingProtectedMethods();
-
+        // Expectations
         $builder->expects()
             ->getCollection($model)
             ->andReturn($collection);
@@ -124,8 +125,11 @@ class BuilderTest extends TestCase
             $this->expectEventNotToBeFired('inserted', $model);
         }
 
-        // Assert
-        $this->assertSame($expected, $builder->insert($model, $options));
+        // Actions
+        $result = $builder->insert($model, $options);
+
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -133,9 +137,10 @@ class BuilderTest extends TestCase
      */
     public function testShouldInsertWithoutFiringEvents($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
@@ -143,9 +148,7 @@ class BuilderTest extends TestCase
 
         $model->_id = null;
 
-        // Act
-        $builder->shouldAllowMockingProtectedMethods();
-
+        // Expectations
         $builder->expects()
             ->getCollection($model)
             ->andReturn($collection);
@@ -165,8 +168,11 @@ class BuilderTest extends TestCase
         $this->expectEventNotToBeFired('inserting', $model);
         $this->expectEventNotToBeFired('inserted', $model);
 
-        // Assert
-        $this->assertSame($expected, $builder->insert($model, $options, false));
+        // Actions
+        $result = $builder->insert($model, $options, false);
+
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -174,7 +180,7 @@ class BuilderTest extends TestCase
      */
     public function testShouldUpdate($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
@@ -185,7 +191,7 @@ class BuilderTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        // Expect
+        // Expectations
         $connection->expects()
             ->getRawConnection()
             ->andReturn($client);
@@ -221,16 +227,16 @@ class BuilderTest extends TestCase
             $this->expectEventNotToBeFired('updated', $model);
         }
 
-        // Act
+        // Actions
         $result = $builder->update($model, $options);
 
-        // Assert
+        // Assertions
         $this->assertSame($expected, $result);
     }
 
     public function testShouldUpdateUnsettingFields()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $client = m::mock(Client::class);
         $database = m::mock(Database::class);
@@ -272,7 +278,7 @@ class BuilderTest extends TestCase
         $model->_id = 123;
         unset($model->name);
 
-        // Expect
+        // Expectations
         $connection->expects()
             ->getRawConnection()
             ->andReturn($client);
@@ -304,10 +310,10 @@ class BuilderTest extends TestCase
 
         $this->expectEventToBeFired('updated', $model, false);
 
-        // Act
+        // Actions
         $result = $builder->update($model, $options);
 
-        // Assert
+        // Assertions
         $this->assertTrue($result);
     }
 
@@ -320,7 +326,7 @@ class BuilderTest extends TestCase
         $shouldFireEventAfter,
         $expected
     ) {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
 
@@ -330,7 +336,7 @@ class BuilderTest extends TestCase
 
         $model->_id = null;
 
-        // Act
+        // Actions
         $builder->shouldAllowMockingProtectedMethods();
 
         $builder->expects()
@@ -362,8 +368,11 @@ class BuilderTest extends TestCase
         $this->expectEventNotToBeFired('inserting', $model);
         $this->expectEventNotToBeFired('inserted', $model);
 
-        // Assert
-        $this->assertSame($expected, $builder->update($model, $options));
+        // Actions
+        $result = $builder->update($model, $options);
+
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -371,17 +380,16 @@ class BuilderTest extends TestCase
      */
     public function testShouldDelete($model, $writeConcern, $shouldFireEventAfter, $expected)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        // Act
-        $builder->shouldAllowMockingProtectedMethods();
-
+        // Expectations
         $builder->expects()
             ->getCollection($model)
             ->andReturn($collection);
@@ -406,8 +414,11 @@ class BuilderTest extends TestCase
             $this->expectEventNotToBeFired('deleted', $model);
         }
 
-        // Assert
-        $this->assertSame($expected, $builder->delete($model, $options));
+        // Actions
+        $result = $builder->delete($model, $options);
+
+        // Assertions
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -418,7 +429,7 @@ class BuilderTest extends TestCase
         $dbOperation,
         $eventName
     ) {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
@@ -426,7 +437,7 @@ class BuilderTest extends TestCase
 
         $builder->shouldAllowMockingProtectedMethods();
 
-        // Expect
+        // Expectations
         $builder->allows()
             ->getCollection($model)
             ->andReturn($collection);
@@ -437,16 +448,16 @@ class BuilderTest extends TestCase
         /* "Mocks" the fireEvent to return false and bail the operation */
         $this->expectEventToBeFired($eventName, $model, true, false);
 
-        // Act
+        // Actions
         $result = $builder->$operation($model);
 
-        // Assert
+        // Assertions
         $this->assertFalse($result);
     }
 
     public function testShouldGetWithWhereQuery()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
 
@@ -458,7 +469,7 @@ class BuilderTest extends TestCase
 
         $builder->shouldAllowMockingProtectedMethods();
 
-        // Expect
+        // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
@@ -467,14 +478,14 @@ class BuilderTest extends TestCase
             ->getCollection($model)
             ->andReturn($collection);
 
-        // Act
+        // Actions
         $result = $builder->where($model, $query, $projection);
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertAttributeEquals($collection, 'collection', $result);
-        $this->assertAttributeEquals('find', 'command', $result);
-        $this->assertAttributeEquals(
+        $this->assertAttributeSame($collection, 'collection', $result);
+        $this->assertAttributeSame('find', 'command', $result);
+        $this->assertAttributeSame(
             [$preparedQuery, ['projection' => $projection]],
             'params',
             $result
@@ -483,27 +494,27 @@ class BuilderTest extends TestCase
 
     public function testShouldGetAll()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[where]', [$connection]);
         $mongolidCursor = m::mock(Cursor::class);
         $model = m::mock(ModelInterface::class);
 
-        // Expect
+        // Expectations
         $builder->expects()
             ->where($model, [])
             ->andReturn($mongolidCursor);
 
-        // Act
+        // Actions
         $result = $builder->all($model);
 
-        // Assert
+        // Assertions
         $this->assertSame($mongolidCursor, $result);
     }
 
     public function testShouldGetFirstWithQuery()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
@@ -518,7 +529,7 @@ class BuilderTest extends TestCase
         };
         $builder->shouldAllowMockingProtectedMethods();
 
-        // Act
+        // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
@@ -531,28 +542,29 @@ class BuilderTest extends TestCase
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn($object);
 
+        // Actions
         $result = $builder->first($object, $query);
 
-        // Assert
+        // Assertions
         $this->assertSame($object, $result);
     }
 
     public function testFirstWithNullShouldNotHitTheDatabase()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
-        // Act
+        // Actions
         $result = $builder->first(m::mock(ModelInterface::class), null);
 
-        // Assert
+        // Assertions
         $this->assertNull($result);
     }
 
     public function testFirstOrFailShouldGetFirst()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
@@ -564,7 +576,7 @@ class BuilderTest extends TestCase
 
         $builder->shouldAllowMockingProtectedMethods();
 
-        // Act
+        // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
@@ -577,31 +589,33 @@ class BuilderTest extends TestCase
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn($object);
 
+        // Actions
         $result = $builder->firstOrFail($object, $query);
 
-        // Assert
+        // Assertions
         $this->assertSame($object, $result);
     }
 
     public function testFirstOrFailWithNullShouldFail()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $model = new class extends AbstractModel
         {
         };
 
+        // Expectations
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model ['.get_class($model).'].');
 
-        // Act
+        // Actions
         $builder->firstOrFail($model, null);
     }
 
     public function testShouldGetNullIfFirstCantFindAnything()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
         $model = m::mock(ModelInterface::class);
@@ -611,7 +625,7 @@ class BuilderTest extends TestCase
 
         $builder->shouldAllowMockingProtectedMethods();
 
-        // Expect
+        // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
@@ -624,21 +638,22 @@ class BuilderTest extends TestCase
             ->findOne($preparedQuery, ['projection' => []])
             ->andReturn(null);
 
-        // Act
+        // Actions
         $result = $builder->first($model, $query);
 
-        // Assert
+        // Assertions
         $this->assertNull($result);
     }
 
     public function testShouldGetFirstProjectingFields()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(
             Builder::class.'[prepareValueQuery,getCollection]',
             [$connection]
         );
+        $builder->shouldAllowMockingProtectedMethods();
         $model = m::mock(ModelInterface::class);
 
         $collection = m::mock(Collection::class);
@@ -646,9 +661,7 @@ class BuilderTest extends TestCase
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false];
 
-        $builder->shouldAllowMockingProtectedMethods();
-
-        // Expect
+        // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
@@ -661,16 +674,16 @@ class BuilderTest extends TestCase
             ->findOne($preparedQuery, ['projection' => $projection])
             ->andReturn(null);
 
-        // Act
+        // Actions
         $result = $builder->first($model, $query, $projection);
 
-        // Assert
+        // Assertions
         $this->assertNull($result);
     }
 
     public function testShouldGetRawCollection()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
@@ -679,7 +692,7 @@ class BuilderTest extends TestCase
         $connection->defaultDatabase = 'grimory';
         $connection->grimory = (object) ['models' => $collection];
 
-        // Expect
+        // Expectations
         $connection->expects()
             ->getRawConnection()
             ->andReturn($connection);
@@ -688,10 +701,10 @@ class BuilderTest extends TestCase
             ->getCollectionName()
             ->andReturn('models');
 
-        // Act
+        // Actions
         $result = $this->callProtected($builder, 'getCollection', [$model]);
 
-        // Assert
+        // Assertions
         $this->assertSame($collection, $result);
     }
 
@@ -700,14 +713,14 @@ class BuilderTest extends TestCase
      */
     public function testShouldPrepareQueryValue($value, $expectation)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
-        // Act
+        // Actions
         $result = $this->callProtected($builder, 'prepareValueQuery', [$value]);
 
-        // Assert
+        // Assertions
         $this->assertMongoQueryEquals($expectation, $result);
     }
 
@@ -716,20 +729,20 @@ class BuilderTest extends TestCase
      */
     public function testPrepareProjectionShouldConvertArray($data, $expectation)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
-        // Act
+        // Actions
         $result = $this->callProtected($builder, 'prepareProjection', [$data]);
 
-        // Assert
+        // Assertions
         $this->assertSame($expectation, $result);
     }
 
     public function testPrepareProjectionShouldThrownAnException()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
@@ -738,11 +751,11 @@ class BuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid projection: 'invalid-key' => 'invalid-value'");
 
-        // Act
+        // Actions
         $this->callProtected($builder, 'prepareProjection', [$data]);
     }
 
-    public function eventsToBailOperations()
+    public function eventsToBailOperations(): array
     {
         return [
             'Saving event' => [
@@ -750,19 +763,16 @@ class BuilderTest extends TestCase
                 'dbOperation' => 'replaceOne',
                 'eventName' => 'saving',
             ],
-            // ------------------------
             'Inserting event' => [
                 'operation' => 'insert',
                 'dbOperation' => 'insertOne',
                 'eventName' => 'inserting',
             ],
-            // ------------------------
             'Updating event' => [
                 'operation' => 'update',
                 'dbOperation' => 'updateOne',
                 'eventName' => 'updating',
             ],
-            // ------------------------
             'Deleting event' => [
                 'operation' => 'delete',
                 'dbOperation' => 'deleteOne',
@@ -771,29 +781,25 @@ class BuilderTest extends TestCase
         ];
     }
 
-    public function queryValueScenarios()
+    public function queryValueScenarios(): array
     {
         return [
             'An array' => [
                 'value' => ['age' => ['$gt' => 25]],
                 'expectation' => ['age' => ['$gt' => 25]],
             ],
-            // ------------------------
             'An ObjectId string' => [
                 'value' => '507f1f77bcf86cd799439011',
                 'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
             ],
-            // ------------------------
             'An ObjectId string within a query' => [
                 'value' => ['_id' => '507f1f77bcf86cd799439011'],
                 'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
             ],
-            // ------------------------
             'Other type of _id, sequence for example' => [
                 'value' => 7,
                 'expectation' => ['_id' => 7],
             ],
-            // ------------------------
             'Series of string _ids as the $in parameter' => [
                 'value' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
                 'expectation' => [
@@ -805,15 +811,14 @@ class BuilderTest extends TestCase
                     ],
                 ],
             ],
-            // ------------------------
-            'Series of string _ids as the $in parameter' => [
+            'Series of string _ids as the $nin parameter' => [
                 'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
                 'expectation' => ['_id' => ['$nin' => [new ObjectId('507f1f77bcf86cd799439011')]]],
             ],
         ];
     }
 
-    public function getWriteConcernVariations()
+    public function getWriteConcernVariations(): array
     {
         $model = new class extends AbstractModel
         {
@@ -863,7 +868,7 @@ class BuilderTest extends TestCase
     /**
      * Retrieves projections that should be replaced by mapper.
      */
-    public function getProjections()
+    public function getProjections(): array
     {
         return [
             'Should return self array' => [
@@ -885,7 +890,7 @@ class BuilderTest extends TestCase
         ];
     }
 
-    protected function getEventService()
+    protected function getEventService(): EventTriggerService
     {
         if (!Ioc::has(EventTriggerService::class)) {
             Ioc::instance(EventTriggerService::class, m::mock(EventTriggerService::class));
@@ -894,20 +899,22 @@ class BuilderTest extends TestCase
         return Ioc::make(EventTriggerService::class);
     }
 
-    protected function expectEventToBeFired($event, $model, bool $halt, $return = true)
+    protected function expectEventToBeFired(string $event, ModelInterface $model, bool $halt, bool $return = true): void
     {
         $event = 'mongolid.'.$event.': '.get_class($model);
 
-        $this->getEventService()->expects()
+        $this->getEventService()
+            ->expects()
             ->fire($event, $model, $halt)
             ->andReturn($return);
     }
 
-    protected function expectEventNotToBeFired($event, $model)
+    protected function expectEventNotToBeFired(string $event, ModelInterface $model): void
     {
         $event = 'mongolid.'.$event.': '.get_class($model);
 
-        $this->getEventService()->expects()
+        $this->getEventService()
+            ->expects()
             ->fire($event, $model, m::any())
             ->never();
     }

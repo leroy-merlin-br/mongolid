@@ -70,12 +70,12 @@ class HasRelationsTraitTest extends TestCase
 
         $expectedItems = $expectedItems['embedsOne'];
 
-        // Act
+        // Actions
         $result = $model->relationEmbedsOne;
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(RelatedStub::class, $result);
-        $this->assertEquals($expectedItems, $result);
+        $this->assertSame($expectedItems, $result);
     }
 
     /**
@@ -89,16 +89,16 @@ class HasRelationsTraitTest extends TestCase
 
         $expectedItems = $expectedItems['embedsMany'];
 
-        // Act
+        // Actions
         $result = $model->relationEmbedsMany;
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(EmbeddedCursor::class, $result);
         $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
-        $this->assertEquals($expectedItems, $result->all());
+        $this->assertSame($expectedItems, $result->all());
     }
 
-    public function referenceScenarios()
+    public function referenceScenarios(): array
     {
         return [
             'referenced by string id' => [
@@ -160,7 +160,7 @@ class HasRelationsTraitTest extends TestCase
         ];
     }
 
-    public function embedsScenarios()
+    public function embedsScenarios(): array
     {
         $model1 = new RelatedStub();
         $model1->_id = 12345;

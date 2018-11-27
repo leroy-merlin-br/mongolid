@@ -13,13 +13,13 @@ class SequenceServiceTest extends TestCase
      */
     public function testShouldGetNextValue($sequenceName, $currentValue, $expectation)
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $sequenceService = m::mock(SequenceService::class.'[rawCollection]', [$connection]);
         $sequenceService->shouldAllowMockingProtectedMethods();
         $rawCollection = m::mock(Collection::class);
 
-        // Act
+        // Expectations
         $sequenceService->expects()
             ->rawCollection()
             ->andReturn($rawCollection);
@@ -33,16 +33,16 @@ class SequenceServiceTest extends TestCase
                 $currentValue ? (object) ['seq' => $currentValue] : null
             );
 
-        // Assertion
-        $this->assertEquals(
-            $expectation,
-            $sequenceService->getNextValue($sequenceName)
-        );
+        // Actions
+        $result = $sequenceService->getNextValue($sequenceName);
+
+        // Assertions
+        $this->assertSame($expectation, $result);
     }
 
     public function testShouldGetRawCollection()
     {
-        // Arrange
+        // Set
         $connection = m::mock(Connection::class);
         $sequenceService = new SequenceService($connection, 'foobar');
         $collection = m::mock(Collection::class);
@@ -50,19 +50,19 @@ class SequenceServiceTest extends TestCase
         $connection->defaultDatabase = 'grimory';
         $connection->grimory = (object) ['foobar' => $collection];
 
-        // Act
+        // Expectations
         $connection->expects()
             ->getRawConnection()
             ->andReturnSelf($connection);
 
-        // Assertion
-        $this->assertEquals(
-            $collection,
-            $this->callProtected($sequenceService, 'rawCollection')
-        );
+        // Actions
+        $result = $this->callProtected($sequenceService, 'rawCollection');
+
+        // Assertions
+        $this->assertSame($collection, $result);
     }
 
-    public function sequenceScenarios()
+    public function sequenceScenarios(): array
     {
         return [
             'New sequence in collection "products"' => [
@@ -70,17 +70,10 @@ class SequenceServiceTest extends TestCase
                 'currentValue' => 0,
                 'expectation' => 1,
             ],
-            // -----------------------
             'Existing sequence in collection "unicorns"' => [
                 'sequenceName' => 'unicorns',
                 'currentValue' => 7,
                 'expectation' => 8,
-            ],
-            // -----------------------
-            'Existing sequence in collection "unicorns"' => [
-                'sequenceName' => 'unicorns',
-                'currentValue' => 3,
-                'expectation' => 4,
             ],
         ];
     }

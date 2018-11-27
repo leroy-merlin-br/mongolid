@@ -2,6 +2,10 @@
 namespace Mongolid\Model;
 
 use Mockery as m;
+use MongoDB\BSON\Persistable;
+use MongoDB\BSON\Serializable;
+use MongoDB\BSON\Type;
+use MongoDB\BSON\Unserializable;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
@@ -47,10 +51,32 @@ class AbstractModelTest extends TestCase
 
     public function testShouldImplementModelTraits()
     {
+        // Actions
+        $result = array_keys(class_uses(AbstractModel::class));
+
         // Assertions
         $this->assertSame(
             [HasAttributesTrait::class, HasRelationsTrait::class],
-            array_keys(class_uses(AbstractModel::class))
+            $result
+        );
+    }
+
+    public function testShouldImplementModelInterface()
+    {
+        // Actions
+        $result = array_keys(class_implements(AbstractModel::class));
+
+        // Assertions
+        $this->assertSame(
+            [
+                ModelInterface::class,
+                Unserializable::class,
+                Serializable::class,
+                Type::class,
+                Persistable::class,
+                HasAttributesInterface::class,
+            ],
+            $result
         );
     }
 
@@ -59,13 +85,16 @@ class AbstractModelTest extends TestCase
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->save($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
+        // Actions
+        $result = $this->model->save();
+
         // Assertions
-        $this->assertTrue($this->model->save());
+        $this->assertTrue($result);
     }
 
     public function testShouldInsert()
@@ -73,13 +102,16 @@ class AbstractModelTest extends TestCase
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->insert($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
+        // Actions
+        $result = $this->model->insert();
+
         // Assertions
-        $this->assertTrue($this->model->insert());
+        $this->assertTrue($result);
     }
 
     public function testShouldUpdate()
@@ -87,13 +119,16 @@ class AbstractModelTest extends TestCase
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->update($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
+        // Actions
+        $result = $this->model->update();
+
         // Assertions
-        $this->assertTrue($this->model->update());
+        $this->assertTrue($result);
     }
 
     public function testShouldDelete()
@@ -101,13 +136,16 @@ class AbstractModelTest extends TestCase
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->delete($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
+        // Actions
+        $result = $this->model->delete();
+
         // Assertions
-        $this->assertTrue($this->model->delete());
+        $this->assertTrue($result);
     }
 
     public function testSaveShouldThrowExceptionIfCollectionIsNull()
@@ -171,29 +209,34 @@ class AbstractModelTest extends TestCase
 
         $cursor = m::mock(CursorInterface::class);
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->where(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($cursor);
 
+        // Actions
+        $result = $this->model->where($query, $projection);
+
         // Assertions
-        $this->assertSame($cursor, $this->model->where($query, $projection));
+        $this->assertSame($cursor, $result);
     }
 
     public function testShouldGetAll()
     {
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
-
         $cursor = m::mock(CursorInterface::class);
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->all(m::type(get_class($this->model)))
             ->andReturn($cursor);
 
+        // Actions
+        $result = $this->model->all();
+
         // Assertions
-        $this->assertSame($cursor, $this->model->all());
+        $this->assertSame($cursor, $result);
     }
 
     public function testShouldGetFirstWithQuery()
@@ -203,13 +246,16 @@ class AbstractModelTest extends TestCase
         $projection = ['some', 'fields'];
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->first(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
+        // Actions
+        $result = $this->model->first($query, $projection);
+
         // Assertions
-        $this->assertSame($this->model, $this->model->first($query, $projection));
+        $this->assertSame($this->model, $result);
     }
 
     public function testShouldGetFirstOrFail()
@@ -219,13 +265,16 @@ class AbstractModelTest extends TestCase
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->firstOrFail(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
+        // Actions
+        $result = $this->model->firstOrFail($query, $projection);
+
         // Assertions
-        $this->assertSame($this->model, $this->model->firstOrFail($query, $projection));
+        $this->assertSame($this->model, $result);
     }
 
     public function testShouldGetFirstOrNewAndReturnExistingModel()
@@ -234,13 +283,16 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
         $id = 123;
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->first(m::type(get_class($this->model)), $id, [])
             ->andReturn($this->model);
 
+        // Actions
+        $result = $this->model->firstOrNew($id);
+
         // Assertions
-        $this->assertSame($this->model, $this->model->firstOrNew($id));
+        $this->assertSame($this->model, $result);
     }
 
     public function testShouldGetFirstOrNewAndReturnNewModel()
@@ -249,13 +301,16 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
         $id = 123;
 
-        // Actions
+        // Expectations
         $builder->expects()
             ->first(m::type(get_class($this->model)), $id, [])
             ->andReturn(null);
 
+        // Actions
+        $result = $this->model->firstOrNew($id);
+
         // Assertions
-        $this->assertNotEquals($this->model, $this->model->firstOrNew($id));
+        $this->assertNotEquals($this->model, $result);
     }
 
     public function testShouldGetBuilder()
@@ -274,44 +329,72 @@ class AbstractModelTest extends TestCase
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
     {
+        // Set
         $model = new class() extends AbstractModel
         {
         };
 
+        // Expectations
         $this->expectException(NoCollectionNameException::class);
+
+        // Actions
         $model->all();
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
     {
+        // Set
         $model = new class() extends AbstractModel
         {
         };
 
+        // Expectations
         $this->expectException(NoCollectionNameException::class);
+
+        // Actions
         $model->first();
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
     {
+        // Set
         $model = new class() extends AbstractModel
         {
         };
 
+        // Expectations
         $this->expectException(NoCollectionNameException::class);
+
+        // Actions
         $model->where();
     }
 
     public function testShouldGetCollectionName()
     {
-        $this->assertSame('mongolid', $this->model->getCollectionName());
+        // Actions
+        $result = $this->model->getCollectionName();
+
+        // Assertions
+        $this->assertSame('mongolid', $result);
     }
 
-    public function testShouldGetSetWriteConcernInModelClass()
+    public function testShouldHaveDefaultWriteConcern()
     {
-        $this->assertSame(1, $this->model->getWriteConcern());
+        // Actions
+        $result = $this->model->getWriteConcern();
+
+        // Assertions
+        $this->assertSame(1, $result);
+    }
+
+    public function testShouldSetWriteConcern()
+    {
+        // Actions
         $this->model->setWriteConcern(0);
-        $this->assertSame(0, $this->model->getWriteConcern());
+        $result = $this->model->getWriteConcern();
+
+        // Assertions
+        $this->assertSame(0, $result);
     }
 
     public function testShouldHaveDynamicSetters()
@@ -322,18 +405,21 @@ class AbstractModelTest extends TestCase
         };
 
         $childObj = new stdClass();
-
-        // Assertions
         $model->name = 'John';
         $model->age = 25;
         $model->child = $childObj;
+
+        // Actions
+        $result = $model->getDocumentAttributes();
+
+        // Assertions
         $this->assertSame(
             [
                 'name' => 'John',
                 'age' => 25,
                 'child' => $childObj,
             ],
-            $model->getDocumentAttributes()
+            $result
         );
     }
 
@@ -344,6 +430,8 @@ class AbstractModelTest extends TestCase
         $model = new class() extends AbstractModel
         {
         };
+
+        // Actions
         $model->fill(
             [
                 'name' => 'John',
@@ -365,6 +453,8 @@ class AbstractModelTest extends TestCase
         $model = new class() extends AbstractModel
         {
         };
+
+        // Actions
         $model->fill(['name' => 'John', 'ignored' => null]);
 
         // Assertions
@@ -455,6 +545,7 @@ class AbstractModelTest extends TestCase
             }
         };
 
+        // Actions
         $model->short_name = 'My awesome name';
 
         // Assertions
@@ -463,7 +554,7 @@ class AbstractModelTest extends TestCase
 
     public function testShouldSetAttributeFromMutator()
     {
-        // Arrange
+        // Set
         $model = new class() extends AbstractModel
         {
             /**
@@ -477,10 +568,11 @@ class AbstractModelTest extends TestCase
             }
         };
 
+        // Actions
         $model->short_name = 'My awesome name';
         $result = $model->short_name;
 
-        // Assert
+        // Assertions
         $this->assertSame('MY AWESOME NAME', $result);
     }
 }

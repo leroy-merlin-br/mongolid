@@ -18,26 +18,26 @@ class ManagerTest extends TestCase
 
     public function testShouldAddAndGetConnection()
     {
-        // Arrange
+        // Set
         $manager = new Manager();
         $connection = m::mock(Connection::class);
         $rawConnection = m::mock(Client::class);
 
-        // Expect
+        // Expectations
         $connection->expects()
             ->getRawConnection()
             ->andReturn($rawConnection);
 
-        // Act
+        // Actions
         $manager->setConnection($connection);
 
-        // Assert
-        $this->assertEquals($rawConnection, $manager->getConnection());
+        // Assertions
+        $this->assertSame($rawConnection, $manager->getConnection());
     }
 
     public function testShouldSetEventTrigger()
     {
-        // Arrange
+        // Set
         $test = $this;
         $manager = new Manager();
         $container = m::mock(Container::class);
@@ -45,31 +45,36 @@ class ManagerTest extends TestCase
 
         $this->setProtected($manager, 'container', $container);
 
-        // Act
+        // Expectations
         $container->expects()
             ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
-                $test->assertEquals(EventTriggerService::class, $class);
-                $test->assertAttributeEquals($eventTrigger, 'builder', $eventService);
+                $test->assertSame(EventTriggerService::class, $class);
+                $test->assertAttributeSame($eventTrigger, 'builder', $eventService);
             });
 
-        // Assert
+        // Actions
         $manager->setEventTrigger($eventTrigger);
     }
 
     public function testShouldInitializeOnce()
     {
-        // Arrange
+        // Set
         $manager = new Manager();
+
+        // Actions
         $this->callProtected($manager, 'init');
 
-        // Assertion
-        $this->assertAttributeEquals($manager, 'singleton', Manager::class);
+        // Assertions
+        $this->assertAttributeSame($manager, 'singleton', Manager::class);
         $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
 
+        // Actions
         $container = $manager->container;
         $this->callProtected($manager, 'init');
+
+        // Assertions
         // Initializes again to make sure that it will not instantiate a new container
-        $this->assertAttributeEquals($container, 'container', $manager);
+        $this->assertAttributeSame($container, 'container', $manager);
     }
 }

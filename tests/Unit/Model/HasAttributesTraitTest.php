@@ -24,6 +24,7 @@ class HasAttributesTraitTest extends TestCase
             }
         };
 
+        // Actions
         $model->setDocumentAttribute('short_name', 'My awesome name');
         $result = $model->getDocumentAttribute('short_name');
 
@@ -33,7 +34,7 @@ class HasAttributesTraitTest extends TestCase
 
     public function testShouldIgnoreMutators()
     {
-        // Arrange
+        // Set
         $model = new class()
         {
             use HasAttributesTrait;
@@ -50,16 +51,17 @@ class HasAttributesTraitTest extends TestCase
             }
         };
 
+        // Actions
         $model->setDocumentAttribute('short_name', 'My awesome name');
         $result = $model->getDocumentAttribute('short_name');
 
-        // Assert
+        // Assertions
         $this->assertSame('My awesome name', $result);
     }
 
     public function testShouldSetAttributeFromMutator()
     {
-        // Arrange
+        // Set
         $model = new class()
         {
             use HasAttributesTrait;
@@ -76,10 +78,11 @@ class HasAttributesTraitTest extends TestCase
             }
         };
 
+        // Actions
         $model->setDocumentAttribute('short_name', 'My awesome name');
         $result = $model->getDocumentAttribute('short_name');
 
-        // Assert
+        // Assertions
         $this->assertSame('MY AWESOME NAME', $result);
     }
 
@@ -92,7 +95,7 @@ class HasAttributesTraitTest extends TestCase
         $input,
         $expected
     ) {
-        // Arrange
+        // Set
         $model = new class($fillable, $guarded)
         {
             use HasAttributesTrait;
@@ -105,16 +108,16 @@ class HasAttributesTraitTest extends TestCase
             }
         };
 
-        // Act
+        // Actions
         $model->fill($input);
 
-        // Assert
+        // Assertions
         $this->assertSame($expected, $model->getDocumentAttributes());
     }
 
     public function testShouldForceFillAttributes()
     {
-        // Arrange
+        // Set
         $model = new class()
         {
             use HasAttributesTrait;
@@ -126,16 +129,17 @@ class HasAttributesTraitTest extends TestCase
             'not_allowed_attribute' => true,
         ];
 
-        // Act
+        // Actions
         $model->fill($input, true);
+        $result = $model->getDocumentAttribute('not_allowed_attribute');
 
-        // Assert
-        $this->assertTrue($model->getDocumentAttribute('not_allowed_attribute'));
+        // Assertions
+        $this->assertTrue($result);
     }
 
     public function testShouldBeCastableToArray()
     {
-        // Arrange
+        // Set
         $model = new class()
         {
             use HasAttributesTrait;
@@ -145,16 +149,16 @@ class HasAttributesTraitTest extends TestCase
         $model->setDocumentAttribute('name', 'John');
         $model->setDocumentAttribute('age', 25);
 
-        // Assert
-        $this->assertSame(
-            ['name' => 'John', 'age' => 25],
-            $model->toArray()
-        );
+        // Actions
+        $result = $model->toArray();
+
+        // Assertions
+        $this->assertSame(['name' => 'John', 'age' => 25], $result);
     }
 
     public function testShouldSetOriginalAttributes()
     {
-        // Arrange
+        // Set
         $model = new class() implements HasAttributesInterface
         {
             use HasAttributesTrait;
@@ -164,16 +168,17 @@ class HasAttributesTraitTest extends TestCase
         $model->name = 'John';
         $model->age = 25;
 
-        // Act
+        // Actions
         $model->syncOriginalDocumentAttributes();
+        $result = $model->getOriginalDocumentAttributes();
 
-        // Assert
-        $this->assertSame($model->getDocumentAttributes(), $model->getOriginalDocumentAttributes());
+        // Assertions
+        $this->assertSame($model->getDocumentAttributes(), $result);
     }
 
     public function testShouldFallbackOriginalAttributesIfUnserializationFails()
     {
-        // Arrange
+        // Set
         $model = new class() implements HasAttributesInterface
         {
             use HasAttributesTrait;
@@ -187,96 +192,13 @@ class HasAttributesTraitTest extends TestCase
             }
         };
 
-        // Act
+        // Actions
         $model->syncOriginalDocumentAttributes();
+        $result = $model->getOriginalDocumentAttributes();
 
-        // Assert
-        $this->assertSame($model->getDocumentAttributes(), $model->getOriginalDocumentAttributes());
+        // Assertions
+        $this->assertSame($model->getDocumentAttributes(), $result);
     }
-
-    public function getFillableOptions()
-    {
-        return [
-            // -----------------------------
-            '$fillable = []; $guarded = []' => [
-                'fillable' => [],
-                'guarded' => [],
-                'input' => [
-                    'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
-                ],
-                'expected' => [
-                    'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
-                ],
-            ],
-
-            // -----------------------------
-            '$fillable = ["name"]; $guarded = []' => [
-                'fillable' => ['name'],
-                'guarded' => [],
-                'input' => [
-                    'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
-                ],
-                'expected' => [
-                    'name' => 'John',
-                ],
-            ],
-
-            // -----------------------------
-            '$fillable = []; $guarded = []' => [
-                'fillable' => [],
-                'guarded' => ['sex'],
-                'input' => [
-                    'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
-                ],
-                'expected' => [
-                    'name' => 'John',
-                    'age' => 25,
-                ],
-            ],
-
-            // -----------------------------
-            '$fillable = ["name", "sex"]; $guarded = ["sex"]' => [
-                'fillable' => ['name', 'sex'],
-                'guarded' => ['sex'],
-                'input' => [
-                    'name' => 'John',
-                    'age' => 25,
-                    'sex' => 'male',
-                ],
-                'expected' => [
-                    'name' => 'John',
-                ],
-            ],
-
-            // -----------------------------
-            'ignore nulls but not falsy ones' => [
-                'fillable' => ['name', 'surname', 'sex', 'age', 'has_sex'],
-                'guarded' => [],
-                'input' => [
-                    'name' => 'John',
-                    'surname' => '',
-                    'sex' => null,
-                    'age' => 0,
-                    'has_sex' => false,
-                ],
-                'expected' => [
-                    'name' => 'John',
-                    'surname' => '',
-                    'age' => 0,
-                    'has_sex' => false,
-                ],
-            ],
-        ];
-    }
-
 
     public function testShouldCheckIfAttributeIsSet()
     {
@@ -284,6 +206,8 @@ class HasAttributesTraitTest extends TestCase
         $model = new class() extends AbstractModel
         {
         };
+
+        // Actions
         $model->fill(['name' => 'John', 'ignored' => null]);
 
         // Assertions
@@ -291,6 +215,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertFalse(isset($model->nonexistant));
         $this->assertFalse(isset($model->ignored));
     }
+
 
     public function testShouldCheckIfMutatedAttributeIsSet()
     {
@@ -311,5 +236,79 @@ class HasAttributesTraitTest extends TestCase
         // Assertions
         $this->assertTrue(isset($model->name));
         $this->assertFalse(isset($model->nonexistant));
+    }
+
+    public function getFillableOptions(): array
+    {
+        return [
+            '$fillable = []; $guarded = []' => [
+                'fillable' => [],
+                'guarded' => [],
+                'input' => [
+                    'name' => 'John',
+                    'age' => 25,
+                    'sex' => 'male',
+                ],
+                'expected' => [
+                    'name' => 'John',
+                    'age' => 25,
+                    'sex' => 'male',
+                ],
+            ],
+            '$fillable = ["name"]; $guarded = []' => [
+                'fillable' => ['name'],
+                'guarded' => [],
+                'input' => [
+                    'name' => 'John',
+                    'age' => 25,
+                    'sex' => 'male',
+                ],
+                'expected' => [
+                    'name' => 'John',
+                ],
+            ],
+            '$fillable = []; $guarded = [sex]' => [
+                'fillable' => [],
+                'guarded' => ['sex'],
+                'input' => [
+                    'name' => 'John',
+                    'age' => 25,
+                    'sex' => 'male',
+                ],
+                'expected' => [
+                    'name' => 'John',
+                    'age' => 25,
+                ],
+            ],
+            '$fillable = ["name", "sex"]; $guarded = ["sex"]' => [
+                'fillable' => ['name', 'sex'],
+                'guarded' => ['sex'],
+                'input' => [
+                    'name' => 'John',
+                    'age' => 25,
+                    'sex' => 'male',
+                ],
+                'expected' => [
+                    'name' => 'John',
+                ],
+            ],
+            'ignore nulls but not falsy ones' => [
+                'fillable' => ['name', 'surname', 'sex', 'age', 'has_sex'],
+                'guarded' => [],
+                'input' => [
+                    'name' => 'John',
+                    'surname' => '',
+                    'sex' => null,
+                    'age' => 0,
+                    'has_sex' => false,
+                ],
+                'expected' => [
+                    'name' => 'John',
+                    'surname' => '',
+                    'age' => 0,
+                    'has_sex' => false,
+                ],
+            ],
+        ];
     }
 }

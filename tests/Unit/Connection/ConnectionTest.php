@@ -9,32 +9,32 @@ class ConnectionTest extends TestCase
 {
     public function testShouldConstructANewConnection()
     {
-        // Arrange
+        // Set
         $server = 'mongodb://my-server/my_db';
         $options = ['some', 'uri', 'options'];
         $driverOptions = ['some', 'driver', 'options'];
 
-        // Act
+        // Actions
         $connection = new Connection($server, $options, $driverOptions);
 
-        // Assert
+        // Assertions
         $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
-        $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
+        $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
     }
 
     public function testShouldDetermineDatabaseFromACluster()
     {
-        // Arrange
+        // Set
         $server = 'mongodb://my-server,other-server/my_db?replicaSet=someReplica';
         $options = ['some', 'uri', 'options'];
         $driverOptions = ['some', 'driver', 'options'];
 
-        // Act
+        // Actions
         $connection = new Connection($server, $options, $driverOptions);
 
-        // Assert
+        // Assertions
         $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
-        $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
+        $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
     }
 
     public function testShouldGetRawConnection()
@@ -56,22 +56,22 @@ class ConnectionTest extends TestCase
         $rawConnection = $connection->getRawConnection();
 
         // Assertions
-        $this->assertAttributeEquals($expectedParameters['uri'], 'uri', $rawConnection);
-        $this->assertAttributeEquals($expectedParameters['typeMap'], 'typeMap', $rawConnection);
+        $this->assertAttributeSame($expectedParameters['uri'], 'uri', $rawConnection);
+        $this->assertAttributeSame($expectedParameters['typeMap'], 'typeMap', $rawConnection);
     }
 
     public function testShouldGetRawManager()
     {
-        // Arrange
+        // Set
         $server = 'mongodb://my-server/my_db';
         $options = ['some', 'uri', 'options'];
         $driverOptions = ['some', 'driver', 'options'];
 
-        // Act
+        // Actions
         $connection = new Connection($server, $options, $driverOptions);
         $rawManager = $connection->getRawManager();
 
-        // Assert
+        // Assertions
         $this->assertInstanceOf(Manager::class, $rawManager);
     }
 }

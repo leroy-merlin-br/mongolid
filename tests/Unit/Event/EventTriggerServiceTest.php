@@ -8,37 +8,39 @@ class EventTriggerServiceTest extends TestCase
 {
     public function testShouldSendTheEventsToTheExternalBuilder()
     {
-        // Arrange
+        // Set
         $builder = m::mock(EventTriggerInterface::class);
         $service = new EventTriggerService();
+        $service->registerEventBuilder($builder);
 
-        // Act
+        // Expectations
         $builder->expects()
             ->fire('foobar', ['answer' => 23], true)
             ->andReturn(true);
 
-        // Assertion
-        $service->registerEventBuilder($builder);
-        $this->assertTrue(
-            $service->fire('foobar', ['answer' => 23], true)
-        );
+        // Actions
+        $result = $service->fire('foobar', ['answer' => 23], true);
+
+        // Assertions
+        $this->assertTrue($result);
     }
 
     public function testShouldReturnTrueIfThereIsNoExternalBuilder()
     {
-        // Arrange
+        // Set
         $builder = m::mock(EventTriggerInterface::class);
         $service = new EventTriggerService();
 
-        // Act
+        // Expectations
         $builder->expects()
             ->fire()
             ->never();
 
-        // Assertion
+        // Actions
+        $result = $service->fire('foobar', ['answer' => 23], true);
+
+        // Assertions
         /* without calling registerEventBuilder */
-        $this->assertTrue(
-            $service->fire('foobar', ['answer' => 23], true)
-        );
+        $this->assertTrue($result);
     }
 }
