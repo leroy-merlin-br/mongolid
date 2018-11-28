@@ -465,7 +465,7 @@ class BuilderTest extends TestCase
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-        $projection = ['project' => true, '_id' => false];
+        $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
         $builder->shouldAllowMockingProtectedMethods();
 
@@ -659,7 +659,7 @@ class BuilderTest extends TestCase
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-        $projection = ['project' => true, 'fields' => false];
+        $projection = ['project' => true, 'fields' => false, '__pclass' => true];
 
         // Expectations
         $builder->expects()
@@ -873,19 +873,27 @@ class BuilderTest extends TestCase
         return [
             'Should return self array' => [
                 'projection' => ['some' => true, 'fields' => false],
-                'expected' => ['some' => true, 'fields' => false],
+                'expected' => ['some' => true, 'fields' => false, '__pclass' => true],
             ],
             'Should convert number' => [
                 'projection' => ['some' => 1, 'fields' => -1],
-                'expected' => ['some' => true, 'fields' => false],
+                'expected' => ['some' => true, 'fields' => false, '__pclass' => true],
             ],
             'Should add true in fields' => [
                 'projection' => ['some', 'fields'],
-                'expected' => ['some' => true, 'fields' => true],
+                'expected' => ['some' => true, 'fields' => true, '__pclass' => true],
             ],
             'Should add boolean values according to key value' => [
                 'projection' => ['-some', 'fields'],
-                'expected' => ['some' => false, 'fields' => true],
+                'expected' => ['some' => false, 'fields' => true, '__pclass' => true],
+            ],
+            'Should not exclude __pclass from projection' => [
+                'projection' => ['fields' => true, '__pclass' => false],
+                'expected' => ['fields' => true, '__pclass' => true],
+            ],
+            'Empty should not include __pclass' => [
+                'projection' => [],
+                'expected' => [],
             ],
         ];
     }

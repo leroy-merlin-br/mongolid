@@ -370,7 +370,7 @@ class Builder
      *
      * @return array
      */
-    protected function prepareProjection(array $fields)
+    protected function prepareProjection(array $fields): array
     {
         $projection = [];
         foreach ($fields as $key => $value) {
@@ -408,6 +408,10 @@ class Builder
                     $value
                 )
             );
+        }
+
+        if ($projection) {
+            $projection['__pclass'] = true;
         }
 
         return $projection;
