@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\Exception\NotARelationException;
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class ReferencesOneRelationTest extends IntegrationTestCase
 {
@@ -51,7 +51,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->parent()->attach($bob);
         $this->assertParent($bob, $john);
-        $john->fill(['parent_id' => [$chuck->_id]], true);
+        $john = ReferencedUser::fill(['parent_id' => [$chuck->_id]], $john, true);
         $this->assertParent($chuck, $john);
     }
 
@@ -99,7 +99,7 @@ class ReferencesOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->son()->attach($bob);
         $this->assertSon($bob, $john);
-        $john->fill(['arbitrary_field' => [$chuck->code]], true);
+        $john = ReferencedUser::fill(['arbitrary_field' => [$chuck->code]], $john, true);
         $this->assertSon($chuck, $john);
     }
 

@@ -6,6 +6,8 @@ use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\EmbeddedCursor;
 use Mongolid\Query\Builder;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\EmbeddedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class HasRelationsTraitTest extends TestCase
 {
@@ -15,20 +17,20 @@ class HasRelationsTraitTest extends TestCase
     public function testShouldReferenceOne($fieldValue, $expectedQuery)
     {
         // Set
-        $model = new UserStub();
-        $model->refOne = $fieldValue;
+        $model = new ReferencedUser();
+        $model->parent_id = $fieldValue;
 
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
         $expectedQuery = $expectedQuery['referencesOne'];
-        $expected = new RelatedStub();
+        $expected = new ReferencedUser();
 
         // Expectations
         $builder->expects()
-            ->first(m::type(RelatedStub::class), $expectedQuery, [])
+            ->first(m::type(ReferencedUser::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
-        $result = $model->relationReferencesOne;
+        $result = $model->parent;
 
         // Assertions
         $this->assertSame($expected, $result);
@@ -40,8 +42,8 @@ class HasRelationsTraitTest extends TestCase
     public function testShouldReferenceMany($fieldValue, $expectedQuery)
     {
         // Set
-        $model = new UserStub();
-        $model->refMany = $fieldValue;
+        $model = new ReferencedUser();
+        $model->siblings_ids = $fieldValue;
 
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
         $expectedQuery = $expectedQuery['referencesMany'];
@@ -49,11 +51,11 @@ class HasRelationsTraitTest extends TestCase
 
         // Expectations
         $builder->expects()
-            ->where(m::type(RelatedStub::class), $expectedQuery, [])
+            ->where(m::type(ReferencedUser::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
-        $result = $model->relationReferencesMany;
+        $result = $model->siblings;
 
         // Assertions
         $this->assertSame($expected, $result);
@@ -65,16 +67,16 @@ class HasRelationsTraitTest extends TestCase
     public function testShouldEmbedsOne($fieldValue, $expectedItems)
     {
         // Set
-        $model = new UserStub();
-        $model->embOne = $fieldValue;
+        $model = new EmbeddedUser();
+        $model->embedded_parent = $fieldValue;
 
         $expectedItems = $expectedItems['embedsOne'];
 
         // Actions
-        $result = $model->relationEmbedsOne;
+        $result = $model->parent;
 
         // Assertions
-        $this->assertInstanceOf(RelatedStub::class, $result);
+        $this->assertInstanceOf(EmbeddedUser::class, $result);
         $this->assertSame($expectedItems, $result);
     }
 
@@ -84,17 +86,17 @@ class HasRelationsTraitTest extends TestCase
     public function testShouldEmbedsMany($fieldValue, $expectedItems)
     {
         // Set
-        $model = new UserStub();
-        $model->embMany = $fieldValue;
+        $model = new EmbeddedUser();
+        $model->embedded_siblings = $fieldValue;
 
         $expectedItems = $expectedItems['embedsMany'];
 
         // Actions
-        $result = $model->relationEmbedsMany;
+        $result = $model->siblings;
 
         // Assertions
         $this->assertInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertContainsOnlyInstancesOf(RelatedStub::class, $result->all());
+        $this->assertContainsOnlyInstancesOf(EmbeddedUser::class, $result->all());
         $this->assertSame($expectedItems, $result->all());
     }
 
@@ -162,12 +164,12 @@ class HasRelationsTraitTest extends TestCase
 
     public function embedsScenarios(): array
     {
-        $model1 = new RelatedStub();
+        $model1 = new EmbeddedUser();
         $model1->_id = 12345;
         $model1->name = 'John';
         $model1->syncOriginalDocumentAttributes();
 
-        $model2 = new RelatedStub();
+        $model2 = new EmbeddedUser();
         $model2->_id = 67890;
         $model2->name = 'Bob';
         $model2->syncOriginalDocumentAttributes();
@@ -189,40 +191,4 @@ class HasRelationsTraitTest extends TestCase
             ],
         ];
     }
-}
-
-class UserStub extends AbstractModel
-{
-    /**
-     * {@inheritdoc}
-     */
-    protected $collection = 'users';
-
-    public function relationReferencesOne()
-    {
-        return $this->referencesOne(RelatedStub::class, 'refOne');
-    }
-
-    public function relationReferencesMany()
-    {
-        return $this->referencesMany(RelatedStub::class, 'refMany');
-    }
-
-    public function relationEmbedsOne()
-    {
-        return $this->embedsOne(RelatedStub::class, 'embOne');
-    }
-
-    public function relationEmbedsMany()
-    {
-        return $this->embedsMany(RelatedStub::class, 'embMany');
-    }
-}
-
-class RelatedStub extends AbstractModel
-{
-    /**
-     * {@inheritdoc}
-     */
-    protected $collection = 'related';
 }

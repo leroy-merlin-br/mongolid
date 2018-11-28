@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class ReferencesManyRelationTest extends IntegrationTestCase
 {
@@ -61,7 +61,7 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->siblings()->attach($bob);
         $this->assertSiblings([$bob], $john);
-        $john->fill(['siblings_ids' => [$chuck->_id]], true);
+        $john = ReferencedUser::fill(['siblings_ids' => [$chuck->_id]], $john, true);
         $this->assertSiblings([$chuck], $john);
     }
 
@@ -123,7 +123,7 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->grandsons()->attach($bob);
         $this->assertGrandsons([$bob], $john);
-        $john->fill(['grandsons_codes' => [$chuck->code]], true);
+        $john = ReferencedUser::fill(['grandsons_codes' => [$chuck->code]], $john, true);
         $this->assertGrandsons([$chuck], $john);
     }
 

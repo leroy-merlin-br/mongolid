@@ -432,12 +432,13 @@ class AbstractModelTest extends TestCase
         };
 
         // Actions
-        $model->fill(
+        $model = $model::fill(
             [
                 'name' => 'John',
                 'age' => 25,
                 'child' => $child,
-            ]
+            ],
+            $model
         );
 
         // Assertions
@@ -455,7 +456,7 @@ class AbstractModelTest extends TestCase
         };
 
         // Actions
-        $model->fill(['name' => 'John', 'ignored' => null]);
+        $model = $model::fill(['name' => 'John', 'ignored' => null]);
 
         // Assertions
         $this->assertTrue(isset($model->name));
@@ -490,7 +491,7 @@ class AbstractModelTest extends TestCase
         $model = new class() extends AbstractModel
         {
         };
-        $model->fill(
+        $model = $model::fill(
             [
                 'name' => 'John',
                 'age' => 25,

@@ -4,7 +4,7 @@ namespace Mongolid\Tests\Integration;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Model\Exception\InvalidFieldNameException;
-use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
+use Mongolid\Tests\Stubs\EmbeddedUser;
 
 class EmbedsOneRelationTest extends IntegrationTestCase
 {
@@ -53,7 +53,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->parent()->add($bob);
         $this->assertParent($bob, $john);
-        $john->fill(['embedded_parent' => [$chuck]], true);
+        $john = EmbeddedUser::fill(['embedded_parent' => [$chuck]], $john, true);
         $this->assertParent($chuck, $john);
     }
 
@@ -101,7 +101,7 @@ class EmbedsOneRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->son()->add($bob);
         $this->assertSon($bob, $john);
-        $john->fill(['arbitrary_field' => [$chuck]], true);
+        $john = EmbeddedUser::fill(['arbitrary_field' => [$chuck]], $john, true);
         $this->assertSon($chuck, $john);
     }
 

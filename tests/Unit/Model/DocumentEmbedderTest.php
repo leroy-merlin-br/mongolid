@@ -23,7 +23,7 @@ class DocumentEmbedderTest extends TestCase
             $model = new class extends AbstractModel
             {
             };
-            $model->fill($modelFields);
+            $model = $model::fill($modelFields);
         } else {
             $model = $modelFields;
         }

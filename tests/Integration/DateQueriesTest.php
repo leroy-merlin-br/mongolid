@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class DateQueriesTest extends IntegrationTestCase
 {

@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid\Tests\Integration;
 
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class AttributesKeyTest extends IntegrationTestCase
 {

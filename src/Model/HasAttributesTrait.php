@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
  * will be set.
  *
  * It is supposed to be used on model classes in general
+ *
+ * @mixin HasAttributesInterface
  */
 trait HasAttributesTrait
 {
@@ -64,6 +66,40 @@ trait HasAttributesTrait
     /**
      * {@inheritdoc}
      */
+    public static function fill(
+        array $input,
+        HasAttributesInterface $object = null,
+        bool $force = false
+    ): HasAttributesInterface {
+        if (!$object) {
+            $object = new static();
+        }
+
+        if ($object instanceof PolymorphableModelInterface) {
+            $class = $object->polymorph($input);
+            if ($class !== get_class($object)) {
+                $originalAttributes = $object->getDocumentAttributes();
+                $object = new $class();
+
+                foreach ($originalAttributes as $key => $value) {
+                    $object->setDocumentAttribute($key, $value);
+                }
+            }
+        }
+
+        foreach ($input as $key => $value) {
+            if ($force
+                || ((!$object->fillable || in_array($key, $object->fillable)) && !in_array($key, $object->guarded))) {
+                $object->setDocumentAttribute($key, $value);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasDocumentAttribute(string $key): bool
     {
         return !is_null($this->getDocumentAttribute($key));
@@ -104,19 +140,6 @@ trait HasAttributesTrait
                 return !is_null($value);
             }
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fill(array $input, bool $force = false)
-    {
-        foreach ($input as $key => $value) {
-            if ($force
-                || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
-                $this->setDocumentAttribute($key, $value);
-            }
-        }
     }
 
     /**
