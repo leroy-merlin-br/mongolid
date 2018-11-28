@@ -12,6 +12,17 @@ namespace Mongolid\Model;
 interface HasAttributesInterface
 {
     /**
+     * Set the model attributes using an array.
+     *
+     * @param array                       $input  the data that will be used to fill the attributes
+     * @param HasAttributesInterface|null $object if provided, $input will be merged with object attributes
+     * @param bool                        $force  force fill (ignore fillable fields)
+     *
+     * @return HasAttributesInterface
+     */
+    public static function fill(array $input, HasAttributesInterface $object = null, bool $force = false): HasAttributesInterface;
+
+    /**
      * Check if an attribute is set on the model.
      *
      * @param string $key the attribute to be checked
@@ -31,14 +42,6 @@ interface HasAttributesInterface
      * Get all attributes from the model.
      */
     public function getDocumentAttributes(): array;
-
-    /**
-     * Set the model attributes using an array.
-     *
-     * @param array $input the data that will be used to fill the attributes
-     * @param bool  $force force fill
-     */
-    public function fill(array $input, bool $force = false);
 
     /**
      * Unset a given attribute on the model.

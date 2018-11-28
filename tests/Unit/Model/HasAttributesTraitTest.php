@@ -96,7 +96,7 @@ class HasAttributesTraitTest extends TestCase
         $expected
     ) {
         // Set
-        $model = new class($fillable, $guarded)
+        $model = new class($fillable, $guarded) implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -109,7 +109,7 @@ class HasAttributesTraitTest extends TestCase
         };
 
         // Actions
-        $model->fill($input);
+        $model = $model::fill($input, $model);
 
         // Assertions
         $this->assertSame($expected, $model->getDocumentAttributes());
@@ -118,7 +118,7 @@ class HasAttributesTraitTest extends TestCase
     public function testShouldForceFillAttributes()
     {
         // Set
-        $model = new class()
+        $model = new class() implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -130,7 +130,7 @@ class HasAttributesTraitTest extends TestCase
         ];
 
         // Actions
-        $model->fill($input, true);
+        $model = $model::fill($input, $model, true);
         $result = $model->getDocumentAttribute('not_allowed_attribute');
 
         // Assertions
@@ -208,7 +208,7 @@ class HasAttributesTraitTest extends TestCase
         };
 
         // Actions
-        $model->fill(['name' => 'John', 'ignored' => null]);
+        $model = $model::fill(['name' => 'John', 'ignored' => null]);
 
         // Assertions
         $this->assertTrue(isset($model->name));

@@ -64,6 +64,25 @@ trait HasAttributesTrait
     /**
      * {@inheritdoc}
      */
+    public static function fill(array $input, HasAttributesInterface $object = null, bool $force = false): HasAttributesInterface
+    {
+        if (!$object) {
+            $object = new static();
+        }
+
+        foreach ($input as $key => $value) {
+            if ($force
+                || ((!$object->fillable || in_array($key, $object->fillable)) && !in_array($key, $object->guarded))) {
+                $object->setDocumentAttribute($key, $value);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasDocumentAttribute(string $key): bool
     {
         return !is_null($this->getDocumentAttribute($key));
@@ -104,19 +123,6 @@ trait HasAttributesTrait
                 return !is_null($value);
             }
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fill(array $input, bool $force = false)
-    {
-        foreach ($input as $key => $value) {
-            if ($force
-                || ((!$this->fillable || in_array($key, $this->fillable)) && !in_array($key, $this->guarded))) {
-                $this->setDocumentAttribute($key, $value);
-            }
-        }
     }
 
     /**
