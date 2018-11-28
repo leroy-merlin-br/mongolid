@@ -2,7 +2,7 @@
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -17,7 +17,7 @@ class ReferencesOne extends AbstractRelation
     {
         parent::__construct($parent, $model, $field);
         $this->key = $key;
-        $this->modelInstance = Ioc::make($this->model);
+        $this->modelInstance = Container::make($this->model);
     }
 
     public function attach(ModelInterface $model): void

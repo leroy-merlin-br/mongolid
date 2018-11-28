@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid\Connection;
 
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as IlluminateContainer;
 use MongoDB\Client;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 
@@ -46,12 +46,12 @@ class Manager
      * pure PHP. After adding a connection into the Manager you are ready to
      * persist and query your models.
      *
-     * @param Connection $connection connection instance to be used in database interactions
+     * @param IlluminateContainer $connection connection instance to be used in database interactions
      */
-    public function setConnection(Connection $connection): bool
+    public function setConnection(IlluminateContainer $connection): bool
     {
         $this->init();
-        $this->container->instance(Connection::class, $this->connection);
+        $this->container->instance(IlluminateContainer::class, $this->connection);
 
         $this->connection = $connection;
 
@@ -91,8 +91,8 @@ class Manager
             return;
         }
 
-        $this->container = new Container();
-        Ioc::setContainer($this->container);
+        $this->container = new IlluminateContainer();
+        Container::setContainer($this->container);
 
         static::$singleton = $this;
     }

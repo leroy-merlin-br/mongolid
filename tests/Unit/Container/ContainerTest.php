@@ -1,15 +1,15 @@
 <?php
 namespace Mongolid\Container;
 
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as IlluminateContainer;
 use Mockery as m;
 use Mongolid\TestCase;
 
-class IocTest extends TestCase
+class ContainerTest extends TestCase
 {
     protected function tearDown()
     {
-        Ioc::expects()
+        Container::expects()
             ->flush();
 
         parent::tearDown();
@@ -18,30 +18,30 @@ class IocTest extends TestCase
     public function testShouldCallMethodsProperlyWithNoArguments()
     {
         // Set
-        $container = m::mock(Container::class);
-        Ioc::setContainer($container);
+        $illuminateContainer = m::mock(IlluminateContainer::class);
+        Container::setContainer($illuminateContainer);
 
         // Expectations
-        $container->expects()
+        $illuminateContainer->expects()
             ->method()
             ->andReturn(true);
 
         // Actions
-        Ioc::method();
+        Container::method();
     }
 
     public function testShouldCallMethodsProperlyWithArguments()
     {
         // Set
-        $container = m::mock(Container::class);
-        Ioc::setContainer($container);
+        $illuminateContainer = m::mock(IlluminateContainer::class);
+        Container::setContainer($illuminateContainer);
 
         // Expectations
-        $container->expects()
+        $illuminateContainer->expects()
             ->method(1, 2, 3)
             ->andReturn(true);
 
         // Actions
-        Ioc::method(1, 2, 3);
+        Container::method(1, 2, 3);
     }
 }

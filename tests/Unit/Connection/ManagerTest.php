@@ -1,7 +1,7 @@
 <?php
 namespace Mongolid\Connection;
 
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as IlluminateContainer;
 use Mockery as m;
 use MongoDB\Client;
 use Mongolid\Event\EventTriggerInterface;
@@ -20,7 +20,7 @@ class ManagerTest extends TestCase
     {
         // Set
         $manager = new Manager();
-        $connection = m::mock(Connection::class);
+        $connection = m::mock(IlluminateContainer::class);
         $client = m::mock(Client::class);
 
         // Expectations
@@ -40,7 +40,7 @@ class ManagerTest extends TestCase
         // Set
         $test = $this;
         $manager = new Manager();
-        $container = m::mock(Container::class);
+        $container = m::mock(IlluminateContainer::class);
         $eventTrigger = m::mock(EventTriggerInterface::class);
 
         $this->setProtected($manager, 'container', $container);
@@ -67,7 +67,7 @@ class ManagerTest extends TestCase
 
         // Assertions
         $this->assertAttributeSame($manager, 'singleton', Manager::class);
-        $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
+        $this->assertAttributeInstanceOf(IlluminateContainer::class, 'container', $manager);
 
         // Actions
         $container = $manager->container;

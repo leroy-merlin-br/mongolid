@@ -9,7 +9,7 @@ use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Serializable;
 
 /**
@@ -285,7 +285,7 @@ class Cursor implements CursorInterface, Serializable
     {
         $attributes = unserialize($serialized);
 
-        $connection = Ioc::make(Connection::class);
+        $connection = Container::make(Connection::class);
         $db = $connection->defaultDatabase;
         $collectionObject = $connection->getClient()->$db->{$attributes['collection']};
 

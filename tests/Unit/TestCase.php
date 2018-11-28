@@ -1,9 +1,9 @@
 <?php
 namespace Mongolid;
 
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as IlluminateContainer;
 use Mockery as m;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -12,12 +12,12 @@ class TestCase extends PHPUnitTestCase
 {
     protected function setUp()
     {
-        Ioc::setContainer(new Container());
+        Container::setContainer(new IlluminateContainer());
     }
 
     protected function tearDown()
     {
-        Ioc::flush();
+        Container::flush();
         m::close();
         parent::tearDown();
     }
@@ -75,7 +75,7 @@ class TestCase extends PHPUnitTestCase
      */
     protected function instance($abstract, $instance)
     {
-        Ioc::bind(
+        Container::bind(
             $abstract,
             function () use ($instance) {
                 return $instance;

@@ -4,7 +4,7 @@ namespace Mongolid\Model;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
@@ -224,7 +224,7 @@ abstract class AbstractModel implements ModelInterface
      */
     public function getCollection(): Collection
     {
-        $connection = Ioc::make(Connection::class);
+        $connection = Container::make(Connection::class);
 
         $database = $connection->defaultDatabase;
         $collectionName = $this->getCollectionName();
@@ -252,7 +252,7 @@ abstract class AbstractModel implements ModelInterface
 
     public function bsonSerialize()
     {
-        return Ioc::make(ModelMapper::class)
+        return Container::make(ModelMapper::class)
             ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
@@ -288,6 +288,6 @@ abstract class AbstractModel implements ModelInterface
      */
     private function getBuilder(): Builder
     {
-        return Ioc::make(Builder::class);
+        return Container::make(Builder::class);
     }
 }

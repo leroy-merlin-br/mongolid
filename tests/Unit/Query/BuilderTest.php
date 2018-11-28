@@ -7,7 +7,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AbstractModel;
@@ -765,11 +765,11 @@ class BuilderTest extends TestCase
 
     protected function getEventService(): EventTriggerService
     {
-        if (!Ioc::has(EventTriggerService::class)) {
-            Ioc::instance(EventTriggerService::class, m::mock(EventTriggerService::class));
+        if (!Container::has(EventTriggerService::class)) {
+            Container::instance(EventTriggerService::class, m::mock(EventTriggerService::class));
         }
 
-        return Ioc::make(EventTriggerService::class);
+        return Container::make(EventTriggerService::class);
     }
 
     protected function expectEventToBeFired(string $event, ModelInterface $model, bool $halt, bool $return = true): void

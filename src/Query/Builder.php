@@ -4,7 +4,7 @@ namespace Mongolid\Query;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
@@ -329,7 +329,7 @@ class Builder
     {
         $event = "mongolid.{$event}: ".get_class($model);
 
-        $this->eventService ?: $this->eventService = Ioc::make(EventTriggerService::class);
+        $this->eventService ?: $this->eventService = Container::make(EventTriggerService::class);
 
         return $this->eventService->fire($event, $model, $halt);
     }
