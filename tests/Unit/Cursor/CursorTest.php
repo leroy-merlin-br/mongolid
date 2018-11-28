@@ -98,6 +98,25 @@ class CursorTest extends TestCase
         $this->assertSame($mode, $result);
     }
 
+    public function testShouldBeAbleToSetReadPreferenceAndCursorTimeoutTogether()
+    {
+        // Set
+        $cursor = $this->getCursor();
+        $mode = ReadPreference::RP_SECONDARY;
+
+        // Actions
+        $cursor->setReadPreference($mode);
+        $cursor->disableTimeout();
+        $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
+        $result = $readPreferenceParameter->getMode();
+        $timeoutResult = $this->getProtected($cursor, 'params')[1]['noCursorTimeout'];
+
+        // Assertions
+        $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
+        $this->assertSame($mode, $result);
+        $this->assertTrue($timeoutResult);
+    }
+
     public function testShouldCountDocuments()
     {
         // Set
