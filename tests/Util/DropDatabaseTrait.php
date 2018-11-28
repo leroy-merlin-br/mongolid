@@ -10,7 +10,7 @@ trait DropDatabaseTrait
     {
         $connection = Ioc::make(Connection::class);
 
-        $connection->getRawConnection()
+        $connection->getClient()
             ->dropDatabase($connection->defaultDatabase);
     }
 }

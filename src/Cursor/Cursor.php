@@ -287,7 +287,7 @@ class Cursor implements CursorInterface, Serializable
 
         $connection = Ioc::make(Connection::class);
         $db = $connection->defaultDatabase;
-        $collectionObject = $connection->getRawConnection()->$db->{$attributes['collection']};
+        $collectionObject = $connection->getClient()->$db->{$attributes['collection']};
 
         foreach ($attributes as $key => $value) {
             $this->$key = $value;

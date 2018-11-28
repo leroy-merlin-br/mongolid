@@ -193,7 +193,7 @@ class BuilderTest extends TestCase
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
+            ->getClient()
             ->andReturn($client);
 
         $client->expects()
@@ -280,7 +280,7 @@ class BuilderTest extends TestCase
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
+            ->getClient()
             ->andReturn($client);
 
         $client->expects()
@@ -681,21 +681,31 @@ class BuilderTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldGetRawCollection()
+    public function testShouldGetClient()
     {
         // Set
         $connection = m::mock(Connection::class);
+        $connection->defaultDatabase = 'grimory';
+
         $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
         $model = m::mock(ModelInterface::class);
 
-        $connection->defaultDatabase = 'grimory';
-        $connection->grimory = (object) ['models' => $collection];
+        $client = m::mock(Client::class);
+        $database = m::mock(Database::class);
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
-            ->andReturn($connection);
+            ->getClient()
+            ->andReturn($client);
+
+        $client->expects()
+            ->selectDatabase('grimory')
+            ->andReturn($database);
+
+        $database->expects()
+            ->selectCollection('models')
+            ->andReturn($collection);
 
         $model->expects()
             ->getCollectionName()

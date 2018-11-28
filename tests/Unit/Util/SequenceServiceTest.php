@@ -2,7 +2,9 @@
 namespace Mongolid\Util;
 
 use Mockery as m;
+use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Database;
 use Mongolid\Connection\Connection;
 use Mongolid\TestCase;
 
@@ -40,20 +42,30 @@ class SequenceServiceTest extends TestCase
         $this->assertSame($expectation, $result);
     }
 
-    public function testShouldGetRawCollection()
+    public function testShouldGetClient()
     {
         // Set
         $connection = m::mock(Connection::class);
+        $connection->defaultDatabase = 'grimory';
+
         $sequenceService = new SequenceService($connection, 'foobar');
         $collection = m::mock(Collection::class);
 
-        $connection->defaultDatabase = 'grimory';
-        $connection->grimory = (object) ['foobar' => $collection];
+        $client = m::mock(Client::class);
+        $database = m::mock(Database::class);
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
-            ->andReturnSelf($connection);
+            ->getClient()
+            ->andReturn($client);
+
+        $client->expects()
+            ->selectDatabase('grimory')
+            ->andReturn($database);
+
+        $database->expects()
+            ->selectCollection('foobar')
+            ->andReturn($collection);
 
         // Actions
         $result = $this->callProtected($sequenceService, 'rawCollection');

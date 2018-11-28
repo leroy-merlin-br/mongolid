@@ -58,7 +58,7 @@ class SequenceService
     {
         $database = $this->connection->defaultDatabase;
 
-        return $this->connection->getRawConnection()
+        return $this->connection->getClient()
             ->$database
             ->{$this->collection};
     }

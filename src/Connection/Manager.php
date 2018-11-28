@@ -2,6 +2,7 @@
 namespace Mongolid\Connection;
 
 use Illuminate\Container\Container;
+use MongoDB\Client;
 use Mongolid\Container\Ioc;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
@@ -58,15 +59,13 @@ class Manager
     }
 
     /**
-     * Get the raw MongoDB connection.
-     *
-     * @return \MongoDB\Client
+     * Get MongoDB client.
      */
-    public function getConnection()
+    public function getClient(): Client
     {
         $this->init();
 
-        return $this->connection->getRawConnection();
+        return $this->connection->getClient();
     }
 
     /**

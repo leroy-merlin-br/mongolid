@@ -131,7 +131,7 @@ class BulkWriteTest extends TestCase
         $model = m::mock(ModelInterface::class);
         $mongoBulkWrite = m::mock(new MongoBulkWrite());
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
-        $manager = m::mock(new Manager());
+        $manager = m::mock(new Manager('mongodb://localhost'));
 
         $connection->defaultDatabase = 'foo';
         $namespace = 'foo.bar';
@@ -140,7 +140,7 @@ class BulkWriteTest extends TestCase
 
         // Expectations
         $connection->expects()
-            ->getRawManager()
+            ->getManager()
             ->andReturn($manager);
 
         $model->expects()

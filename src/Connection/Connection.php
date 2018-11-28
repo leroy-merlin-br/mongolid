@@ -2,7 +2,6 @@
 namespace Mongolid\Connection;
 
 use MongoDB\Client;
-use MongoDB\Driver\Manager;
 
 /**
  * Represents a single connection with the database.
@@ -10,18 +9,18 @@ use MongoDB\Driver\Manager;
 class Connection
 {
     /**
-     * The raw MongoDB\Client object that represents this connection.
-     *
-     * @var Client
-     */
-    protected $rawConnection;
-
-    /**
      * The default database where mongolid will store the documents.
      *
      * @var string
      */
     public $defaultDatabase = 'mongolid';
+
+    /**
+     * MongoDB Client object that represents this connection.
+     *
+     * @var Client
+     */
+    protected $client;
 
     /**
      * Constructs a new Mongolid connection. It uses the same constructor
@@ -43,7 +42,25 @@ class Connection
 
         $this->findDefaultDatabase($server);
 
-        $this->rawConnection = new Client($server, $options, $driverOptions);
+        $this->client = new Client($server, $options, $driverOptions);
+    }
+
+    /**
+     * Getter for Client instance.
+     */
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * Getter for Manager instance.
+     *
+     * @return \MongoDB\Driver\Manager
+     */
+    public function getManager()
+    {
+        return $this->getClient()->getManager();
     }
 
     /**
@@ -58,25 +75,5 @@ class Connection
         if ($matches[1] ?? null) {
             $this->defaultDatabase = $matches[1];
         }
-    }
-
-    /**
-     * Getter for Client instance.
-     *
-     * @return Client
-     */
-    public function getRawConnection()
-    {
-        return $this->rawConnection;
-    }
-
-    /**
-     * Getter for Manager instance.
-     *
-     * @return Manager
-     */
-    public function getRawManager()
-    {
-        return $this->getRawConnection()->getManager();
     }
 }

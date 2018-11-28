@@ -21,18 +21,18 @@ class ManagerTest extends TestCase
         // Set
         $manager = new Manager();
         $connection = m::mock(Connection::class);
-        $rawConnection = m::mock(Client::class);
+        $client = m::mock(Client::class);
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
-            ->andReturn($rawConnection);
+            ->getClient()
+            ->andReturn($client);
 
         // Actions
         $manager->setConnection($connection);
 
         // Assertions
-        $this->assertSame($rawConnection, $manager->getConnection());
+        $this->assertSame($client, $manager->getClient());
     }
 
     public function testShouldSetEventTrigger()

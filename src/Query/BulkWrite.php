@@ -100,7 +100,7 @@ class BulkWrite
     public function execute(int $writeConcern = 1)
     {
         $connection = Ioc::make(Connection::class);
-        $manager = $connection->getRawManager();
+        $manager = $connection->getManager();
 
         $namespace = $connection->defaultDatabase.'.'.$this->model->getCollectionName();
 

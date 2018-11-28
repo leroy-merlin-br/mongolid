@@ -18,7 +18,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection($server, $options, $driverOptions);
 
         // Assertions
-        $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
+        $this->assertAttributeInstanceOf(Client::class, 'client', $connection);
         $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
     }
 
@@ -33,11 +33,11 @@ class ConnectionTest extends TestCase
         $connection = new Connection($server, $options, $driverOptions);
 
         // Assertions
-        $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
+        $this->assertAttributeInstanceOf(Client::class, 'client', $connection);
         $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
     }
 
-    public function testShouldGetRawConnection()
+    public function testShouldGetConnection()
     {
         // Set
         $server = 'mongodb://my-server/my_db';
@@ -53,14 +53,14 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
-        $rawConnection = $connection->getRawConnection();
+        $client = $connection->getClient();
 
         // Assertions
-        $this->assertAttributeSame($expectedParameters['uri'], 'uri', $rawConnection);
-        $this->assertAttributeSame($expectedParameters['typeMap'], 'typeMap', $rawConnection);
+        $this->assertAttributeSame($expectedParameters['uri'], 'uri', $client);
+        $this->assertAttributeSame($expectedParameters['typeMap'], 'typeMap', $client);
     }
 
-    public function testShouldGetRawManager()
+    public function testShouldGetManager()
     {
         // Set
         $server = 'mongodb://my-server/my_db';
@@ -69,9 +69,9 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
-        $rawManager = $connection->getRawManager();
+        $manager = $connection->getManager();
 
         // Assertions
-        $this->assertInstanceOf(Manager::class, $rawManager);
+        $this->assertInstanceOf(Manager::class, $manager);
     }
 }

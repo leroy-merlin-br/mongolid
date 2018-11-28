@@ -21,7 +21,7 @@ class EmbeddedUser extends AbstractModel
     public function collection(): Collection
     {
         $connection = Ioc::make(Connection::class);
-        $client = $connection->getRawConnection();
+        $client = $connection->getClient();
 
         return $client->{$connection->defaultDatabase}->{$this->collection};
     }

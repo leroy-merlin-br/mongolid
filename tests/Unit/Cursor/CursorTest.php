@@ -6,7 +6,9 @@ use ArrayObject;
 use Exception;
 use Iterator;
 use Mockery as m;
+use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Database;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
@@ -447,14 +449,22 @@ class CursorTest extends TestCase
 
         $this->setProtected($cursor, 'collection', $driverCollection);
 
+        $client = m::mock(Client::class);
+        $database = m::mock(Database::class);
         $connection->defaultDatabase = 'db';
-        $connection->db = $connection;
-        $connection->my_collection = $driverCollection; // Return the same driver Collection
 
         // Expectations
         $connection->expects()
-            ->getRawConnection()
-            ->andReturn($connection);
+            ->getClient()
+            ->andReturn($client);
+
+        $client->expects()
+            ->selectDatabase('db')
+            ->andReturn($database);
+
+        $database->expects()
+            ->selectCollection('my_collection')
+            ->andReturn($driverCollection);
 
         // Actions
         $result = unserialize(serialize($cursor));

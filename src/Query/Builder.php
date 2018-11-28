@@ -270,7 +270,7 @@ class Builder
         $database = $connection->defaultDatabase;
         $collection = $model->getCollectionName();
 
-        return $connection->getRawConnection()->$database->$collection;
+        return $connection->getClient()->$database->$collection;
     }
 
     /**
