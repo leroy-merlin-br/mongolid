@@ -31,9 +31,9 @@ class BulkWrite
         $this->model = $model;
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return count($this->operations);
+        return !$this->operations;
     }
 
     /**
@@ -70,9 +70,13 @@ class BulkWrite
     {
         $collection = $this->model->getCollection();
 
-        return $collection->bulkWrite(
+        $result = $collection->bulkWrite(
             $this->operations,
             ['writeConcern' => new WriteConcern($writeConcern)]
         );
+
+        $this->operations = [];
+
+        return $result;
     }
 }

@@ -16,6 +16,8 @@ class BulkWriteTest extends IntegrationTestCase
 
         $bulkWrite = new BulkWrite(new ReferencedUser());
 
+        $this->assertTrue($bulkWrite->isEmpty());
+
         $bulkWrite->updateOne(
             ['_id' => $bob->_id],
             ['name' => 'Bulk Updated Bob!']
@@ -47,6 +49,8 @@ class BulkWriteTest extends IntegrationTestCase
             '$unset'
         );
 
+        $this->assertFalse($bulkWrite->isEmpty());
+
         // Before running
         $this->assertSame('Bob', $bob->name);
         $this->assertSame('John', $john->name);
@@ -58,6 +62,8 @@ class BulkWriteTest extends IntegrationTestCase
 
         // Runs it
         $result = $bulkWrite->execute();
+
+        $this->assertTrue($bulkWrite->isEmpty());
 
         $this->assertInstanceOf(BulkWriteResult::class, $result);
         $this->assertTrue($result->isAcknowledged());
