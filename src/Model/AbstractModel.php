@@ -1,7 +1,9 @@
 <?php
 namespace Mongolid\Model;
 
+use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
@@ -215,6 +217,19 @@ abstract class AbstractModel implements ModelInterface
         }
 
         return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollection(): Collection
+    {
+        $connection = Ioc::make(Connection::class);
+
+        $database = $connection->defaultDatabase;
+        $collectionName = $this->getCollectionName();
+
+        return $connection->getClient()->$database->$collectionName;
     }
 
     /**

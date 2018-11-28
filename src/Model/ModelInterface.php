@@ -2,6 +2,7 @@
 namespace Mongolid\Model;
 
 use MongoDB\BSON\Persistable;
+use MongoDB\Collection;
 use Mongolid\Cursor\CursorInterface;
 
 /**
@@ -69,6 +70,13 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      * @throws \Mongolid\Model\Exception\NoCollectionNameException
      */
     public function getCollectionName(): string;
+
+    /**
+     * Retrieve MongoDB's collection.
+     *
+     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     */
+    public function getCollection(): Collection;
 
     /**
      * Getter for $writeConcern attribute.

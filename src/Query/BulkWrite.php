@@ -4,8 +4,6 @@ namespace Mongolid\Query;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BulkWriteResult;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Connection\Connection;
-use Mongolid\Container\Ioc;
 use Mongolid\Model\ModelInterface;
 
 /**
@@ -70,12 +68,7 @@ class BulkWrite
      */
     public function execute(int $writeConcern = 1): BulkWriteResult
     {
-        $connection = Ioc::make(Connection::class);
-
-        $database = $connection->defaultDatabase;
-        $collectionName = $this->model->getCollectionName();
-
-        $collection = $connection->getClient()->$database->$collectionName;
+        $collection = $this->model->getCollection();
 
         return $collection->bulkWrite(
             $this->operations,

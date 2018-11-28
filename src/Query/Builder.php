@@ -3,7 +3,6 @@ namespace Mongolid\Query;
 
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
-use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\Cursor;
@@ -59,7 +58,7 @@ class Builder
 
         $model->bsonSerialize();
 
-        $queryResult = $this->getCollection($model)->replaceOne(
+        $queryResult = $model->getCollection()->replaceOne(
             ['_id' => $model->_id],
             $model,
             $this->mergeOptions($options, ['upsert' => true])
@@ -95,7 +94,7 @@ class Builder
             return false;
         }
 
-        $queryResult = $this->getCollection($model)->insertOne(
+        $queryResult = $model->getCollection()->insertOne(
             $model,
             $this->mergeOptions($options)
         );
@@ -142,7 +141,7 @@ class Builder
 
         $updateData = $this->getUpdateData($model, $model->bsonSerialize());
 
-        $queryResult = $this->getCollection($model)->updateOne(
+        $queryResult = $model->getCollection()->updateOne(
             ['_id' => $model->_id],
             $updateData,
             $this->mergeOptions($options)
@@ -174,7 +173,7 @@ class Builder
             return false;
         }
 
-        $queryResult = $this->getCollection($model)->deleteOne(
+        $queryResult = $model->getCollection()->deleteOne(
             ['_id' => $model->_id],
             $this->mergeOptions($options)
         );
@@ -200,7 +199,7 @@ class Builder
     public function where(ModelInterface $model, $query = [], array $projection = []): CursorInterface
     {
         return new Cursor(
-            $this->getCollection($model),
+            $model->getCollection(),
             'find',
             [
                 $this->prepareValueQuery($query),
@@ -234,7 +233,7 @@ class Builder
             return null;
         }
 
-        return $this->getCollection($model)->findOne(
+        return $model->getCollection()->findOne(
             $this->prepareValueQuery($query),
             ['projection' => $this->prepareProjection($projection)]
         );
@@ -259,18 +258,6 @@ class Builder
         }
 
         throw (new ModelNotFoundException())->setModel(get_class($model));
-    }
-
-    /**
-     * Retrieves the Collection object.
-     */
-    protected function getCollection(ModelInterface $model): Collection
-    {
-        $connection = $this->connection;
-        $database = $connection->defaultDatabase;
-        $collection = $model->getCollectionName();
-
-        return $connection->getClient()->$database->$collection;
     }
 
     /**

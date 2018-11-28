@@ -4,9 +4,7 @@ namespace Mongolid\Query;
 use InvalidArgumentException;
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
-use MongoDB\Client;
 use MongoDB\Collection;
-use MongoDB\Database;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
@@ -16,6 +14,7 @@ use Mongolid\Model\AbstractModel;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\ReplaceCollectionModel;
 
 class BuilderTest extends TestCase
 {
@@ -34,22 +33,19 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldSave($model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldSave(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
 
-        // Expectations
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
+        $model->setCollection($collection);
 
+        // Expectations
         $collection->expects()
             ->replaceOne(
                 ['_id' => 123],
@@ -87,24 +83,20 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsert($model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsert(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
 
+        $model->setCollection($collection);
         $model->_id = null;
 
         // Expectations
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
-
         $collection->expects()
             ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
@@ -135,24 +127,20 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsertWithoutFiringEvents($model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsertWithoutFiringEvents(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
 
+        $model->setCollection($collection);
         $model->_id = null;
 
         // Expectations
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
-
         $collection->expects()
             ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
@@ -178,12 +166,10 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldUpdate($model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldUpdate(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
-        $client = m::mock(Client::class);
-        $database = m::mock(Database::class);
         $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
@@ -191,19 +177,9 @@ class BuilderTest extends TestCase
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
+        $model->setCollection($collection);
+
         // Expectations
-        $connection->expects()
-            ->getClient()
-            ->andReturn($client);
-
-        $client->expects()
-            ->selectDatabase('mongolid')
-            ->andReturn($database);
-
-        $database->expects()
-            ->selectCollection('models')
-            ->andReturn($collection);
-
         $collection->expects()
             ->updateOne(
                 ['_id' => 123],
@@ -238,17 +214,10 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $client = m::mock(Client::class);
-        $database = m::mock(Database::class);
         $builder = new Builder($connection);
 
-        $model = new class extends AbstractModel
+        $model = new class() extends ReplaceCollectionModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            protected $collection = 'models';
-
             /**
              * {@inheritdoc}
              */
@@ -261,15 +230,11 @@ class BuilderTest extends TestCase
              * {@inheritdoc}
              */
             protected $dynamic = false;
-
-            /**
-             * {@inheritdoc}
-             */
-            protected $timestamps = false;
         };
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
+        $model->setCollection($collection);
 
         $model->unchanged = 'unchanged';
         $model->notOnFillable = 'to be deleted';
@@ -279,18 +244,6 @@ class BuilderTest extends TestCase
         unset($model->name);
 
         // Expectations
-        $connection->expects()
-            ->getClient()
-            ->andReturn($client);
-
-        $client->expects()
-            ->selectDatabase('mongolid')
-            ->andReturn($database);
-
-        $database->expects()
-            ->selectCollection('models')
-            ->andReturn($collection);
-
         $collection->expects()
             ->updateOne(
                 ['_id' => 123],
@@ -321,28 +274,23 @@ class BuilderTest extends TestCase
      * @dataProvider getWriteConcernVariations
      */
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
-        $model,
+        ReplaceCollectionModel $model,
         $writeConcern,
         $shouldFireEventAfter,
         $expected
     ) {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
+        $model->setCollection($collection);
         $model->_id = null;
 
         // Actions
-        $builder->shouldAllowMockingProtectedMethods();
-
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
-
         $collection->expects()
             ->insertOne(
                 $model,
@@ -378,22 +326,19 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldDelete($model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldDelete(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
-        // Expectations
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
+        $model->setCollection($collection);
 
+        // Expectations
         $collection->expects()
             ->deleteOne(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
@@ -459,24 +404,20 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
 
-        $model = m::mock(ModelInterface::class);
         $collection = m::mock(Collection::class);
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
-
-        $builder->shouldAllowMockingProtectedMethods();
 
         // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
-
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
 
         // Actions
         $result = $builder->where($model, $query, $projection);
@@ -516,37 +457,28 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-        $object = new class extends AbstractModel
-        {
-            /**
-             * {@inheritdoc}
-             */
-            protected $collection = 'models';
-        };
-        $builder->shouldAllowMockingProtectedMethods();
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
 
         // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $builder->expects()
-            ->getCollection($object)
-            ->andReturn($collection);
-
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
-            ->andReturn($object);
+            ->andReturn($model);
 
         // Actions
-        $result = $builder->first($object, $query);
+        $result = $builder->first($model, $query);
 
         // Assertions
-        $this->assertSame($object, $result);
+        $this->assertSame($model, $result);
     }
 
     public function testFirstWithNullShouldNotHitTheDatabase()
@@ -566,34 +498,28 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-        $object = new class extends AbstractModel
-        {
-        };
-
-        $builder->shouldAllowMockingProtectedMethods();
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
 
         // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
 
-        $builder->expects()
-            ->getCollection($object)
-            ->andReturn($collection);
-
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
-            ->andReturn($object);
+            ->andReturn($model);
 
         // Actions
-        $result = $builder->firstOrFail($object, $query);
+        $result = $builder->firstOrFail($model, $query);
 
         // Assertions
-        $this->assertSame($object, $result);
+        $this->assertSame($model, $result);
     }
 
     public function testFirstOrFailWithNullShouldFail()
@@ -617,22 +543,18 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery,getCollection]', [$connection]);
-        $model = m::mock(ModelInterface::class);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
-
-        $builder->shouldAllowMockingProtectedMethods();
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
 
         // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
-
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => []])
@@ -649,26 +571,20 @@ class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(
-            Builder::class.'[prepareValueQuery,getCollection]',
-            [$connection]
-        );
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
         $builder->shouldAllowMockingProtectedMethods();
-        $model = m::mock(ModelInterface::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false, '__pclass' => true];
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
 
         // Expectations
         $builder->expects()
             ->prepareValueQuery($query)
             ->andReturn($preparedQuery);
-
-        $builder->expects()
-            ->getCollection($model)
-            ->andReturn($collection);
 
         $collection->expects()
             ->findOne($preparedQuery, ['projection' => $projection])
@@ -679,43 +595,6 @@ class BuilderTest extends TestCase
 
         // Assertions
         $this->assertNull($result);
-    }
-
-    public function testShouldGetClient()
-    {
-        // Set
-        $connection = m::mock(Connection::class);
-        $connection->defaultDatabase = 'grimory';
-
-        $builder = new Builder($connection);
-        $collection = m::mock(Collection::class);
-        $model = m::mock(ModelInterface::class);
-
-        $client = m::mock(Client::class);
-        $database = m::mock(Database::class);
-
-        // Expectations
-        $connection->expects()
-            ->getClient()
-            ->andReturn($client);
-
-        $client->expects()
-            ->selectDatabase('grimory')
-            ->andReturn($database);
-
-        $database->expects()
-            ->selectCollection('models')
-            ->andReturn($collection);
-
-        $model->expects()
-            ->getCollectionName()
-            ->andReturn('models');
-
-        // Actions
-        $result = $this->callProtected($builder, 'getCollection', [$model]);
-
-        // Assertions
-        $this->assertSame($collection, $result);
     }
 
     /**
@@ -830,32 +709,8 @@ class BuilderTest extends TestCase
 
     public function getWriteConcernVariations(): array
     {
-        $model = new class extends AbstractModel
-        {
-            /**
-             * {@inheritdoc}
-             */
-            protected $timestamps = false;
-
-            /**
-             * {@inheritdoc}
-             */
-            protected $collection = 'models';
-        };
-
-        $model2 = new class extends AbstractModel
-        {
-            /**
-             * {@inheritdoc}
-             */
-            protected $timestamps = false;
-
-            /**
-             * {@inheritdoc}
-             */
-            protected $collection = 'models';
-        };
-
+        $model = new ReplaceCollectionModel();
+        $model2 = new ReplaceCollectionModel();
         $model->_id = 123;
         $model2->_id = 123;
 
