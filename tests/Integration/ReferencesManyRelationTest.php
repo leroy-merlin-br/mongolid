@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Tests\Integration\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class ReferencesManyRelationTest extends IntegrationTestCase
 {

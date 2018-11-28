@@ -1,12 +1,12 @@
 <?php
-namespace Mongolid\Tests\Integration\Stubs;
+namespace Mongolid\Tests\Stubs;
 
 use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\AbstractModel;
 
-class ReferencedUser extends AbstractModel
+class EmbeddedUser extends AbstractModel
 {
     /**
      * @var string
@@ -16,7 +16,7 @@ class ReferencedUser extends AbstractModel
     /**
      * @var bool
      */
-    protected $timestamps = false;
+    protected $timestamps = true;
 
     public function collection(): Collection
     {
@@ -28,26 +28,26 @@ class ReferencedUser extends AbstractModel
 
     public function parent()
     {
-        return $this->referencesOne(ReferencedUser::class);
+        return $this->embedsOne(EmbeddedUser::class);
     }
 
     public function siblings()
     {
-        return $this->referencesMany(ReferencedUser::class);
+        return $this->embedsMany(EmbeddedUser::class);
     }
 
     public function son()
     {
-        return $this->referencesOne(ReferencedUser::class, 'arbitrary_field', 'code');
+        return $this->embedsOne(EmbeddedUser::class, 'arbitrary_field');
     }
 
     public function grandsons()
     {
-        return $this->referencesMany(ReferencedUser::class, null, 'code');
+        return $this->embedsMany(EmbeddedUser::class, 'other_arbitrary_field');
     }
 
-    public function invalid()
+    public function sameName()
     {
-        return 'I am not a relation!';
+        $this->embedsOne(EmbeddedUser::class, 'sameName');
     }
 }

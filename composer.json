@@ -38,8 +38,7 @@
     "autoload-dev": {
         "psr-4": {
             "Mongolid\\": "tests/Unit",
-            "Mongolid\\Tests\\Integration\\": "tests/Integration",
-            "Mongolid\\Tests\\Util\\": "tests/Util"
+            "Mongolid\\Tests\\": "tests"
         }
     },
     "extra": {

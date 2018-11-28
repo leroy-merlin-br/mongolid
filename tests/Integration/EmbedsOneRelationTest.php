@@ -4,7 +4,7 @@ namespace Mongolid\Tests\Integration;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Model\Exception\InvalidFieldNameException;
-use Mongolid\Tests\Integration\Stubs\EmbeddedUser;
+use Mongolid\Tests\Stubs\EmbeddedUser;
 
 class EmbedsOneRelationTest extends IntegrationTestCase
 {
