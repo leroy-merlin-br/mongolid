@@ -3,31 +3,20 @@ namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Ioc;
-use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesMany extends AbstractRelation
 {
     /**
-     * @var HasAttributesInterface
+     * @var ModelInterface
      */
     protected $modelInstance;
 
-    /**
-     * @var string
-     */
-    protected $key;
-
-    public function __construct(
-        HasAttributesInterface $parent,
-        string $model,
-        string $field,
-        string $key
-    ) {
+    public function __construct(ModelInterface $parent, string $model, string $field, string $key)
+    {
         parent::__construct($parent, $model, $field);
         $this->key = $key;
-        $this->documentEmbedder->setKey($key);
         $this->modelInstance = Ioc::make($this->model);
     }
 
@@ -37,7 +26,17 @@ class ReferencesMany extends AbstractRelation
      */
     public function attach(ModelInterface $model): void
     {
-        $this->documentEmbedder->attach($this->parent, $this->field, $model);
+        $referencedKey = $this->getKey($model);
+        $fieldValue = (array) $this->parent->{$this->field};
+
+        foreach ($fieldValue as $key) {
+            if ($key == $referencedKey) {
+                return;
+            }
+        }
+
+        $fieldValue[] = $referencedKey;
+        $this->parent->{$this->field} = array_values($fieldValue);
         $this->pristine = false;
     }
 
@@ -69,8 +68,16 @@ class ReferencesMany extends AbstractRelation
      */
     public function detach(ModelInterface $model): void
     {
-        $this->documentEmbedder->detach($this->parent, $this->field, $model);
-        $this->pristine = false;
+        $referencedKey = $this->getKey($model);
+
+        foreach ((array) $this->parent->{$this->field} as $arrayKey => $documentKey) {
+            if ($documentKey == $referencedKey) {
+                unset($this->parent->{$this->field}[$arrayKey]);
+                $this->parent->{$this->field} = array_values((array) $this->parent->{$this->field});
+                $this->pristine = false;
+                return;
+            }
+        }
     }
 
     /**

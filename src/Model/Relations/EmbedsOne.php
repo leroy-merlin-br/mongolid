@@ -3,17 +3,18 @@ namespace Mongolid\Model\Relations;
 
 use Mongolid\Model\ModelInterface;
 
-class EmbedsOne extends EmbedsMany
+class EmbedsOne extends AbstractRelation
 {
     public function add(ModelInterface $model): void
     {
-        $this->removeAll();
-        parent::add($model);
+        $this->parent->{$this->field} = $model;
+        $this->pristine = false;
     }
 
-    public function remove(ModelInterface $model = null): void
+    public function remove(): void
     {
-        $this->removeAll();
+        unset($this->parent->{$this->field});
+        $this->pristine = false;
     }
 
     /**
@@ -21,12 +22,6 @@ class EmbedsOne extends EmbedsMany
      */
     public function get()
     {
-        $items = $this->parent->{$this->field} ?? [];
-
-        if (is_object($items)) {
-            return $items;
-        }
-
-        return $this->createCursor($items)->first();
+        return $this->parent->{$this->field};
     }
 }

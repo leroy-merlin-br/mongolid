@@ -12,7 +12,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 class HasRelationsTraitTest extends TestCase
 {
     /**
-     * @dataProvider referenceScenarios
+     * @dataProvider referencesOneScenarios
      */
     public function testShouldReferenceOne($fieldValue, $expectedQuery)
     {
@@ -21,7 +21,6 @@ class HasRelationsTraitTest extends TestCase
         $model->parent_id = $fieldValue;
 
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
-        $expectedQuery = $expectedQuery['referencesOne'];
         $expected = new ReferencedUser();
 
         // Expectations
@@ -36,8 +35,28 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testShouldNotPerformQueryForNullReference()
+    {
+        // Set
+        $model = new ReferencedUser();
+
+        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
+
+        // Expectations
+        $builder->expects()
+            ->first()
+            ->withAnyArgs()
+            ->never();
+
+        // Actions
+        $result = $model->parent;
+
+        // Assertions
+        $this->assertNull($result);
+    }
+
     /**
-     * @dataProvider referenceScenarios
+     * @dataProvider referencesManyScenarios
      */
     public function testShouldReferenceMany($fieldValue, $expectedQuery)
     {
@@ -46,7 +65,6 @@ class HasRelationsTraitTest extends TestCase
         $model->siblings_ids = $fieldValue;
 
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
-        $expectedQuery = $expectedQuery['referencesMany'];
         $expected = new EmbeddedCursor([]);
 
         // Expectations
@@ -61,35 +79,60 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider embedsScenarios
-     */
-    public function testShouldEmbedsOne($fieldValue, $expectedItems)
+    public function testShouldEmbedOne()
     {
         // Set
         $model = new EmbeddedUser();
-        $model->embedded_parent = $fieldValue;
 
-        $expectedItems = $expectedItems['embedsOne'];
+        $embeddedModel = new EmbeddedUser();
+        $embeddedModel->_id = 12345;
+        $embeddedModel->name = 'John';
+        $embeddedModel->syncOriginalDocumentAttributes();
+
+        $model->embedded_parent = $embeddedModel;
 
         // Actions
         $result = $model->parent;
 
         // Assertions
         $this->assertInstanceOf(EmbeddedUser::class, $result);
-        $this->assertSame($expectedItems, $result);
+        $this->assertSame($embeddedModel, $result);
+    }
+
+    public function testEmbedOneShouldAllowOnlyOneEmbeddedModel()
+    {
+        // Set
+        $model = new EmbeddedUser();
+
+        $oldEmbeddedModel = new EmbeddedUser();
+        $oldEmbeddedModel->_id = 12345;
+        $oldEmbeddedModel->name = 'John';
+        $oldEmbeddedModel->syncOriginalDocumentAttributes();
+
+        $newEmbeddedModel = new EmbeddedUser();
+        $newEmbeddedModel->_id = 54321;
+        $newEmbeddedModel->name = 'Bob';
+        $newEmbeddedModel->syncOriginalDocumentAttributes();
+
+        $model->embedded_parent = $oldEmbeddedModel;
+
+        // Actions
+        $model->parent()->add($newEmbeddedModel);
+        $result = $model->parent;
+
+        // Assertions
+        $this->assertInstanceOf(EmbeddedUser::class, $result);
+        $this->assertSame($newEmbeddedModel, $result);
     }
 
     /**
-     * @dataProvider embedsScenarios
+     * @dataProvider embedsManyScenarios
      */
-    public function testShouldEmbedsMany($fieldValue, $expectedItems)
+    public function testShouldEmbedMany($fieldValue, $expectedItems)
     {
         // Set
         $model = new EmbeddedUser();
         $model->embedded_siblings = $fieldValue;
-
-        $expectedItems = $expectedItems['embedsMany'];
 
         // Actions
         $result = $model->siblings;
@@ -100,40 +143,46 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($expectedItems, $result->all());
     }
 
-    public function referenceScenarios(): array
+    public function referencesOneScenarios(): array
     {
         return [
             'referenced by string id' => [
                 'fieldValue' => 'abc123',
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => 'abc123'],
-                    'referencesMany' => ['_id' => ['$in' => ['abc123']]],
-                ],
+                'expectedQuery' => ['_id' => 'abc123'],
             ],
             'referenced by objectId represented as string' => [
                 'fieldValue' => '577afb0b4d3cec136058fa82',
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
-                ],
+                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
             ],
             'referenced by an objectId itself' => [
                 'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
-                ],
+                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+            ],
+        ];
+    }
+
+    public function referencesManyScenarios(): array
+    {
+        return [
+            'referenced by string id' => [
+                'fieldValue' => 'abc123',
+                'expectedQuery' => ['_id' => ['$in' => ['abc123']]],
+            ],
+            'referenced by objectId represented as string' => [
+                'fieldValue' => '577afb0b4d3cec136058fa82',
+                'expectedQuery' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
+            ],
+            'referenced by an objectId itself' => [
+                'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
+                'expectedQuery' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
             ],
             'series of objectIds' => [
                 'fieldValue' => [new ObjectId('577afb0b4d3cec136058fa82'), new ObjectId('577afb7e4d3cec136258fa83')],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => [
-                        '_id' => [
-                            '$in' => [
-                                new ObjectId('577afb0b4d3cec136058fa82'),
-                                new ObjectId('577afb7e4d3cec136258fa83'),
-                            ],
+                    '_id' => [
+                        '$in' => [
+                            new ObjectId('577afb0b4d3cec136058fa82'),
+                            new ObjectId('577afb7e4d3cec136258fa83'),
                         ],
                     ],
                 ],
@@ -141,28 +190,22 @@ class HasRelationsTraitTest extends TestCase
             'series of objectIds as strings' => [
                 'fieldValue' => ['577afb0b4d3cec136058fa82', '577afb7e4d3cec136258fa83'],
                 'expectedQuery' => [
-                    'referencesOne' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
-                    'referencesMany' => [
-                        '_id' => [
-                            '$in' => [
-                                new ObjectId('577afb0b4d3cec136058fa82'),
-                                new ObjectId('577afb7e4d3cec136258fa83'),
-                            ],
+                    '_id' => [
+                        '$in' => [
+                            new ObjectId('577afb0b4d3cec136058fa82'),
+                            new ObjectId('577afb7e4d3cec136258fa83'),
                         ],
                     ],
                 ],
             ],
             'Model referenced with null' => [
                 'fieldValue' => null,
-                'expectedQuery' => [
-                    'referencesOne' => ['_id' => null],
-                    'referencesMany' => ['_id' => ['$in' => []]],
-                ],
+                'expectedQuery' => ['_id' => ['$in' => []]],
             ],
         ];
     }
 
-    public function embedsScenarios(): array
+    public function embedsManyScenarios(): array
     {
         $model1 = new EmbeddedUser();
         $model1->_id = 12345;
@@ -177,17 +220,11 @@ class HasRelationsTraitTest extends TestCase
         return [
             'A single embedded document' => [
                 'fieldValue' => $model1,
-                'expectedItems' => [
-                    'embedsOne' => $model1,
-                    'embedsMany' => [$model1],
-                ],
+                'expectedItems' => [$model1],
             ],
             'Many embedded documents' => [
                 'fieldValue' => [$model1, $model2],
-                'expectedItems' => [
-                    'embedsOne' => $model1,
-                    'embedsMany' => [$model1, $model2],
-                ],
+                'expectedItems' => [$model1, $model2],
             ],
         ];
     }

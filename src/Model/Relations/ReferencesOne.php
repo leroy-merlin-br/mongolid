@@ -2,32 +2,44 @@
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Container\Ioc;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
-class ReferencesOne extends ReferencesMany
+class ReferencesOne extends AbstractRelation
 {
-    public function attach(ModelInterface $model): void
+    /**
+     * @var ModelInterface
+     */
+    protected $modelInstance;
+
+    public function __construct(ModelInterface $parent, string $model, string $field, string $key)
     {
-        $this->detachAll();
-        parent::attach($model);
+        parent::__construct($parent, $model, $field);
+        $this->key = $key;
+        $this->modelInstance = Ioc::make($this->model);
     }
 
-    public function detach(ModelInterface $model = null): void
+    public function attach(ModelInterface $model): void
     {
-        $this->detachAll();
+        $this->parent->{$this->field} = $this->getKey($model);
+        $this->pristine = false;
+    }
+
+    public function detach(): void
+    {
+        unset($this->parent->{$this->field});
+        $this->pristine = false;
     }
 
     public function get()
     {
-        $referencedKey = $this->parent->{$this->field};
-
-        if (is_array($referencedKey) && isset($referencedKey[0])) {
-            $referencedKey = $referencedKey[0];
+        if (!$referencedKey = $this->parent->{$this->field}) {
+            return null;
         }
 
-        if (ObjectIdUtils::isObjectId($referencedKey)) {
-            $referencedKey = new ObjectId((string) $referencedKey);
+        if (is_string($referencedKey) && ObjectIdUtils::isObjectId($referencedKey)) {
+            $referencedKey = new ObjectId($referencedKey);
         }
 
         return $this->modelInstance->first([$this->key => $referencedKey]);

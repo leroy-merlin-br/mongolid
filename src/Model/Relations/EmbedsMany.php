@@ -12,7 +12,11 @@ class EmbedsMany extends AbstractRelation
      */
     public function add(ModelInterface $model): void
     {
-        $this->documentEmbedder->embed($this->parent, $this->field, $model);
+        $this->remove($model);
+
+        $fieldValue = $this->parent->{$this->field};
+        $fieldValue[] = $model;
+        $this->parent->{$this->field} = array_values($fieldValue);
         $this->pristine = false;
     }
 
@@ -47,7 +51,15 @@ class EmbedsMany extends AbstractRelation
      */
     public function remove(ModelInterface $model): void
     {
-        $this->documentEmbedder->unembed($this->parent, $this->field, $model);
+        $embeddedKey = $this->getKey($model);
+
+        foreach ((array) $this->parent->{$this->field} as $arrayKey => $document) {
+            if ($embeddedKey == $this->getKey($document)) {
+                unset($this->parent->{$this->field}[$arrayKey]);
+            }
+        }
+
+        $this->parent->{$this->field} = array_values((array) $this->parent->{$this->field});
         $this->pristine = false;
     }
 
@@ -68,11 +80,6 @@ class EmbedsMany extends AbstractRelation
             $items = [$items];
         }
 
-        return $this->createCursor($items);
-    }
-
-    protected function createCursor(array $items): EmbeddedCursor
-    {
         return new EmbeddedCursor($items);
     }
 }

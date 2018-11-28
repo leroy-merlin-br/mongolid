@@ -1,13 +1,13 @@
 <?php
 namespace Mongolid\Model\Relations;
 
-use Mongolid\Container\Ioc;
-use Mongolid\Model\HasAttributesInterface;
+use MongoDB\BSON\ObjectId;
+use Mongolid\Model\ModelInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
     /**
-     * @var HasAttributesInterface
+     * @var ModelInterface
      */
     protected $parent;
 
@@ -22,11 +22,6 @@ abstract class AbstractRelation implements RelationInterface
     protected $field;
 
     /**
-     * @var DocumentEmbedder
-     */
-    protected $documentEmbedder;
-
-    /**
      * @var bool
      */
     protected $pristine = false;
@@ -38,13 +33,16 @@ abstract class AbstractRelation implements RelationInterface
      */
     protected $results;
 
-    public function __construct(HasAttributesInterface $parent, string $model, string $field)
+    /**
+     * @var string
+     */
+    protected $key = '_id';
+
+    public function __construct(ModelInterface $parent, string $model, string $field)
     {
         $this->parent = $parent;
         $this->model = $model;
         $this->field = $field;
-
-        $this->documentEmbedder = Ioc::make(DocumentEmbedder::class);
     }
 
     /**
@@ -72,5 +70,22 @@ abstract class AbstractRelation implements RelationInterface
     protected function pristine(): bool
     {
         return $this->pristine;
+    }
+
+    /**
+     * Gets the key of the given model. If there is no key,
+     * a new key will be generated and set on the model (while still returning it).
+     *
+     * @param ModelInterface $model the object that the key will be retrieved from
+     *
+     * @return ObjectId|mixed
+     */
+    protected function getKey(ModelInterface $model)
+    {
+        if (!$model->{$this->key}) {
+            $model->{$this->key} = new ObjectId();
+        }
+
+        return $model->{$this->key};
     }
 }
