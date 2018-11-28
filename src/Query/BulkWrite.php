@@ -2,7 +2,7 @@
 namespace Mongolid\Query;
 
 use MongoDB\BSON\ObjectId;
-use MongoDB\Driver\BulkWrite as MongoBulkWrite;
+use MongoDB\BulkWriteResult;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
@@ -12,55 +12,30 @@ use Mongolid\Model\ModelInterface;
  * This class is meant to provide a better API for handling
  * with bulk operations.
  *
- * It's an incomplete and highly opinionated abstraction
- * but yet flexible, since you are able to access the
- * driver's API.
+ * It's an incomplete and highly opinionated abstraction.
  */
 class BulkWrite
 {
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * @var MongoBulkWrite
-     */
-    protected $bulkWrite;
-
     /**
      * @var ModelInterface
      */
     private $model;
 
+    /**
+     * Hold bulk write operations to run.
+     *
+     * @var array
+     */
+    private $operations = [];
+
     public function __construct(ModelInterface $model)
     {
-        $this->setBulkWrite(new MongoBulkWrite(['ordered' => false]));
         $this->model = $model;
     }
 
-    /**
-     * Get the BulkWrite object to perform other operations
-     * not covered by this class.
-     *
-     * @return MongoBulkWrite
-     */
-    public function getBulkWrite()
+    public function isEmpty()
     {
-        return $this->bulkWrite;
-    }
-
-    /**
-     * Set BulkWrite object that will receive all operations
-     * and later be executed.
-     *
-     * @return $this
-     */
-    public function setBulkWrite(MongoBulkWrite $bulkWrite)
-    {
-        $this->bulkWrite = $bulkWrite;
-
-        return $this;
+        return count($this->operations);
     }
 
     /**
@@ -79,14 +54,12 @@ class BulkWrite
         array $dataToSet,
         array $options = ['upsert' => true],
         string $operator = '$set'
-    ) {
+    ): void {
         $filter = is_array($filter) ? $filter : ['_id' => $filter];
 
-        return $this->getBulkWrite()->update(
-            $filter,
-            [$operator => $dataToSet],
-            $options
-        );
+        $update = [$operator => $dataToSet];
+
+        $this->operations[] = ['updateOne' => [$filter, $update, $options]];
     }
 
     /**
@@ -94,19 +67,18 @@ class BulkWrite
      * The collection is inferred from model's collection name.
      *
      * @throws \Mongolid\Model\Exception\NoCollectionNameException
-     *
-     * @return \MongoDB\Driver\WriteResult
      */
-    public function execute(int $writeConcern = 1)
+    public function execute(int $writeConcern = 1): BulkWriteResult
     {
         $connection = Ioc::make(Connection::class);
-        $manager = $connection->getManager();
 
-        $namespace = $connection->defaultDatabase.'.'.$this->model->getCollectionName();
+        $database = $connection->defaultDatabase;
+        $collectionName = $this->model->getCollectionName();
 
-        return $manager->executeBulkWrite(
-            $namespace,
-            $this->getBulkWrite(),
+        $collection = $connection->getClient()->$database->$collectionName;
+
+        return $collection->bulkWrite(
+            $this->operations,
             ['writeConcern' => new WriteConcern($writeConcern)]
         );
     }

@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use MongoDB\Driver\WriteResult;
+use MongoDB\BulkWriteResult;
 use Mongolid\Query\BulkWrite;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
@@ -59,7 +59,9 @@ class BulkWriteTest extends IntegrationTestCase
         // Runs it
         $result = $bulkWrite->execute();
 
-        $this->assertInstanceOf(WriteResult::class, $result);
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
+        $this->assertTrue($result->isAcknowledged());
+        $this->assertSame(6, $result->getModifiedCount());
 
         // Refresh models
         $bob = $bob->first($bob->_id);
