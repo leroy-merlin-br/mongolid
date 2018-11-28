@@ -1,9 +1,10 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Relations;
 
 use Mockery as m;
 use Mockery\Matcher\Any;
 use MongoDB\BSON\ObjectId;
+use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
 
 class DocumentEmbedderTest extends TestCase

@@ -2,7 +2,6 @@
 namespace Mongolid\Model\Relations;
 
 use Mongolid\Container\Ioc;
-use Mongolid\Model\DocumentEmbedder;
 use Mongolid\Model\HasAttributesInterface;
 
 abstract class AbstractRelation implements RelationInterface

@@ -1,7 +1,8 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Model\ModelInterface;
 
 /**
  * Document embedder is a service that will embed documents within each other.
