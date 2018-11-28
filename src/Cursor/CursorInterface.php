@@ -2,12 +2,13 @@
 namespace Mongolid\Cursor;
 
 use Countable;
+use Illuminate\Contracts\Support\Arrayable;
 use Iterator;
 
 /**
  * Common interface for all kinds of cursors.
  */
-interface CursorInterface extends Countable, Iterator
+interface CursorInterface extends Countable, Iterator, Arrayable
 {
     /**
      * Limits the number of results returned.
