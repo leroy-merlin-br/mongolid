@@ -23,44 +23,6 @@ class TestCase extends PHPUnitTestCase
     }
 
     /**
-     * Assert if two queries are equals. It will compare ObjectIds within any
-     * level of the query and make sure that they are the same.
-     *
-     * @param mixed $expectedQuery correct query
-     * @param mixed $query         query being evaluated
-     */
-    protected function assertMongoQueryEquals($expectedQuery, $query)
-    {
-        $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
-
-        if (!is_array($expectedQuery)) {
-            return;
-        }
-
-        foreach ($expectedQuery as $key => $value) {
-            if (is_object($value)) {
-                $this->assertInstanceOf(
-                    get_class($value),
-                    $query[$key],
-                    'Type of an object within the query is not equals'
-                );
-
-                if (method_exists($value, '__toString')) {
-                    $this->assertSame(
-                        (string) $expectedQuery[$key],
-                        (string) $query[$key],
-                        'Object within the query is not equals'
-                    );
-                }
-            }
-
-            if (is_array($value)) {
-                $this->assertMongoQueryEquals($value, $query[$key]);
-            }
-        }
-    }
-
-    /**
      * Actually runs a protected method of the given object.
      *
      * @param object $obj

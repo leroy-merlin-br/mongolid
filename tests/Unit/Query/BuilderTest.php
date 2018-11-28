@@ -721,7 +721,7 @@ class BuilderTest extends TestCase
         $result = $this->callProtected($builder, 'prepareValueQuery', [$value]);
 
         // Assertions
-        $this->assertMongoQueryEquals($expectation, $result);
+        $this->assertEquals($expectation, $result, 'Queries are not equals');
     }
 
     /**
