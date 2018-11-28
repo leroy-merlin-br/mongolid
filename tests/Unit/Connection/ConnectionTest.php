@@ -2,7 +2,6 @@
 namespace Mongolid\Connection;
 
 use MongoDB\Client;
-use MongoDB\Driver\Manager;
 use Mongolid\TestCase;
 
 class ConnectionTest extends TestCase
@@ -58,20 +57,5 @@ class ConnectionTest extends TestCase
         // Assertions
         $this->assertAttributeSame($expectedParameters['uri'], 'uri', $client);
         $this->assertAttributeSame($expectedParameters['typeMap'], 'typeMap', $client);
-    }
-
-    public function testShouldGetManager()
-    {
-        // Set
-        $server = 'mongodb://my-server/my_db';
-        $options = ['some', 'uri', 'options'];
-        $driverOptions = ['some', 'driver', 'options'];
-
-        // Actions
-        $connection = new Connection($server, $options, $driverOptions);
-        $manager = $connection->getManager();
-
-        // Assertions
-        $this->assertInstanceOf(Manager::class, $manager);
     }
 }

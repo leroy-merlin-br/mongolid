@@ -54,16 +54,6 @@ class Connection
     }
 
     /**
-     * Getter for Manager instance.
-     *
-     * @return \MongoDB\Driver\Manager
-     */
-    public function getManager()
-    {
-        return $this->getClient()->getManager();
-    }
-
-    /**
      * Find and stores the default database in the connection string.
      *
      * @param string $connectionString mongoDB connection string
