@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
  * will be set.
  *
  * It is supposed to be used on model classes in general
+ *
+ * @mixin HasAttributesInterface
  */
 trait HasAttributesTrait
 {
@@ -64,10 +66,25 @@ trait HasAttributesTrait
     /**
      * {@inheritdoc}
      */
-    public static function fill(array $input, HasAttributesInterface $object = null, bool $force = false): HasAttributesInterface
-    {
+    public static function fill(
+        array $input,
+        HasAttributesInterface $object = null,
+        bool $force = false
+    ): HasAttributesInterface {
         if (!$object) {
             $object = new static();
+        }
+
+        if ($object instanceof PolymorphableModelInterface) {
+            $class = $object->polymorph($input);
+            if ($class !== get_class($object)) {
+                $originalAttributes = $object->getDocumentAttributes();
+                $object = new $class();
+
+                foreach ($originalAttributes as $key => $value) {
+                    $object->setDocumentAttribute($key, $value);
+                }
+            }
         }
 
         foreach ($input as $key => $value) {

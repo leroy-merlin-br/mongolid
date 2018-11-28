@@ -5,8 +5,9 @@ use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Ioc;
 use Mongolid\Model\AbstractModel;
+use Mongolid\Model\PolymorphableModelInterface;
 
-class ReferencedUser extends AbstractModel
+class ReferencedUser extends AbstractModel implements PolymorphableModelInterface
 {
     /**
      * @var string
@@ -17,6 +18,15 @@ class ReferencedUser extends AbstractModel
      * @var bool
      */
     protected $timestamps = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $fillable = [
+        'type',
+        'exclusive',
+        'other_exclusive',
+    ];
 
     public function collection(): Collection
     {
@@ -49,5 +59,17 @@ class ReferencedUser extends AbstractModel
     public function invalid()
     {
         return 'I am not a relation!';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function polymorph(array $input): string
+    {
+        if ('polymorphed' === ($input['type'] ?? '')) {
+            return PolymorphedReferencedUser::class;
+        }
+
+        return static::class;
     }
 }

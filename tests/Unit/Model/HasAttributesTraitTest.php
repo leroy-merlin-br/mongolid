@@ -1,7 +1,10 @@
 <?php
 namespace Mongolid\Model;
 
+use MongoDB\BSON\ObjectId;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\PolymorphedReferencedUser;
+use Mongolid\Tests\Stubs\ReferencedUser;
 
 class HasAttributesTraitTest extends TestCase
 {
@@ -115,6 +118,109 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame($expected, $model->getDocumentAttributes());
     }
 
+    public function testFillShouldRetrievePolymorphedModel()
+    {
+        // Set
+        $input = [
+            'type' => 'polymorphed',
+            'new_field' => 'hello',
+        ];
+        // Actions
+        $result = ReferencedUser::fill($input);
+
+        // Assertions
+        $this->assertInstanceOf(PolymorphedReferencedUser::class, $result);
+        $this->assertSame('polymorphed', $result->type);
+        $this->assertSame('hello', $result->new_field);
+    }
+
+    public function testFillShouldRetrievePolymorphedModelEvenWithExistingModel()
+    {
+        // Set
+        $input = [
+            'type' => 'polymorphed',
+            'new_field' => 'hello',
+            'exclusive' => 'value', // should not be set
+            'other_exclusive' => 'value from fill', // should not be set
+        ];
+        $model = new ReferencedUser();
+        $id = new ObjectId();
+        $model->_id = $id;
+        $model->name = 'Albert';
+        $model->other_exclusive = 'other value'; // should be inherited
+        // Actions
+        $result = ReferencedUser::fill($input, $model);
+
+        // Assertions
+        $this->assertInstanceOf(PolymorphedReferencedUser::class, $result);
+        $this->assertSame('polymorphed', $result->type);
+        $this->assertSame('hello', $result->new_field);
+        $this->assertSame($id, $result->_id);
+        $this->assertSame('Albert', $result->name);
+        $this->assertNull($result->exclusive);
+        $this->assertSame('other value', $result->other_exclusive);
+    }
+
+    public function testFillShouldHoldValuesOnModel()
+    {
+        // Set
+        $input = [
+            'type' => 'regular',
+            'new_field' => 'hello', // should not be set
+        ];
+        $model = new ReferencedUser();
+        $id = new ObjectId();
+        $model->_id = $id;
+        $model->name = 'Albert';
+        // Actions
+        $result = ReferencedUser::fill($input, $model);
+
+        // Assertions
+        $this->assertSame($model, $result);
+        $this->assertSame(
+            [
+                '_id' => $id,
+                'name' => 'Albert',
+                'type' => 'regular',
+            ],
+            $model->getDocumentAttributes()
+        );
+    }
+
+    public function testFillShouldNotHoldValuesOnModelIfPolymorphed()
+    {
+        // Set
+        $input = [
+            'type' => 'polymorphed',
+            'new_field' => 'hello',
+        ];
+        $model = new ReferencedUser();
+        $id = new ObjectId();
+        $model->_id = $id;
+        $model->name = 'Albert';
+        // Actions
+        $result = ReferencedUser::fill($input, $model);
+
+        // Assertions
+        $this->assertNotSame($model, $result);
+        $this->assertSame(
+            [
+                '_id' => $id,
+                'name' => 'Albert',
+                'type' => 'polymorphed',
+                'new_field' => 'hello',
+            ],
+            $result->getDocumentAttributes()
+        );
+        $this->assertSame(
+            [
+                '_id' => $id,
+                'name' => 'Albert',
+            ],
+            $model->getDocumentAttributes()
+        );
+    }
+
     public function testShouldForceFillAttributes()
     {
         // Set
@@ -186,8 +292,9 @@ class HasAttributesTraitTest extends TestCase
 
             public function __construct()
             {
-                $this->attributes = [function () {
-                },
+                $this->attributes = [
+                    function () {
+                    },
                 ];
             }
         };
@@ -215,7 +322,6 @@ class HasAttributesTraitTest extends TestCase
         $this->assertFalse(isset($model->nonexistant));
         $this->assertFalse(isset($model->ignored));
     }
-
 
     public function testShouldCheckIfMutatedAttributeIsSet()
     {
