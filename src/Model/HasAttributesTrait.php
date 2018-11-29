@@ -136,12 +136,13 @@ trait HasAttributesTrait
      */
     public function getDocumentAttributes(): array
     {
-        return array_filter(
-            $this->attributes ?? [],
-            function ($value) {
-                return !is_null($value);
+        foreach ($this->attributes as $field => $value) {
+            if (null === $value) {
+                $this->cleanDocumentAttribute($field);
             }
-        );
+        }
+
+        return $this->attributes ?? [];
     }
 
     /**
