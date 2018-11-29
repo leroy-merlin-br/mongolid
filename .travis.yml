@@ -22,5 +22,5 @@ script:
   - vendor/bin/phpcs
   - vendor/bin/phpunit -c phpunit.xml.dist
 
-after_script:
+after_success:
   - if [[ $(phpenv version-name) = "7.2" ]]; then php vendor/bin/php-coveralls -v; fi
