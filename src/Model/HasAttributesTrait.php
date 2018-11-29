@@ -3,6 +3,7 @@ namespace Mongolid\Model;
 
 use Exception;
 use Illuminate\Support\Str;
+use Mongolid\Container\Container;
 
 /**
  * This trait adds attribute getter, setters and also a useful
@@ -72,7 +73,7 @@ trait HasAttributesTrait
         bool $force = false
     ): HasAttributesInterface {
         if (!$object) {
-            $object = new static();
+            $object = Container::make(static::class);
         }
 
         if ($object instanceof PolymorphableModelInterface) {
