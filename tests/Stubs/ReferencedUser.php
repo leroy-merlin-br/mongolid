@@ -1,9 +1,6 @@
 <?php
 namespace Mongolid\Tests\Stubs;
 
-use MongoDB\Collection;
-use Mongolid\Connection\Connection;
-use Mongolid\Container\Container;
 use Mongolid\Model\AbstractModel;
 use Mongolid\Model\PolymorphableModelInterface;
 
@@ -27,14 +24,6 @@ class ReferencedUser extends AbstractModel implements PolymorphableModelInterfac
         'exclusive',
         'other_exclusive',
     ];
-
-    public function collection(): Collection
-    {
-        $connection = Container::make(Connection::class);
-        $client = $connection->getClient();
-
-        return $client->{$connection->defaultDatabase}->{$this->collection};
-    }
 
     public function parent()
     {

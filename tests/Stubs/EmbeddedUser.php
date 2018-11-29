@@ -1,9 +1,6 @@
 <?php
 namespace Mongolid\Tests\Stubs;
 
-use MongoDB\Collection;
-use Mongolid\Connection\Connection;
-use Mongolid\Container\Container;
 use Mongolid\Model\AbstractModel;
 
 class EmbeddedUser extends AbstractModel
@@ -17,14 +14,6 @@ class EmbeddedUser extends AbstractModel
      * @var bool
      */
     protected $timestamps = true;
-
-    public function collection(): Collection
-    {
-        $connection = Container::make(Connection::class);
-        $client = $connection->getClient();
-
-        return $client->{$connection->defaultDatabase}->{$this->collection};
-    }
 
     public function parent()
     {
