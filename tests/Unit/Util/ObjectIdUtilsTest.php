@@ -20,12 +20,20 @@ class ObjectIdUtilsTest extends TestCase
 
     public function objectIdStringScenarios(): array
     {
+        $object = new class {
+            public function __toString()
+            {
+                return '577a68c44d3cec1f6c7796a2';
+            }
+        };
+
         return [
             ['value' => '577a68c44d3cec1f6c7796a2', 'expectation' => true],
             ['value' => '577a68d24d3cec1f817796a5', 'expectation' => true],
             ['value' => '577a68d14d3cec1f6d7796a3', 'expectation' => true],
             ['value' => '507f1f77bcf86cd799439011', 'expectation' => true],
             ['value' => '507f191e810c19729de860ea', 'expectation' => true],
+            ['value' => $object, 'expectation' => true],
             ['value' => new ObjectId(), 'expectation' => true],
             ['value' => new ObjectId('577a68c44d3cec1f6c7796a2'), 'expectation' => true],
             ['value' => 1, 'expectation' => false],

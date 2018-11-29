@@ -127,8 +127,12 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsertWithoutFiringEvents(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
-    {
+    public function testShouldInsertWithoutFiringEvents(
+        ReplaceCollectionModel $model,
+        $writeConcern,
+        $shouldFireEventAfter,
+        $expected
+    ) {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -248,6 +252,60 @@ class BuilderTest extends TestCase
             ->updateOne(
                 ['_id' => 123],
                 ['$set' => ['_id' => 123], '$unset' => ['name' => '', 'notOnFillable' => '']],
+                $options
+            )->andReturn($operationResult);
+
+        $operationResult->expects()
+            ->isAcknowledged()
+            ->andReturn(true);
+
+        $operationResult->allows()
+            ->getModifiedCount()
+            ->andReturn(1);
+
+        $this->expectEventToBeFired('updating', $model, true);
+
+        $this->expectEventToBeFired('updated', $model, false);
+
+        // Actions
+        $result = $builder->update($model, $options);
+
+        // Assertions
+        $this->assertTrue($result);
+    }
+
+    public function testUpdateShouldCalculateChangesAccordingly()
+    {
+        // Set
+        $connection = m::mock(Connection::class);
+        $builder = new Builder($connection);
+
+        $model = new class() extends ReplaceCollectionModel
+        {
+        };
+        $collection = m::mock(Collection::class);
+        $operationResult = m::mock();
+        $options = ['writeConcern' => new WriteConcern(1)];
+        $model->setCollection($collection);
+
+        $model->unchanged = 'unchanged';
+        $model->name = 'John';
+        $model->surname = 'Doe';
+        $model->addresses = ['1 Blue Street'];
+        $model->syncOriginalDocumentAttributes();
+        $model->_id = 123;
+        unset($model->name);
+        $model->surname = ['Doe', 'Jr'];
+        $model->addresses = ['1 Blue Street', '2 Green Street'];
+
+        // Expectations
+        $collection->expects()
+            ->updateOne(
+                ['_id' => 123],
+                [
+                    '$set' => ['_id' => 123, 'surname' => ['Doe', 'Jr'], 'addresses.1' => '2 Green Street'],
+                    '$unset' => ['name' => ''],
+                ],
                 $options
             )->andReturn($operationResult);
 

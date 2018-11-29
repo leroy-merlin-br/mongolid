@@ -36,6 +36,36 @@ class ModelMapperTest extends TestCase
         );
     }
 
+    public function testShouldClearDynamicFieldsIfModelIsNotDynamicCheckingTimestamps()
+    {
+        // Set
+        $model = new class extends AbstractModel
+        {
+        };
+        $modelMapper = new ModelMapper();
+        $model->_id = 1;
+        $model->name = 'John';
+        $model->age = 23;
+        $model->location = 'Brazil';
+        $dateTime = new UTCDateTime();
+        $model->created_at = $dateTime; // `$model->timestamps` is false!
+
+        // Actions
+        $result = $modelMapper->map($model, ['name', 'age'], false, true);
+
+        // Assertions
+        $this->assertSame(
+            [
+                '_id' => 1,
+                'name' => 'John',
+                'age' => 23,
+                'created_at' => $dateTime,
+                'updated_at' => $model->updated_at,
+            ],
+            $result
+        );
+    }
+
     public function testShouldNotClearDynamicFieldsIfModelIsDynamic()
     {
         // Set

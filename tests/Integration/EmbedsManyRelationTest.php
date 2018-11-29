@@ -18,7 +18,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $this->assertSiblings([$chuck], $john);
 
         $mary = $this->createUser('Mary');
-        $john->siblings()->add($mary);
+        $john->siblings()->addMany([$mary]);
 
         $this->assertSiblings([$chuck, $mary], $john);
 
@@ -27,11 +27,10 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $this->assertSiblings([$mary], $john);
 
         // replace siblings
-        $john->siblings()->remove($mary);
         $bob = $this->createUser('Bob');
 
         // unset
-        $john->siblings()->add($bob);
+        $john->siblings()->replace([$bob]);
         $this->assertSiblings([$bob], $john);
         unset($john->embedded_siblings);
         $this->assertEmpty($john->siblings->all());
