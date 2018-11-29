@@ -134,6 +134,43 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('hello', $result->new_field);
     }
 
+    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributes()
+    {
+        // Set
+        $input = [
+            'new_field' => 'hello',
+        ];
+        $model = new ReferencedUser();
+        $model->type = 'polymorphed';
+
+        // Actions
+        $result = ReferencedUser::fill($input, $model);
+
+        // Assertions
+        $this->assertInstanceOf(PolymorphedReferencedUser::class, $result);
+        $this->assertSame('polymorphed', $result->type);
+        $this->assertSame('hello', $result->new_field);
+    }
+
+    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributesButPrioritizingInput()
+    {
+        // Set
+        $input = [
+            'type' => 'default',
+            'new_field' => 'hello',
+        ];
+        $model = new PolymorphedReferencedUser();
+        $model->type = 'polymorphed';
+
+        // Actions
+        $result = ReferencedUser::fill($input, $model);
+
+        // Assertions
+        $this->assertInstanceOf(ReferencedUser::class, $result);
+        $this->assertSame('default', $result->type);
+        $this->assertSame('hello', $result->new_field);
+    }
+
     public function testFillShouldRetrievePolymorphedModelEvenWithExistingModel()
     {
         // Set

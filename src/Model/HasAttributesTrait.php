@@ -77,7 +77,8 @@ trait HasAttributesTrait
         }
 
         if ($object instanceof PolymorphableModelInterface) {
-            $class = $object->polymorph($input);
+            $class = $object->polymorph(array_merge($object->getDocumentAttributes(), $input));
+
             if ($class !== get_class($object)) {
                 $originalAttributes = $object->getDocumentAttributes();
                 $object = new $class();
