@@ -11,28 +11,25 @@
 </p>
 
 ## About Mongolid
-
 Easy, powerful and ultrafast ODM for PHP 7.1+ build on top of the [new mongodb driver](https://docs.mongodb.org/ecosystem/drivers/php/).
 
 Mongolid supports **ActiveRecord** pattern.
 
 ## Introduction
-
 Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementation for working with MongoDB. Each database collection can have a corresponding "Model" which is used to interact with that collection.
 
 **Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
-## Installation
+## Requirements
+- PHP **7.1** or superior
+- [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 
+## Installation
 You can install the library through Composer:
 
 ```
 $ composer require leroy-merlin-br/mongolid
 ```
-
-## Requirements
-- PHP **7.1**
-- [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 
 ## Documentation
 You can access the full documentation [here](http://leroy-merlin-br.github.com/mongolid).
