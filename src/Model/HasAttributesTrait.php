@@ -165,6 +165,12 @@ trait HasAttributesTrait
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
 
+        if (null === $value) {
+            $this->cleanDocumentAttribute($key);
+
+            return;
+        }
+
         $this->attributes[$key] = $value;
 
         if ($this->hasFieldRelation($key)) {

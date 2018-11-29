@@ -70,7 +70,6 @@ class PersistedDataTest extends IntegrationTestCase
             'name' => 'Jane Doe',
             'preferences' => [],
             'friends' => ['Mary'],
-            'address' => '123 Blue Street',
             'skills' => [
                 'PHP' => ['percentage' => '100%', 'version' => '7.1'],
                 'JavaScript' => ['percentage' => '80%', 'version' => 'ES6'],
@@ -79,6 +78,7 @@ class PersistedDataTest extends IntegrationTestCase
             ],
             'photos' => ['profile' => '/user-photo', 'icon' => '/user-icon'],
             'email' => 'jane@doe.com',
+            'address' => '123 Blue Street',
         ];
 
         // Actions
