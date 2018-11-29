@@ -426,7 +426,9 @@ class AbstractModelTest extends TestCase
     public function testShouldHaveDynamicGetters()
     {
         // Set
-        $child = new stdClass();
+        $child = new class() extends AbstractModel
+        {
+        };
         $model = new class() extends AbstractModel
         {
         };

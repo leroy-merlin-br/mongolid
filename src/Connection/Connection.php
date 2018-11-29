@@ -38,7 +38,7 @@ class Connection
         array $driverOptions = []
     ) {
         // In order to work with PHP arrays instead of with objects
-        $driverOptions['typeMap'] = ['array' => 'array', 'document' => 'array'];
+        $driverOptions['typeMap'] = ['array' => 'array'];
 
         $this->findDefaultDatabase($server);
 

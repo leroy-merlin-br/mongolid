@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
+use stdClass;
 
 /**
  * This trait adds attribute getter, setters and also a useful
@@ -92,6 +93,10 @@ trait HasAttributesTrait
         foreach ($input as $key => $value) {
             if ($force
                 || ((!$object->fillable || in_array($key, $object->fillable)) && !in_array($key, $object->guarded))) {
+                if ($value instanceof stdClass) {
+                    $value = json_decode(json_encode($value), true); // cast to array
+                }
+
                 $object->setDocumentAttribute($key, $value);
             }
         }
