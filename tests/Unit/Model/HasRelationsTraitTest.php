@@ -14,7 +14,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider referencesOneScenarios
      */
-    public function testShouldReferenceOne($fieldValue, $expectedQuery)
+    public function testShouldReferenceOne($fieldValue, array $expectedQuery)
     {
         // Set
         $model = new ReferencedUser();
@@ -58,7 +58,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider referencesManyScenarios
      */
-    public function testShouldReferenceMany($fieldValue, $expectedQuery)
+    public function testShouldReferenceMany($fieldValue, array $expectedQuery)
     {
         // Set
         $model = new ReferencedUser();
@@ -128,7 +128,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider embedsManyScenarios
      */
-    public function testShouldEmbedMany($fieldValue, $expectedItems)
+    public function testShouldEmbedMany($fieldValue, array $expectedItems)
     {
         // Set
         $model = new EmbeddedUser();

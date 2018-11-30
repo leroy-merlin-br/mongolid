@@ -93,10 +93,10 @@ class HasAttributesTraitTest extends TestCase
      * @dataProvider getFillableOptions
      */
     public function testShouldFillOnlyPermittedAttributes(
-        $fillable,
-        $guarded,
-        $input,
-        $expected
+        array $fillable,
+        array $guarded,
+        array $input,
+        array $expected
     ) {
         // Set
         $model = new class($fillable, $guarded) implements HasAttributesInterface

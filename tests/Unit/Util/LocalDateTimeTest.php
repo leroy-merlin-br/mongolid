@@ -65,7 +65,7 @@ class LocalDateTimeTest extends TestCase
         $this->assertSame($this->date->format($this->format), $result);
     }
 
-    public function testFormatShouldRetrieesDateUsingGivenFormat()
+    public function testFormatShouldRetrieveDateUsingGivenFormat()
     {
         // Set
         $timezone = new DateTimeZone(date_default_timezone_get());

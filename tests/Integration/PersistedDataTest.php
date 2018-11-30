@@ -152,7 +152,7 @@ class PersistedDataTest extends IntegrationTestCase
             'CSS' => ['percentage' => '45%', 'version' => 'CSS3'],
         ];
 
-        // dinamically set array
+        // dynamically set array
         $user->photos['profile'] = '/user-photo';
         $user->photos['icon'] = '/user-icon';
 

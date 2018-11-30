@@ -33,7 +33,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldSave(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldSave(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -83,7 +83,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsert(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsert(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -129,9 +129,9 @@ class BuilderTest extends TestCase
      */
     public function testShouldInsertWithoutFiringEvents(
         ReplaceCollectionModel $model,
-        $writeConcern,
-        $shouldFireEventAfter,
-        $expected
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
     ) {
         // Set
         $connection = m::mock(Connection::class);
@@ -170,7 +170,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldUpdate(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldUpdate(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -333,9 +333,9 @@ class BuilderTest extends TestCase
      */
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
         ReplaceCollectionModel $model,
-        $writeConcern,
-        $shouldFireEventAfter,
-        $expected
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
     ) {
         // Set
         $connection = m::mock(Connection::class);
@@ -384,7 +384,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldDelete(ReplaceCollectionModel $model, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldDelete(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -428,9 +428,9 @@ class BuilderTest extends TestCase
      * @dataProvider eventsToBailOperations
      */
     public function testDatabaseOperationsShouldBailOutIfTheEventHandlerReturnsFalse(
-        $operation,
-        $dbOperation,
-        $eventName
+        string $operation,
+        string $dbOperation,
+        string $eventName
     ) {
         // Set
         $connection = m::mock(Connection::class);

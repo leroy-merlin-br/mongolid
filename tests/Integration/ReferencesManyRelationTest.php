@@ -149,6 +149,8 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertInstanceOf(CursorInterface::class, $siblings);
         $this->assertEquals($expected, $siblings->all());
 
+        $ids = [];
+
         foreach ($expected as $expectedModel) {
             $ids[] = $expectedModel->_id;
         }
@@ -174,6 +176,7 @@ class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertInstanceOf(CursorInterface::class, $grandsons);
         $this->assertEquals($expected, $grandsons->all());
 
+        $codes = [];
         foreach ($expected as $expectedModel) {
             $codes[] = $expectedModel->code;
         }

@@ -12,6 +12,7 @@ class TestCase extends PHPUnitTestCase
 {
     protected function setUp()
     {
+        parent::setUp();
         Container::setContainer(new IlluminateContainer());
     }
 
@@ -73,7 +74,7 @@ class TestCase extends PHPUnitTestCase
     /**
      * Replace instance on Ioc
      */
-    protected function instance($abstract, $instance)
+    protected function instance(string $abstract, $instance)
     {
         Container::bind(
             $abstract,

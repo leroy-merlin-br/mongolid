@@ -28,7 +28,7 @@ class LocalDateTime
     }
 
     /**
-     * Retrieves formated date time using timezone.
+     * Retrieves formatted date time using timezone.
      */
     public static function format(
         UTCDateTime $date,

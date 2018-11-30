@@ -405,7 +405,7 @@ class Builder
     }
 
     /**
-     * Based on the work of bjori/mongo-php-transistor.
+     * Based on the work of "bjori/mongo-php-transistor".
      * Calculate `$set` and `$unset` arrays for update operation and store them on $changes.
      *
      * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108

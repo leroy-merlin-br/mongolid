@@ -34,7 +34,7 @@ class EmbeddedCursorTest extends TestCase
     /**
      * @dataProvider getDocumentsToSort
      */
-    public function testShouldSortDocuments($items, $parameters, $expected)
+    public function testShouldSortDocuments(array $items, array $parameters, array $expected)
     {
         // Set
         $cursor = new EmbeddedCursor($items);
@@ -340,7 +340,7 @@ class EmbeddedCursorTest extends TestCase
                     ['age' => 26, 'name' => 'Abe'],
                     ['age' => 25],
                     $age24,
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                     [],
                 ],
@@ -350,7 +350,7 @@ class EmbeddedCursorTest extends TestCase
                     $age24,
                     ['age' => 25],
                     ['age' => 26, 'name' => 'Abe'],
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                 ],
             ],
@@ -359,14 +359,14 @@ class EmbeddedCursorTest extends TestCase
                     ['age' => 26, 'name' => 'Abe'],
                     ['age' => 25],
                     $age24,
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                     [],
                 ],
                 'parameters' => ['age' => -1],
                 'expected' => [
                     ['age' => 26, 'name' => 'Abe'],
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                     ['age' => 25],
                     $age24,
@@ -378,7 +378,7 @@ class EmbeddedCursorTest extends TestCase
                     ['age' => 26, 'name' => 'Abe'],
                     ['age' => 25],
                     $age24,
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                     [],
                 ],
@@ -387,7 +387,7 @@ class EmbeddedCursorTest extends TestCase
                     [],
                     $age24,
                     ['age' => 25],
-                    ['age' => 26, 'name' => 'Zizaco'],
+                    ['age' => 26, 'name' => 'Wilson'],
                     ['age' => 26, 'name' => 'John'],
                     ['age' => 26, 'name' => 'Abe'],
                 ],
@@ -397,16 +397,16 @@ class EmbeddedCursorTest extends TestCase
                     ['age' => 26, 'name' => 'Abe', 'color' => 'red'],
                     ['age' => 25],
                     $age24,
-                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'red'],
-                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'blue'],
+                    ['age' => 26, 'name' => 'Wilson', 'color' => 'red'],
+                    ['age' => 26, 'name' => 'Wilson', 'color' => 'blue'],
                     ['age' => 26, 'name' => 'John'],
                 ],
                 'parameters' => ['age' => 1, 'name' => -1, 'color' => 1],
                 'expected' => [
                     $age24,
                     ['age' => 25],
-                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'blue'],
-                    ['age' => 26, 'name' => 'Zizaco', 'color' => 'red'],
+                    ['age' => 26, 'name' => 'Wilson', 'color' => 'blue'],
+                    ['age' => 26, 'name' => 'Wilson', 'color' => 'red'],
                     ['age' => 26, 'name' => 'John'],
                     ['age' => 26, 'name' => 'Abe', 'color' => 'red'],
                 ],

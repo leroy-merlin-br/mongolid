@@ -13,7 +13,7 @@ class SequenceServiceTest extends TestCase
     /**
      * @dataProvider sequenceScenarios
      */
-    public function testShouldGetNextValue($sequenceName, $currentValue, $expectation)
+    public function testShouldGetNextValue(string $sequenceName, int $currentValue, int $expectation)
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -46,7 +46,7 @@ class SequenceServiceTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $connection->defaultDatabase = 'grimory';
+        $connection->defaultDatabase = 'production';
 
         $sequenceService = new SequenceService($connection, 'foobar');
         $collection = m::mock(Collection::class);
@@ -60,7 +60,7 @@ class SequenceServiceTest extends TestCase
             ->andReturn($client);
 
         $client->expects()
-            ->selectDatabase('grimory')
+            ->selectDatabase('production')
             ->andReturn($database);
 
         $database->expects()

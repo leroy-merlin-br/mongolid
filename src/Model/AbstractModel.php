@@ -80,7 +80,7 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
-     * @return ModelInterface|null
+     * @return AbstractModel|null
      */
     public static function first($query = [], array $projection = [])
     {
@@ -96,7 +96,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @throws ModelNotFoundException If no document was found
      *
-     * @return ModelInterface|null
+     * @return AbstractModel|null
      */
     public static function firstOrFail($query = [], array $projection = [])
     {
@@ -110,7 +110,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $id document id
      *
-     * @return ModelInterface|null
+     * @return AbstractModel|null
      */
     public static function firstOrNew($id)
     {
