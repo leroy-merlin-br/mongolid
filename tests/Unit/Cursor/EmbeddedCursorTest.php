@@ -184,11 +184,6 @@ class EmbeddedCursorTest extends TestCase
     public function testShouldGetCurrentUsingModelClassMorphingIt()
     {
         // Set
-        $object = new class() extends AbstractModel
-        {
-        };
-
-        // Other class (mimics polymorph behavior)
         $model = new class() extends AbstractModel
         {
         };
