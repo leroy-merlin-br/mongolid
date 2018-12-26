@@ -6,6 +6,8 @@ use Illuminate\Contracts\Container\Container as IlluminateContainer;
 /**
  * This class is a simple Facade for a Illuminate\Container\Container
  * in order to use the Container as IOC at all classes.
+ *
+ * @mixin \Illuminate\Container\Container
  */
 class Container
 {

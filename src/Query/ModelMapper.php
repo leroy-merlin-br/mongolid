@@ -3,6 +3,7 @@ namespace Mongolid\Query;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
+use Mongolid\Container\Container;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -28,8 +29,12 @@ class ModelMapper
     /**
      * If the model is not dynamic, remove all non specified fields.
      */
-    protected function clearDynamicFields(ModelInterface $model, array $allowedFields, bool $dynamic, bool $timestamps): void
-    {
+    protected function clearDynamicFields(
+        ModelInterface $model,
+        array $allowedFields,
+        bool $dynamic,
+        bool $timestamps
+    ): void {
         if ($dynamic) {
             return;
         }
@@ -64,7 +69,7 @@ class ModelMapper
         if (!$timestamps) {
             return;
         }
-        $model->updated_at = new UTCDateTime();
+        $model->updated_at = Container::make(UTCDateTime::class, ['milliseconds' => null]);
 
         if (!$model->created_at instanceof UTCDateTime) {
             $model->created_at = $model->updated_at;
@@ -76,7 +81,7 @@ class ModelMapper
         $value = $model->_id;
 
         if (is_null($value) || (is_string($value) && ObjectIdUtils::isObjectId($value))) {
-            $value = new ObjectId($value);
+            $value = Container::make(ObjectId::class, ['id' => $value]);
         }
 
         $model->_id = $value;
