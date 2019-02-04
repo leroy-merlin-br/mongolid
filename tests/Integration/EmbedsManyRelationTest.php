@@ -131,6 +131,19 @@ class EmbedsManyRelationTest extends IntegrationTestCase
             array_except($chuck->toArray(), 'updated_at'),
             array_except($john->grandsons->first()->toArray(), 'updated_at')
         );
+
+        $chuck = $john->grandsons->first();
+        $chuck->name = 'Chuck Norris';
+        $john->other_arbitrary_field = [$chuck];
+
+        $this->assertTrue($john->update());
+        $john = $john->first($john->_id);
+
+        $this->assertInstanceOf(EmbeddedUser::class, $john->grandsons->first());
+        $this->assertEquals(
+            array_except($chuck->toArray(), 'updated_at'),
+            array_except($john->grandsons->first()->toArray(), 'updated_at')
+        );
     }
 
     private function createUser(string $name): EmbeddedUser
