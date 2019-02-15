@@ -310,4 +310,4 @@ In order to set a reference to a document use the attach method or it's alias. F
 
 > **Note:** When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. The changes will only persists after you call the 'save()' method.
 
-You can use `dettach` method with the referenced object or it's `_id` in order to remove a single reference.
+You can use `detach` method with the referenced object or it's `_id` in order to remove a single reference.
