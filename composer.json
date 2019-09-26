@@ -21,13 +21,13 @@
         "php": ">=7.1",
         "ext-mongodb": "*",
         "mongodb/mongodb": "^1.4",
-        "illuminate/container": "^5.4"
+        "illuminate/container": "^5.4 || ^6.0"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^0.1",
         "mockery/mockery": "^1.2",
         "php-coveralls/php-coveralls": "^2.1",
-        "phpunit/phpunit": "^6.5",
+        "phpunit/phpunit": "^7.0 || ^8.0",
         "sami/sami": "^4.1"
     },
     "autoload": {

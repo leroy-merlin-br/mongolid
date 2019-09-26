@@ -13,7 +13,7 @@ class SequenceServiceTest extends TestCase
     /**
      * @dataProvider sequenceScenarios
      */
-    public function testShouldGetNextValue(string $sequenceName, int $currentValue, int $expectation)
+    public function testShouldGetNextValue(string $sequenceName, int $currentValue, int $expectation): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -42,7 +42,7 @@ class SequenceServiceTest extends TestCase
         $this->assertSame($expectation, $result);
     }
 
-    public function testShouldGetClient()
+    public function testShouldGetClient(): void
     {
         // Set
         $connection = m::mock(Connection::class);

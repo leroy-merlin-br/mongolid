@@ -18,23 +18,28 @@ use Mongolid\Tests\Stubs\ReplaceCollectionModel;
 
 class BuilderTest extends TestCase
 {
-    public function testShouldBeAbleToConstruct()
+    public function testShouldBeAbleToConstruct(): void
     {
         // Set
         $connection = m::mock(Connection::class);
 
         // Actions
         $builder = new Builder($connection);
+        $result = $this->getProtected($builder, 'connection');
 
         // Assertions
-        $this->assertAttributeSame($connection, 'connection', $builder);
+        $this->assertSame($connection, $result);
     }
 
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldSave(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
-    {
+    public function testShouldSave(
+        ReplaceCollectionModel $model,
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -83,8 +88,12 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldInsert(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
-    {
+    public function testShouldInsert(
+        ReplaceCollectionModel $model,
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -170,8 +179,12 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldUpdate(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
-    {
+    public function testShouldUpdate(
+        ReplaceCollectionModel $model,
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -214,7 +227,7 @@ class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testShouldUpdateUnsettingFields()
+    public function testShouldUpdateUnsettingFields(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -274,7 +287,7 @@ class BuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testUpdateShouldCalculateChangesAccordingly()
+    public function testUpdateShouldCalculateChangesAccordingly(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -384,8 +397,12 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getWriteConcernVariations
      */
-    public function testShouldDelete(ReplaceCollectionModel $model, int $writeConcern, bool $shouldFireEventAfter, bool $expected)
-    {
+    public function testShouldDelete(
+        ReplaceCollectionModel $model,
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -458,7 +475,7 @@ class BuilderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testShouldGetWithWhereQuery()
+    public function testShouldGetWithWhereQuery(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -479,19 +496,18 @@ class BuilderTest extends TestCase
 
         // Actions
         $result = $builder->where($model, $query, $projection);
+        $collectionResult = $this->getProtected($result, 'collection');
+        $commandResult = $this->getProtected($result, 'command');
+        $paramsResult = $this->getProtected($result, 'params');
 
         // Assertions
         $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertAttributeSame($collection, 'collection', $result);
-        $this->assertAttributeSame('find', 'command', $result);
-        $this->assertAttributeSame(
-            [$preparedQuery, ['projection' => $projection]],
-            'params',
-            $result
-        );
+        $this->assertSame($collection, $collectionResult);
+        $this->assertSame('find', $commandResult);
+        $this->assertSame([$preparedQuery, ['projection' => $projection]], $paramsResult);
     }
 
-    public function testShouldGetAll()
+    public function testShouldGetAll(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -511,7 +527,7 @@ class BuilderTest extends TestCase
         $this->assertSame($mongolidCursor, $result);
     }
 
-    public function testShouldGetFirstWithQuery()
+    public function testShouldGetFirstWithQuery(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -539,7 +555,7 @@ class BuilderTest extends TestCase
         $this->assertSame($model, $result);
     }
 
-    public function testFirstWithNullShouldNotHitTheDatabase()
+    public function testFirstWithNullShouldNotHitTheDatabase(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -552,7 +568,7 @@ class BuilderTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testFirstOrFailShouldGetFirst()
+    public function testFirstOrFailShouldGetFirst(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -580,7 +596,7 @@ class BuilderTest extends TestCase
         $this->assertSame($model, $result);
     }
 
-    public function testFirstOrFailWithNullShouldFail()
+    public function testFirstOrFailWithNullShouldFail(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -597,7 +613,7 @@ class BuilderTest extends TestCase
         $builder->firstOrFail($model, null);
     }
 
-    public function testShouldGetNullIfFirstCantFindAnything()
+    public function testShouldGetNullIfFirstCantFindAnything(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -625,7 +641,7 @@ class BuilderTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldGetFirstProjectingFields()
+    public function testShouldGetFirstProjectingFields(): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -658,7 +674,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider queryValueScenarios
      */
-    public function testShouldPrepareQueryValue($value, $expectation)
+    public function testShouldPrepareQueryValue($value, $expectation): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -674,7 +690,7 @@ class BuilderTest extends TestCase
     /**
      * @dataProvider getProjections
      */
-    public function testPrepareProjectionShouldConvertArray($data, $expectation)
+    public function testPrepareProjectionShouldConvertArray($data, $expectation): void
     {
         // Set
         $connection = m::mock(Connection::class);
@@ -687,7 +703,7 @@ class BuilderTest extends TestCase
         $this->assertSame($expectation, $result);
     }
 
-    public function testPrepareProjectionShouldThrownAnException()
+    public function testPrepareProjectionShouldThrownAnException(): void
     {
         // Set
         $connection = m::mock(Connection::class);

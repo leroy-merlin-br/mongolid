@@ -6,7 +6,7 @@ use Mongolid\TestCase;
 
 class EventTriggerServiceTest extends TestCase
 {
-    public function testShouldSendTheEventsToTheExternalDispatcher()
+    public function testShouldSendTheEventsToTheExternalDispatcher(): void
     {
         // Set
         $dispatcher = m::mock(EventTriggerInterface::class);
@@ -25,7 +25,7 @@ class EventTriggerServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testShouldReturnTrueIfThereIsNoExternalDispatcher()
+    public function testShouldReturnTrueIfThereIsNoExternalDispatcher(): void
     {
         // Set
         $dispatcher = m::mock(EventTriggerInterface::class);

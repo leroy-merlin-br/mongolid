@@ -5,7 +5,7 @@ use Mongolid\TestCase;
 
 class ModelNotFoundExceptionTest extends TestCase
 {
-    public function testSetModel()
+    public function testSetModel(): void
     {
         // Set
         $object = new ModelNotFoundException();

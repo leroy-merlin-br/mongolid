@@ -10,13 +10,13 @@ use ReflectionMethod;
 
 class TestCase extends PHPUnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Container::setContainer(new IlluminateContainer());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Container::flush();
         m::close();

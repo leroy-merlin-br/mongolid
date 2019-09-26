@@ -6,7 +6,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 
 class RewindableCursorTest extends IntegrationTestCase
 {
-    public function testCursorShouldBeRewindableAndSerializable()
+    public function testCursorShouldBeRewindableAndSerializable(): void
     {
         $this->createUser('Bob');
         $this->createUser('Mary');

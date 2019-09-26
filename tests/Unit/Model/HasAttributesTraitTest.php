@@ -8,7 +8,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 
 class HasAttributesTraitTest extends TestCase
 {
-    public function testShouldGetAttributeFromMutator()
+    public function testShouldGetAttributeFromMutator(): void
     {
         // Set
         $model = new class()
@@ -35,7 +35,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('Other name', $result);
     }
 
-    public function testShouldIgnoreMutators()
+    public function testShouldIgnoreMutators(): void
     {
         // Set
         $model = new class()
@@ -62,7 +62,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('My awesome name', $result);
     }
 
-    public function testShouldSetAttributeFromMutator()
+    public function testShouldSetAttributeFromMutator(): void
     {
         // Set
         $model = new class()
@@ -118,7 +118,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame($expected, $model->getDocumentAttributes());
     }
 
-    public function testFillShouldRetrievePolymorphedModel()
+    public function testFillShouldRetrievePolymorphedModel(): void
     {
         // Set
         $input = [
@@ -134,7 +134,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('hello', $result->new_field);
     }
 
-    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributes()
+    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributes(): void
     {
         // Set
         $input = [
@@ -152,7 +152,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('hello', $result->new_field);
     }
 
-    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributesButPrioritizingInput()
+    public function testFillShouldRetrievePolymorphedModelConsideringModelAttributesButPrioritizingInput(): void
     {
         // Set
         $input = [
@@ -171,7 +171,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('hello', $result->new_field);
     }
 
-    public function testFillShouldRetrievePolymorphedModelEvenWithExistingModel()
+    public function testFillShouldRetrievePolymorphedModelEvenWithExistingModel(): void
     {
         // Set
         $input = [
@@ -198,7 +198,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame('other value', $result->other_exclusive);
     }
 
-    public function testFillShouldHoldValuesOnModel()
+    public function testFillShouldHoldValuesOnModel(): void
     {
         // Set
         $input = [
@@ -224,7 +224,7 @@ class HasAttributesTraitTest extends TestCase
         );
     }
 
-    public function testFillShouldNotHoldValuesOnModelIfPolymorphed()
+    public function testFillShouldNotHoldValuesOnModelIfPolymorphed(): void
     {
         // Set
         $input = [
@@ -258,7 +258,7 @@ class HasAttributesTraitTest extends TestCase
         );
     }
 
-    public function testShouldForceFillAttributes()
+    public function testShouldForceFillAttributes(): void
     {
         // Set
         $model = new class() implements HasAttributesInterface
@@ -280,7 +280,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testShouldBeCastableToArray()
+    public function testShouldBeCastableToArray(): void
     {
         // Set
         $model = new class()
@@ -299,7 +299,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame(['name' => 'John', 'age' => 25], $result);
     }
 
-    public function testShouldSetOriginalAttributes()
+    public function testShouldSetOriginalAttributes(): void
     {
         // Set
         $model = new class() implements HasAttributesInterface
@@ -319,7 +319,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame($model->getDocumentAttributes(), $result);
     }
 
-    public function testShouldFallbackOriginalAttributesIfUnserializationFails()
+    public function testShouldFallbackOriginalAttributesIfUnserializationFails(): void
     {
         // Set
         $model = new class() implements HasAttributesInterface
@@ -344,7 +344,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertSame($model->getDocumentAttributes(), $result);
     }
 
-    public function testShouldCheckIfAttributeIsSet()
+    public function testShouldCheckIfAttributeIsSet(): void
     {
         // Set
         $model = new class() extends AbstractModel
@@ -360,7 +360,7 @@ class HasAttributesTraitTest extends TestCase
         $this->assertFalse(isset($model->ignored));
     }
 
-    public function testShouldCheckIfMutatedAttributeIsSet()
+    public function testShouldCheckIfMutatedAttributeIsSet(): void
     {
         // Set
         $model = new class() extends AbstractModel

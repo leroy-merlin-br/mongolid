@@ -9,7 +9,7 @@ class ObjectIdUtilsTest extends TestCase
     /**
      * @dataProvider objectIdStringScenarios
      */
-    public function testShouldEvaluateIfValueIsAnObjectId($value, bool $expectation)
+    public function testShouldEvaluateIfValueIsAnObjectId($value, bool $expectation): void
     {
         // Actions
         $result = ObjectIdUtils::isObjectId($value);

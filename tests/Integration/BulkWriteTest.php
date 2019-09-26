@@ -8,7 +8,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 
 class BulkWriteTest extends IntegrationTestCase
 {
-    public function testShouldRunMultipleUpdateOperations()
+    public function testShouldRunMultipleUpdateOperations(): void
     {
         $bob = $this->createUser('Bob');
         $john = $this->createUser('John');

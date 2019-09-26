@@ -21,13 +21,6 @@ use Mongolid\Event\EventTriggerService;
 class Manager
 {
     /**
-     * Singleton instance of the manager.
-     *
-     * @var Manager
-     */
-    protected static $singleton;
-
-    /**
      * Container being used by Mongolid.
      *
      * @var \Illuminate\Contracts\Container\Container
@@ -93,7 +86,5 @@ class Manager
 
         $this->container = new IlluminateContainer();
         Container::setContainer($this->container);
-
-        static::$singleton = $this;
     }
 }

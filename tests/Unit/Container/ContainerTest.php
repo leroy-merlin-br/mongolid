@@ -7,7 +7,7 @@ use Mongolid\TestCase;
 
 class ContainerTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Container::expects()
             ->flush();
@@ -15,7 +15,7 @@ class ContainerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testShouldCallMethodsProperlyWithNoArguments()
+    public function testShouldCallMethodsProperlyWithNoArguments(): void
     {
         // Set
         $illuminateContainer = m::mock(IlluminateContainer::class);
@@ -30,7 +30,7 @@ class ContainerTest extends TestCase
         Container::method();
     }
 
-    public function testShouldCallMethodsProperlyWithArguments()
+    public function testShouldCallMethodsProperlyWithArguments(): void
     {
         // Set
         $illuminateContainer = m::mock(IlluminateContainer::class);

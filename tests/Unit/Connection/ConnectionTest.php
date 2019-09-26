@@ -6,7 +6,7 @@ use Mongolid\TestCase;
 
 class ConnectionTest extends TestCase
 {
-    public function testShouldConstructANewConnection()
+    public function testShouldConstructANewConnection(): void
     {
         // Set
         $server = 'mongodb://my-server/my_db';
@@ -15,13 +15,14 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
+        $result = $this->getProtected($connection, 'client');
 
         // Assertions
-        $this->assertAttributeInstanceOf(Client::class, 'client', $connection);
-        $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
+        $this->assertInstanceOf(Client::class, $result);
+        $this->assertSame('my_db', $connection->defaultDatabase);
     }
 
-    public function testShouldDetermineDatabaseFromACluster()
+    public function testShouldDetermineDatabaseFromACluster(): void
     {
         // Set
         $server = 'mongodb://my-server,other-server/my_db?replicaSet=someReplica';
@@ -30,13 +31,14 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
+        $result = $this->getProtected($connection, 'client');
 
         // Assertions
-        $this->assertAttributeInstanceOf(Client::class, 'client', $connection);
-        $this->assertAttributeSame('my_db', 'defaultDatabase', $connection);
+        $this->assertInstanceOf(Client::class, $result);
+        $this->assertSame('my_db', $connection->defaultDatabase);
     }
 
-    public function testShouldGetConnection()
+    public function testShouldGetConnection(): void
     {
         // Set
         $server = 'mongodb://my-server/my_db';
@@ -52,7 +54,7 @@ class ConnectionTest extends TestCase
         $client = $connection->getClient();
 
         // Assertions
-        $this->assertAttributeSame($expectedParameters['uri'], 'uri', $client);
-        $this->assertAttributeSame($expectedParameters['typeMap'], 'typeMap', $client);
+        $this->assertSame($expectedParameters['uri'], (string) $client);
+        $this->assertSame($expectedParameters['typeMap'], $client->getTypeMap());
     }
 }

@@ -20,7 +20,7 @@ use Traversable;
 
 class CursorTest extends TestCase
 {
-    public function testShouldLimitDocumentQuantity()
+    public function testShouldLimitDocumentQuantity(): void
     {
         // Set
         $cursor = $this->getCursor();
@@ -28,63 +28,52 @@ class CursorTest extends TestCase
         // Actions
         $cursor->limit(10);
 
+        $result = $this->getProtected($cursor, 'params');
+
         // Assertions
-        $this->assertAttributeSame(
-            [[], ['limit' => 10]],
-            'params',
-            $cursor
-        );
+        $this->assertSame([[], ['limit' => 10]], $result);
     }
 
-    public function testShouldSortDocumentsOfCursor()
+    public function testShouldSortDocumentsOfCursor(): void
     {
         // Set
         $cursor = $this->getCursor();
 
         // Actions
         $cursor->sort(['name' => 1]);
+        $result = $this->getProtected($cursor, 'params');
 
         // Assertions
-        $this->assertAttributeSame(
-            [[], ['sort' => ['name' => 1]]],
-            'params',
-            $cursor
-        );
+        $this->assertSame([[], ['sort' => ['name' => 1]]], $result);
     }
 
-    public function testShouldSkipDocuments()
+    public function testShouldSkipDocuments(): void
     {
         // Set
         $cursor = $this->getCursor();
 
         // Actions
         $cursor->skip(5);
+        $result = $this->getProtected($cursor, 'params');
 
         // Assertions
-        $this->assertAttributeSame(
-            [[], ['skip' => 5]],
-            'params',
-            $cursor
-        );
+        $this->assertSame([[], ['skip' => 5]], $result);
     }
 
-    public function testShouldSetNoCursorTimeoutToTrue()
+    public function testShouldSetNoCursorTimeoutToTrue(): void
     {
         // Set
         $cursor = $this->getCursor();
 
         // Actions
         $cursor->disableTimeout();
+        $result = $this->getProtected($cursor, 'params');
 
         // Assertions
-        $this->assertAttributeSame(
-            [[], ['noCursorTimeout' => true]],
-            'params',
-            $cursor
-        );
+        $this->assertSame([[], ['noCursorTimeout' => true]], $result);
     }
 
-    public function testShouldSetReadPreferenceParameterAccordingly()
+    public function testShouldSetReadPreferenceParameterAccordingly(): void
     {
         // Set
         $cursor = $this->getCursor();
@@ -100,7 +89,7 @@ class CursorTest extends TestCase
         $this->assertSame($mode, $result);
     }
 
-    public function testShouldBeAbleToSetReadPreferenceAndCursorTimeoutTogether()
+    public function testShouldBeAbleToSetReadPreferenceAndCursorTimeoutTogether(): void
     {
         // Set
         $cursor = $this->getCursor();
@@ -119,7 +108,7 @@ class CursorTest extends TestCase
         $this->assertTrue($timeoutResult);
     }
 
-    public function testShouldCountDocuments()
+    public function testShouldCountDocuments(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -137,7 +126,7 @@ class CursorTest extends TestCase
         $this->assertSame(5, $result);
     }
 
-    public function testShouldCountDocumentsWithCountFunction()
+    public function testShouldCountDocumentsWithCountFunction(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -155,7 +144,7 @@ class CursorTest extends TestCase
         $this->assertSame(5, $result);
     }
 
-    public function testShouldRewind()
+    public function testShouldRewind(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -170,12 +159,13 @@ class CursorTest extends TestCase
 
         // Actions
         $cursor->rewind();
+        $result = $this->getProtected($cursor, 'position');
 
         // Assertions
-        $this->assertAttributeSame(0, 'position', $cursor);
+        $this->assertSame(0, $result);
     }
 
-    public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
+    public function testShouldRewindACursorThatHasAlreadyBeenInitialized(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -197,12 +187,13 @@ class CursorTest extends TestCase
 
         // Actions
         $cursor->rewind();
+        $result = $this->getProtected($cursor, 'position');
 
         // Assertions
-        $this->assertAttributeSame(0, 'position', $cursor);
+        $this->assertSame(0, $result);
     }
 
-    public function testShouldGetCurrent()
+    public function testShouldGetCurrent(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -221,7 +212,7 @@ class CursorTest extends TestCase
         $this->assertSame('John Doe', $model->name);
     }
 
-    public function testShouldGetFirst()
+    public function testShouldGetFirst(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -240,7 +231,7 @@ class CursorTest extends TestCase
         $this->assertSame('John Doe', $model->name);
     }
 
-    public function testShouldGetFirstWhenEmpty()
+    public function testShouldGetFirstWhenEmpty(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -255,7 +246,7 @@ class CursorTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldRefreshTheCursor()
+    public function testShouldRefreshTheCursor(): void
     {
         // Set
         $driverCursor = new CachingIterator(new ArrayObject());
@@ -264,12 +255,13 @@ class CursorTest extends TestCase
 
         // Actions
         $cursor->fresh();
+        $result = $this->getProtected($cursor, 'cursor');
 
         // Assertions
-        $this->assertAttributeSame(null, 'cursor', $cursor);
+        $this->assertNull($result);
     }
 
-    public function testShouldImplementKeyMethodFromIterator()
+    public function testShouldImplementKeyMethodFromIterator(): void
     {
         // Set
         $cursor = $this->getCursor();
@@ -282,7 +274,7 @@ class CursorTest extends TestCase
         $this->assertSame(7, $result);
     }
 
-    public function testShouldImplementNextMethodFromIterator()
+    public function testShouldImplementNextMethodFromIterator(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -302,7 +294,7 @@ class CursorTest extends TestCase
         $this->assertSame(8, $cursor->key());
     }
 
-    public function testShouldImplementValidMethodFromIterator()
+    public function testShouldImplementValidMethodFromIterator(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -321,7 +313,7 @@ class CursorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testShouldWrapMongoDriverCursorWithIterator()
+    public function testShouldWrapMongoDriverCursorWithIterator(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -363,7 +355,7 @@ class CursorTest extends TestCase
         $this->assertInstanceOf(CachingIterator::class, $result);
     }
 
-    public function testShouldReturnAllResults()
+    public function testShouldReturnAllResults(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -398,7 +390,7 @@ class CursorTest extends TestCase
         $this->assertSame('tester', $nextModel->occupation);
     }
 
-    public function testShouldReturnResultsToArray()
+    public function testShouldReturnResultsToArray(): void
     {
         // Set
         $collection = m::mock(Collection::class);
@@ -440,7 +432,7 @@ class CursorTest extends TestCase
         );
     }
 
-    public function testShouldSerializeAnActiveCursor()
+    public function testShouldSerializeAnActiveCursor(): void
     {
         // Set
         $connection = $this->instance(Connection::class, m::mock(Connection::class));

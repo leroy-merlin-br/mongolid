@@ -10,13 +10,7 @@ use Mongolid\TestCase;
 
 class ManagerTest extends TestCase
 {
-    protected function tearDown()
-    {
-        $this->setProtected(Manager::class, 'singleton', null);
-        parent::tearDown();
-    }
-
-    public function testShouldAddAndGetConnection()
+    public function testShouldAddAndGetConnection(): void
     {
         // Set
         $manager = new Manager();
@@ -35,7 +29,7 @@ class ManagerTest extends TestCase
         $this->assertSame($client, $manager->getClient());
     }
 
-    public function testShouldSetEventTrigger()
+    public function testShouldSetEventTrigger(): void
     {
         // Set
         $test = $this;
@@ -50,14 +44,15 @@ class ManagerTest extends TestCase
             ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
                 $test->assertSame(EventTriggerService::class, $class);
-                $test->assertAttributeSame($eventTrigger, 'dispatcher', $eventService);
+                $dispatcher = $this->getProtected($eventService, 'dispatcher');
+                $test->assertSame($eventTrigger, $dispatcher);
             });
 
         // Actions
         $manager->setEventTrigger($eventTrigger);
     }
 
-    public function testShouldInitializeOnce()
+    public function testShouldInitializeOnce(): void
     {
         // Set
         $manager = new Manager();
@@ -66,8 +61,7 @@ class ManagerTest extends TestCase
         $this->callProtected($manager, 'init');
 
         // Assertions
-        $this->assertAttributeSame($manager, 'singleton', Manager::class);
-        $this->assertAttributeInstanceOf(IlluminateContainer::class, 'container', $manager);
+        $this->assertInstanceOf(IlluminateContainer::class, $manager->container);
 
         // Actions
         $container = $manager->container;
@@ -75,6 +69,6 @@ class ManagerTest extends TestCase
 
         // Assertions
         // Initializes again to make sure that it will not instantiate a new container
-        $this->assertAttributeSame($container, 'container', $manager);
+        $this->assertSame($container, $manager->container);
     }
 }

@@ -21,7 +21,7 @@ class LocalDateTimeTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,13 +34,13 @@ class LocalDateTimeTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->date);
         parent::tearDown();
     }
 
-    public function testGetShouldRetrievesDateUsingTimezone()
+    public function testGetShouldRetrievesDateUsingTimezone(): void
     {
         // Set
         $date = new UTCDateTime($this->date);
@@ -52,7 +52,7 @@ class LocalDateTimeTest extends TestCase
         $this->assertEquals($this->date, $result);
     }
 
-    public function testFormatShouldRetrievesDateWithDefaultFormat()
+    public function testFormatShouldRetrievesDateWithDefaultFormat(): void
     {
         // Set
         $timezone = new DateTimeZone(date_default_timezone_get());
@@ -65,7 +65,7 @@ class LocalDateTimeTest extends TestCase
         $this->assertSame($this->date->format($this->format), $result);
     }
 
-    public function testFormatShouldRetrieveDateUsingGivenFormat()
+    public function testFormatShouldRetrieveDateUsingGivenFormat(): void
     {
         // Set
         $timezone = new DateTimeZone(date_default_timezone_get());
@@ -79,7 +79,7 @@ class LocalDateTimeTest extends TestCase
         $this->assertSame($this->date->format($format), $result);
     }
 
-    public function testTimestampShouldRetrievesTimestampUsingTimezone()
+    public function testTimestampShouldRetrievesTimestampUsingTimezone(): void
     {
         // Set
         $timestamp = $this->date->getTimestamp();

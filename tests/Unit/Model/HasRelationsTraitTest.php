@@ -14,7 +14,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider referencesOneScenarios
      */
-    public function testShouldReferenceOne($fieldValue, array $expectedQuery)
+    public function testShouldReferenceOne($fieldValue, array $expectedQuery): void
     {
         // Set
         $model = new ReferencedUser();
@@ -35,7 +35,7 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testShouldNotPerformQueryForNullReference()
+    public function testShouldNotPerformQueryForNullReference(): void
     {
         // Set
         $model = new ReferencedUser();
@@ -58,7 +58,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider referencesManyScenarios
      */
-    public function testShouldReferenceMany($fieldValue, array $expectedQuery)
+    public function testShouldReferenceMany($fieldValue, array $expectedQuery): void
     {
         // Set
         $model = new ReferencedUser();
@@ -79,7 +79,7 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testShouldEmbedOne()
+    public function testShouldEmbedOne(): void
     {
         // Set
         $model = new EmbeddedUser();
@@ -99,7 +99,7 @@ class HasRelationsTraitTest extends TestCase
         $this->assertSame($embeddedModel, $result);
     }
 
-    public function testEmbedOneShouldAllowOnlyOneEmbeddedModel()
+    public function testEmbedOneShouldAllowOnlyOneEmbeddedModel(): void
     {
         // Set
         $model = new EmbeddedUser();
@@ -128,7 +128,7 @@ class HasRelationsTraitTest extends TestCase
     /**
      * @dataProvider embedsManyScenarios
      */
-    public function testShouldEmbedMany($fieldValue, array $expectedItems)
+    public function testShouldEmbedMany($fieldValue, array $expectedItems): void
     {
         // Set
         $model = new EmbeddedUser();

@@ -9,7 +9,7 @@ use Mongolid\TestCase;
 
 class ModelMapperTest extends TestCase
 {
-    public function testShouldClearDynamicFieldsIfModelIsNotDynamic()
+    public function testShouldClearDynamicFieldsIfModelIsNotDynamic(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -36,7 +36,7 @@ class ModelMapperTest extends TestCase
         );
     }
 
-    public function testShouldClearDynamicFieldsIfModelIsNotDynamicCheckingTimestamps()
+    public function testShouldClearDynamicFieldsIfModelIsNotDynamicCheckingTimestamps(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -66,7 +66,7 @@ class ModelMapperTest extends TestCase
         );
     }
 
-    public function testShouldNotClearDynamicFieldsIfModelIsDynamic()
+    public function testShouldNotClearDynamicFieldsIfModelIsDynamic(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -94,7 +94,7 @@ class ModelMapperTest extends TestCase
         );
     }
 
-    public function testShouldClearNullFields()
+    public function testShouldClearNullFields(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -120,7 +120,7 @@ class ModelMapperTest extends TestCase
         );
     }
 
-    public function testShouldGenerateAnIdIfModelDoesNotHaveOne()
+    public function testShouldGenerateAnIdIfModelDoesNotHaveOne(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -139,7 +139,7 @@ class ModelMapperTest extends TestCase
         $this->assertInstanceOf(ObjectId::class, $model->_id);
     }
 
-    public function testShouldCastObjectId()
+    public function testShouldCastObjectId(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -159,7 +159,7 @@ class ModelMapperTest extends TestCase
         $this->assertEquals(new ObjectId($id), $model->_id);
     }
 
-    public function testShouldHandleTimestampsCreatingCreatedAtField()
+    public function testShouldHandleTimestampsCreatingCreatedAtField(): void
     {
         // Set
         $model = new class extends AbstractModel
@@ -183,7 +183,7 @@ class ModelMapperTest extends TestCase
         $this->assertSame($model->updated_at, $model->created_at);
     }
 
-    public function testShouldHandleTimestampsOnlyUpdatingUpdatedAtField()
+    public function testShouldHandleTimestampsOnlyUpdatingUpdatedAtField(): void
     {
         // Set
         $model = new class extends AbstractModel

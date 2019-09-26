@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Tests\Integration;
 
+use Illuminate\Support\Arr;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
@@ -8,7 +9,7 @@ use Mongolid\Tests\Stubs\EmbeddedUser;
 
 class EmbedsManyRelationTest extends IntegrationTestCase
 {
-    public function testShouldRetrieveSiblingsOfUser()
+    public function testShouldRetrieveSiblingsOfUser(): void
     {
         // create sibling
         $chuck = $this->createUser('Chuck');
@@ -65,7 +66,7 @@ class EmbedsManyRelationTest extends IntegrationTestCase
         $this->assertSiblings([$chuck], $john);
     }
 
-    public function testShouldRetrieveGrandsonsOfUserUsingCustomKey()
+    public function testShouldRetrieveGrandsonsOfUserUsingCustomKey(): void
     {
         // create grandson
         $chuck = $this->createUser('Chuck');
@@ -128,8 +129,8 @@ class EmbedsManyRelationTest extends IntegrationTestCase
 
         $this->assertInstanceOf(EmbeddedUser::class, $john->grandsons->first());
         $this->assertEquals(
-            array_except($chuck->toArray(), 'updated_at'),
-            array_except($john->grandsons->first()->toArray(), 'updated_at')
+            Arr::except($chuck->toArray(), 'updated_at'),
+            Arr::except($john->grandsons->first()->toArray(), 'updated_at')
         );
 
         $chuck = $john->grandsons->first();
@@ -141,8 +142,8 @@ class EmbedsManyRelationTest extends IntegrationTestCase
 
         $this->assertInstanceOf(EmbeddedUser::class, $john->grandsons->first());
         $this->assertEquals(
-            array_except($chuck->toArray(), 'updated_at'),
-            array_except($john->grandsons->first()->toArray(), 'updated_at')
+            Arr::except($chuck->toArray(), 'updated_at'),
+            Arr::except($john->grandsons->first()->toArray(), 'updated_at')
         );
     }
 

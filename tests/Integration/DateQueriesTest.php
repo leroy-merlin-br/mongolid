@@ -7,7 +7,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 
 class DateQueriesTest extends IntegrationTestCase
 {
-    public function testShouldRetrieveDocumentsUsingDateFilters()
+    public function testShouldRetrieveDocumentsUsingDateFilters(): void
     {
         // Set
         $user = new ReferencedUser();
@@ -47,7 +47,7 @@ class DateQueriesTest extends IntegrationTestCase
         $this->assertCount(0, $emptyResult);
     }
 
-    public function testShouldRetrieveDocumentsUsingDateFiltersWithRelativeDates()
+    public function testShouldRetrieveDocumentsUsingDateFiltersWithRelativeDates(): void
     {
         // Set
         $user = new ReferencedUser();
