@@ -12,6 +12,7 @@ services: mongodb
 
 before_install:
   - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - pecl upgrade mongodb
 
 before_script:
   - composer install --no-interaction
