@@ -18,7 +18,7 @@ class DynamicSchemaTest extends TestCase
     public function testShouldExtendSchema()
     {
         // Arrange
-        $schema = m::mock(DynamicSchema::class.'[]');
+        $schema = new DynamicSchema();
 
         // Assert
         $this->assertInstanceOf(Schema::class, $schema);
@@ -27,7 +27,7 @@ class DynamicSchemaTest extends TestCase
     public function testShouldBeDynamic()
     {
         // Arrange
-        $schema = m::mock(DynamicSchema::class.'[]');
+        $schema = new DynamicSchema();
 
         // Assert
         $this->assertAttributeEquals(true, 'dynamic', $schema);

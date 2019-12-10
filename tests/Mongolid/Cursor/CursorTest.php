@@ -191,7 +191,8 @@ class CursorTest extends TestCase
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $entity = m::mock(ActiveRecord::class.'[]');
+        $entity = new class() extends ActiveRecord {
+        };
         $entity->name = 'John Doe';
         $driverCursor = new ArrayIterator([$entity]);
         $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);

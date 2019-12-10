@@ -28,7 +28,8 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesOne'];
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = new class() extends ActiveRecord {
+        };
         $dataMapper = m::mock(DataMapper::class)->makePartial();
         $result = m::mock();
 
@@ -61,7 +62,8 @@ class RelationsTest extends TestCase
     {
         // Set
         $expectedQuery = $expectedQuery['referencesMany'];
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = new class() extends ActiveRecord {
+        };
         $dataMapper = m::mock(DataMapper::class)->makePartial();
         $result = m::mock(Cursor::class);
 
@@ -93,7 +95,8 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsOne($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = new class() extends ActiveRecord {
+        };
         $cursorFactory = m::mock(CursorFactory::class);
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
@@ -124,7 +127,8 @@ class RelationsTest extends TestCase
     public function testShouldEmbedsMany($entity, $field, $fieldValue, $expectedItems)
     {
         // Set
-        $model = m::mock(ActiveRecord::class.'[]');
+        $model = new class() extends ActiveRecord {
+        };
         $cursorFactory = m::mock(CursorFactory::class);
         $cursor = m::mock(EmbeddedCursor::class);
         $document = $fieldValue;
