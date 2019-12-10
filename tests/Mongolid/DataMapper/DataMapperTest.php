@@ -259,6 +259,11 @@ class DataMapperTest extends TestCase
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('originalAttributes')
+                ->once()
+                ->with()
+                ->andReturn([]);
+
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -274,6 +279,65 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertEquals($expected, $mapper->update($entity, $options));
+    }
+
+    public function testDifferentialUpdateShouldWork()
+    {
+        // Arrange
+        $entity = m::mock(AttributesAccessInterface::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+
+        $collection = m::mock(Collection::class);
+        $parsedObject = ['_id' => 123, 'name' => 'Original Name', 'age' => 32, 'address' => null, 'other' => null];
+        $originalAttributes = ['_id' => 123, 'name' => 'Original Name', 'address' => '1 Blue street', 'gender' => 'm'];
+        $operationResult = m::mock();
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        $entity->_id = 123;
+        $updateData = ['$set' => ['age' => 32], '$unset' => ['address' => '', 'gender' => '']];
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($entity)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                $updateData,
+                $options
+            )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('isAcknowledged')
+            ->once()
+            ->andReturn(true);
+
+        $operationResult->shouldReceive('getModifiedCount')
+            ->andReturn(1);
+
+        $entity->shouldReceive('originalAttributes')
+            ->once()
+            ->with()
+            ->andReturn($originalAttributes);
+
+        $entity->shouldReceive('syncOriginalAttributes')
+            ->once()
+            ->with();
+
+        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updated', $entity, false);
+
+        // Assert
+        $this->assertTrue($mapper->update($entity, $options));
     }
 
     /**

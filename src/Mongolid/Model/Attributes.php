@@ -123,6 +123,14 @@ trait Attributes
     }
 
     /**
+     * Get original attributes.
+     */
+    public function originalAttributes()
+    {
+        return $this->original;
+    }
+
+    /**
      * Stores original attributes from actual data from attributes
      * to be used in future comparisons about changes.
      *
