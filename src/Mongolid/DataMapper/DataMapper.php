@@ -606,7 +606,7 @@ class DataMapper implements HasSchemaInterface
             if (!isset($oldData[$k])) { // new field
                 $changes['$set']["{$keyfix}{$k}"] = $v;
             } elseif ($oldData[$k] != $v) {  // changed value
-                if (is_array($v) && is_array($oldData[$k]) && $v) { // check array recursively for changes
+                if (is_array($v) && is_array($oldData[$k]) && $v && $oldData[$k] !== []) { // check array recursively for changes
                     $this->calculateChanges($changes, $v, $oldData[$k], "{$keyfix}{$k}.");
                 } else {
                     // overwrite normal changes in keys
