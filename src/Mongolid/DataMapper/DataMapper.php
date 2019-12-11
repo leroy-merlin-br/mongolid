@@ -599,6 +599,10 @@ class DataMapper implements HasSchemaInterface
     private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
     {
         foreach ($newData as $k => $v) {
+            if (is_null($v)) {
+                continue;
+            }
+
             if (!isset($oldData[$k])) { // new field
                 $changes['$set']["{$keyfix}{$k}"] = $v;
             } elseif ($oldData[$k] != $v) {  // changed value

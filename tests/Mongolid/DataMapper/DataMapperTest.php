@@ -289,13 +289,13 @@ class DataMapperTest extends TestCase
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123, 'name' => 'Original Name', 'age' => 32, 'hobbies' => ['bike', 'skate'], 'address' => null, 'other' => null];
-        $originalAttributes = ['_id' => 123, 'name' => 'Original Name', 'hobbies' => ['bike', 'motorcycle', 'gardening'], 'address' => '1 Blue street', 'gender' => 'm', 'nullField' => null];
+        $parsedObject = ['_id' => 123, 'name' => 'Original Name', 'age' => 32, 'hobbies' => ['bike', 'skate'], 'address' => null, 'other' => null, 'nested' => [['field' => null]]];
+        $originalAttributes = ['_id' => 123, 'name' => 'Original Name', 'hobbies' => ['bike', 'motorcycle', 'gardening'], 'address' => '1 Blue street', 'gender' => 'm', 'nullField' => null, 'nested' => [['field' => 'value']]];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $entity->_id = 123;
-        $updateData = ['$set' => ['age' => 32, 'hobbies.1' => 'skate'], '$unset' => ['hobbies.2' => '', 'address' => '', 'gender' => '', 'nullField' => '']];
+        $updateData = ['$set' => ['age' => 32, 'hobbies.1' => 'skate'], '$unset' => ['hobbies.2' => '', 'address' => '', 'gender' => '', 'nullField' => '', 'nested.0.field' => '']];
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
