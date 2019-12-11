@@ -289,13 +289,13 @@ class DataMapperTest extends TestCase
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
         $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123, 'name' => 'Original Name', 'age' => 32, 'address' => null, 'other' => null];
-        $originalAttributes = ['_id' => 123, 'name' => 'Original Name', 'address' => '1 Blue street', 'gender' => 'm'];
+        $parsedObject = ['_id' => 123, 'name' => 'Original Name', 'age' => 32, 'hobbies' => ['bike', 'skate'], 'address' => null, 'other' => null];
+        $originalAttributes = ['_id' => 123, 'name' => 'Original Name', 'hobbies' => ['bike', 'motorcycle', 'gardening'], 'address' => '1 Blue street', 'gender' => 'm', 'nullField' => null];
         $operationResult = m::mock();
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $entity->_id = 123;
-        $updateData = ['$set' => ['age' => 32], '$unset' => ['address' => '', 'gender' => '']];
+        $updateData = ['$set' => ['age' => 32, 'hobbies.1' => 'skate'], '$unset' => ['hobbies.2' => '', 'address' => '', 'gender' => '', 'nullField' => '']];
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();
