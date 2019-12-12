@@ -371,6 +371,49 @@ class DataMapperTest extends TestCase
         $this->assertTrue($mapper->update($entity, $options));
     }
 
+    public function testDifferentialUpdateShouldReturnTrueIfThereIsNothingToUpdate()
+    {
+        // Arrange
+        $entity = m::mock(AttributesAccessInterface::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        $entity->_id = 123;
+        $parsedObject = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'age' => 32,
+            'hobbies' => ['bike', 'skate'],
+            'nested' => [['field' => null]],
+            'data' => ['key' => '123'],
+        ];
+        $originalAttributes = $parsedObject;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($entity)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->never();
+
+        $entity->shouldReceive('originalAttributes')
+            ->once()
+            ->with()
+            ->andReturn($originalAttributes);
+
+        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventNotToBeFired('updated', $entity);
+
+        // Assert
+        $this->assertTrue($mapper->update($entity, $options));
+    }
+
     /**
      * @dataProvider getWriteConcernVariations
      */

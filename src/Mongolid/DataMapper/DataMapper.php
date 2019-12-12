@@ -175,7 +175,10 @@ class DataMapper implements HasSchemaInterface
         }
 
         $data = $this->parseToDocument($entity);
-        $updateData = $this->getUpdateData($entity, $data);
+
+        if (!$updateData = $this->getUpdateData($entity, $data)) {
+            return true;
+        }
 
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
