@@ -263,9 +263,10 @@ class AttributesTest extends TestCase
 
         // Act
         $model->syncOriginalAttributes();
+        $result = $model->originalAttributes();
 
         // Assert
-        $this->assertAttributeEquals($model->attributes, 'original', $model);
+        $this->assertSame(['name' => 'John', 'age' => 25], $result);
     }
 
     public function getFillableOptions()

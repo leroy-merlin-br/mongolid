@@ -176,9 +176,13 @@ class DataMapper implements HasSchemaInterface
 
         $data = $this->parseToDocument($entity);
 
+        if (!$updateData = $this->getUpdateData($entity, $data)) {
+            return true;
+        }
+
         $queryResult = $this->getCollection()->updateOne(
             ['_id' => $data['_id']],
-            ['$set' => $data],
+            $updateData,
             $this->mergeOptions($options)
         );
 
@@ -569,5 +573,57 @@ class DataMapper implements HasSchemaInterface
     public function setSchema(Schema $schema)
     {
         $this->schema = $schema;
+    }
+
+    private function getUpdateData($model, array $data): array
+    {
+        $changes = [];
+        $oldData = [];
+
+        if ($model instanceof AttributesAccessInterface) {
+            $oldData = $model->originalAttributes();
+        }
+
+        $data = array_filter($data, function ($value) {
+            return !is_null($value);
+        });
+
+        $this->calculateChanges($changes, $data, $oldData);
+
+        return $changes;
+    }
+
+    /**
+     * Based on the work of "bjori/mongo-php-transistor".
+     * Calculate `$set` and `$unset` arrays for update operation and store them on $changes.
+     *
+     * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108
+     */
+    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
+    {
+        foreach ($newData as $k => $v) {
+            if (is_null($v)) {
+                continue;
+            }
+
+            if (!isset($oldData[$k])) { // new field
+                $changes['$set']["{$keyfix}{$k}"] = $v;
+            } elseif ($oldData[$k] != $v) {  // changed value
+                if (is_array($v) && is_array($oldData[$k]) && $v && $oldData[$k] !== []) { // check array recursively for changes
+                    $this->calculateChanges($changes, $v, $oldData[$k], "{$keyfix}{$k}.");
+                } else {
+                    // overwrite normal changes in keys
+                    // this applies to previously empty arrays/documents too
+                    $changes['$set']["{$keyfix}{$k}"] = $v;
+                }
+            }
+        }
+
+        foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
+            if (!isset($newData[$k])) { // removed field
+                $changes['$unset']["{$keyfix}{$k}"] = '';
+                continue;
+            }
+        }
     }
 }

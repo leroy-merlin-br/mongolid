@@ -39,7 +39,8 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $value = null;
 
         // Assert
@@ -52,7 +53,8 @@ class SchemaTest extends TestCase
     public function testShouldNotCastRandomStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $value = 'A random string';
 
         // Assert
@@ -65,7 +67,8 @@ class SchemaTest extends TestCase
     public function testShouldCastObjectIdStringIntoObjectId()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $value = '507f1f77bcf86cd799439011';
 
         // Assert
@@ -83,7 +86,8 @@ class SchemaTest extends TestCase
     public function testShouldCastNullIntoAutoIncrementSequence()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $sequenceService = m::mock(SequenceService::class);
         $value = null;
 
@@ -103,7 +107,8 @@ class SchemaTest extends TestCase
 
     public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
     {
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $sequenceService = m::mock(SequenceService::class);
         $value = 3;
 
@@ -124,7 +129,8 @@ class SchemaTest extends TestCase
     public function testShouldCastDocumentTimestamps()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $value = null;
 
         // Assertion
@@ -137,7 +143,8 @@ class SchemaTest extends TestCase
     public function testShouldRefreshUpdatedAtTimestamps()
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
         $value = (new UTCDateTime(25));
 
         // Assertion
@@ -155,7 +162,8 @@ class SchemaTest extends TestCase
         $compareTimestamp = true
     ) {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = new class extends Schema {
+        };
 
         // Assertion
         $result = $schema->createdAtTimestamp($value);

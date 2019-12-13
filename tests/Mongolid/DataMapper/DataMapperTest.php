@@ -259,6 +259,11 @@ class DataMapperTest extends TestCase
             ->andReturn(1);
 
         if ($entity instanceof AttributesAccessInterface) {
+            $entity->shouldReceive('originalAttributes')
+                ->once()
+                ->with()
+                ->andReturn([]);
+
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -274,6 +279,139 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertEquals($expected, $mapper->update($entity, $options));
+    }
+
+    public function testDifferentialUpdateShouldWork()
+    {
+        // Arrange
+        $entity = m::mock(AttributesAccessInterface::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+
+        $collection = m::mock(Collection::class);
+        $operationResult = m::mock();
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        $entity->_id = 123;
+        $parsedObject = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'age' => 32,
+            'hobbies' => ['bike', 'skate'],
+            'address' => null,
+            'other' => null,
+            'nested' => [['field' => null]],
+            'data' => ['key' => '123'],
+        ];
+        $originalAttributes = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'hobbies' => ['bike', 'motorcycle', 'gardening'],
+            'address' => '1 Blue street',
+            'gender' => 'm',
+            'nullField' => null,
+            'nested' => [['field' => 'value']],
+            'data' => [],
+        ];
+        $updateData = [
+            '$set' => [
+                'age' => 32,
+                'hobbies.1' => 'skate',
+                'data' => ['key' => '123'],
+            ],
+            '$unset' => [
+                'hobbies.2' => '',
+                'address' => '',
+                'gender' => '',
+                'nullField' => '',
+                'nested.0.field' => '',
+            ],
+        ];
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($entity)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                $updateData,
+                $options
+            )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('isAcknowledged')
+            ->once()
+            ->andReturn(true);
+
+        $operationResult->shouldReceive('getModifiedCount')
+            ->andReturn(1);
+
+        $entity->shouldReceive('originalAttributes')
+            ->once()
+            ->with()
+            ->andReturn($originalAttributes);
+
+        $entity->shouldReceive('syncOriginalAttributes')
+            ->once()
+            ->with();
+
+        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updated', $entity, false);
+
+        // Assert
+        $this->assertTrue($mapper->update($entity, $options));
+    }
+
+    public function testDifferentialUpdateShouldReturnTrueIfThereIsNothingToUpdate()
+    {
+        // Arrange
+        $entity = m::mock(AttributesAccessInterface::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        $entity->_id = 123;
+        $parsedObject = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'age' => 32,
+            'hobbies' => ['bike', 'skate'],
+            'nested' => [['field' => null]],
+            'data' => ['key' => '123'],
+        ];
+        $originalAttributes = $parsedObject;
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($entity)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->never();
+
+        $entity->shouldReceive('originalAttributes')
+            ->once()
+            ->with()
+            ->andReturn($originalAttributes);
+
+        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventNotToBeFired('updated', $entity);
+
+        // Assert
+        $this->assertTrue($mapper->update($entity, $options));
     }
 
     /**
