@@ -300,8 +300,8 @@ class DataMapperTest extends TestCase
             'hobbies' => ['bike', 'skate'],
             'address' => null,
             'other' => null,
-            'nested' => [['field' => null]],
-            'data' => ['key' => '123'],
+            'nested' => [['field' => null], ['other-field' => 'other-value']],
+            'data' => [['key' => '123'], null, ['other-field' => 'other-value']],
         ];
         $originalAttributes = [
             '_id' => 123,
@@ -310,21 +310,22 @@ class DataMapperTest extends TestCase
             'address' => '1 Blue street',
             'gender' => 'm',
             'nullField' => null,
-            'nested' => [['field' => 'value']],
+            'nested' => [['field' => 'value'], null],
             'data' => [],
         ];
         $updateData = [
             '$set' => [
                 'age' => 32,
                 'hobbies.1' => 'skate',
-                'data' => ['key' => '123'],
+                'nested.1' => ['other-field' => 'other-value'],
+                'data' => [['key' => '123'], ['other-field' => 'other-value']],
             ],
             '$unset' => [
                 'hobbies.2' => '',
+                'nested.0.field' => '',
                 'address' => '',
                 'gender' => '',
                 'nullField' => '',
-                'nested.0.field' => '',
             ],
         ];
 
