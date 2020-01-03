@@ -584,10 +584,6 @@ class DataMapper implements HasSchemaInterface
             $oldData = $model->originalAttributes();
         }
 
-        $data = array_filter($data, function ($value) {
-            return !is_null($value);
-        });
-
         $this->calculateChanges($changes, $data, $oldData);
 
         return $changes;
@@ -612,6 +608,10 @@ class DataMapper implements HasSchemaInterface
                 if (is_array($v) && is_array($oldData[$k]) && $v && $oldData[$k] !== []) { // check array recursively for changes
                     $this->calculateChanges($changes, $v, $oldData[$k], "{$keyfix}{$k}.");
                 } else {
+                    if (is_array($v)) {
+                        $v = $this->filterNullValues($v);
+                    }
+
                     // overwrite normal changes in keys
                     // this applies to previously empty arrays/documents too
                     $changes['$set']["{$keyfix}{$k}"] = $v;
@@ -625,5 +625,17 @@ class DataMapper implements HasSchemaInterface
                 continue;
             }
         }
+    }
+
+    private function filterNullValues(array $data): array
+    {
+        return array_values(
+            array_filter(
+                $data,
+                function ($value) {
+                    return !is_null($value);
+                }
+            )
+        );
     }
 }
