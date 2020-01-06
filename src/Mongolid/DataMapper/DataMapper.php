@@ -629,13 +629,17 @@ class DataMapper implements HasSchemaInterface
 
     private function filterNullValues(array $data): array
     {
-        return array_values(
-            array_filter(
-                $data,
-                function ($value) {
-                    return !is_null($value);
-                }
-            )
+        $filtered =  array_filter(
+            $data,
+            function ($value) {
+                return !is_null($value);
+            }
         );
+
+        if ($data == array_values($data)) {
+            $filtered = array_values($filtered);
+        }
+
+        return $filtered;
     }
 }
