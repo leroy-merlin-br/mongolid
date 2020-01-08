@@ -60,6 +60,11 @@ class DataMapper implements HasSchemaInterface
     protected $eventService;
 
     /**
+     * @var array
+     */
+    private $pullNullValues = [];
+
+    /**
      * @param Pool $connPool the connections that are going to be used to interact with the database
      */
     public function __construct(Pool $connPool)
@@ -180,11 +185,19 @@ class DataMapper implements HasSchemaInterface
             return true;
         }
 
-        $queryResult = $this->getCollection()->updateOne(
-            ['_id' => $data['_id']],
-            $updateData,
-            $this->mergeOptions($options)
-        );
+        $collection = $this->getCollection();
+        $filter = ['_id' => $data['_id']];
+        $updateOptions = $this->mergeOptions($options);
+
+        $queryResult = $collection->updateOne($filter, $updateData, $updateOptions);
+
+        if ($this->pullNullValues) {
+            $collection->updateOne(
+                $filter,
+                ['$pull' => $this->pullNullValues],
+                $updateOptions
+            );
+        }
 
         $result = $queryResult->isAcknowledged() && $queryResult->getModifiedCount();
 
@@ -577,6 +590,7 @@ class DataMapper implements HasSchemaInterface
 
     private function getUpdateData($model, array $data): array
     {
+        $this->pullNullValues = [];
         $changes = [];
         $oldData = [];
 
@@ -592,7 +606,10 @@ class DataMapper implements HasSchemaInterface
     /**
      * Based on the work of "bjori/mongo-php-transistor".
      * Calculate `$set` and `$unset` arrays for update operation and store them on $changes.
+     * We also have a workaround for SERVER-1014, running a $pull on other update after the $unset,
+     * when needed.
      *
+     * @see https://jira.mongodb.org/browse/SERVER-1014
      * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108
      */
     private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
@@ -621,6 +638,9 @@ class DataMapper implements HasSchemaInterface
 
         foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
             if (!isset($newData[$k])) { // removed field
+                if (is_integer($k)) {
+                    $this->pullNullValues[rtrim($keyfix, '.')] = null;
+                }
                 $changes['$unset']["{$keyfix}{$k}"] = '';
                 continue;
             }

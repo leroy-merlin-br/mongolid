@@ -297,7 +297,7 @@ class DataMapperTest extends TestCase
             '_id' => 123,
             'name' => 'Original Name',
             'age' => 32,
-            'hobbies' => ['bike', 'skate'],
+            'hobbies' => ['bike', 'skate', 'gardening'],
             'address' => null,
             'other' => null,
             'nested' => [['field' => null], ['other-field' => 'other-value']],
@@ -324,7 +324,6 @@ class DataMapperTest extends TestCase
                 'array-to-object' => ['first' => 'value', 'second' => 'other-value'],
             ],
             '$unset' => [
-                'hobbies.2' => '',
                 'nested.0.field' => '',
                 'address' => '',
                 'gender' => '',
@@ -351,6 +350,121 @@ class DataMapperTest extends TestCase
                 $updateData,
                 $options
             )->andReturn($operationResult);
+
+        $operationResult->shouldReceive('isAcknowledged')
+            ->once()
+            ->andReturn(true);
+
+        $operationResult->shouldReceive('getModifiedCount')
+            ->andReturn(1);
+
+        $entity->shouldReceive('originalAttributes')
+            ->once()
+            ->with()
+            ->andReturn($originalAttributes);
+
+        $entity->shouldReceive('syncOriginalAttributes')
+            ->once()
+            ->with();
+
+        $this->expectEventToBeFired('updating', $entity, true);
+        $this->expectEventToBeFired('updated', $entity, false);
+
+        // Assert
+        $this->assertTrue($mapper->update($entity, $options));
+    }
+
+    public function testDifferentialUpdateShouldWorkHandlingNullValuesInArrays()
+    {
+        // Arrange
+        $entity = m::mock(AttributesAccessInterface::class);
+        $connPool = m::mock(Pool::class);
+        $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
+
+        $collection = m::mock(Collection::class);
+        $operationResult = m::mock();
+        $options = ['writeConcern' => new WriteConcern(1)];
+
+        $entity->_id = 123;
+        $parsedObject = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'age' => 32,
+            'hobbies' => ['bike', 'skate'],
+            'address' => null,
+            'other' => null,
+            'data' => [['key' => '123'], null, ['other-field' => 'other-value']],
+            'array-to-object' => ['first' => 'value', 'second' => 'other-value'],
+            'nested' => [
+                'field' => 'value',
+                'null-values' => [null, null],
+            ],
+        ];
+        $originalAttributes = [
+            '_id' => 123,
+            'name' => 'Original Name',
+            'hobbies' => ['bike', 'motorcycle', 'gardening'],
+            'address' => '1 Blue street',
+            'gender' => 'm',
+            'nullField' => null,
+            'data' => [],
+            'array-to-object' => [],
+            'nested' => [
+                'field' => 'value',
+                'null-values' => [[1, 2, 3], null],
+            ],
+        ];
+        $firstUpdateData = [
+            '$set' => [
+                'age' => 32,
+                'hobbies.1' => 'skate',
+                'data' => [['key' => '123'], ['other-field' => 'other-value']],
+                'array-to-object' => ['first' => 'value', 'second' => 'other-value'],
+            ],
+            '$unset' => [
+                'hobbies.2' => '',
+                'address' => '',
+                'gender' => '',
+                'nullField' => '',
+                'nested.null-values.0' => '',
+                'nested.null-values.1' => '',
+            ],
+        ];
+
+        $secondUpdateData = [
+            '$pull' => [
+                'hobbies' => null,
+                'nested.null-values' => null,
+            ]
+        ];
+
+        // Act
+        $mapper->shouldAllowMockingProtectedMethods();
+
+        $mapper->shouldReceive('parseToDocument')
+            ->once()
+            ->with($entity)
+            ->andReturn($parsedObject);
+
+        $mapper->shouldReceive('getCollection')
+            ->once()
+            ->andReturn($collection);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                $firstUpdateData,
+                $options
+            )->andReturn($operationResult);
+
+        $collection->shouldReceive('updateOne')
+            ->once()
+            ->with(
+                ['_id' => 123],
+                $secondUpdateData,
+                $options
+            );
 
         $operationResult->shouldReceive('isAcknowledged')
             ->once()
