@@ -23,7 +23,7 @@ The minimalistic way of doing it is to use `Mongolid\Manager`:
 require 'vendor/autoload.php';
 
 use Mongolid\Manager;
-use Mongolid\Connection;
+use Mongolid\Connection\Connection;
 
 $manager = new Manager(new Connection('mongodb://localhost:27017'));
 ```
