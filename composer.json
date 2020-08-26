@@ -20,9 +20,8 @@
     "require": {
         "php": ">=7.2",
         "ext-mongodb": "*",
-        "illuminate/container": "^7.26",
-        "illuminate/support": "^7.26",
-        "mongodb/mongodb": "^1.4"
+        "mongodb/mongodb": "^1.4",
+        "illuminate/container": "^5.4 || ^6.0"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^0.1",
