@@ -90,7 +90,7 @@ class CacheableCursor extends Cursor
             $this->documents[] = $document;
         }
 
-        $cacheComponent->put($cacheKey, $this->documents, 0.6);
+        $cacheComponent->put($cacheKey, $this->documents, 36);
 
         // Drops the unserializable DriverCursor.
         $this->cursor = null;

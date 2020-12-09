@@ -6,10 +6,8 @@
 
 Mongolid supports both **ActiveRecord** and **DataMapper** patterns. **You choose! (:**
 
-[![Build Status](https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master)](https://travis-ci.org/leroy-merlin-br/mongolid)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cc45e93bb0d0413d9e0355c7377d4d33)](https://www.codacy.com/app/zizaco/mongolid?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=leroy-merlin-br/mongolid&amp;utm_campaign=Badge_Grade)
 [![StyleCI](https://styleci.io/repos/9799450/shield?branch=master)](https://styleci.io/repos/9799450)
-[![Coverage Status](https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master)](https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/leroy-merlin-br/mongolid/v/stable)](https://packagist.org/packages/leroy-merlin-br/mongolid)
 [![Total Downloads](https://poser.pugx.org/leroy-merlin-br/mongolid/downloads)](https://packagist.org/packages/leroy-merlin-br/mongolid)
 [![Latest Unstable Version](https://poser.pugx.org/leroy-merlin-br/mongolid/v/unstable)](https://packagist.org/packages/leroy-merlin-br/mongolid)
