@@ -13,7 +13,7 @@ jobs:
                 run: docker-compose run --rm -T php composer install --no-interaction --no-progress
 
             -   name: Run Tests
-                run: docker-compose run --rm -T php vendor/bin/phpunit
+                run: docker-compose run --rm -T php vendor/bin/phpunit -c phpunit.xml.dist
 
             -   name: Report Coverage
                 run: CODACY_PROJECT_TOKEN=${{ secrets.CODACY_PROJECT_TOKEN }} bash <(curl -Ls https://coverage.codacy.com/get.sh) report
