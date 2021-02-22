@@ -18,10 +18,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.3",
         "ext-mongodb": "*",
-        "illuminate/container": "^5.4 || ^6.0 || ^7.0",
-        "illuminate/support": "^5.4 || ^6.0 || ^7.0",
+        "illuminate/container": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "illuminate/support": "^5.4 || ^6.0 || ^7.0 || ^8.0",
         "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
