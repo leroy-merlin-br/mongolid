@@ -3,9 +3,6 @@ namespace Mongolid\Model\Exception;
 
 use Exception;
 
-/**
- * Class NoCollectionNameException.
- */
 class NoCollectionNameException extends Exception
 {
     /**
