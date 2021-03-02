@@ -256,7 +256,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     {
         $dataMapper = Ioc::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
-        
+
+        // If needs a different DB
         if($this->database){
             $dataMapper->database = $this->database;
         }
