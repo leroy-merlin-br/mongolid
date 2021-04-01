@@ -3,6 +3,7 @@
 namespace Mongolid\Model;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\ActiveRecord;
 use Mongolid\Container\Ioc;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
@@ -83,7 +84,7 @@ trait Relations
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded document is stored
      *
-     * @return Model|null
+     * @return ActiveRecord|Schema|null
      */
     protected function embedsOne(string $entity, string $field)
     {
