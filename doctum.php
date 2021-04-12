@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Sami configuration file.
+ * Doctum configuration file.
  *
- * @see https://github.com/FriendsOfPHP/Sami
+ * @see https://github.com/code-lts/doctum#readme
  */
 
-return new Sami\Sami(
+return new Doctum\Doctum(
     './src',
     [
         'title' => 'Mongolid ODM Api',
