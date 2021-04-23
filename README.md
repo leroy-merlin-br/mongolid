@@ -38,8 +38,8 @@ $ composer require leroy-merlin-br/mongolid
 
 > **Note:** If you are looking for the old PHP 5.x version, head to the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
 
-## [Read the Docs: <small>leroy-merlin-br.github.com/mongolid</small>](http://leroy-merlin-br.github.com/mongolid)
-[![Mongolid Docs](https://dl.dropboxusercontent.com/u/12506137/libs_bundles/MongolidDocs.png)](http://leroy-merlin-br.github.com/mongolid)
+## [Read the Docs: <small>leroy-merlin-br.github.io/mongolid</small>](http://leroy-merlin-br.github.io/mongolid)
+[![Mongolid Docs](https://dl.dropboxusercontent.com/u/12506137/libs_bundles/MongolidDocs.png)](http://leroy-merlin-br.github.io/mongolid)
 
 <a name="troubleshooting"></a>
 ## Troubleshooting
