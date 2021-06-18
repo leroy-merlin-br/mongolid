@@ -16,7 +16,7 @@ Mongolid supports **ActiveRecord** pattern.
 ## Introduction
 Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementation for working with MongoDB. Each database collection can have a corresponding "Model" which is used to interact with that collection.
 
-**Note:** If you are working ReferencesMany.php with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
+**Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
 ## Requirements
 - PHP **7.1** or superior
