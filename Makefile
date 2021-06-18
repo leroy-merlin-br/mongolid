@@ -13,4 +13,4 @@ mkdocs:
 	docker-compose run --rm mkdocs mkdocs build --clean
 
 mkapi:
-	docker run --rm --user ${CONTAINER_USER} -v ${PWD}:/app --workdir /app --entrypoint /bin/doctum botsudo/action-doctum:v5 update doctum.php
+	docker run --rm --user ${CONTAINER_USER} -v ${PWD}:/app --workdir /app --entrypoint /bin/doctum botsudo/action-doctum:v5 update bin/generate-api-docs
