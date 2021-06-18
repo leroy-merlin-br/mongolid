@@ -1,3 +1,5 @@
+CONTAINER_USER="$(shell id -u):$(shell id -g)"
+
 sniff:
 	docker-compose run --rm php vendor/bin/phpcs
 
@@ -11,4 +13,4 @@ mkdocs:
 	docker-compose run --rm mkdocs mkdocs build --clean
 
 mkapi:
-	docker-compose run --rm php vendor/bin/sami.php update sami.php
+	docker run --rm --user ${CONTAINER_USER} -v ${PWD}:/app --workdir /app --entrypoint /bin/doctum botsudo/action-doctum:v5 update doctum.php
