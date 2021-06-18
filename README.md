@@ -1,6 +1,4 @@
-# Mongolid ODM for MongoDB
-
-<p align="center"><img src="https://user-images.githubusercontent.com/1991286/28967747-fe5c258a-78f2-11e7-91c7-8850ffb32004.png" alt="Mongolid"></p>
+![Mongolid](https://user-images.githubusercontent.com/1991286/28967747-fe5c258a-78f2-11e7-91c7-8850ffb32004.png)
 
 <p align="center">
 <a href="https://travis-ci.org/leroy-merlin-br/mongolid"><img src="https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master" alt="Build Status"></a>
@@ -18,7 +16,7 @@ Mongolid supports **ActiveRecord** pattern.
 ## Introduction
 Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementation for working with MongoDB. Each database collection can have a corresponding "Model" which is used to interact with that collection.
 
-**Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
+**Note:** If you are working ReferencesMany.php with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
 ## Requirements
 - PHP **7.1** or superior
@@ -42,4 +40,4 @@ Made with ❤ by [Leroy Merlin Brazil](https://github.com/leroy-merlin-br) and [
 
 If you have any questions, feel free to contact us.
 
-If you any issues, please [report here](https://github.com/leroy-merlin-br/mongolid/issues).
+If you have any issues, please [report here](https://github.com/leroy-merlin-br/mongolid/issues).
