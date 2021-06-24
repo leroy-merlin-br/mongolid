@@ -1,10 +1,9 @@
 <?php
 namespace Mongolid\Connection;
 
-use MongoDB\Client;
 use Mongolid\TestCase;
 
-class ConnectionTest extends TestCase
+final class ConnectionTest extends TestCase
 {
     public function testShouldConstructANewConnection(): void
     {
@@ -15,11 +14,8 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
-        $result = $this->getProtected($connection, 'client');
-
 
         // Assertions
-        $this->assertInstanceOf(Client::class, $result);
         $this->assertSame('my_db', $connection->defaultDatabase);
     }
 
@@ -32,10 +28,8 @@ class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
-        $result = $this->getProtected($connection, 'client');
 
         // Assertions
-        $this->assertInstanceOf(Client::class, $result);
         $this->assertSame('my_db', $connection->defaultDatabase);
     }
 
