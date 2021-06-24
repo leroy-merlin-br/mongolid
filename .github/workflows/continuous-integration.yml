@@ -1,0 +1,43 @@
+name: Continuous Integration
+on:
+  - pull_request
+  - push
+jobs:
+  testing:
+    name: Tests
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php:
+          - "7.3"
+          - "7.4"
+        mongo:
+          - "3.6"
+          - "4.0"
+          - "4.2"
+          - "4.4"
+    services:
+      mongodb:
+        image: mongo:${{ matrix.mongo }}
+        ports:
+          - "27017:27017"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: PHP setup
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Composer
+        uses: ramsey/composer-install@v1
+
+      - name: Running tests
+        run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=./coverage/clover.xml
+
+      - name: Report coverage
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ./coverage/clover.xml
