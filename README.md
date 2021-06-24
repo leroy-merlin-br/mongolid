@@ -1,8 +1,10 @@
 ![Mongolid](https://user-images.githubusercontent.com/1991286/28967747-fe5c258a-78f2-11e7-91c7-8850ffb32004.png)
 
 <p align="center">
-<a href="https://travis-ci.org/leroy-merlin-br/mongolid"><img src="https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=v3.x" alt="Build Status"></a>
-<a href="https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master"><img src="https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master" alt="Coverage Status"></a>
+
+[![Continuous Integration](https://github.com/leroy-merlin-br/mongolid/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/leroy-merlin-br/mongolid/actions/workflows/continuous-integration.yml)
+<a href="https://www.codacy.com/gh/leroy-merlin-br/mongolid/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=leroy-merlin-br/mongolid&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/bdda2d9ea3e94141946af9bad2da1a09"/></a>
+<a href="https://www.codacy.com/gh/leroy-merlin-br/mongolid/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=leroy-merlin-br/mongolid&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/bdda2d9ea3e94141946af9bad2da1a09"/></a>
 <a href="https://packagist.org/packages/leroy-merlin-br/mongolid"><img src="https://poser.pugx.org/leroy-merlin-br/mongolid/v/stable" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/leroy-merlin-br/mongolid"><img src="https://poser.pugx.org/leroy-merlin-br/mongolid/downloads" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/leroy-merlin-br/mongolid"><img src="https://poser.pugx.org/leroy-merlin-br/mongolid/license" alt="License"></a>

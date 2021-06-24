@@ -3,8 +3,8 @@ on:
   - pull_request
   - push
 jobs:
-  integration-testing:
-    name: Unit tests
+  testing:
+    name: Tests
     runs-on: ubuntu-20.04
     strategy:
       matrix:

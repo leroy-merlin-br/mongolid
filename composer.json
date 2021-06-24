@@ -27,7 +27,6 @@
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^1.0",
         "mockery/mockery": "^1.2",
-        "php-coveralls/php-coveralls": "^2.1",
         "phpunit/phpunit": "^7.0 || ^8.0"
     },
     "autoload": {
