@@ -5,7 +5,7 @@ use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
 use stdClass;
 
-class EmbeddedCursorTest extends TestCase
+final class EmbeddedCursorTest extends TestCase
 {
     public function testShouldLimitDocumentQuantity(): void
     {

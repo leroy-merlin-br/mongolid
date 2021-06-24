@@ -28,11 +28,11 @@ class TestCase extends PHPUnitTestCase
      *
      * @param object $obj
      * @param string $method
-     * @param array  $args
+     * @param array $args
      *
      * @return mixed
      */
-    protected function callProtected($obj, $method, $args = [])
+    protected function callProtected($obj, string $method, array $args = [])
     {
         $methodObj = new ReflectionMethod(get_class($obj), $method);
         $methodObj->setAccessible(true);
@@ -47,7 +47,7 @@ class TestCase extends PHPUnitTestCase
      * @param string $property property name
      * @param mixed  $value    value to be set
      */
-    protected function setProtected($obj, $property, $value): void
+    protected function setProtected($obj, string $property, $value): void
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
@@ -63,7 +63,7 @@ class TestCase extends PHPUnitTestCase
      *
      * @return mixed property value
      */
-    protected function getProtected($obj, $property)
+    protected function getProtected($obj, string $property)
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);

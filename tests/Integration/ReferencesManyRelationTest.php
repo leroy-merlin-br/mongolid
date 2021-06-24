@@ -5,7 +5,7 @@ use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class ReferencesManyRelationTest extends IntegrationTestCase
+final class ReferencesManyRelationTest extends IntegrationTestCase
 {
     public function testShouldRetrieveSiblingsOfUser(): void
     {

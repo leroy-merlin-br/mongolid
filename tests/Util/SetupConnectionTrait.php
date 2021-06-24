@@ -6,7 +6,7 @@ use Mongolid\Container\Container;
 
 trait SetupConnectionTrait
 {
-    public function setupConnection(string $host, string $database)
+    public function setupConnection(string $host, string $database): void
     {
         Container::singleton(
             Connection::class,

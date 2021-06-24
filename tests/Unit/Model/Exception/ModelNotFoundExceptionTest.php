@@ -3,7 +3,7 @@ namespace Mongolid\Model\Exception;
 
 use Mongolid\TestCase;
 
-class ModelNotFoundExceptionTest extends TestCase
+final class ModelNotFoundExceptionTest extends TestCase
 {
     public function testSetModel(): void
     {

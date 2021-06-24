@@ -6,7 +6,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Model\Exception\InvalidFieldNameException;
 use Mongolid\Tests\Stubs\EmbeddedUser;
 
-class EmbedsOneRelationTest extends IntegrationTestCase
+final class EmbedsOneRelationTest extends IntegrationTestCase
 {
     public function testShouldRetrieveParentOfUser(): void
     {

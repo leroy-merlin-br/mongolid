@@ -4,7 +4,7 @@ namespace Mongolid\Event;
 use Mockery as m;
 use Mongolid\TestCase;
 
-class EventTriggerServiceTest extends TestCase
+final class EventTriggerServiceTest extends TestCase
 {
     public function testShouldSendTheEventsToTheExternalDispatcher(): void
     {
@@ -14,8 +14,9 @@ class EventTriggerServiceTest extends TestCase
         $service->registerEventDispatcher($dispatcher);
 
         // Expectations
-        $dispatcher->expects()
-            ->fire('foobar', ['answer' => 23], true)
+        $dispatcher
+            ->expects('fire')
+            ->with('foobar', ['answer' => 23], true)
             ->andReturn(true);
 
         // Actions
@@ -32,8 +33,9 @@ class EventTriggerServiceTest extends TestCase
         $service = new EventTriggerService();
 
         // Expectations
-        $dispatcher->expects()
-            ->fire()
+        $dispatcher
+            ->expects('fire')
+            ->withNoArgs()
             ->never();
 
         // Actions

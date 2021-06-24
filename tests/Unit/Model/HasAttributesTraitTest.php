@@ -6,7 +6,7 @@ use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\PolymorphedReferencedUser;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class HasAttributesTraitTest extends TestCase
+final class HasAttributesTraitTest extends TestCase
 {
     public function testShouldGetAttributeFromMutator(): void
     {
@@ -21,7 +21,7 @@ class HasAttributesTraitTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function getShortNameDocumentAttribute()
+            public function getShortNameDocumentAttribute(): string
             {
                 return 'Other name';
             }
@@ -43,12 +43,12 @@ class HasAttributesTraitTest extends TestCase
             use HasAttributesTrait;
             use HasRelationsTrait;
 
-            public function getShortNameDocumentAttribute()
+            public function getShortNameDocumentAttribute(): string
             {
                 return 'Other name';
             }
 
-            public function setShortNameDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value): string
             {
                 return strtoupper($value);
             }
@@ -75,7 +75,7 @@ class HasAttributesTraitTest extends TestCase
                 $this->mutable = true;
             }
 
-            public function setShortNameDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value): string
             {
                 return strtoupper($value);
             }

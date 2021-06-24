@@ -7,7 +7,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Tests\Stubs\EmbeddedUser;
 
-class EmbedsManyRelationTest extends IntegrationTestCase
+final class EmbedsManyRelationTest extends IntegrationTestCase
 {
     public function testShouldRetrieveSiblingsOfUser(): void
     {

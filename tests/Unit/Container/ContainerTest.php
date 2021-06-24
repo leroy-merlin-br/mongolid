@@ -5,7 +5,7 @@ use Illuminate\Container\Container as IlluminateContainer;
 use Mockery as m;
 use Mongolid\TestCase;
 
-class ContainerTest extends TestCase
+final class ContainerTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -22,8 +22,9 @@ class ContainerTest extends TestCase
         Container::setContainer($illuminateContainer);
 
         // Expectations
-        $illuminateContainer->expects()
-            ->method()
+        $illuminateContainer
+            ->expects('method')
+            ->withNoArgs()
             ->andReturn(true);
 
         // Actions
@@ -37,8 +38,9 @@ class ContainerTest extends TestCase
         Container::setContainer($illuminateContainer);
 
         // Expectations
-        $illuminateContainer->expects()
-            ->method(1, 2, 3)
+        $illuminateContainer
+            ->expects('method')
+            ->with(1, 2, 3)
             ->andReturn(true);
 
         // Actions

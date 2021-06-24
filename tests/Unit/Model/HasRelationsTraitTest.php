@@ -9,7 +9,7 @@ use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\EmbeddedUser;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class HasRelationsTraitTest extends TestCase
+final class HasRelationsTraitTest extends TestCase
 {
     /**
      * @dataProvider referencesOneScenarios
@@ -24,8 +24,9 @@ class HasRelationsTraitTest extends TestCase
         $expected = new ReferencedUser();
 
         // Expectations
-        $builder->expects()
-            ->first(m::type(ReferencedUser::class), $expectedQuery, [])
+        $builder
+            ->expects('first')
+            ->with(m::type(ReferencedUser::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
@@ -43,8 +44,8 @@ class HasRelationsTraitTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
 
         // Expectations
-        $builder->expects()
-            ->first()
+        $builder
+            ->expects('first')
             ->withAnyArgs()
             ->never();
 
@@ -68,8 +69,9 @@ class HasRelationsTraitTest extends TestCase
         $expected = new EmbeddedCursor([]);
 
         // Expectations
-        $builder->expects()
-            ->where(m::type(ReferencedUser::class), $expectedQuery, [])
+        $builder
+            ->expects('where')
+            ->with(m::type(ReferencedUser::class), $expectedQuery, [])
             ->andReturn($expected);
 
         // Actions
