@@ -7,7 +7,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
 
-class ModelMapperTest extends TestCase
+final class ModelMapperTest extends TestCase
 {
     public function testShouldClearDynamicFieldsIfModelIsNotDynamic(): void
     {

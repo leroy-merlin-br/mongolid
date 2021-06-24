@@ -5,7 +5,7 @@ use DateTime;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class DateQueriesTest extends IntegrationTestCase
+final class DateQueriesTest extends IntegrationTestCase
 {
     public function testShouldRetrieveDocumentsUsingDateFilters(): void
     {

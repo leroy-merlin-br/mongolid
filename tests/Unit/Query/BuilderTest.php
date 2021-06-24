@@ -16,7 +16,7 @@ use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\ReplaceCollectionModel;
 
-class BuilderTest extends TestCase
+final class BuilderTest extends TestCase
 {
     public function testShouldBeAbleToConstruct(): void
     {
@@ -51,23 +51,27 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $collection->expects()
-            ->replaceOne(
+        $collection
+            ->expects('replaceOne')
+            ->with(
                 ['_id' => 123],
                 $model,
                 ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
             )->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getModifiedCount()
+        $operationResult
+            ->allows('getModifiedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
-        $operationResult->allows()
-            ->getUpsertedCount()
+        $operationResult
+            ->allows('getUpsertedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('saving', $model, true);
@@ -106,16 +110,19 @@ class BuilderTest extends TestCase
         $model->_id = null;
 
         // Expectations
-        $collection->expects()
-            ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection
+            ->expects('insertOne')
+            ->with($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getInsertedCount()
+        $operationResult
+            ->allows('getInsertedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('inserting', $model, true);
@@ -154,16 +161,19 @@ class BuilderTest extends TestCase
         $model->_id = null;
 
         // Expectations
-        $collection->expects()
-            ->insertOne($model, ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection
+            ->expects('insertOne')
+            ->with($model, ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getInsertedCount()
+        $operationResult
+            ->allows('getInsertedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventNotToBeFired('inserting', $model);
@@ -197,19 +207,19 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $collection->expects()
-            ->updateOne(
-                ['_id' => 123],
-                ['$set' => $parsedObject],
-                $options
-            )->andReturn($operationResult);
+        $collection
+            ->expects('updateOne')
+            ->with(['_id' => 123], ['$set' => $parsedObject], $options)
+            ->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getModifiedCount()
+        $operationResult
+            ->allows('getModifiedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('updating', $model, true);
@@ -261,19 +271,22 @@ class BuilderTest extends TestCase
         unset($model->name);
 
         // Expectations
-        $collection->expects()
-            ->updateOne(
+        $collection
+            ->expects('updateOne')
+            ->with(
                 ['_id' => 123],
                 ['$set' => ['_id' => 123], '$unset' => ['name' => '', 'notOnFillable' => '']],
                 $options
             )->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn(true);
 
-        $operationResult->allows()
-            ->getModifiedCount()
+        $operationResult
+            ->allows('getModifiedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('updating', $model, true);
@@ -312,8 +325,9 @@ class BuilderTest extends TestCase
         $model->addresses = ['1 Blue Street', '2 Green Street'];
 
         // Expectations
-        $collection->expects()
-            ->updateOne(
+        $collection
+            ->expects('updateOne')
+            ->with(
                 ['_id' => 123],
                 [
                     '$set' => ['_id' => 123, 'surname' => ['Doe', 'Jr'], 'addresses.1' => '2 Green Street'],
@@ -322,12 +336,14 @@ class BuilderTest extends TestCase
                 $options
             )->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn(true);
 
-        $operationResult->allows()
-            ->getModifiedCount()
+        $operationResult
+            ->allows('getModifiedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('updating', $model, true);
@@ -362,18 +378,19 @@ class BuilderTest extends TestCase
         $model->_id = null;
 
         // Actions
-        $collection->expects()
-            ->insertOne(
-                $model,
-                ['writeConcern' => new WriteConcern($writeConcern)]
-            )->andReturn($operationResult);
+        $collection
+            ->expects('insertOne')
+            ->with($model, ['writeConcern' => new WriteConcern($writeConcern)])
+            ->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getInsertedCount()
+        $operationResult
+            ->allows('getInsertedCount')
+            ->withNoArgs()
             ->andReturn(1);
 
         $this->expectEventToBeFired('updating', $model, true);
@@ -414,16 +431,19 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $collection->expects()
-            ->deleteOne(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
+        $collection
+            ->expects('deleteOne')
+            ->with(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
             ->andReturn($operationResult);
 
-        $operationResult->expects()
-            ->isAcknowledged()
+        $operationResult
+            ->expects('isAcknowledged')
+            ->withNoArgs()
             ->andReturn((bool) $writeConcern);
 
-        $operationResult->allows()
-            ->getDeletedCount()
+        $operationResult
+            ->allows('getDeletedCount')
+            ->with()
             ->andReturn(1);
 
         $this->expectEventToBeFired('deleting', $model, true);
@@ -458,11 +478,13 @@ class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
 
         // Expectations
-        $builder->allows()
-            ->getCollection($model)
+        $builder
+            ->allows('getCollection')
+            ->with($model)
             ->andReturn($collection);
 
-        $collection->expects($dbOperation)
+        $collection
+            ->expects($dbOperation)
             ->never();
 
         /* "Mocks" the fireEvent to return false and bail the operation */
@@ -490,8 +512,9 @@ class BuilderTest extends TestCase
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
         // Expectations
-        $builder->expects()
-            ->prepareValueQuery($query)
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
             ->andReturn($preparedQuery);
 
         // Actions
@@ -516,8 +539,9 @@ class BuilderTest extends TestCase
         $model = m::mock(ModelInterface::class);
 
         // Expectations
-        $builder->expects()
-            ->where($model, [])
+        $builder
+            ->expects('where')
+            ->with($model, [])
             ->andReturn($mongolidCursor);
 
         // Actions
@@ -540,12 +564,14 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $builder->expects()
-            ->prepareValueQuery($query)
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
             ->andReturn($preparedQuery);
 
-        $collection->expects()
-            ->findOne($preparedQuery, ['projection' => []])
+        $collection
+            ->expects('findOne')
+            ->with($preparedQuery, ['projection' => []])
             ->andReturn($model);
 
         // Actions
@@ -581,12 +607,14 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $builder->expects()
-            ->prepareValueQuery($query)
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
             ->andReturn($preparedQuery);
 
-        $collection->expects()
-            ->findOne($preparedQuery, ['projection' => []])
+        $collection
+            ->expects('findOne')
+            ->with($preparedQuery, ['projection' => []])
             ->andReturn($model);
 
         // Actions
@@ -626,12 +654,14 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $builder->expects()
-            ->prepareValueQuery($query)
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
             ->andReturn($preparedQuery);
 
-        $collection->expects()
-            ->findOne($preparedQuery, ['projection' => []])
+        $collection
+            ->expects('findOne')
+            ->with($preparedQuery, ['projection' => []])
             ->andReturn(null);
 
         // Actions
@@ -656,12 +686,14 @@ class BuilderTest extends TestCase
         $model->setCollection($collection);
 
         // Expectations
-        $builder->expects()
-            ->prepareValueQuery($query)
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
             ->andReturn($preparedQuery);
 
-        $collection->expects()
-            ->findOne($preparedQuery, ['projection' => $projection])
+        $collection
+            ->expects('findOne')
+            ->with($preparedQuery, ['projection' => $projection])
             ->andReturn(null);
 
         // Actions

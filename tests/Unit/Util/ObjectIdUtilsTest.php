@@ -4,7 +4,7 @@ namespace Mongolid\Util;
 use MongoDB\BSON\ObjectId;
 use Mongolid\TestCase;
 
-class ObjectIdUtilsTest extends TestCase
+final class ObjectIdUtilsTest extends TestCase
 {
     /**
      * @dataProvider objectIdStringScenarios

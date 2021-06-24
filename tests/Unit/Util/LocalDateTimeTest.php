@@ -6,7 +6,7 @@ use DateTimeZone;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\TestCase;
 
-class LocalDateTimeTest extends TestCase
+final class LocalDateTimeTest extends TestCase
 {
     /**
      * @var DateTime

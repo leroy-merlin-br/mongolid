@@ -18,7 +18,7 @@ use Mongolid\TestCase;
 use Serializable;
 use Traversable;
 
-class CursorTest extends TestCase
+final class CursorTest extends TestCase
 {
     public function testShouldLimitDocumentQuantity(): void
     {
@@ -115,8 +115,9 @@ class CursorTest extends TestCase
         $cursor = $this->getCursor($collection);
 
         // Expectations
-        $collection->expects()
-            ->count([])
+        $collection
+            ->expects('count')
+            ->with([])
             ->andReturn(5);
 
         // Actions

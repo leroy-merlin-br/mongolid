@@ -6,7 +6,7 @@ use MongoDB\BulkWriteResult;
 use Mongolid\Query\BulkWrite;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class BulkWriteTest extends IntegrationTestCase
+final class BulkWriteTest extends IntegrationTestCase
 {
     public function testShouldRunMultipleUpdateOperations(): void
     {

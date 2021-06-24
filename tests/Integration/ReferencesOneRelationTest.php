@@ -5,7 +5,7 @@ use MongoDB\BSON\ObjectId;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class ReferencesOneRelationTest extends IntegrationTestCase
+final class ReferencesOneRelationTest extends IntegrationTestCase
 {
     public function testShouldRetrieveParentOfUser(): void
     {

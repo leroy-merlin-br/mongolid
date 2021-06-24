@@ -4,7 +4,7 @@ namespace Mongolid\Tests\Integration;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class PersistedDataTest extends IntegrationTestCase
+final class PersistedDataTest extends IntegrationTestCase
 {
     /**
      * @var ObjectId

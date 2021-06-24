@@ -3,7 +3,7 @@ namespace Mongolid\Tests\Integration;
 
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class AttributesKeyTest extends IntegrationTestCase
+final class AttributesKeyTest extends IntegrationTestCase
 {
     public function testAttributesKeysShouldNotBeReserved(): void
     {

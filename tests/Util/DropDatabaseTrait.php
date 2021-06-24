@@ -6,11 +6,12 @@ use Mongolid\Container\Container;
 
 trait DropDatabaseTrait
 {
-    public function dropDatabase()
+    public function dropDatabase(): void
     {
         $connection = Container::make(Connection::class);
 
-        $connection->getClient()
+        $connection
+            ->getClient()
             ->dropDatabase($connection->defaultDatabase);
     }
 }

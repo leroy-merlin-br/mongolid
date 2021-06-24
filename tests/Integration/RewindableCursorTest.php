@@ -4,7 +4,7 @@ namespace Mongolid\Tests\Integration;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Tests\Stubs\ReferencedUser;
 
-class RewindableCursorTest extends IntegrationTestCase
+final class RewindableCursorTest extends IntegrationTestCase
 {
     public function testCursorShouldBeRewindableAndSerializable(): void
     {

@@ -8,7 +8,7 @@ use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\TestCase;
 
-class ManagerTest extends TestCase
+final class ManagerTest extends TestCase
 {
     public function testShouldAddAndGetConnection(): void
     {
@@ -18,8 +18,9 @@ class ManagerTest extends TestCase
         $client = m::mock(Client::class);
 
         // Expectations
-        $connection->expects()
-            ->getClient()
+        $connection
+            ->expects('getClient')
+            ->withNoArgs()
             ->andReturn($client);
 
         // Actions
@@ -40,13 +41,16 @@ class ManagerTest extends TestCase
         $this->setProtected($manager, 'container', $container);
 
         // Expectations
-        $container->expects()
-            ->instance(EventTriggerService::class, m::type(EventTriggerService::class))
-            ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
-                $test->assertSame(EventTriggerService::class, $class);
-                $dispatcher = $this->getProtected($eventService, 'dispatcher');
-                $test->assertSame($eventTrigger, $dispatcher);
-            });
+        $expectationCallable = function ($class, $eventService) use ($test, $eventTrigger) {
+            $test->assertSame(EventTriggerService::class, $class);
+            $dispatcher = $this->getProtected($eventService, 'dispatcher');
+            $test->assertSame($eventTrigger, $dispatcher);
+        };
+
+        $container
+            ->expects('instance')
+            ->with(EventTriggerService::class, m::type(EventTriggerService::class))
+            ->andReturnUsing($expectationCallable);
 
         // Actions
         $manager->setEventTrigger($eventTrigger);

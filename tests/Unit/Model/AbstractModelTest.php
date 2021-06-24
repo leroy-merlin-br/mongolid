@@ -13,7 +13,7 @@ use Mongolid\Query\Builder;
 use Mongolid\TestCase;
 use stdClass;
 
-class AbstractModelTest extends TestCase
+final class AbstractModelTest extends TestCase
 {
     /**
      * @var AbstractModel
@@ -86,8 +86,9 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Expectations
-        $builder->expects()
-            ->save($this->model, ['writeConcern' => new WriteConcern(1)])
+        $builder
+            ->expects('save')
+            ->with($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Actions
@@ -103,8 +104,9 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Expectations
-        $builder->expects()
-            ->insert($this->model, ['writeConcern' => new WriteConcern(1)])
+        $builder
+            ->expects('insert')
+            ->with($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Actions
@@ -120,8 +122,9 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Expectations
-        $builder->expects()
-            ->update($this->model, ['writeConcern' => new WriteConcern(1)])
+        $builder
+            ->expects('update')
+            ->with($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Actions
@@ -137,8 +140,9 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Expectations
-        $builder->expects()
-            ->delete($this->model, ['writeConcern' => new WriteConcern(1)])
+        $builder
+            ->expects('delete')
+            ->with($this->model, ['writeConcern' => new WriteConcern(1)])
             ->andReturn(true);
 
         // Actions
@@ -210,8 +214,9 @@ class AbstractModelTest extends TestCase
         $cursor = m::mock(CursorInterface::class);
 
         // Expectations
-        $builder->expects()
-            ->where(m::type(get_class($this->model)), $query, $projection)
+        $builder
+            ->expects('where')
+            ->with(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($cursor);
 
         // Actions
@@ -228,8 +233,9 @@ class AbstractModelTest extends TestCase
         $cursor = m::mock(CursorInterface::class);
 
         // Expectations
-        $builder->expects()
-            ->all(m::type(get_class($this->model)))
+        $builder
+            ->expects('all')
+            ->with(m::type(get_class($this->model)))
             ->andReturn($cursor);
 
         // Actions
@@ -247,8 +253,9 @@ class AbstractModelTest extends TestCase
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
 
         // Expectations
-        $builder->expects()
-            ->first(m::type(get_class($this->model)), $query, $projection)
+        $builder
+            ->expects('first')
+            ->with(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
         // Actions
@@ -266,8 +273,9 @@ class AbstractModelTest extends TestCase
         $projection = ['some', 'fields'];
 
         // Expectations
-        $builder->expects()
-            ->firstOrFail(m::type(get_class($this->model)), $query, $projection)
+        $builder
+            ->expects('firstOrFail')
+            ->with(m::type(get_class($this->model)), $query, $projection)
             ->andReturn($this->model);
 
         // Actions
@@ -284,8 +292,9 @@ class AbstractModelTest extends TestCase
         $id = 123;
 
         // Expectations
-        $builder->expects()
-            ->first(m::type(get_class($this->model)), $id, [])
+        $builder
+            ->expects('first')
+            ->with(m::type(get_class($this->model)), $id, [])
             ->andReturn($this->model);
 
         // Actions
@@ -302,8 +311,9 @@ class AbstractModelTest extends TestCase
         $id = 123;
 
         // Expectations
-        $builder->expects()
-            ->first(m::type(get_class($this->model)), $id, [])
+        $builder
+            ->expects('first')
+            ->with(m::type(get_class($this->model)), $id, [])
             ->andReturn(null);
 
         // Actions
@@ -476,7 +486,7 @@ class AbstractModelTest extends TestCase
              */
             public $mutable = true;
 
-            public function getNameDocumentAttribute()
+            public function getNameDocumentAttribute(): string
             {
                 return 'John';
             }
@@ -518,7 +528,7 @@ class AbstractModelTest extends TestCase
              */
             public $mutable = true;
 
-            public function getShortNameDocumentAttribute()
+            public function getShortNameDocumentAttribute(): string
             {
                 return 'Other name';
             }
@@ -537,12 +547,12 @@ class AbstractModelTest extends TestCase
         // Set
         $model = new class() extends AbstractModel
         {
-            public function getShortNameDocumentAttribute()
+            public function getShortNameDocumentAttribute(): string
             {
                 return 'Other name';
             }
 
-            public function setShortNameDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value): string
             {
                 return strtoupper($value);
             }
@@ -565,7 +575,7 @@ class AbstractModelTest extends TestCase
              */
             protected $mutable = true;
 
-            public function setShortNameDocumentAttribute($value)
+            public function setShortNameDocumentAttribute($value): string
             {
                 return strtoupper($value);
             }

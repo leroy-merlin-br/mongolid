@@ -8,7 +8,7 @@ use MongoDB\Database;
 use Mongolid\Connection\Connection;
 use Mongolid\TestCase;
 
-class SequenceServiceTest extends TestCase
+final class SequenceServiceTest extends TestCase
 {
     /**
      * @dataProvider sequenceScenarios
@@ -22,18 +22,15 @@ class SequenceServiceTest extends TestCase
         $rawCollection = m::mock(Collection::class);
 
         // Expectations
-        $sequenceService->expects()
-            ->rawCollection()
+        $sequenceService
+            ->expects('rawCollection')
+            ->withNoArgs()
             ->andReturn($rawCollection);
 
-        $rawCollection->expects()
-            ->findOneAndUpdate(
-                ['_id' => $sequenceName],
-                ['$inc' => ['seq' => 1]],
-                ['upsert' => true]
-            )->andReturn(
-                $currentValue ? (object) ['seq' => $currentValue] : null
-            );
+        $rawCollection
+            ->expects('findOneAndUpdate')
+            ->with(['_id' => $sequenceName], ['$inc' => ['seq' => 1]], ['upsert' => true])
+            ->andReturn($currentValue ? (object) ['seq' => $currentValue] : null);
 
         // Actions
         $result = $sequenceService->getNextValue($sequenceName);
@@ -55,16 +52,19 @@ class SequenceServiceTest extends TestCase
         $database = m::mock(Database::class);
 
         // Expectations
-        $connection->expects()
-            ->getClient()
+        $connection
+            ->expects('getClient')
+            ->withNoArgs()
             ->andReturn($client);
 
-        $client->expects()
-            ->selectDatabase('production')
+        $client
+            ->expects('selectDatabase')
+            ->with('production')
             ->andReturn($database);
 
-        $database->expects()
-            ->selectCollection('foobar')
+        $database
+            ->expects('selectCollection')
+            ->with('foobar')
             ->andReturn($collection);
 
         // Actions
