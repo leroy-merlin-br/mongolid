@@ -17,6 +17,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection($server, $options, $driverOptions);
         $result = $this->getProtected($connection, 'client');
 
+
         // Assertions
         $this->assertInstanceOf(Client::class, $result);
         $this->assertSame('my_db', $connection->defaultDatabase);
