@@ -1,7 +1,7 @@
 ![Mongolid](https://user-images.githubusercontent.com/1991286/28967747-fe5c258a-78f2-11e7-91c7-8850ffb32004.png)
 
 <p align="center">
-<a href="https://travis-ci.org/leroy-merlin-br/mongolid"><img src="https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=master" alt="Build Status"></a>
+<a href="https://travis-ci.org/leroy-merlin-br/mongolid"><img src="https://travis-ci.org/leroy-merlin-br/mongolid.svg?branch=v3.x" alt="Build Status"></a>
 <a href="https://coveralls.io/github/leroy-merlin-br/mongolid?branch=master"><img src="https://coveralls.io/repos/github/leroy-merlin-br/mongolid/badge.svg?branch=master" alt="Coverage Status"></a>
 <a href="https://packagist.org/packages/leroy-merlin-br/mongolid"><img src="https://poser.pugx.org/leroy-merlin-br/mongolid/v/stable" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/leroy-merlin-br/mongolid"><img src="https://poser.pugx.org/leroy-merlin-br/mongolid/downloads" alt="Total Downloads"></a>
@@ -30,7 +30,7 @@ $ composer require leroy-merlin-br/mongolid
 ```
 
 ## Documentation
-You can access the full documentation [here](http://leroy-merlin-br.github.com/mongolid).
+You can access the full documentation [here](http://leroy-merlin-br.github.io/mongolid).
 
 ## License
 Mongolid is free software distributed under the terms of the [MIT license](LICENSE).
