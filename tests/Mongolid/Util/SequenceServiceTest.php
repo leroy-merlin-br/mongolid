@@ -38,9 +38,7 @@ class SequenceServiceTest extends TestCase
                 ['_id' => $sequenceName],
                 ['$inc' => ['seq' => 1]],
                 ['upsert' => true]
-            )->andReturn(
-                $currentValue ? (object) ['seq' => $currentValue] : null
-            );
+            )->andReturn($currentValue);
 
         // Assertion
         $this->assertEquals(
@@ -80,19 +78,22 @@ class SequenceServiceTest extends TestCase
         return [
             'New sequence in collection "products"' => [
                 'sequenceName' => 'products',
-                'currentValue' => 0,
+                'currentValue' => null,
                 'expectation' => 1,
             ],
-            // -----------------------
             'Existing sequence in collection "unicorns"' => [
                 'sequenceName' => 'unicorns',
-                'currentValue' => 7,
+                'currentValue' => (object) ['seq' => 7],
                 'expectation' => 8,
             ],
-            // -----------------------
-            'Existing sequence in collection "unicorns"' => [
+            'Existing one more sequence in collection "unicorns"' => [
                 'sequenceName' => 'unicorns',
-                'currentValue' => 3,
+                'currentValue' => (object) ['seq' => 3],
+                'expectation' => 4,
+            ],
+            'Returned as an array instead of object' => [
+                'sequenceName' => 'unicorns',
+                'currentValue' => ['seq' => 3],
                 'expectation' => 4,
             ],
         ];
