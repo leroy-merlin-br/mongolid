@@ -51,11 +51,16 @@ class SequenceService
             ['upsert' => true]
         );
 
-        if ($sequenceValue) {
-            $_id = $sequenceValue->seq + 1;
+        if (!$sequenceValue) {
+            return 1;
         }
 
-        return $_id ?? 1;
+        // On MongoDB 4.0 or below, this value will be an
+        // object. From 4.1 it is returned as an array.
+        // so we cast it to object to make sure.
+        $sequenceValue = (object) $sequenceValue;
+
+        return $sequenceValue->seq + 1;
     }
 
     /**
