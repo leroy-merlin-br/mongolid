@@ -9,19 +9,25 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="Package Test Suite">
-            <directory>./tests/</directory>
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">tests/Integration</directory>
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist>
-            <directory suffix=".php">src</directory>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
     <logging>
+        <log type="coverage-text"/>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
+    <php>
+        <server name="DB_HOST" value="mongodb"/>
+    </php>
 </phpunit>

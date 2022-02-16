@@ -1,11 +1,7 @@
 {
     "name": "leroy-merlin-br/mongolid",
     "description": "Easy, powerful and ultrafast ODM for PHP and MongoDB.",
-    "keywords": [
-        "odm",
-        "mongodb",
-        "nosql"
-    ],
+    "keywords": ["odm", "mongodb", "mongo", "nosql", "active record", "laravel"],
     "license": "MIT",
     "authors": [
         {
@@ -15,30 +11,44 @@
         {
             "name": "Guilherme Guitte",
             "email": "guilherme.guitte@gmail.com"
+        },
+        {
+            "name": "Boitatá",
+            "email": "boitata@leroymerlin.com.br"
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "mongodb/mongodb": "1.8.0",
-        "illuminate/container": "^5.8 || ^6.0 || ^7.0 || ^8.0"
+        "php": ">=7.3",
+        "ext-mongodb": "*",
+        "illuminate/container": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "illuminate/support": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
-        "mockery/mockery": "^1.0",
-        "phpunit/phpunit": "^6.4",
-        "squizlabs/php_codesniffer": "^2.0",
-        "sami/sami": "^4.0"
+        "leroy-merlin-br/coding-standard": "^1.0",
+        "mockery/mockery": "^1.2",
+        "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
     },
     "autoload": {
         "psr-4": {
-            "Mongolid\\": "src/Mongolid"
-        },
-        "classmap": [
-            "tests/TestCase.php"
-        ]
+            "Mongolid\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mongolid\\": "tests/Unit",
+            "Mongolid\\Tests\\": "tests"
+        }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "v2.1.x-dev"
+            "dev-master": "v4.0.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "suggest": {
+        "leroy-merlin-br/mongolid-laravel": "Easy, powerful and ultrafast MongoDB ODM for Laravel."
     }
 }
