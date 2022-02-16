@@ -8,7 +8,7 @@ use Mongolid\TestCase;
 
 class IocTest extends TestCase
 {
-    public function tearDown(): void
+    public function setUp(): void
     {
         parent::tearDown();
         m::close();

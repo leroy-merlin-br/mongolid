@@ -3,11 +3,11 @@
 namespace Mongolid\Connection;
 
 use Mockery as m;
-use TestCase;
+use Mongolid\TestCase;
 
 class PoolTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         m::close();
