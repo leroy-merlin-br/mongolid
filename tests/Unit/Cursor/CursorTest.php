@@ -34,10 +34,9 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->limit(10);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [[], ['limit' => 10]],
-            'params',
-            $cursor
+            $cursor->params()
         );
     }
 
@@ -48,10 +47,9 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->sort(['name' => 1]);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [[], ['sort' => ['name' => 1]]],
-            'params',
-            $cursor
+            $cursor->params()
         );
     }
 
@@ -62,10 +60,9 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->skip(5);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [[], ['skip' => 5]],
-            'params',
-            $cursor
+            $cursor->params()
         );
     }
 
@@ -76,10 +73,9 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->disableTimeout();
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [[], ['noCursorTimeout' => true]],
-            'params',
-            $cursor
+            $cursor->params()
         );
     }
 
@@ -143,7 +139,7 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+        $this->assertEquals(0, $cursor->key());
     }
 
     public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
@@ -166,7 +162,7 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+        $this->assertEquals(0, $cursor->key());
     }
 
     public function testShouldGetCurrent()
@@ -184,7 +180,7 @@ class CursorTest extends TestCase
         // Assert
         $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('John Doe', 'name', $entity);
+        $this->assertEquals('John Doe', $entity->name);
     }
 
     public function testShouldGetCurrentUsingActiveRecordClasses()
@@ -221,7 +217,7 @@ class CursorTest extends TestCase
         // Assert
         $entity = $cursor->first();
         $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('John Doe', 'name', $entity);
+        $this->assertEquals('John Doe', $entity->name);
     }
 
     public function testShouldGetFirstWhenEmpty()
@@ -253,7 +249,7 @@ class CursorTest extends TestCase
 
         // Assert
         $cursor->fresh();
-        $this->assertAttributeEquals(null, 'cursor', $cursor);
+        $this->assertEquals(null, $cursor->key());
     }
 
     public function testShouldImplementKeyMethodFromIterator()

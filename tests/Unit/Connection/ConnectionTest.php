@@ -19,8 +19,8 @@ class ConnectionTest extends TestCase
         $connection = new Connection($server, $options, $driverOptions);
 
         // Assert
-        $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
-        $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
+        $this->assertInstanceOf(Client::class, $connection->getRawConnection());
+        $this->assertEquals('my_db', $connection->defaultDatabase);
     }
 
     public function testShouldDetermineDatabaseFromACluster()
@@ -34,11 +34,11 @@ class ConnectionTest extends TestCase
         $connection = new Connection($server, $options, $driverOptions);
 
         // Assert
-        $this->assertAttributeInstanceOf(Client::class, 'rawConnection', $connection);
-        $this->assertAttributeEquals('my_db', 'defaultDatabase', $connection);
+        $this->assertInstanceOf(Client::class, $connection->getRawConnection());
+        $this->assertEquals('my_db', $connection->defaultDatabase);
     }
 
-    public function testShouldGetRawConnection()
+    public function testShouldGetRawConnection(): void
     {
         // Arrange
         $server = 'mongodb://my-server/my_db';
@@ -57,8 +57,8 @@ class ConnectionTest extends TestCase
         $rawConnection = $connection->getRawConnection();
 
         // Assert
-        $this->assertAttributeEquals($expectedParameters['uri'], 'uri', $rawConnection);
-        $this->assertAttributeEquals($expectedParameters['typeMap'], 'typeMap', $rawConnection);
+        $this->assertEquals($expectedParameters['uri'], $rawConnection);
+        $this->assertEquals($expectedParameters['typeMap'], $rawConnection->getTypeMap());
     }
 
     public function testShouldGetRawManager()

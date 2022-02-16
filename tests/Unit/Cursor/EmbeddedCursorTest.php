@@ -28,13 +28,12 @@ class EmbeddedCursorTest extends TestCase
 
         // Assert
         $cursor->limit(2);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [
                 ['name' => 'A'],
                 ['name' => 'B'],
             ],
-            'items',
-            $cursor
+            $cursor->toArray()
         );
     }
 
@@ -48,10 +47,9 @@ class EmbeddedCursorTest extends TestCase
 
         // Assert
         $cursor->sort($parameters);
-        $this->assertAttributeSame(
+        $this->assertSame(
             $expected,
-            'items',
-            $cursor
+            $cursor->toArray()
         );
     }
 
@@ -67,12 +65,11 @@ class EmbeddedCursorTest extends TestCase
 
         // Assert
         $cursor->skip(2);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [
                 ['name' => 'C'],
             ],
-            'items',
-            $cursor
+            $cursor->toArray()
         );
     }
 
@@ -111,7 +108,7 @@ class EmbeddedCursorTest extends TestCase
 
         // Assert
         $cursor->rewind();
-        $this->assertAttributeEquals(0, 'position', $cursor);
+        $this->assertEquals(0, $cursor->key());
     }
 
     public function testShouldGetCurrent()
@@ -129,7 +126,7 @@ class EmbeddedCursorTest extends TestCase
         // Assert
         $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('B', 'name', $entity);
+        $this->assertEquals('B', $entity->name);
     }
 
     public function testShouldNotGetCurrentWhenCursorIsInvalid()
@@ -158,7 +155,7 @@ class EmbeddedCursorTest extends TestCase
         // Assert
         $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('A', 'name', $entity);
+        $this->assertEquals('A', $entity->name);
     }
 
     public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
@@ -197,7 +194,7 @@ class EmbeddedCursorTest extends TestCase
         // Assert
         $entity = $cursor->first();
         $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertAttributeEquals('A', 'name', $entity);
+        $this->assertEquals('A', $entity->name);
     }
 
     public function testShouldGetAllItems()
@@ -265,7 +262,7 @@ class EmbeddedCursorTest extends TestCase
 
         // Assertion
         $cursor->next();
-        $this->assertAttributeEquals(8, 'position', $cursor);
+        $this->assertEquals(8, $cursor->key());
     }
 
     public function testShouldImplementValidMethodFromIterator()

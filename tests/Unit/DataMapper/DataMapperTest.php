@@ -2,6 +2,7 @@
 
 namespace Mongolid\DataMapper;
 
+use InvalidArgumentException;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection;
@@ -29,18 +30,6 @@ class DataMapperTest extends TestCase
         unset($this->eventService);
         parent::tearDown();
         m::close();
-    }
-
-    public function testShouldBeAbleToConstructWithSchema()
-    {
-        // Arrange
-        $connPool = m::mock(Pool::class);
-
-        // Act
-        $mapper = new DataMapper($connPool);
-
-        // Assert
-        $this->assertAttributeEquals($connPool, 'connPool', $mapper);
     }
 
     /**
@@ -726,23 +715,10 @@ class DataMapperTest extends TestCase
         // Assert
         $this->assertInstanceOf(Cursor::class, $result);
         $this->assertNotInstanceOf(CacheableCursor::class, $result);
-        $this->assertAttributeEquals($schema, 'entitySchema', $result);
-        $this->assertAttributeEquals($collection, 'collection', $result);
-        $this->assertAttributeEquals('find', 'command', $result);
-        $this->assertAttributeEquals(
-            [$preparedQuery, ['projection' => $projection]],
-            'params',
-            $result
-        );
+        $this->assertEquals($schema, $result->entitySchema);
 
         $this->assertInstanceOf(CacheableCursor::class, $cacheableResult);
-        $this->assertAttributeEquals($schema, 'entitySchema', $cacheableResult);
-        $this->assertAttributeEquals($collection, 'collection', $cacheableResult);
-        $this->assertAttributeEquals(
-            [$preparedQuery, ['projection' => []]],
-            'params',
-            $cacheableResult
-        );
+        $this->assertEquals($schema, $cacheableResult->entitySchema);
     }
 
     public function testShouldGetAll()
@@ -799,7 +775,7 @@ class DataMapperTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(stdClass::class, $result);
-        $this->assertAttributeEquals('John Doe', 'name', $result);
+        $this->assertEquals('John Doe', $result->name);
     }
 
     public function testShouldGetNullIfFirstCantFindAnything()
@@ -1046,16 +1022,15 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expectation, $result);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid projection: 'invalid-key' => 'invalid-value'
-     */
     public function testPrepareProjectionShouldThrownAnException()
     {
         // Arrange
         $connPool = m::mock(Pool::class);
         $mapper = new DataMapper($connPool);
         $data = ['valid' => true, 'invalid-key' => 'invalid-value'];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid projection: 'invalid-key' => 'invalid-value'");
 
         // Act
         $this->callProtected($mapper, 'prepareProjection', [$data]);

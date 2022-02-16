@@ -30,6 +30,6 @@ class DynamicSchemaTest extends TestCase
         $schema = new DynamicSchema();
 
         // Assert
-        $this->assertAttributeEquals(true, 'dynamic', $schema);
+        $this->assertEquals(true, $schema->dynamic);
     }
 }

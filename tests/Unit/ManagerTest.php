@@ -40,7 +40,7 @@ class ManagerTest extends TestCase
         $this->assertEquals($rawConnection, $manager->getConnection());
     }
 
-    public function testShouldSetEventTrigger()
+    public function testShouldSetEventTrigger(): void
     {
         // Arrange
         $test = $this;
@@ -55,7 +55,7 @@ class ManagerTest extends TestCase
             ->once()
             ->andReturnUsing(function ($class, $eventService) use ($test, $eventTrigger) {
                 $test->assertEquals(EventTriggerService::class, $class);
-                $test->assertAttributeEquals($eventTrigger, 'dispatcher', $eventService);
+                $test->assertEquals($eventTrigger, $eventService->getDispatcher());
             });
 
         // Assert
@@ -71,10 +71,9 @@ class ManagerTest extends TestCase
 
         // Assert
         $manager->registerSchema($schema);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             ['Bacon' => $schema],
-            'schemas',
-            $manager
+            $manager->getSchemas()
         );
     }
 
@@ -95,7 +94,7 @@ class ManagerTest extends TestCase
         $result = $manager->getMapper('Bacon');
 
         $this->assertEquals($dataMapper, $result);
-        $this->assertAttributeEquals($schema, 'schema', $result);
+        $this->assertEquals($schema, $result->getSchema());
     }
 
     public function testShouldNotGetDataMapperForUnknownEntities()
@@ -115,14 +114,13 @@ class ManagerTest extends TestCase
         $this->callProtected($manager, 'init');
 
         // Assertion
-        $this->assertAttributeEquals($manager, 'singleton', Manager::class);
-        $this->assertAttributeInstanceOf(Container::class, 'container', $manager);
-        $this->assertAttributeInstanceOf(Pool::class, 'connectionPool', $manager);
-        $this->assertAttributeInstanceOf(CacheComponentInterface::class, 'cacheComponent', $manager);
+        $this->assertInstanceOf(Container::class, $manager->container);
+        $this->assertInstanceOf(Pool::class, $manager->connectionPool);
+        $this->assertInstanceOf(CacheComponentInterface::class, $manager->cacheComponent);
 
         $container = $manager->container;
         $this->callProtected($manager, 'init');
         // Initializes again to make sure that it will not instantiate a new container
-        $this->assertAttributeEquals($container, 'container', $manager);
+        $this->assertEquals($container, $manager->container);
     }
 }

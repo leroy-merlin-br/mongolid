@@ -24,7 +24,7 @@ class SchemaTest extends TestCase
         $schema = m::mock(Schema::class.'[]');
 
         // Assert
-        $this->assertAttributeEquals(false, 'dynamic', $schema);
+        $this->assertEquals(false,  $schema->dynamic);
     }
 
     public function testMustHaveAnEntityClass()
@@ -33,7 +33,7 @@ class SchemaTest extends TestCase
         $schema = m::mock(Schema::class.'[]');
 
         // Assert
-        $this->assertAttributeEquals('stdClass', 'entityClass', $schema);
+        $this->assertEquals('stdClass', $schema->entityClass);
     }
 
     public function testShouldCastNullIntoObjectId()

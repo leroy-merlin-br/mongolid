@@ -21,16 +21,13 @@ class CursorFactoryTest extends TestCase
             $schema,
             $collection,
             'find',
-            $params = ['age' => ['$gr' => 25]]
+            ['age' => ['$gr' => 25]]
         );
 
         $this->assertInstanceOf(Cursor::class, $result);
         $this->assertNotInstanceOf(CacheableCursor::class, $result);
         $this->assertNotInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertAttributeEquals($schema, 'entitySchema', $result);
-        $this->assertAttributeEquals($collection, 'collection', $result);
-        $this->assertAttributeEquals('find', 'command', $result);
-        $this->assertAttributeEquals($params, 'params', $result);
+        $this->assertEquals($schema, $result->entitySchema);
     }
 
     public function testShouldCreateACacheableCursor()
@@ -52,10 +49,7 @@ class CursorFactoryTest extends TestCase
         $this->assertInstanceOf(Cursor::class, $result);
         $this->assertInstanceOf(CacheableCursor::class, $result);
         $this->assertNotInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertAttributeEquals($schema, 'entitySchema', $result);
-        $this->assertAttributeEquals($collection, 'collection', $result);
-        $this->assertAttributeEquals('find', 'command', $result);
-        $this->assertAttributeEquals($params, 'params', $result);
+        $this->assertEquals($schema, $result->entitySchema);
     }
 
     public function testShouldCreateAEmbeddedCursor()
@@ -70,7 +64,6 @@ class CursorFactoryTest extends TestCase
         $this->assertInstanceOf(EmbeddedCursor::class, $result);
         $this->assertNotInstanceOf(Cursor::class, $result);
         $this->assertNotInstanceOf(CacheableCursor::class, $result);
-        $this->assertAttributeEquals($entityClass, 'entityClass', $result);
-        $this->assertAttributeEquals([['foo' => 'bar']], 'items', $result);
+        $this->assertEquals($entityClass, $result->entityClass);
     }
 }

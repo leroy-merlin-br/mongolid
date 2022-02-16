@@ -91,6 +91,11 @@ class Manager
         return $this->connectionPool->getConnection()->getRawConnection();
     }
 
+    public function getSchemas(): array
+    {
+        return $this->schemas;
+    }
+
     /**
      * Sets the event trigger for Mongolid events.
      *

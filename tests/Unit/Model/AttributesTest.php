@@ -27,14 +27,13 @@ class AttributesTest extends TestCase
         $model->name = 'John';
         $model->age = 25;
         $model->child = $childObj;
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [
                 'name' => 'John',
                 'age' => 25,
                 'child' => $childObj,
             ],
-            'attributes',
-            $model
+            $model->attributes
         );
     }
 
@@ -119,12 +118,11 @@ class AttributesTest extends TestCase
 
         // Assert
         unset($model->age);
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             [
                 'name' => 'John',
             ],
-            'attributes',
-            $model
+            $model->attributes
         );
     }
 
@@ -212,7 +210,7 @@ class AttributesTest extends TestCase
 
         // Assert
         $model->fill($input);
-        $this->assertAttributeEquals($expected, 'attributes', $model);
+        $this->assertEquals($expected, $model->attributes);
     }
 
     public function testShouldForceFillAttributes()

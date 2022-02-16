@@ -176,6 +176,11 @@ class Cursor implements CursorInterface, Serializable
         return $this->collection->count(...$this->params);
     }
 
+    public function params(): array
+    {
+        return $this->params;
+    }
+
     /**
      * Iterator interface rewind (used in foreach).
      */
