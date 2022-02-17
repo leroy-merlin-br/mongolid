@@ -11,7 +11,7 @@
          stopOnFailure="false"
 >
     <testsuites>
-        <testsuite name="unit">
+        <testsuite name="Package Unit Tests">
             <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
     </testsuites>

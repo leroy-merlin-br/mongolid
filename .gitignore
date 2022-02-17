@@ -4,3 +4,4 @@
 /site
 .idea
 coverage
+.phpunit.result.cache

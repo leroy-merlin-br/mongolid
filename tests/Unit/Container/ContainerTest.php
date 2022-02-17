@@ -6,9 +6,9 @@ use Illuminate\Container\Container;
 use Mockery as m;
 use Mongolid\TestCase;
 
-class IocTest extends TestCase
+class ContainerTest extends TestCase
 {
-    public function setUp(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         m::close();

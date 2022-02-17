@@ -46,7 +46,7 @@ class EventTriggerService
         return true;
     }
 
-    public function getDispatcher():EventTriggerInterface
+    public function getDispatcher(): EventTriggerInterface
     {
         return $this->dispatcher;
     }
