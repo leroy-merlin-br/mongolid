@@ -65,15 +65,11 @@ trait HasLegacyAttributesTrait
      */
     private $originalAttributes = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function fill(
+    public function fill(
         array $input,
         bool $force = false
     ): HasAttributesInterface {
-        $object = Container::make(static::class);
-
+        $object = $this;
         if ($object instanceof PolymorphableModelInterface) {
             $class = $object->polymorph(array_merge($object->getDocumentAttributes(), $input));
 

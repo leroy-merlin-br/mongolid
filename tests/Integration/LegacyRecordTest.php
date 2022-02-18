@@ -28,4 +28,15 @@ class LegacyRecordTest extends IntegrationTestCase
 
         $this->assertEquals('Embedded User', $entity->siblings()->first()->name);
     }
+
+    public function testShouldFillModel(): void
+    {
+        $entity = new LegacyRecordUser();
+        $data = [
+            'name' => 'Parent User',
+        ];
+        $entity->fill($data);
+
+        dd($entity->getAttributes());
+    }
 }
