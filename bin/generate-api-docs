@@ -1,0 +1,17 @@
+#!/usr/bin/php
+<?php
+
+/**
+ * Doctum configuration file.
+ *
+ * @see https://github.com/code-lts/doctum#readme
+ */
+
+return new Doctum\Doctum(
+    './src',
+    [
+        'title' => 'Mongolid ODM Api',
+        'build_dir' => __DIR__.'/../site/api',
+        'cache_dir' => __DIR__.'/../build/cache',
+    ]
+);
