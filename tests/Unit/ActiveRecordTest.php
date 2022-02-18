@@ -12,7 +12,6 @@ use Mongolid\Model\Attributes;
 use Mongolid\Model\Relations;
 use Mongolid\Schema\Schema;
 use stdClass;
-use Mongolid\TestCase;
 
 class ActiveRecordTest extends TestCase
 {
@@ -41,7 +40,7 @@ class ActiveRecordTest extends TestCase
         unset($this->entity);
     }
 
-    public function testShouldImplementModelTraits()
+    public function testShouldImplementModelTraits(): void
     {
         // Assert
         $this->assertEquals(
@@ -50,7 +49,7 @@ class ActiveRecordTest extends TestCase
         );
     }
 
-    public function testShouldSave()
+    public function testShouldSave(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
@@ -75,7 +74,7 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->save());
     }
 
-    public function testShouldInsert()
+    public function testShouldInsert(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
@@ -100,7 +99,7 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->insert());
     }
 
-    public function testShouldUpdate()
+    public function testShouldUpdate(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
@@ -125,7 +124,7 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->update());
     }
 
-    public function testShouldDelete()
+    public function testShouldDelete(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
@@ -147,27 +146,27 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->delete());
     }
 
-    public function testSaveShouldReturnFalseIfCollectionIsNull()
+    public function testSaveShouldReturnFalseIfCollectionIsNull(): void
     {
         $this->assertFalse($this->entity->save());
     }
 
-    public function testUpdateShouldReturnFalseIfCollectionIsNull()
+    public function testUpdateShouldReturnFalseIfCollectionIsNull(): void
     {
         $this->assertFalse($this->entity->update());
     }
 
-    public function testInsertShouldReturnFalseIfCollectionIsNull()
+    public function testInsertShouldReturnFalseIfCollectionIsNull(): void
     {
         $this->assertFalse($this->entity->insert());
     }
 
-    public function testDeleteShouldReturnFalseIfCollectionIsNull()
+    public function testDeleteShouldReturnFalseIfCollectionIsNull(): void
     {
         $this->assertFalse($this->entity->delete());
     }
 
-    public function testShouldGetWithWhereQuery()
+    public function testShouldGetWithWhereQuery(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -192,7 +191,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($cursor, $entity->where($query, $projection, true));
     }
 
-    public function testShouldGetAll()
+    public function testShouldGetAll(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -214,7 +213,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($cursor, $entity->all());
     }
 
-    public function testShouldGetFirstWithQuery()
+    public function testShouldGetFirstWithQuery(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -238,7 +237,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($entity, $entity->first($query, $projection, true));
     }
 
-    public function testShouldGetFirstOrFail()
+    public function testShouldGetFirstOrFail(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -262,7 +261,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($entity, $entity->firstOrFail($query, $projection, true));
     }
 
-    public function testShouldGetFirstOrNewAndReturnExistingModel()
+    public function testShouldGetFirstOrNewAndReturnExistingModel(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -285,7 +284,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($entity, $entity->firstOrNew($id));
     }
 
-    public function testShouldGetFirstOrNewAndReturnNewModel()
+    public function testShouldGetFirstOrNewAndReturnNewModel(): void
     {
         // Arrage
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
@@ -308,7 +307,7 @@ class ActiveRecordTest extends TestCase
         $this->assertNotEquals($entity, $entity->firstOrNew($id));
     }
 
-    public function testShouldGetSchemaIfFieldsIsTheClassName()
+    public function testShouldGetSchemaIfFieldsIsTheClassName(): void
     {
         // Arrage
         $this->setProtected($this->entity, 'fields', 'MySchemaClass');
@@ -324,7 +323,7 @@ class ActiveRecordTest extends TestCase
         );
     }
 
-    public function testShouldGetSchemaIfFieldsDescribesSchemaFields()
+    public function testShouldGetSchemaIfFieldsDescribesSchemaFields(): void
     {
         // Arrage
         $fields = ['name' => 'string', 'age' => 'int'];
@@ -358,7 +357,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals($schema, $result->getSchema());
     }
 
-    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction()
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction(): void
     {
         $entity = new class() extends ActiveRecord {
         };
@@ -370,7 +369,7 @@ class ActiveRecordTest extends TestCase
         $entity->all();
     }
 
-    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction()
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction(): void
     {
         $entity = new class() extends ActiveRecord {
         };
@@ -382,7 +381,7 @@ class ActiveRecordTest extends TestCase
         $entity->first();
     }
 
-    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction()
+    public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction(): void
     {
         $entity = new class() extends ActiveRecord {
         };
@@ -394,7 +393,7 @@ class ActiveRecordTest extends TestCase
         $entity->where();
     }
 
-    public function testShouldGetCollectionName()
+    public function testShouldGetCollectionName(): void
     {
         $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
@@ -403,7 +402,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals('collection_name', $entity->getCollectionName());
     }
 
-    public function testShouldAttachToAttribute()
+    public function testShouldAttachToAttribute(): void
     {
         $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
@@ -421,7 +420,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals([$embedded->_id], $entity->courseClass);
     }
 
-    public function testShouldEmbedToAttribute()
+    public function testShouldEmbedToAttribute(): void
     {
         $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
@@ -438,7 +437,7 @@ class ActiveRecordTest extends TestCase
         $this->assertEquals('Course Class #1', $entity->classes()->first()->name);
     }
 
-    public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()
+    public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod(): void
     {
         $entity = new class() extends ActiveRecord {
             protected $collection = 'collection_name';
@@ -449,7 +448,7 @@ class ActiveRecordTest extends TestCase
         $entity->foobar();
     }
 
-    public function testShouldGetSetWriteConcernInActiveRecordClass()
+    public function testShouldGetSetWriteConcernInActiveRecordClass(): void
     {
         $this->assertEquals(1, $this->entity->getWriteConcern());
         $this->assertEquals(1, $this->entity->getWriteConcern());
