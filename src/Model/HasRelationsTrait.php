@@ -92,7 +92,9 @@ trait HasRelationsTrait
      */
     protected function referencesOne(string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
     {
-        return $this->getRelationsService()->referencesOne($this, $modelClass, $field, $key);
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->referencesOne($this, $relationName, $modelClass, $field, $key);
     }
 
     /**
@@ -104,7 +106,9 @@ trait HasRelationsTrait
      */
     protected function referencesMany(string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
     {
-        return $this->getRelationsService()->referencesMany($this, $modelClass, $field, $key);
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->referencesMany($this, $relationName, $modelClass, $field, $key);
     }
 
     /**
@@ -115,7 +119,9 @@ trait HasRelationsTrait
      */
     protected function embedsOne(string $modelClass, string $field = null): EmbedsOne
     {
-        return $this->getRelationsService()->embedsOne($this, $modelClass, $field);
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->embedsOne($this, $relationName, $modelClass, $field);
     }
 
     /**
@@ -126,7 +132,9 @@ trait HasRelationsTrait
      */
     protected function embedsMany(string $modelClass, string $field = null): EmbedsMany
     {
-        return $this->getRelationsService()->embedsMany($this, $modelClass, $field);
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->embedsMany($this, $relationName, $modelClass, $field);
     }
 
     private function getRelationsService(): RelationsService
