@@ -32,7 +32,7 @@ class LegacyEmbeddedUser extends ActiveRecord
 
     public function grandsons()
     {
-        return $this->embedsMany(LegacyEmbeddedUser::class, 'other_arbitrary_field');
+        return $this->referencesMany(LegacyEmbeddedUser::class, 'other_arbitrary_field');
     }
 
     public function sameName()

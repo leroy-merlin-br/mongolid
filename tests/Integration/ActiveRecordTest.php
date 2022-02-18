@@ -13,9 +13,9 @@ class ActiveRecordTest extends IntegrationTestCase
         $embedded = new LegacyEmbeddedUser();
         $embedded->_id = new ObjectID();
         $embedded->name = 'Course Class #1';
-        $entity->attachToCourseClass($embedded);
+        $entity->attachToGrandsons($embedded);
 
-        $this->assertEquals([$embedded->_id], $entity->courseClass);
+        $this->assertEquals([$embedded->_id], $entity->other_arbitrary_field);
     }
 
     public function testShouldEmbedToAttribute(): void

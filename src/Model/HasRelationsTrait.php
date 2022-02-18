@@ -91,11 +91,9 @@ trait HasRelationsTrait
      */
     public function embed(string $field, $obj)
     {
-        $relation = $this->embedsMany(get_class($this), $field);
+        $relation = $this->$field();
 
         $relation->add($obj);
-
-        return $relation->getResults();
     }
 
     /**
@@ -107,11 +105,9 @@ trait HasRelationsTrait
      */
     public function unembed(string $field, $obj)
     {
-        $relation = $this->embedsMany(get_class($this), $field);
+        $relation = $this->$field();
 
         $relation->remove($obj);
-
-        return $relation->getResults();
     }
 
     /**
@@ -123,11 +119,9 @@ trait HasRelationsTrait
      */
     public function attach(string $field, $obj)
     {
-        $relation = $this->referencesMany(get_class($this), $field);
+        $relation = $this->$field();
 
         $relation->attach($obj);
-
-        return $relation->getResults();
     }
 
     /**
@@ -139,11 +133,9 @@ trait HasRelationsTrait
      */
     public function detach(string $field, $obj)
     {
-        $relation = $this->referencesMany(get_class($this), $field);
+        $relation = $this->$field();
 
         $relation->detach($obj);
-
-        return $relation->getResults();
     }
 
     /**
