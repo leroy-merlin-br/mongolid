@@ -3,12 +3,8 @@ namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
-use Mongolid\Model\Exception\InvalidFieldNameException;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NotARelationException;
-use Mongolid\Model\Relations\EmbedsMany;
-use Mongolid\Model\Relations\EmbedsOne;
-use Mongolid\Model\Relations\ReferencesMany;
-use Mongolid\Model\Relations\ReferencesOne;
 use Mongolid\Model\Relations\RelationInterface;
 
 /**
@@ -30,6 +26,7 @@ trait HasLegacyRelationsTrait
      */
     private $fieldRelations = [];
 
+    public $shouldReturnCursor = true;
 
     /**
      * Get a specified relationship.
@@ -52,7 +49,6 @@ trait HasLegacyRelationsTrait
      */
     public function setRelation(string $relation, RelationInterface $value, string $field): void
     {
-        $this->validateField($relation, $field);
         $this->relations[$relation] = $value;
         $this->fieldRelations[$field] = $relation;
     }
@@ -91,9 +87,17 @@ trait HasLegacyRelationsTrait
      * @param string|null $field      the field where the $key is stored
      * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    protected function referencesOne(string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
+    protected function referencesOne(string $modelClass, string $field = null, string $key = '_id')
     {
-        return $this->getRelationService()->referencesOne($this, $modelClass, $field, $key);
+        $relationName = $this->guessRelationName();
+
+        $relation = $this->getRelationsService()->referencesOne($this, $relationName, $modelClass, $field, $key);
+
+        if ($this->shouldReturnCursor) {
+            return $relation->getResults();
+        }
+
+        return $relation;
     }
 
     /**
@@ -103,9 +107,17 @@ trait HasLegacyRelationsTrait
      * @param string|null $field      the field where the _ids are stored
      * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    protected function referencesMany(string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
+    protected function referencesMany(string $modelClass, string $field = null, string $key = '_id')
     {
-        return $this->getRelationService()->referencesMany($this, $modelClass, $field, $key);
+        $relationName = $this->guessRelationName();
+
+        $relation = $this->getRelationsService()->referencesMany($this, $relationName, $modelClass, $field, $key);
+
+        if ($this->shouldReturnCursor) {
+            return $relation->getResults();
+        }
+
+        return $relation;
     }
 
     /**
@@ -114,9 +126,17 @@ trait HasLegacyRelationsTrait
      * @param string      $modelClass class of the embedded model
      * @param string|null $field      field where the embedded document is stored
      */
-    protected function embedsOne(string $modelClass, string $field = null): EmbedsOne
+    protected function embedsOne(string $modelClass, string $field = null)
     {
-        return $this->getRelationService()->embedsOne($this, $modelClass, $field);
+        $relationName = $this->guessRelationName();
+
+        $relation = $this->getRelationsService()->embedsOne($this, $relationName, $modelClass, $field);
+
+        if ($this->shouldReturnCursor) {
+            return $relation->getResults();
+        }
+
+        return $relation;
     }
 
     /**
@@ -125,13 +145,82 @@ trait HasLegacyRelationsTrait
      * @param string      $modelClass class of the embedded model
      * @param string|null $field      field where the embedded documents are stored
      */
-    protected function embedsMany(string $modelClass, string $field = null): EmbedsMany
+    protected function embedsMany(string $modelClass, string $field = null)
     {
-        return $this->getRelationService()->embedsMany($this, $modelClass, $field);
+        $relationName = $this->guessRelationName();
+
+        $relation = $this->getRelationsService()->embedsMany($this, $relationName, $modelClass, $field);
+
+        if ($this->shouldReturnCursor) {
+            return $relation->getResults();
+        }
+
+        return $relation;
     }
 
-    private function getRelationService(): RelationsService
+    private function getRelationsService(): RelationsService
     {
-        return Container::make(RelationsService::class);
+        if (!$this->relationsService) {
+            $this->relationsService = Container::make(RelationsService::class);
+        }
+
+        return $this->relationsService;
+    }
+
+    /**
+     * Retrieve relation name. For example, if we have a code like this:
+     *
+     * ```
+     * class User extends AbstractModel
+     * {
+     *     public function brother()
+     *     {
+     *         return $this->referencesOne(User::class);
+     *     }
+     * }
+     * ```
+     * we will retrieve `brother` as the relation name.
+     * This is useful for storing the "Brother Reference"
+     * on a field called `brother_id`.
+     */
+    public function guessRelationName(): string
+    {
+        [$method, $relationType, $relation] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+
+        return $relation['function'];
+    }
+
+    /**
+     * Infer field name for reference relations.
+     * This is useful for storing the relation on
+     * a field based on both the relation name and the
+     * referenced key used.
+     *
+     * @example a `parent` relation on a `code` field
+     * would be inferred as `parent_code`.
+     * @example a `addresses` relation on `_id` field
+     * would be inferred as `addresses_ids`.
+     */
+    private function inferFieldForReference(string $relationName, string $key, bool $plural): string
+    {
+        $relationName = Str::snake($relationName);
+        $key = $plural ? Str::plural($key) : $key;
+
+        return $relationName.'_'.ltrim($key, '_');
+    }
+
+    /**
+     * Infer field name for embed relations.
+     * This is useful for storing the relation on
+     * a field based on the relation name.
+     *
+     * @example a `comments` relation on would be inferred as `embedded_comments`.
+     * @example a `tag` relation on would be inferred as `embedded_tag`.
+     */
+    private function inferFieldForEmbed(string $relationName): string
+    {
+        $relationName = Str::snake($relationName);
+
+        return 'embedded_'.$relationName;
     }
 }

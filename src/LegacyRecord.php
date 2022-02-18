@@ -11,6 +11,8 @@ use Mongolid\Model\AbstractModel;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasAttributesTrait;
+use Mongolid\Model\HasLegacyAttributesTrait;
+use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\HasRelationsTrait;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Query\Builder;
@@ -23,8 +25,8 @@ use Mongolid\Query\ModelMapper;
  */
 class LegacyRecord implements ModelInterface
 {
-    use HasAttributesTrait;
-    use HasRelationsTrait;
+    use HasLegacyAttributesTrait;
+    use HasLegacyRelationsTrait;
 
     /**
      * The $dynamic property tells if the object will accept additional fields
@@ -68,9 +70,11 @@ class LegacyRecord implements ModelInterface
      */
     public function embed(string $field, $obj)
     {
+        $this->shouldReturnCursor = false;
         $relation = $this->$field();
 
         $relation->add($obj);
+        $this->shouldReturnCursor = true;
     }
 
     /**
@@ -82,9 +86,11 @@ class LegacyRecord implements ModelInterface
      */
     public function unembed(string $field, $obj)
     {
+        $this->shouldReturnCursor = false;
         $relation = $this->$field();
 
         $relation->remove($obj);
+        $this->shouldReturnCursor = true;
     }
 
     /**
@@ -96,9 +102,11 @@ class LegacyRecord implements ModelInterface
      */
     public function attach(string $field, $obj)
     {
+        $this->shouldReturnCursor = false;
         $relation = $this->$field();
 
         $relation->attach($obj);
+        $this->shouldReturnCursor = true;
     }
 
     /**
@@ -110,9 +118,11 @@ class LegacyRecord implements ModelInterface
      */
     public function detach(string $field, $obj)
     {
+        $this->shouldReturnCursor = false;
         $relation = $this->$field();
 
         $relation->detach($obj);
+        $this->shouldReturnCursor = true;
     }
 
     /**

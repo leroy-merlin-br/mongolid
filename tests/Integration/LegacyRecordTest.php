@@ -15,7 +15,7 @@ class LegacyRecordTest extends IntegrationTestCase
         $embedded->name = 'Course Class #1';
         $entity->attachToGrandsons($embedded);
 
-        $this->assertEquals([$embedded->_id], $entity->other_arbitrary_field);
+        $this->assertEquals([$embedded->_id], $entity->grandsons);
     }
 
     public function testShouldEmbedToAttribute(): void
@@ -26,6 +26,6 @@ class LegacyRecordTest extends IntegrationTestCase
         $embedded->name = 'Embedded User';
         $entity->embed('siblings', $embedded);
 
-        $this->assertEquals('Embedded User', $entity->siblings()->getResults()->first()->name);
+        $this->assertEquals('Embedded User', $entity->siblings()->first()->name);
     }
 }

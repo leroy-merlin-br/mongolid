@@ -33,7 +33,7 @@ class LegacyRecordUser extends LegacyRecord
 
     public function grandsons()
     {
-        return $this->referencesMany(LegacyRecordUser::class, 'other_arbitrary_field');
+        return $this->referencesMany(LegacyRecordUser::class, 'grandsons');
     }
 
     public function sameName()
