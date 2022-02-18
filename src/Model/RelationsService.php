@@ -2,14 +2,17 @@
 
 namespace Mongolid\Model;
 
+use Illuminate\Support\Str;
+use Mongolid\Model\Exception\InvalidFieldNameException;
+use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\EmbedsMany;
 use Mongolid\Model\Relations\EmbedsOne;
 use Mongolid\Model\Relations\ReferencesMany;
 use Mongolid\Model\Relations\ReferencesOne;
+use Mongolid\Model\Relations\RelationInterface;
 
 class RelationsService
 {
-
     /**
      * Create a ReferencesOne Relation.
      *
@@ -17,18 +20,18 @@ class RelationsService
      * @param string|null $field      the field where the $key is stored
      * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    public function referencesOne(string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
+    public function referencesOne(ModelInterface $model, string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
     {
-        $relationName = $this->guessRelationName();
+        $relationName = $model->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
+        if (!$model->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
 
-            $relation = new ReferencesOne($this, $modelClass, $field, $key);
-            $this->setRelation($relationName, $relation, $field);
+            $relation = new ReferencesOne($model, $modelClass, $field, $key);
+            $model->setRelation($relationName, $relation, $field);
         }
 
-        return $this->getRelation($relationName);
+        return $model->getRelation($relationName);
     }
 
     /**
@@ -38,18 +41,18 @@ class RelationsService
      * @param string|null $field      the field where the _ids are stored
      * @param string      $key        the field that the document will be referenced by (usually _id)
      */
-    public function referencesMany(string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
+    public function referencesMany(ModelInterface $model, string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
     {
-        $relationName = $this->guessRelationName();
+        $relationName = $model->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
+        if (!$model->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
 
-            $relation = new ReferencesMany($this, $modelClass, $field, $key);
-            $this->setRelation($relationName, $relation, $field);
+            $relation = new ReferencesMany($model, $modelClass, $field, $key);
+            $model->setRelation($relationName, $relation, $field);
         }
 
-        return $this->getRelation($relationName);
+        return $model->getRelation($relationName);
     }
 
     /**
@@ -58,18 +61,18 @@ class RelationsService
      * @param string      $modelClass class of the embedded model
      * @param string|null $field      field where the embedded document is stored
      */
-    public function embedsOne(string $modelClass, string $field = null): EmbedsOne
+    public function embedsOne(ModelInterface $model, string $modelClass, string $field = null): EmbedsOne
     {
-        $relationName = $this->guessRelationName();
+        $relationName = $model->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
+        if (!$model->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-            $relation = new EmbedsOne($this, $modelClass, $field);
-            $this->setRelation($relationName, $relation, $field);
+            $relation = new EmbedsOne($model, $modelClass, $field);
+            $model->setRelation($relationName, $relation, $field);
         }
 
-        return $this->getRelation($relationName);
+        return $model->getRelation($relationName);
     }
 
     /**
@@ -78,18 +81,51 @@ class RelationsService
      * @param string      $modelClass class of the embedded model
      * @param string|null $field      field where the embedded documents are stored
      */
-    public function embedsMany(string $modelClass, string $field = null): EmbedsMany
+    public function embedsMany(ModelInterface $model, string $modelClass, string $field = null): EmbedsMany
     {
-        $relationName = $this->guessRelationName();
+        $relationName = $model->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
+        if (!$model->relationLoaded($relationName)) {
             $field = $field ?: $this->inferFieldForEmbed($relationName);
 
-            $relation = new EmbedsMany($this, $modelClass, $field);
-            $this->setRelation($relationName, $relation, $field);
+            $relation = new EmbedsMany($model, $modelClass, $field);
+            $model->setRelation($relationName, $relation, $field);
         }
 
-        return $this->getRelation($relationName);
+        return $model->getRelation($relationName);
     }
 
+    /**
+     * Infer field name for reference relations.
+     * This is useful for storing the relation on
+     * a field based on both the relation name and the
+     * referenced key used.
+     *
+     * @example a `parent` relation on a `code` field
+     * would be inferred as `parent_code`.
+     * @example a `addresses` relation on `_id` field
+     * would be inferred as `addresses_ids`.
+     */
+    private function inferFieldForReference(string $relationName, string $key, bool $plural): string
+    {
+        $relationName = Str::snake($relationName);
+        $key = $plural ? Str::plural($key) : $key;
+
+        return $relationName.'_'.ltrim($key, '_');
+    }
+
+    /**
+     * Infer field name for embed relations.
+     * This is useful for storing the relation on
+     * a field based on the relation name.
+     *
+     * @example a `comments` relation on would be inferred as `embedded_comments`.
+     * @example a `tag` relation on would be inferred as `embedded_tag`.
+     */
+    private function inferFieldForEmbed(string $relationName): string
+    {
+        $relationName = Str::snake($relationName);
+
+        return 'embedded_'.$relationName;
+    }
 }
