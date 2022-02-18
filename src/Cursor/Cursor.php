@@ -11,7 +11,7 @@ use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
 
@@ -329,7 +329,7 @@ class Cursor implements CursorInterface, Serializable
     protected function getAssembler()
     {
         if (!$this->assembler) {
-            $this->assembler = Ioc::make(EntityAssembler::class);
+            $this->assembler = Container::make(EntityAssembler::class);
         }
 
         return $this->assembler;
@@ -358,7 +358,7 @@ class Cursor implements CursorInterface, Serializable
     {
         $attributes = unserialize($serialized);
 
-        $conn = Ioc::make(Pool::class)->getConnection();
+        $conn = Container::make(Pool::class)->getConnection();
         $db = $conn->defaultDatabase;
         $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
 

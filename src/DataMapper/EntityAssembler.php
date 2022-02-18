@@ -2,8 +2,7 @@
 
 namespace Mongolid\DataMapper;
 
-use Mongolid\Container\Ioc;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Container\Container;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema\Schema;
 
@@ -31,7 +30,7 @@ class EntityAssembler
     public function assemble($document, Schema $schema)
     {
         $entityClass = $schema->entityClass;
-        $model = Ioc::make($entityClass);
+        $model = Container::make($entityClass);
 
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
@@ -76,7 +75,7 @@ class EntityAssembler
      */
     protected function prepareOriginalAttributes($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof Att) {
             $entity->syncOriginalAttributes();
         }
 
@@ -99,8 +98,8 @@ class EntityAssembler
             return;
         }
 
-        $schema = Ioc::make($schemaClass);
-        $assembler = Ioc::make(self::class);
+        $schema = Container::make($schemaClass);
+        $assembler = Container::make(self::class);
 
         if (!isset($value[0])) {
             $value = [$value];

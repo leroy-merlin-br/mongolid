@@ -3,7 +3,7 @@
 namespace Mongolid\Cursor;
 
 use Mongolid\ActiveRecord;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
@@ -145,7 +145,7 @@ class EmbeddedCursor implements CursorInterface
         }
 
         $schema = $this->getSchemaForEntity();
-        $entityAssembler = Ioc::makeWith(EntityAssembler::class, compact('schema'));
+        $entityAssembler = Container::makeWith(EntityAssembler::class, compact('schema'));
 
         return $entityAssembler->assemble($document, $schema);
     }

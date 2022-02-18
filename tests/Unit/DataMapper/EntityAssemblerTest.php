@@ -4,9 +4,9 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\Container\Ioc;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Container\Container;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\HasAttributesTrait;
 use Mongolid\Model\PolymorphableInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
@@ -35,7 +35,7 @@ class EntityAssemblerTest extends TestCase
 
         // Act
         foreach ($schemas as $className => $instance) {
-            Ioc::instance($className, $instance);
+            Container::instance($className, $instance);
         }
 
         // Assert
@@ -261,9 +261,9 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class _stubStudent extends \stdClass implements AttributesAccessInterface
+class _stubStudent extends \stdClass implements HasAttributesInterface
 {
-    use Attributes;
+    use HasAttributesTrait;
 
     public function __construct($attr = [])
     {

@@ -6,7 +6,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 
@@ -111,7 +111,7 @@ class BulkWrite
      */
     public function execute($writeConcern = 1)
     {
-        $connection = Ioc::make(Pool::class)->getConnection();
+        $connection = Container::make(Pool::class)->getConnection();
         $manager = $connection->getRawManager();
 
         $namespace = $connection->defaultDatabase.'.'.$this->schema->collection;

@@ -4,15 +4,13 @@ namespace Mongolid;
 
 use BadMethodCallException;
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Exception\NoCollectionNameException;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\Relations;
+use Mongolid\Model\HasAttributesTrait;
+use Mongolid\Model\HasRelationsTrait;
 use Mongolid\Schema\Schema;
-use stdClass;
-use Mongolid\TestCase;
 
 class ActiveRecordTest extends TestCase
 {
@@ -45,7 +43,7 @@ class ActiveRecordTest extends TestCase
     {
         // Assert
         $this->assertEquals(
-            [Attributes::class, Relations::class],
+            [HasAttributesTrait::class, HasRelationsTrait::class],
             array_keys(class_uses(ActiveRecord::class))
         );
     }
@@ -175,10 +173,10 @@ class ActiveRecordTest extends TestCase
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor = m::mock();
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -198,10 +196,10 @@ class ActiveRecordTest extends TestCase
         $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $dataMapper = m::mock();
-        $cursor = m::mock();
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -224,7 +222,7 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -248,7 +246,7 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -271,7 +269,7 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -294,7 +292,7 @@ class ActiveRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -315,7 +313,7 @@ class ActiveRecordTest extends TestCase
         $schema = m::mock(Schema::class);
 
         // Act
-        Ioc::instance('MySchemaClass', $schema);
+        Container::instance('MySchemaClass', $schema);
 
         // Assert
         $this->assertEquals(
@@ -401,41 +399,6 @@ class ActiveRecordTest extends TestCase
         };
 
         $this->assertEquals('collection_name', $entity->getCollectionName());
-    }
-
-    public function testShouldAttachToAttribute()
-    {
-        $entity = new class() extends ActiveRecord {
-            protected $collection = 'collection_name';
-
-            public function class()
-            {
-                return $this->referencesOne(stdClass::class, 'courseClass');
-            }
-        };
-        $embedded = new stdClass();
-        $embedded->_id = new ObjectID();
-        $embedded->name = 'Course Class #1';
-        $entity->attachToCourseClass($embedded);
-
-        $this->assertEquals([$embedded->_id], $entity->courseClass);
-    }
-
-    public function testShouldEmbedToAttribute()
-    {
-        $entity = new class() extends ActiveRecord {
-            protected $collection = 'collection_name';
-
-            public function classes()
-            {
-                return $this->embedsMany(stdClass::class, 'courseClasses');
-            }
-        };
-        $embedded = new stdClass();
-        $embedded->name = 'Course Class #1';
-        $entity->embedToCourseClasses($embedded);
-
-        $this->assertEquals('Course Class #1', $entity->classes()->first()->name);
     }
 
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod()

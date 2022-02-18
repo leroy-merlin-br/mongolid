@@ -4,12 +4,14 @@ namespace Mongolid;
 
 use BadMethodCallException;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Exception\NoCollectionNameException;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\AttributesAccessInterface;
-use Mongolid\Model\Relations;
+use Mongolid\Model\AbstractModel;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\HasAttributesTrait;
+use Mongolid\Model\HasRelationsTrait;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
@@ -21,9 +23,9 @@ use Mongolid\Schema\Schema;
  * The Mongolid\Schema\Schema that describes the entity will be generated on the go
  * based on the $fields.
  */
-abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInterface
+abstract class ActiveRecord extends AbstractModel implements HasAttributesInterface, HasSchemaInterface
 {
-    use Attributes, Relations;
+    use HasAttributesTrait, HasRelationsTrait;
 
     /**
      * Name of the collection where this kind of Entity is going to be saved or
@@ -66,72 +68,66 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
 
     /**
      * Saves this object into database.
-     *
-     * @return bool Success
      */
-    public function save()
+    public function save(): bool
     {
         return $this->execute('save');
     }
 
     /**
      * Insert this object into database.
-     *
-     * @return bool Success
      */
-    public function insert()
+    public function insert(): bool
     {
         return $this->execute('insert');
     }
 
+    public function &__get(string $key)
+    {
+        return $this->getAttribute($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param string $key   attribute name
+     * @param mixed  $value value to be set
+     */
+    public function __set(string $key, $value): void
+    {
+        $this->setAttribute($key, $value);
+    }
+
+    /**
+     * Determine if an attribute exists on the model.
+     *
+     * @param string $key attribute name
+     */
+    public function __isset(string $key): bool
+    {
+        return $this->hasAttribute($key);
+    }
+
     /**
      * Updates this object in database.
-     *
-     * @return bool Success
      */
-    public function update()
+    public function update(): bool
     {
         return $this->execute('update');
     }
 
     /**
      * Deletes this object in database.
-     *
-     * @return bool Success
      */
-    public function delete()
+    public function delete(): bool
     {
         return $this->execute('delete');
     }
 
     /**
-     * Gets a cursor of this kind of entities that matches the query from the
-     * database.
-     *
-     * @param array $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves a CacheableCursor instead
-     *
-     * @return \Mongolid\Cursor\Cursor
-     */
-    public static function where(
-        array $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->where(
-            $query,
-            $projection,
-            $useCache
-        );
-    }
-
-    /**
      * Gets a cursor of this kind of entities from the database.
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
-    public static function all()
+    public static function all(): CursorInterface
     {
         return self::getDataMapperInstance()->all();
     }
@@ -247,7 +243,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      */
     public function getDataMapper()
     {
-        $dataMapper = Ioc::make(DataMapper::class);
+        $dataMapper = Container::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
 
         return $dataMapper;
@@ -258,17 +254,15 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      *
      * @return string
      */
-    public function getCollectionName()
+    public function getCollectionName(): ?string
     {
-        return $this->collection ? $this->collection : $this->getSchema()->collection;
+        return $this->collection ?: $this->getSchema()->collection;
     }
 
     /**
      * Getter for $writeConcern variable.
-     *
-     * @return mixed
      */
-    public function getWriteConcern()
+    public function getWriteConcern(): int
     {
         return $this->writeConcern;
     }
@@ -278,7 +272,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      *
      * @param mixed $writeConcern level of write concern to the transation
      */
-    public function setWriteConcern($writeConcern)
+    public function setWriteConcern($writeConcern): void
     {
         $this->writeConcern = $writeConcern;
     }
@@ -310,7 +304,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
     protected function instantiateSchemaInFields()
     {
         if (is_string($this->fields)) {
-            if (is_subclass_of($instance = Ioc::make($this->fields), Schema::class)) {
+            if (is_subclass_of($instance = Container::make($this->fields), Schema::class)) {
                 return $instance;
             }
         }
@@ -320,10 +314,8 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      * Performs the given action into database.
      *
      * @param string $action datamapper function to execute
-     *
-     * @return bool
      */
-    protected function execute(string $action)
+    protected function execute(string $action): bool
     {
         if (!$this->getCollectionName()) {
             return false;
@@ -349,7 +341,7 @@ abstract class ActiveRecord implements AttributesAccessInterface, HasSchemaInter
      */
     private static function getDataMapperInstance()
     {
-        $instance = Ioc::make(get_called_class());
+        $instance = Container::make(get_called_class());
 
         if (!$instance->getCollectionName()) {
             throw new NoCollectionNameException();

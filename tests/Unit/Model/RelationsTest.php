@@ -5,7 +5,7 @@ namespace Mongolid\Model;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use Mongolid\ActiveRecord;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\EmbeddedCursor;
@@ -36,8 +36,8 @@ class RelationsTest extends TestCase
         $model->$field = $fieldValue;
 
         // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance('EntityClass', $entity);
+        Container::instance(DataMapper::class, $dataMapper);
+        Container::instance('EntityClass', $entity);
 
         $dataMapper->shouldReceive('first')
             ->with(m::type('array'), [], $useCache)
@@ -70,8 +70,8 @@ class RelationsTest extends TestCase
         $model->$field = $fieldValue;
 
         // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
-        Ioc::instance('EntityClass', $entity);
+        Container::instance(DataMapper::class, $dataMapper);
+        Container::instance('EntityClass', $entity);
 
         $dataMapper->shouldReceive('where')
             ->with(m::type('array'), [], $useCache)
@@ -105,7 +105,7 @@ class RelationsTest extends TestCase
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
 
         // Act
-        Ioc::instance(CursorFactory::class, $cursorFactory);
+        Container::instance(CursorFactory::class, $cursorFactory);
 
         $cursorFactory->shouldReceive('createEmbeddedCursor')
             ->once()
@@ -137,7 +137,7 @@ class RelationsTest extends TestCase
         $instantiableClass = $entity instanceof Schema ? 'stdClass' : get_class($entity);
 
         // Act
-        Ioc::instance(CursorFactory::class, $cursorFactory);
+        Container::instance(CursorFactory::class, $cursorFactory);
 
         $cursorFactory->shouldReceive('createEmbeddedCursor')
             ->once()
@@ -162,7 +162,7 @@ class RelationsTest extends TestCase
         $documentEmbedder = m::mock(DocumentEmbedder::class);
 
         // Act
-        Ioc::instance(DocumentEmbedder::class, $documentEmbedder);
+        Container::instance(DocumentEmbedder::class, $documentEmbedder);
 
         $documentEmbedder->shouldReceive($method)
             ->once()

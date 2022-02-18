@@ -6,12 +6,12 @@ use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Exception\ModelNotFoundException;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
@@ -371,10 +371,10 @@ class DataMapper implements HasSchemaInterface
     protected function getSchemaMapper()
     {
         if (!$this->schema) {
-            $this->schema = Ioc::make($this->schemaClass);
+            $this->schema = Container::make($this->schemaClass);
         }
 
-        return Ioc::makeWith(SchemaMapper::class, ['schema' => $this->schema]);
+        return Container::makeWith(SchemaMapper::class, ['schema' => $this->schema]);
     }
 
     /**
@@ -455,7 +455,7 @@ class DataMapper implements HasSchemaInterface
     protected function getAssembler()
     {
         if (!$this->assembler) {
-            $this->assembler = Ioc::make(EntityAssembler::class);
+            $this->assembler = Container::make(EntityAssembler::class);
         }
 
         return $this->assembler;
@@ -474,7 +474,7 @@ class DataMapper implements HasSchemaInterface
     {
         $event = "mongolid.{$event}: ".get_class($entity);
 
-        $this->eventService ? $this->eventService : $this->eventService = Ioc::make(EventTriggerService::class);
+        $this->eventService ? $this->eventService : $this->eventService = Container::make(EventTriggerService::class);
 
         return $this->eventService->fire($event, $entity, $halt);
     }
@@ -565,7 +565,7 @@ class DataMapper implements HasSchemaInterface
      */
     private function afterSuccess($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->syncOriginalAttributes();
         }
     }
@@ -594,7 +594,7 @@ class DataMapper implements HasSchemaInterface
         $changes = [];
         $oldData = [];
 
-        if ($model instanceof AttributesAccessInterface) {
+        if ($model instanceof HasAttributesInterface) {
             $oldData = $model->originalAttributes();
         }
 

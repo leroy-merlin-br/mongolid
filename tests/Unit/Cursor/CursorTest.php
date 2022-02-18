@@ -12,7 +12,7 @@ use MongoDB\Driver\ReadPreference;
 use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use stdClass;
@@ -402,7 +402,7 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'collection', $driverCollection);
 
         // Act
-        Ioc::instance(Pool::class, $pool);
+        Container::instance(Pool::class, $pool);
 
         $pool->shouldReceive('getConnection')
             ->andReturn($conn);

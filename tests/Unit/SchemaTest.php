@@ -5,7 +5,7 @@ namespace Mongolid;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\SequenceService;
 use Mongolid\TestCase;
@@ -94,7 +94,7 @@ class SchemaTest extends TestCase
         $schema->collection = 'resources';
 
         // Act
-        Ioc::instance(SequenceService::class, $sequenceService);
+        Container::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
             ->with('resources')
@@ -115,7 +115,7 @@ class SchemaTest extends TestCase
         $schema->collection = 'resources';
 
         // Act
-        Ioc::instance(SequenceService::class, $sequenceService);
+        Container::instance(SequenceService::class, $sequenceService);
 
         $sequenceService->shouldReceive('getNextValue')
             ->with('resources')

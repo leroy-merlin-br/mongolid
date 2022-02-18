@@ -7,7 +7,7 @@ use ErrorException;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\TestCase;
@@ -49,7 +49,7 @@ class CacheableCursorTest extends TestCase
         $cursor->shouldReceive('generateCacheKey')
             ->andReturn('find:collection:123');
 
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+        Container::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->once()
@@ -82,7 +82,7 @@ class CacheableCursorTest extends TestCase
         $cursor->shouldReceive('generateCacheKey')
             ->andReturn($cacheKey);
 
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+        Container::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->with($cacheKey, null)
@@ -125,7 +125,7 @@ class CacheableCursorTest extends TestCase
         $cursor->shouldReceive('generateCacheKey')
             ->andReturn('find:collection:123');
 
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+        Container::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->with('find:collection:123', null)
@@ -170,7 +170,7 @@ class CacheableCursorTest extends TestCase
         $cursor->shouldReceive('generateCacheKey')
             ->never();
 
-        Ioc::instance(CacheComponentInterface::class, $cacheComponent);
+        Container::instance(CacheComponentInterface::class, $cacheComponent);
 
         $cacheComponent->shouldReceive('get')
             ->with('find:collection:123', null)

@@ -2,7 +2,7 @@
 
 namespace Mongolid\DataMapper;
 
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 
 /**
@@ -134,8 +134,8 @@ class SchemaMapper
     protected function mapToSchema($value, string $schemaClass)
     {
         $value = (array) $value;
-        $schema = Ioc::make($schemaClass);
-        $mapper = Ioc::makeWith(self::class, compact('schema'));
+        $schema = Container::make($schemaClass);
+        $mapper = Container::makeWith(self::class, compact('schema'));
 
         if (!isset($value[0])) {
             $value = [$value];

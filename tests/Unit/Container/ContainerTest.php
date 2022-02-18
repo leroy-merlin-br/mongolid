@@ -23,9 +23,9 @@ class ContainerTest extends TestCase
             ->with()
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method();
+        Container::method();
     }
 
     public function testShouldCallMethodsPropertlywithOneArgument()
@@ -37,9 +37,9 @@ class ContainerTest extends TestCase
             ->with(1)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method(1);
+        Container::method(1);
     }
 
     public function testShouldCallMethodsPropertlywithTwoArgument()
@@ -51,9 +51,9 @@ class ContainerTest extends TestCase
             ->with(1, 2)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method(1, 2);
+        Container::method(1, 2);
     }
 
     public function testShouldCallMethodsPropertlywithThreeArgument()
@@ -65,9 +65,9 @@ class ContainerTest extends TestCase
             ->with(1, 2, 3)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method(1, 2, 3);
+        Container::method(1, 2, 3);
     }
 
     public function testShouldCallMethodsPropertlywithFourArgument()
@@ -79,9 +79,9 @@ class ContainerTest extends TestCase
             ->with(1, 2, 3, 4)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method(1, 2, 3, 4);
+        Container::method(1, 2, 3, 4);
     }
 
     public function testShouldCallMethodsPropertlywithFiveOrMoreArgument()
@@ -93,8 +93,8 @@ class ContainerTest extends TestCase
             ->with(1, 2, 3, 4, 5)
             ->andReturn(true);
 
-        Ioc::setContainer($container);
+        Container::setContainer($container);
 
-        Ioc::method(1, 2, 3, 4, 5);
+        Container::method(1, 2, 3, 4, 5);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Mongolid\Connection;
 
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 
 /**
  * Holds one or more connections and retrieve then as needed. It contains a
@@ -23,7 +23,7 @@ class Pool
      */
     public function __construct()
     {
-        $this->connections = Ioc::make('SplQueue');
+        $this->connections = Container::make('SplQueue');
     }
 
     /**

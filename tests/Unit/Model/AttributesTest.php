@@ -252,8 +252,8 @@ class AttributesTest extends TestCase
     public function testShouldSetOriginalAttributes()
     {
         // Arrange
-        $model = new class() implements AttributesAccessInterface {
-            use Attributes;
+        $model = new class() implements HasAttributesInterface {
+            use HasAttributesTrait;
         };
 
         $model->name = 'John';

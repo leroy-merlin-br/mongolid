@@ -2,10 +2,9 @@
 
 namespace Mongolid;
 
-use Illuminate\Container\Container;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
@@ -132,7 +131,7 @@ class Manager
     public function getMapper(string $entityClass)
     {
         if (isset($this->schemas[$entityClass])) {
-            $dataMapper = Ioc::make(DataMapper::class);
+            $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($this->schemas[$entityClass] ?? null);
 
             return $dataMapper;
@@ -154,7 +153,7 @@ class Manager
 
         $this->container->instance(Pool::class, $this->connectionPool);
         $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
-        Ioc::setContainer($this->container);
+        Container::setContainer($this->container);
 
         static::$singleton = $this;
     }

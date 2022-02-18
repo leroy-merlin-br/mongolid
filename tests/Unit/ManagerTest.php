@@ -2,12 +2,11 @@
 
 namespace Mongolid;
 
-use Illuminate\Container\Container;
 use Mockery as m;
 use MongoDB\Client;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
@@ -87,7 +86,7 @@ class ManagerTest extends TestCase
         $schema->entityClass = 'Bacon';
 
         // Act
-        Ioc::instance(DataMapper::class, $dataMapper);
+        Container::instance(DataMapper::class, $dataMapper);
 
         // Assert
         $manager->registerSchema($schema);

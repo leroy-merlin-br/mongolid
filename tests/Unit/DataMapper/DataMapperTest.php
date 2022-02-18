@@ -9,11 +9,11 @@ use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
-use Mongolid\Model\AttributesAccessInterface;
+use Mongolid\Model\HasAttributesInterface;
 use Mongolid\Schema\Schema;
 use stdClass;
 use Mongolid\TestCase;
@@ -75,7 +75,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getModifiedCount', 'getUpsertedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -133,7 +133,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -191,7 +191,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -247,7 +247,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getModifiedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('originalAttributes')
                 ->once()
                 ->with()
@@ -273,7 +273,7 @@ class DataMapperTest extends TestCase
     public function testDifferentialUpdateShouldWork()
     {
         // Arrange
-        $entity = m::mock(AttributesAccessInterface::class);
+        $entity = m::mock(HasAttributesInterface::class);
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
@@ -366,7 +366,7 @@ class DataMapperTest extends TestCase
     public function testDifferentialUpdateShouldWorkHandlingNullValuesInArrays()
     {
         // Arrange
-        $entity = m::mock(AttributesAccessInterface::class);
+        $entity = m::mock(HasAttributesInterface::class);
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
@@ -481,7 +481,7 @@ class DataMapperTest extends TestCase
     public function testDifferentialUpdateShouldReturnTrueIfThereIsNothingToUpdate()
     {
         // Arrange
-        $entity = m::mock(AttributesAccessInterface::class);
+        $entity = m::mock(HasAttributesInterface::class);
         $connPool = m::mock(Pool::class);
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connPool]);
 
@@ -567,7 +567,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getInsertedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -628,7 +628,7 @@ class DataMapperTest extends TestCase
         $operationResult->shouldReceive('getDeletedCount')
             ->andReturn(1);
 
-        if ($entity instanceof AttributesAccessInterface) {
+        if ($entity instanceof HasAttributesInterface) {
             $entity->shouldReceive('syncOriginalAttributes')
                 ->once()
                 ->with();
@@ -951,7 +951,7 @@ class DataMapperTest extends TestCase
         $mapper->schemaClass = 'MySchema';
         $schema = m::mock(Schema::class);
 
-        Ioc::instance('MySchema', $schema);
+        Container::instance('MySchema', $schema);
 
         // Act
         $result = $this->callProtected($mapper, 'getSchemaMapper');
@@ -1040,7 +1040,7 @@ class DataMapperTest extends TestCase
     {
         if (!($this->eventService ?? false)) {
             $this->eventService = m::mock(EventTriggerService::class);
-            Ioc::instance(EventTriggerService::class, $this->eventService);
+            Container::instance(EventTriggerService::class, $this->eventService);
         }
 
         return $this->eventService;
@@ -1147,7 +1147,7 @@ class DataMapperTest extends TestCase
                 'expected' => true,
             ],
             'acknowledged write concern with attributesAccessIntesarface' => [
-                'object' => m::mock(AttributesAccessInterface::class),
+                'object' => m::mock(HasAttributesInterface::class),
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
@@ -1158,8 +1158,8 @@ class DataMapperTest extends TestCase
                 'shouldFireEventAfter' => false,
                 'expected' => false,
             ],
-            'unacknowledged write concern with attributesAccessInterface' => [
-                'object' => m::mock(AttributesAccessInterface::class),
+            'unacknowledged write concern with HasAttributesInterface' => [
+                'object' => m::mock(HasAttributesInterface::class),
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
                 'expected' => false,

@@ -4,7 +4,7 @@ namespace Mongolid\Schema;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Util\SequenceService;
 
@@ -92,7 +92,7 @@ abstract class Schema
             return $value;
         }
 
-        return Ioc::make(SequenceService::class)
+        return Container::make(SequenceService::class)
             ->getNextValue($this->collection ?: $this->entityClass);
     }
 

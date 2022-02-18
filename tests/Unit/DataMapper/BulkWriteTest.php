@@ -7,7 +7,7 @@ use MongoDB\Driver\BulkWrite as MongoBulkWrite;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Manager;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
@@ -174,7 +174,7 @@ class BulkWriteTest extends TestCase
         $schema->collection = 'bar';
         $namespace = 'foo.bar';
 
-        Ioc::instance(Pool::class, $pool);
+        Container::instance(Pool::class, $pool);
 
         // Expect
         $entity->shouldReceive('getSchema')

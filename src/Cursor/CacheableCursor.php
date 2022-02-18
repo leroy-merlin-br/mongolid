@@ -4,7 +4,7 @@ namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use ErrorException;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
@@ -68,7 +68,7 @@ class CacheableCursor extends Cursor
         }
 
         // Check if there is a cached set of documents
-        $cacheComponent = Ioc::make(CacheComponentInterface::class);
+        $cacheComponent = Container::make(CacheComponentInterface::class);
         $cacheKey = $this->generateCacheKey();
 
         try {
