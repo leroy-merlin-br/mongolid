@@ -21,10 +21,11 @@ class ActiveRecordTest extends IntegrationTestCase
     public function testShouldEmbedToAttribute(): void
     {
         $entity = new LegacyEmbeddedUser();
+        $entity->name = 'Parent User';
         $embedded = new LegacyEmbeddedUser();
-        $embedded->name = 'Course Class #1';
-        $entity->embedToSiblings($embedded);
+        $embedded->name = 'Embedded User';
+        $entity->embed('siblings', $embedded);
 
-        $this->assertEquals('Course Class #1', $entity->siblings()->getResults()->first()->name);
+        $this->assertEquals('Embedded User', $entity->siblings()->getResults()->first()->name);
     }
 }

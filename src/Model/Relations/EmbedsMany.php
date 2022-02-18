@@ -53,13 +53,23 @@ class EmbedsMany extends AbstractRelation
     {
         $embeddedKey = $this->getKey($model);
 
-        foreach ((array) $this->parent->{$this->field} as $arrayKey => $document) {
+        $embedsData = $this->parent->{$this->field};
+        if ($embedsData instanceof EmbeddedCursor) {
+            $embedsData = $embedsData->all();
+        }
+
+        foreach ((array) $embedsData as $arrayKey => $document) {
             if ($embeddedKey == $this->getKey($document)) {
                 unset($this->parent->{$this->field}[$arrayKey]);
             }
         }
 
-        $this->parent->{$this->field} = array_values((array) $this->parent->{$this->field});
+        $embedsData = $this->parent->{$this->field};
+        if ($embedsData instanceof EmbeddedCursor) {
+            $embedsData = $embedsData->all();
+        }
+
+        $this->parent->{$this->field} = array_values($embedsData);
         $this->pristine = false;
     }
 

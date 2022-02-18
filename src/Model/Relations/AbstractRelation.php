@@ -82,7 +82,6 @@ abstract class AbstractRelation implements RelationInterface
      */
     protected function getKey($model)
     {
-        var_dump($model);
         if (!$model->{$this->key}) {
             $model->{$this->key} = new ObjectId();
         }

@@ -89,7 +89,7 @@ trait HasRelationsTrait
      * @param string $field field to where the $obj will be embedded
      * @param mixed  $obj   document or model instance
      */
-    public function embed(string $field, &$obj)
+    public function embed(string $field, $obj)
     {
         $relation = $this->embedsMany(get_class($this), $field);
 
