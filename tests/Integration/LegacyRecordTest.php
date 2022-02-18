@@ -34,9 +34,13 @@ class LegacyRecordTest extends IntegrationTestCase
         $entity = new LegacyRecordUser();
         $data = [
             'name' => 'Parent User',
+            'invalidField' => 'value',
+        ];
+        $expected = [
+            'name' => 'Parent User',
         ];
         $entity->fill($data);
 
-        dd($entity->getAttributes());
+        $this->assertSame($expected, $entity->getAttributes());
     }
 }

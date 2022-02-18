@@ -16,6 +16,8 @@ class LegacyRecordUser extends LegacyRecord
      */
     protected $timestamps = true;
 
+    protected $dynamic = false;
+
     protected $fillable = [
         'name'
     ];
