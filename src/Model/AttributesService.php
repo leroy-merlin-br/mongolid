@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Model;
 
 use Illuminate\Support\Str;

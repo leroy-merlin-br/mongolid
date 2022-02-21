@@ -27,8 +27,7 @@ class TestCase extends PHPUnitTestCase
      * Actually runs a protected method of the given object.
      *
      * @param object $obj
-     * @param string $method
-     * @param array $args
+     * @param array  $args
      *
      * @return mixed
      */

@@ -128,7 +128,6 @@ trait HasAttributesTrait
         }
 
         if (!method_exists(self::class, $key) && method_exists($this, $key)) {
-
             return $this->getRelationResults($key);
         }
 

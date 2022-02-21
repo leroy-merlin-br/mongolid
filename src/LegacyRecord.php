@@ -1,9 +1,9 @@
 <?php
-
 namespace Mongolid;
 
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
+use MongoDB\Exception\BadMethodCallException;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
@@ -129,7 +129,7 @@ class LegacyRecord implements ModelInterface
      * @param mixed $method     name of the method that is being called
      * @param mixed $parameters parameters of $method
      *
-     * @throws BadMethodCallException in case of invalid methods be called
+     * @Throws BadMethodCallException in case of invalid methods be called
      *
      * @return mixed
      */
@@ -154,7 +154,7 @@ class LegacyRecord implements ModelInterface
         throw new BadMethodCallException(
             sprintf(
                 'The following method can not be reached or does not exist: %s@%s',
-                get_class($this),
+                static::class,
                 $method
             )
         );

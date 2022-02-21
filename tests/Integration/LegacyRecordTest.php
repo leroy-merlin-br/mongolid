@@ -1,5 +1,4 @@
 <?php
-
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
@@ -11,7 +10,7 @@ class LegacyRecordTest extends IntegrationTestCase
     {
         $entity = new LegacyRecordUser();
         $embedded = new LegacyRecordUser();
-        $embedded->_id = new ObjectID();
+        $embedded->_id = new ObjectId();
         $embedded->name = 'Course Class #1';
         $entity->attachToGrandsons($embedded);
 

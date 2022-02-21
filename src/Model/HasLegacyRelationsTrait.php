@@ -25,6 +25,9 @@ trait HasLegacyRelationsTrait
      */
     private $fieldRelations = [];
 
+    /**
+     * @var bool
+     */
     public $shouldReturnCursor = true;
 
     /**
