@@ -256,6 +256,6 @@ trait HasLegacyAttributesTrait
      */
     protected function buildMutatorMethod(string $key, string $prefix): string
     {
-        return $prefix.Str::studly($key).'DocumentAttribute';
+        return $prefix.Str::studly($key).'Attribute';
     }
 }

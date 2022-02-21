@@ -43,4 +43,17 @@ class LegacyRecordTest extends IntegrationTestCase
 
         $this->assertSame($expected, $entity->getAttributes());
     }
+
+    public function testShouldOverrideSetAttributeMethods(): void
+    {
+        $entity = new LegacyRecordUser();
+        $expected = [
+            'secret' => 'password_override',
+        ];
+
+        // Should be overridden by setSecretAttribute on LegacyRecordUser
+        $entity->secret = 'password';
+
+        $this->assertSame($expected, $entity->getAttributes());
+    }
 }
