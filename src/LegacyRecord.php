@@ -10,10 +10,8 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\AbstractModel;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
-use Mongolid\Model\HasAttributesTrait;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
-use Mongolid\Model\HasRelationsTrait;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
@@ -367,7 +365,7 @@ class LegacyRecord implements ModelInterface
     public function bsonUnserialize(array $data)
     {
         unset($data['__pclass']);
-        static::fill($data, $this, true);
+        $this->fill($data, true);
 
         $this->syncOriginalDocumentAttributes();
     }
