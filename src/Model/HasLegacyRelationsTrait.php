@@ -3,7 +3,6 @@ namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
-use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
 

@@ -3,7 +3,6 @@ namespace Mongolid\Model;
 
 use Exception;
 use Illuminate\Support\Str;
-use Mongolid\Container\Container;
 use stdClass;
 
 /**
