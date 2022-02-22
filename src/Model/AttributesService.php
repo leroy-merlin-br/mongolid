@@ -141,7 +141,7 @@ class AttributesService
     /**
      * {@inheritdoc}
      */
-    public function cleanDocumentAttribute(string $key)
+    public function cleanDocumentAttribute(string $key): void
     {
         unset($this->attributes[$key]);
 
@@ -153,7 +153,7 @@ class AttributesService
     /**
      * {@inheritdoc}
      */
-    public function setDocumentAttribute(string $key, $value)
+    public function setDocumentAttribute(string $key, $value): void
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
@@ -175,7 +175,7 @@ class AttributesService
     /**
      * {@inheritdoc}
      */
-    public function syncOriginalDocumentAttributes()
+    public function syncOriginalDocumentAttributes(): void
     {
         try {
             $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
