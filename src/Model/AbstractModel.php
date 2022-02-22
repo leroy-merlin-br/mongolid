@@ -80,7 +80,7 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
-     * @return AbstractModel|null
+     * @return AbstractModel|array|null
      */
     public static function first($query = [], array $projection = [])
     {

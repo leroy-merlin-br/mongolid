@@ -13,6 +13,7 @@ use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Model\Relations\AbstractRelation;
 use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
 
@@ -64,14 +65,16 @@ class LegacyRecord implements ModelInterface
      * _id for the document if it's not present.
      *
      * @param string $field field to where the $obj will be embedded
-     * @param mixed  $obj   document or model instance
+     * @param ModelInterface $obj document or model instance
      */
-    public function embed(string $field, $obj)
+    public function embed(string $field, ModelInterface $obj): void
     {
         $this->shouldReturnCursor = false;
-        $relation = $this->$field();
 
+        /** @var AbstractRelation $relation */
+        $relation = $this->$field();
         $relation->add($obj);
+
         $this->shouldReturnCursor = true;
     }
 
@@ -80,14 +83,16 @@ class LegacyRecord implements ModelInterface
      * the _id of the given $obj.
      *
      * @param string $field name of the field where the $obj is embeded
-     * @param mixed  $obj   document, model instance or _id
+     * @param ModelInterface $obj document, model instance or _id
      */
-    public function unembed(string $field, $obj)
+    public function unembed(string $field, ModelInterface $obj): void
     {
         $this->shouldReturnCursor = false;
-        $relation = $this->$field();
 
+        /** @var AbstractRelation $relation */
+        $relation = $this->$field();
         $relation->remove($obj);
+
         $this->shouldReturnCursor = true;
     }
 
@@ -96,14 +101,16 @@ class LegacyRecord implements ModelInterface
      * _id for the document if it's not present.
      *
      * @param string $field name of the field where the reference will be stored
-     * @param mixed  $obj   document, model instance or _id to be referenced
+     * @param ModelInterface $obj document, model instance or _id to be referenced
      */
-    public function attach(string $field, $obj)
+    public function attach(string $field, ModelInterface $obj): void
     {
         $this->shouldReturnCursor = false;
-        $relation = $this->$field();
 
+        /** @var AbstractRelation $relation */
+        $relation = $this->$field();
         $relation->attach($obj);
+
         $this->shouldReturnCursor = true;
     }
 
@@ -112,14 +119,16 @@ class LegacyRecord implements ModelInterface
      * _id of the given $obj from inside the given $field.
      *
      * @param string $field field where the reference is stored
-     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     * @param ModelInterface $obj document, model instance or _id that have been referenced by $field
      */
-    public function detach(string $field, $obj)
+    public function detach(string $field, ModelInterface $obj): void
     {
         $this->shouldReturnCursor = false;
-        $relation = $this->$field();
 
+        /** @var AbstractRelation $relation */
+        $relation = $this->$field();
         $relation->detach($obj);
+
         $this->shouldReturnCursor = true;
     }
 
@@ -130,25 +139,25 @@ class LegacyRecord implements ModelInterface
      * @param mixed $parameters parameters of $method
      *
      * @Throws BadMethodCallException in case of invalid methods be called
-     *
-     * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, $parameters): void
     {
         $value = $parameters[0] ?? null;
 
         // Alias to attach
         if ('attachTo' == substr($method, 0, 8)) {
             $field = lcfirst(substr($method, 8));
+            $this->attach($field, $value);
 
-            return $this->attach($field, $value);
+            return;
         }
 
         // Alias to embed
         if ('embedTo' == substr($method, 0, 7)) {
             $field = lcfirst(substr($method, 7));
+            $this->embed($field, $value);
 
-            return $this->embed($field, $value);
+            return;
         }
 
         throw new BadMethodCallException(
@@ -186,7 +195,7 @@ class LegacyRecord implements ModelInterface
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
-     * @return AbstractModel|null
+     * @return AbstractModel|array|null
      */
     public static function first($query = [], array $projection = [])
     {
@@ -202,7 +211,7 @@ class LegacyRecord implements ModelInterface
      *
      * @throws ModelNotFoundException If no document was found
      *
-     * @return AbstractModel|null
+     * @return AbstractModel|array|null
      */
     public static function firstOrFail($query = [], array $projection = [])
     {
@@ -215,10 +224,8 @@ class LegacyRecord implements ModelInterface
      * _if field filled.
      *
      * @param mixed $id document id
-     *
-     * @return AbstractModel|null
      */
-    public static function firstOrNew($id)
+    public static function firstOrNew($id): AbstractModel
     {
         if (!$model = self::first($id)) {
             $model = new static();
@@ -356,13 +363,13 @@ class LegacyRecord implements ModelInterface
         $this->writeConcern = $writeConcern;
     }
 
-    public function bsonSerialize()
+    public function bsonSerialize(): array
     {
         return Container::make(ModelMapper::class)
             ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
-    public function bsonUnserialize(array $data)
+    public function bsonUnserialize(array $data): void
     {
         unset($data['__pclass']);
         $this->fill($data, true);
