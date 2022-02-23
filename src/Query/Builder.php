@@ -196,6 +196,7 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve documents
      * @param array          $projection fields to project in MongoDB query
+     * @param bool           $useCache   retrieves a CacheableCursor instead
      */
     public function where(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {

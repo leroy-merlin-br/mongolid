@@ -22,6 +22,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @param array $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
      */
     public static function where(array $query = [], array $projection = []): CursorInterface;
 
