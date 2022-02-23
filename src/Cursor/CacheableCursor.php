@@ -52,10 +52,8 @@ class CacheableCursor extends Cursor
      * The difference between the CacheableCursor and the normal Cursor is that
      * the Cacheable stores all the results within itself and drops the
      * Driver Cursor in order to be serializable.
-     *
-     * @return Traversable
      */
-    protected function getCursor(): Traversable
+    protected function getCursor(): Iterator
     {
         // Returns original (non-cached) cursor
         if ($this->ignoreCache || $this->position >= self::DOCUMENT_LIMIT) {
