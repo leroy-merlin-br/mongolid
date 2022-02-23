@@ -45,6 +45,19 @@ class CacheableCursor extends Cursor
     const DOCUMENT_LIMIT = 100;
 
     /**
+     * Serializes this object. Drops the unserializable DriverCursor. In order
+     * to make the CacheableCursor object serializable.
+     *
+     * @return string serialized object
+     */
+    public function serialize()
+    {
+        $this->documents = $this->cursor = null;
+
+        return parent::serialize();
+    }
+
+    /**
      * Actually returns a Traversable object with the DriverCursor within.
      * If it does not exists yet, create it using the $collection, $command and
      * $params given.
@@ -157,18 +170,5 @@ class CacheableCursor extends Cursor
         $this->ignoreCache = true;
 
         return $this->getOriginalCursor();
-    }
-
-    /**
-     * Serializes this object. Drops the unserializable DriverCursor. In order
-     * to make the CacheableCursor object serializable.
-     *
-     * @return string serialized object
-     */
-    public function serialize()
-    {
-        $this->documents = $this->cursor = null;
-
-        return parent::serialize();
     }
 }
