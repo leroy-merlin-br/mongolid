@@ -184,15 +184,15 @@ class CacheableCursorTest extends TestCase
 
         // Assert
         $this->assertEquals(
-            new IteratorIterator(new ArrayIterator($documentsFromDb)),
-            $this->callProtected($cursor, 'getCursor')
+            (new ArrayIterator($documentsFromDb))->current(),
+            $this->callProtected($cursor, 'getCursor')->current()
         );
     }
 
     public function testShouldGenerateUniqueCacheKey()
     {
         // Arrange
-        $cursor = $this->getCacheableCursor(null, null, 'find', [['color' => 'red']]);
+        $cursor = $this->getCacheableCursor(null, 'find', [['color' => 'red']]);
 
         // Act
         $cursor->shouldReceive('generateCacheKey')
@@ -219,7 +219,6 @@ class CacheableCursorTest extends TestCase
         $params = [[]],
         $driverCursor = null
     ) {
-
         if (!$collection) {
             $collection = m::mock(Collection::class);
             $collection->shouldReceive('getNamespace')
@@ -230,7 +229,7 @@ class CacheableCursorTest extends TestCase
 
         $mock = m::mock(
             CacheableCursor::class . '[generateCacheKey]',
-            [$entitySchema, $collection, $command, $params]
+            [$collection, $command, $params]
         );
         $mock->shouldAllowMockingProtectedMethods();
 

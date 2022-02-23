@@ -2,11 +2,11 @@
 
 namespace Mongolid\Cursor;
 
+use Iterator;
 use ArrayIterator;
 use ErrorException;
 use Mongolid\Container\Container;
 use Mongolid\Util\CacheComponentInterface;
-use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver
@@ -139,10 +139,8 @@ class CacheableCursor extends Cursor
     /**
      * Returns the DriverCursor considering the documents that have already
      * been retrieved from cache.
-     *
-     * @return Traversable
      */
-    protected function getOriginalCursor(): Traversable
+    protected function getOriginalCursor(): Iterator
     {
         if ($this->ignoreCache) {
             return parent::getCursor();
