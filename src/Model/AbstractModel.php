@@ -61,9 +61,9 @@ abstract class AbstractModel implements ModelInterface
      * @param array $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      */
-    public static function where(array $query = [], array $projection = []): CursorInterface
+    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
-        return self::getBuilderInstance()->where(new static(), $query, $projection);
+        return self::getBuilderInstance()->where(new static(), $query, $projection, $useCache);
     }
 
     /**

@@ -161,15 +161,11 @@ class LegacyRecord implements ModelInterface
     }
 
     /**
-     * Gets a cursor of this kind of entities that matches the query from the
-     * database.
-     *
-     * @param array $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
+     * @inheritdoc
      */
-    public static function where(array $query = [], array $projection = []): CursorInterface
+    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
-        return self::getBuilderInstance()->where(new static(), $query, $projection);
+        return self::getBuilderInstance()->where(new static(), $query, $projection, $useCache);
     }
 
     /**
@@ -181,12 +177,7 @@ class LegacyRecord implements ModelInterface
     }
 
     /**
-     * Gets the first model of this kind that matches the query.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     *
-     * @return AbstractModel|null
+     * @inheritdoc
      */
     public static function first($query = [], array $projection = [])
     {
@@ -194,19 +185,11 @@ class LegacyRecord implements ModelInterface
     }
 
     /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, throws ModelNotFoundException.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     *
-     * @throws ModelNotFoundException If no document was found
-     *
-     * @return AbstractModel|null
+     * @inheritdoc
      */
-    public static function firstOrFail($query = [], array $projection = [])
+    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false)
     {
-        return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection);
+        return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection, $useCache);
     }
 
     /**

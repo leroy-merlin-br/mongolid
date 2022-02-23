@@ -5,6 +5,7 @@ use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
+use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
@@ -196,9 +197,11 @@ class Builder
      * @param mixed          $query      MongoDB query to retrieve documents
      * @param array          $projection fields to project in MongoDB query
      */
-    public function where(ModelInterface $model, $query = [], array $projection = []): CursorInterface
+    public function where(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
-        return new Cursor(
+        $cursor = $useCache ? CacheableCursor::class : Cursor::class;
+
+        return new $cursor(
             $model->getCollection(),
             'find',
             [
@@ -235,7 +238,7 @@ class Builder
 
         return $model->getCollection()->findOne(
             $this->prepareValueQuery($query),
-            ['projection' => $this->prepareProjection($projection)]
+            ['projection' => $this->prepareProjection($projection)],
         );
     }
 
