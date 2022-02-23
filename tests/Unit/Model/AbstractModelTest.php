@@ -216,7 +216,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('where')
-            ->with(m::type(get_class($this->model)), $query, $projection)
+            ->with(m::type(get_class($this->model)), $query, $projection, false)
             ->andReturn($cursor);
 
         // Actions
