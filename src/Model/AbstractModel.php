@@ -78,28 +78,30 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Gets the first model of this kind that matches the query.
      *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
+     * @param mixed   $query      mongoDB selection criteria
+     * @param array   $projection fields to project in Mongo query
+     * @param boolean $useCache   retrieves the first through a CacheableCursor
      *
      * @return AbstractModel|null
      */
-    public static function first($query = [], array $projection = [])
+    public static function first($query = [], array $projection = [], bool $useCache = false)
     {
-        return self::getBuilderInstance()->first(new static(), $query, $projection);
+        return self::getBuilderInstance()->first(new static(), $query, $projection, $useCache);
     }
 
     /**
      * Gets the first model of this kind that matches the query. If no
      * document was found, throws ModelNotFoundException.
      *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
+     * @param mixed   $query      mongoDB selection criteria
+     * @param array   $projection fields to project in Mongo quer
+     * @param boolean $useCache   retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no document was found
      *
      * @return AbstractModel|null
      */
-    public static function firstOrFail($query = [], array $projection = [])
+    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false)
     {
         return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection);
     }
