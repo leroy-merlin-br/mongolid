@@ -19,7 +19,7 @@ class CacheableCursorTest extends TestCase
         m::close();
     }
 
-    public function testShouldGetCursorFromPreviousIteration()
+    public function testShouldGetCursorFromPreviousIteration(): void
     {
         // Arrange
         $documentsFromDb = new ArrayIterator([['name' => 'joe'], ['name' => 'doe']]);
@@ -37,7 +37,7 @@ class CacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetCursorFromCache()
+    public function testShouldGetCursorFromCache(): void
     {
         // Arrange
         $documentsFromCache = [['name' => 'joe'], ['name' => 'doe']];
@@ -62,7 +62,7 @@ class CacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetFromDatabaseWhenCacheFails()
+    public function testShouldGetFromDatabaseWhenCacheFails(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
@@ -106,7 +106,7 @@ class CacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetCursorFromDatabaseAndCacheForLater()
+    public function testShouldGetCursorFromDatabaseAndCacheForLater(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
@@ -145,7 +145,7 @@ class CacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetOriginalCursorFromDatabaseAfterTheDocumentLimit()
+    public function testShouldGetOriginalCursorFromDatabaseAfterTheDocumentLimit(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
@@ -189,7 +189,7 @@ class CacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGenerateUniqueCacheKey()
+    public function testShouldGenerateUniqueCacheKey(): void
     {
         // Arrange
         $cursor = $this->getCacheableCursor(null, 'find', [['color' => 'red']]);
@@ -206,7 +206,6 @@ class CacheableCursorTest extends TestCase
         );
 
         // Assert
-
         $this->assertEquals(
             $expectedCacheKey,
             $cursor->generateCacheKey()

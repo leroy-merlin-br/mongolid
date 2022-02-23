@@ -20,7 +20,7 @@ class CacheComponentTest extends TestCase
         m::close();
     }
 
-    public function testShouldImplementCacheComponentInterface()
+    public function testShouldImplementCacheComponentInterface(): void
     {
         // Arrange
         $cacheComponent = (new CacheComponent());
@@ -29,7 +29,7 @@ class CacheComponentTest extends TestCase
         $this->assertInstanceOf(CacheComponentInterface::class, $cacheComponent);
     }
 
-    public function testShouldPutAndRetrieveValues()
+    public function testShouldPutAndRetrieveValues(): void
     {
         // Arrange
         $cacheComponent = $this->getCacheComponent();
@@ -41,7 +41,7 @@ class CacheComponentTest extends TestCase
         $this->assertEquals('bacon', $cacheComponent->get('saveThe'));
     }
 
-    public function testShouldExpireValues()
+    public function testShouldExpireValues(): void
     {
         // Arrange
         $cacheComponent = $this->getCacheComponent();
