@@ -228,13 +228,18 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve the model
      * @param array          $projection fields to project in MongoDB query
+     * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @return ModelInterface|array|null
      */
-    public function first(ModelInterface $model, $query = [], array $projection = [])
+    public function first(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
     {
         if (null === $query) {
             return null;
+        }
+
+        if ($useCache) {
+            return $this->where($model, $query, $projection, $useCache)->first();
         }
 
         return $model->getCollection()->findOne(
@@ -250,14 +255,15 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve the model
      * @param array          $projection fields to project in MongoDB query
+     * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no model was found
      *
      * @return ModelInterface|null
      */
-    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [])
+    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
     {
-        if ($result = $this->first($model, $query, $projection)) {
+        if ($result = $this->first($model, $query, $projection, $useCache)) {
             return $result;
         }
 
