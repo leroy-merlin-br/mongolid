@@ -6,6 +6,8 @@ use MongoDB\Client;
 use Mongolid\Container\Container;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Util\CacheComponent;
+use Mongolid\Util\CacheComponentInterface;
 
 /**
  * Wraps the Mongolid initialization. The main purpose of the Manager is to make
@@ -33,6 +35,11 @@ class Manager
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var CacheComponent
+     */
+    protected $cacheComponent;
 
     /**
      * Main entry point to opening a connection and start using Mongolid in
@@ -85,6 +92,9 @@ class Manager
         }
 
         $this->container = new IlluminateContainer();
+        $this->cacheComponent = new CacheComponent();
+        $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
+
         Container::setContainer($this->container);
     }
 }
