@@ -179,9 +179,9 @@ class LegacyRecord implements ModelInterface
     /**
      * @inheritdoc
      */
-    public static function first($query = [], array $projection = [])
+    public static function first($query = [], array $projection = [], bool $useCache = false)
     {
-        return self::getBuilderInstance()->first(new static(), $query, $projection);
+        return self::getBuilderInstance()->first(new static(), $query, $projection, $useCache);
     }
 
     /**
