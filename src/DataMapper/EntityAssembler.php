@@ -85,8 +85,8 @@ class EntityAssembler
      */
     protected function prepareOriginalAttributes($entity)
     {
-        if ($entity instanceof AttributesAccessInterface) {
-            $entity->syncOriginalAttributes();
+        if ($entity instanceof ModelInterface) {
+            $entity->syncOriginalDocumentAttributes();
         }
 
         return $entity;
