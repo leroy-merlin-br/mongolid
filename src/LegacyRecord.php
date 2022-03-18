@@ -65,6 +65,14 @@ class LegacyRecord implements ModelInterface
     public $dynamic = true;
 
     /**
+     * Whether the model should manage the `created_at` and `updated_at`
+     * timestamps automatically.
+     *
+     * @var bool
+     */
+    protected $timestamps = true;
+
+    /**
      * Saves this object into database.
      */
     public function save(): bool

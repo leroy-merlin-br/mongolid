@@ -248,9 +248,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve documents
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves a CacheableCursor instead
-     *
-     * @return \Mongolid\Cursor\Cursor
+     * @param bool  $cacheable  retrieves a SchemaCacheableCursor instead
      */
     public function where(
         $query = [],
@@ -275,10 +273,8 @@ class DataMapper implements HasSchemaInterface
     /**
      * Retrieve a database cursor that will return all documents as
      * $this->schema->entityClass objects upon iteration.
-     *
-     * @return \Mongolid\Cursor\Cursor
      */
-    public function all(): Cursor
+    public function all(): CursorInterface
     {
         return $this->where([]);
     }
@@ -289,7 +285,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves the first through a CacheableCursor
+     * @param bool  $cacheable  retrieves the first through a SchemaCacheableCursor
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -322,7 +318,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
-     * @param bool  $cacheable  retrieves the first through a CacheableCursor
+     * @param bool  $cacheable  retrieves the first through a SchemaCacheableCursor
      *
      * @throws ModelNotFoundException if no document was found
      *
