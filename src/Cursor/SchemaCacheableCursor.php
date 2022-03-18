@@ -15,7 +15,7 @@ use Traversable;
  * database and store the retrieved documents. By doing this, it is possible
  * to serialize the results and save for later use.
  */
-class SchemaCacheableCursor extends Cursor
+class SchemaCacheableCursor extends SchemaCursor
 {
     /**
      * The documents that were retrieved from the database in a serializable way.

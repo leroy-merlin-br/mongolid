@@ -6,8 +6,9 @@ use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Container\Container;
-use Mongolid\Cursor\CacheableCursor;
-use Mongolid\Cursor\Cursor;
+use Mongolid\Cursor\CursorInterface;
+use Mongolid\Cursor\SchemaCacheableCursor;
+use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
@@ -255,8 +256,8 @@ class DataMapper implements HasSchemaInterface
         $query = [],
         array $projection = [],
         bool $cacheable = false
-    ): Cursor {
-        $cursorClass = $cacheable ? CacheableCursor::class : Cursor::class;
+    ): CursorInterface {
+        $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
 
         $cursor = new $cursorClass(
             $this->schema,
