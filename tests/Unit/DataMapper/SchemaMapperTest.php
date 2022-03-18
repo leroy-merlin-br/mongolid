@@ -3,7 +3,7 @@
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
-use Mongolid\Container\Ioc;
+use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 
@@ -184,10 +184,10 @@ class SchemaMapperTest extends TestCase
         $test = $this;
 
         // Act
-        Ioc::instance('Xd\MySchema', $mySchema);
+        Container::instance('Xd\MySchema', $mySchema);
 
         // When instantiating the SchemaMapper with the specified $param as dependency
-        Ioc::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
+        Container::bind(SchemaMapper::class, function ($container, $params) use ($value, $mySchema, $test) {
             // Check if mySchema has been injected correctly
             $test->assertSame($mySchema, $params['schema']);
 

@@ -4,10 +4,11 @@ namespace Mongolid\DataMapper;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
-use Mongolid\Container\Ioc;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\AttributesAccessInterface;
-use Mongolid\Model\PolymorphableInterface;
+use Mongolid\Container\Container;
+use Mongolid\Model\HasAttributesInterface;
+use Mongolid\Model\HasLegacyAttributesTrait;
+use Mongolid\Model\ModelInterface;
+use Mongolid\Model\PolymorphableModelInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 
@@ -35,7 +36,7 @@ class EntityAssemblerTest extends TestCase
 
         // Act
         foreach ($schemas as $className => $instance) {
-            Ioc::instance($className, $instance);
+            Container::instance($className, $instance);
         }
 
         // Assert
@@ -261,9 +262,9 @@ class EntityAssemblerTest extends TestCase
     }
 }
 
-class _stubStudent extends \stdClass implements AttributesAccessInterface
+class _stubStudent extends \stdClass implements HasAttributesInterface
 {
-    use Attributes;
+    use HasLegacyAttributesTrait;
 
     public function __construct($attr = [])
     {
@@ -285,7 +286,7 @@ class _stubTestGrade extends \stdClass
     }
 }
 
-class _polymorphableStudent extends \stdClass implements PolymorphableInterface
+class _polymorphableStudent extends \stdClass implements PolymorphableModelInterface
 {
     public function __construct($attr = [])
     {
@@ -294,8 +295,8 @@ class _polymorphableStudent extends \stdClass implements PolymorphableInterface
         }
     }
 
-    public function polymorph()
+    public function polymorph(array $input): string
     {
-        return new _stubStudent((array) $this);
+        return _stubStudent::class;
     }
 }

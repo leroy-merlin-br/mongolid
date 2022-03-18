@@ -6,17 +6,18 @@ use BadMethodCallException;
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
-use Mongolid\Container\Ioc;
-use Mongolid\Exception\NoCollectionNameException;
-use Mongolid\Model\Attributes;
-use Mongolid\Model\Relations;
+use Mongolid\Container\Container;
+use Mongolid\Cursor\CursorInterface;
+use Mongolid\Model\Exception\NoCollectionNameException;
+use Mongolid\Model\HasLegacyAttributesTrait;
+use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Schema\Schema;
 use stdClass;
 
-class ActiveRecordTest extends TestCase
+class LegacyRecordTest extends TestCase
 {
     /**
-     * @var ActiveRecord
+     * @var LegacyRecord
      */
     protected $entity;
 
@@ -26,7 +27,8 @@ class ActiveRecordTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->entity = new class() extends ActiveRecord {
+        $this->entity = new class() extends LegacyRecord {
+            protected $collection = 'legacy_record';
         };
     }
 
@@ -44,15 +46,15 @@ class ActiveRecordTest extends TestCase
     {
         // Assert
         $this->assertEquals(
-            [Attributes::class, Relations::class],
-            array_keys(class_uses(ActiveRecord::class))
+            [HasLegacyAttributesTrait::class, HasLegacyRelationsTrait::class],
+            array_keys(class_uses(LegacyRecord::class))
         );
     }
 
     public function testShouldSave(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -77,7 +79,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldInsert(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -102,7 +104,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldUpdate(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper,getCollectionName,syncOriginalAttributes]');
         $dataMapper = m::mock();
 
         // Act
@@ -127,7 +129,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldDelete(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper,getCollectionName]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper,getCollectionName]');
         $dataMapper = m::mock();
 
         // Act
@@ -146,38 +148,18 @@ class ActiveRecordTest extends TestCase
         $this->assertTrue($entity->delete());
     }
 
-    public function testSaveShouldReturnFalseIfCollectionIsNull(): void
-    {
-        $this->assertFalse($this->entity->save());
-    }
-
-    public function testUpdateShouldReturnFalseIfCollectionIsNull(): void
-    {
-        $this->assertFalse($this->entity->update());
-    }
-
-    public function testInsertShouldReturnFalseIfCollectionIsNull(): void
-    {
-        $this->assertFalse($this->entity->insert());
-    }
-
-    public function testDeleteShouldReturnFalseIfCollectionIsNull(): void
-    {
-        $this->assertFalse($this->entity->delete());
-    }
-
     public function testShouldGetWithWhereQuery(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
-        $cursor = m::mock();
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -194,13 +176,13 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetAll(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $dataMapper = m::mock();
-        $cursor = m::mock();
+        $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -216,14 +198,14 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetFirstWithQuery(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -240,14 +222,14 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetFirstOrFail(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -264,13 +246,13 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetFirstOrNewAndReturnExistingModel(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $id = 123;
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -287,13 +269,13 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetFirstOrNewAndReturnNewModel(): void
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getDataMapper]');
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $id = 123;
         $dataMapper = m::mock();
 
         // Act
-        Ioc::instance(get_class($entity), $entity);
+        Container::instance(get_class($entity), $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -314,7 +296,7 @@ class ActiveRecordTest extends TestCase
         $schema = m::mock(Schema::class);
 
         // Act
-        Ioc::instance('MySchemaClass', $schema);
+        Container::instance('MySchemaClass', $schema);
 
         // Assert
         $this->assertEquals(
@@ -341,7 +323,7 @@ class ActiveRecordTest extends TestCase
     public function testShouldGetDataMapper()
     {
         // Arrage
-        $entity = m::mock(ActiveRecord::class.'[getSchema]');
+        $entity = m::mock(LegacyRecord::class.'[getSchema]');
         $schema = m::mock(Schema::class.'[]');
 
         // Act
@@ -359,43 +341,43 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
         $this->expectException(NoCollectionNameException::class);
+
+        $this->assertNull($entity->getCollectionName());
 
         $entity->all();
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
         $this->expectException(NoCollectionNameException::class);
+
+        $this->assertNull($entity->getCollectionName());
 
         $entity->first();
     }
 
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
         };
 
-        $this->assertNull($entity->getCollectionName());
-
         $this->expectException(NoCollectionNameException::class);
+
+        $this->assertNull($entity->getCollectionName());
 
         $entity->where();
     }
 
     public function testShouldGetCollectionName(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
             protected $collection = 'collection_name';
         };
 
@@ -404,7 +386,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldAttachToAttribute(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
             protected $collection = 'collection_name';
 
             public function class()
@@ -422,7 +404,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldEmbedToAttribute(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
             protected $collection = 'collection_name';
 
             public function classes()
@@ -439,7 +421,7 @@ class ActiveRecordTest extends TestCase
 
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod(): void
     {
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
             protected $collection = 'collection_name';
         };
 
@@ -448,7 +430,7 @@ class ActiveRecordTest extends TestCase
         $entity->foobar();
     }
 
-    public function testShouldGetSetWriteConcernInActiveRecordClass(): void
+    public function testShouldGetSetWriteConcernInLegacyRecordClass(): void
     {
         $this->assertEquals(1, $this->entity->getWriteConcern());
         $this->assertEquals(1, $this->entity->getWriteConcern());

@@ -256,6 +256,10 @@ class LegacyRecord implements ModelInterface
      */
     public function getCollectionName(): string
     {
+        if (!$this->collection) {
+            throw new NoCollectionNameException();
+        }
+
         return $this->collection ? $this->collection : $this->getSchema()->collection;
     }
 

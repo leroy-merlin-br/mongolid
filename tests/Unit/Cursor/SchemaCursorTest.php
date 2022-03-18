@@ -9,17 +9,15 @@ use Mockery as m;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
-use Mongolid\ActiveRecord;
 use Mongolid\Connection\Connection;
-use Mongolid\Connection\Pool;
-use Mongolid\Container\Ioc;
+use Mongolid\LegacyRecord;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use stdClass;
 use Mongolid\TestCase;
 use Traversable;
 
-class CursorTest extends TestCase
+class SchemaCursorTest extends TestCase
 {
     public function tearDown(): void
     {
@@ -183,11 +181,11 @@ class CursorTest extends TestCase
         $this->assertEquals('John Doe', $entity->name);
     }
 
-    public function testShouldGetCurrentUsingActiveRecordClasses()
+    public function testShouldGetCurrentUsingLegacyRecordClasses()
     {
         // Arrange
         $collection = m::mock(Collection::class);
-        $entity = new class() extends ActiveRecord {
+        $entity = new class() extends LegacyRecord {
         };
         $entity->name = 'John Doe';
         $driverCursor = new ArrayIterator([$entity]);
@@ -195,7 +193,7 @@ class CursorTest extends TestCase
 
         // Assert
         $entity = $cursor->current();
-        $this->assertInstanceOf(ActiveRecord::class, $entity);
+        $this->assertInstanceOf(LegacyRecord::class, $entity);
         $this->assertEquals('John Doe', $entity->name);
     }
 
@@ -393,7 +391,6 @@ class CursorTest extends TestCase
     public function testShouldSerializeAnActiveCursor()
     {
         // Arrange
-        $pool = m::mock(Pool::class);
         $conn = m::mock(Connection::class);
         $schema = new DynamicSchema();
         $cursor = $this->getCursor($schema, null, 'find', [[]]);
@@ -402,11 +399,6 @@ class CursorTest extends TestCase
         $this->setProtected($cursor, 'collection', $driverCollection);
 
         // Act
-        Ioc::instance(Pool::class, $pool);
-
-        $pool->shouldReceive('getConnection')
-            ->andReturn($conn);
-
         $conn->shouldReceive('getRawConnection')
             ->andReturn($conn);
 

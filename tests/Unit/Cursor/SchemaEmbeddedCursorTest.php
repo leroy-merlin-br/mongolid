@@ -3,12 +3,10 @@
 namespace Mongolid\Cursor;
 
 use Mockery as m;
-use Mongolid\ActiveRecord;
-use Mongolid\Model\PolymorphableInterface;
 use stdClass;
 use Mongolid\TestCase;
 
-class EmbeddedCursorTest extends TestCase
+class SchemaEmbeddedCursorTest extends TestCase
 {
     public function tearDown(): void
     {
