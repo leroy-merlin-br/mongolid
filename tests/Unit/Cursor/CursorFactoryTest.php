@@ -24,9 +24,9 @@ class CursorFactoryTest extends TestCase
             ['age' => ['$gr' => 25]]
         );
 
-        $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertNotInstanceOf(CacheableCursor::class, $result);
-        $this->assertNotInstanceOf(EmbeddedCursor::class, $result);
+        $this->assertInstanceOf(SchemaCursor::class, $result);
+        $this->assertNotInstanceOf(SchemaCacheableCursor::class, $result);
+        $this->assertNotInstanceOf(SchemaEmbeddedCursor::class, $result);
         $this->assertEquals($schema, $result->entitySchema);
     }
 
@@ -46,9 +46,9 @@ class CursorFactoryTest extends TestCase
             true // $cacheable
         );
 
-        $this->assertInstanceOf(Cursor::class, $result);
-        $this->assertInstanceOf(CacheableCursor::class, $result);
-        $this->assertNotInstanceOf(EmbeddedCursor::class, $result);
+        $this->assertInstanceOf(SchemaCursor::class, $result);
+        $this->assertInstanceOf(SchemaCacheableCursor::class, $result);
+        $this->assertNotInstanceOf(SchemaEmbeddedCursor::class, $result);
         $this->assertEquals($schema, $result->entitySchema);
     }
 
@@ -61,9 +61,9 @@ class CursorFactoryTest extends TestCase
         // Assert
         $result = $factory->createEmbeddedCursor($entityClass, [['foo' => 'bar']]);
 
-        $this->assertInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertNotInstanceOf(Cursor::class, $result);
-        $this->assertNotInstanceOf(CacheableCursor::class, $result);
+        $this->assertInstanceOf(SchemaEmbeddedCursor::class, $result);
+        $this->assertNotInstanceOf(SchemaCursor::class, $result);
+        $this->assertNotInstanceOf(SchemaCacheableCursor::class, $result);
         $this->assertEquals($entityClass, $result->entityClass);
     }
 }

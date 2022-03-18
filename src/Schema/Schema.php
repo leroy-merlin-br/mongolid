@@ -4,6 +4,7 @@ namespace Mongolid\Schema;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
+use Mongolid\Container\Container;
 use Mongolid\Container\Ioc;
 use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Util\SequenceService;

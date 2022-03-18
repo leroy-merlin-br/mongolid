@@ -359,9 +359,11 @@ class SchemaCursor implements CursorInterface, Serializable
     {
         $attributes = unserialize($serialized);
 
-        $conn = Container::make(Connection::class)->getClient();
-        $db = $conn->defaultDatabase;
-        $collectionObject = $conn->getRawConnection()->$db->{$attributes['collection']};
+        $connection = Container::make(Connection::class);
+
+        $client = $connection->getClient();
+        $db = $client->selectDatabase($connection->defaultDatabase, ['document' => 'array']);
+        $collectionObject = $db->selectCollection($attributes['collection']);
 
         foreach ($attributes as $key => $value) {
             $this->$key = $value;

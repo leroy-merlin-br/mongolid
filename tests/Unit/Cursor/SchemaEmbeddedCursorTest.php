@@ -109,24 +109,6 @@ class SchemaEmbeddedCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldGetCurrent()
-    {
-        // Arrange
-        $items = [
-            ['name' => 'A'],
-            ['name' => 'B'],
-            ['name' => 'C'],
-        ];
-        $cursor = $this->getCursor(stdClass::class, $items);
-
-        $this->setProtected($cursor, 'position', 1);
-
-        // Assert
-        $entity = $cursor->current();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertEquals('B', $entity->name);
-    }
-
     public function testShouldNotGetCurrentWhenCursorIsInvalid()
     {
         // Arrange
@@ -154,73 +136,6 @@ class SchemaEmbeddedCursorTest extends TestCase
         $entity = $cursor->current();
         $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertEquals('A', $entity->name);
-    }
-
-    public function testShouldGetCurrentUsingEntityClassAndMorphinIt()
-    {
-        // Arrange
-        $object = new class() extends ActiveRecord implements PolymorphableInterface {
-            public function polymorph()
-            {
-                return 'Bacon';
-            }
-        };
-
-        $class = get_class($object);
-        $items = [$object->attributes];
-        $cursor = $this->getCursor($class, $items);
-
-        $this->setProtected($cursor, 'position', 0);
-
-        // Assert
-        $entity = $cursor->current();
-        $this->assertEquals('Bacon', $entity);
-    }
-
-    public function testShouldGetFirst()
-    {
-        // Arrange
-        $items = [
-            ['name' => 'A'],
-            ['name' => 'B'],
-            ['name' => 'C'],
-        ];
-        $cursor = $this->getCursor(stdClass::class, $items);
-
-        $this->setProtected($cursor, 'position', 1);
-
-        // Assert
-        $entity = $cursor->first();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertEquals('A', $entity->name);
-    }
-
-    public function testShouldGetAllItems()
-    {
-        // Arrange
-        $items = [
-            ['name' => 'A'],
-            ['name' => 'B'],
-        ];
-        $cursor = $this->getCursor(stdClass::class, $items);
-
-        $this->setProtected($cursor, 'position', 1);
-
-        $entityA = new stdClass();
-        $entityA->name = 'A';
-
-        $entityB = new stdClass();
-        $entityB->name = 'B';
-
-        $expected = [
-            $entityA,
-            $entityB,
-        ];
-
-        // Assert
-        $result = $cursor->all();
-
-        $this->assertEquals($expected, $result);
     }
 
     public function testShouldGetAllInArrayFormat()
@@ -283,7 +198,7 @@ class SchemaEmbeddedCursorTest extends TestCase
         $entityClass = stdClass::class,
         $items = []
     ) {
-        return new EmbeddedCursor($entityClass, $items);
+        return new SchemaEmbeddedCursor($entityClass, $items);
     }
 
     public function getDocumentsToSort()

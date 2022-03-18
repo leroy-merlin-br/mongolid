@@ -3,10 +3,13 @@
 namespace Mongolid\Cursor;
 
 use ArrayIterator;
+use Exception;
 use Iterator;
 use IteratorIterator;
 use Mockery as m;
+use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Database;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
@@ -163,24 +166,6 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldGetCurrent()
-    {
-        // Arrange
-        $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
-
-        // Act
-        $driverCursor->shouldReceive('current')
-            ->once()
-            ->andReturn(['name' => 'John Doe']);
-
-        // Assert
-        $entity = $cursor->current();
-        $this->assertInstanceOf(stdClass::class, $entity);
-        $this->assertEquals('John Doe', $entity->name);
-    }
-
     public function testShouldGetCurrentUsingLegacyRecordClasses()
     {
         // Arrange
@@ -194,27 +179,6 @@ class SchemaCursorTest extends TestCase
         // Assert
         $entity = $cursor->current();
         $this->assertInstanceOf(LegacyRecord::class, $entity);
-        $this->assertEquals('John Doe', $entity->name);
-    }
-
-    public function testShouldGetFirst()
-    {
-        // Arrange
-        $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
-
-        // Act
-        $driverCursor->shouldReceive('rewind')
-            ->once();
-
-        $driverCursor->shouldReceive('current')
-            ->once()
-            ->andReturn(['name' => 'John Doe']);
-
-        // Assert
-        $entity = $cursor->first();
-        $this->assertInstanceOf(stdClass::class, $entity);
         $this->assertEquals('John Doe', $entity->name);
     }
 
@@ -322,39 +286,6 @@ class SchemaCursorTest extends TestCase
         $this->assertInstanceOf(IteratorIterator::class, $result);
     }
 
-    public function testShouldReturnAllResults()
-    {
-        // Arrange
-        $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(IteratorIterator::class);
-        $cursor = $this->getCursor(null, $collection, 'find', [[]], $driverCursor);
-
-        // Act
-        $driverCursor->shouldReceive('rewind', 'valid', 'key')
-            ->andReturn(true, true, false);
-
-        $driverCursor->shouldReceive('next')
-            ->andReturn(true, false);
-
-        $driverCursor->shouldReceive('current')
-            ->twice()
-            ->andReturn(
-                ['name' => 'bob', 'occupation' => 'coder'],
-                ['name' => 'jef', 'occupation' => 'tester']
-            );
-
-        $result = $cursor->all();
-
-        // Assert
-        $this->assertEquals(
-            [
-                (object) ['name' => 'bob', 'occupation' => 'coder'],
-                (object) ['name' => 'jef', 'occupation' => 'tester'],
-            ],
-            $result
-        );
-    }
-
     public function testShouldReturnResultsToArray()
     {
         // Arrange
@@ -391,20 +322,30 @@ class SchemaCursorTest extends TestCase
     public function testShouldSerializeAnActiveCursor()
     {
         // Arrange
-        $conn = m::mock(Connection::class);
+        $connection = $this->instance(Connection::class, m::mock(Connection::class));
         $schema = new DynamicSchema();
+        $client = m::mock(Client::class);
+        $database = m::mock(Database::class);
         $cursor = $this->getCursor($schema, null, 'find', [[]]);
+
         $driverCollection = $this->getDriverCollection();
 
         $this->setProtected($cursor, 'collection', $driverCollection);
 
         // Act
-        $conn->shouldReceive('getRawConnection')
-            ->andReturn($conn);
+        $connection->shouldReceive('getClient')
+            ->andReturn($client);
 
-        $conn->defaultDatabase = 'db';
-        $conn->db = $conn;
-        $conn->my_collection = $driverCollection; // Return the same driver Collection
+        $client->shouldReceive('selectDatabase')
+            ->with('db', ['document' => 'array'])
+            ->andReturn($database);
+
+        $database->shouldReceive('selectCollection')
+            ->andReturn($driverCollection);
+
+        $connection->defaultDatabase = 'db';
+        $connection->db = $connection;
+        $connection->my_collection = $driverCollection; // Return the same driver Collection
 
         // Assert
         $result = unserialize(serialize($cursor));
@@ -427,11 +368,11 @@ class SchemaCursorTest extends TestCase
         }
 
         if (!$driverCursor) {
-            return new Cursor($entitySchema, $collection, $command, $params);
+            return new SchemaCursor($entitySchema, $collection, $command, $params);
         }
 
         $mock = m::mock(
-            Cursor::class.'[getCursor]',
+            SchemaCursor::class.'[getCursor]',
             [$entitySchema, $collection, $command, $params]
         );
 

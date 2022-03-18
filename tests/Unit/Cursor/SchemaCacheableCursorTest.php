@@ -157,7 +157,7 @@ class SchemaCacheableCursorTest extends TestCase
         $this->setProtected(
             $cursor,
             'position',
-            CacheableCursor::DOCUMENT_LIMIT + 1
+            SchemaCacheableCursor::DOCUMENT_LIMIT + 1
         );
 
         $this->setProtected(
@@ -177,7 +177,7 @@ class SchemaCacheableCursorTest extends TestCase
             ->never();
 
         $rawCollection->shouldReceive('find')
-            ->with([], ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
+            ->with([], ['skip' => SchemaCacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
             ->andReturn(new ArrayIterator($documentsFromDb));
 
         $cacheComponent->shouldReceive('put')
@@ -234,7 +234,7 @@ class SchemaCacheableCursorTest extends TestCase
         }
 
         $mock = m::mock(
-            CacheableCursor::class.'[generateCacheKey]',
+            SchemaCacheableCursor::class.'[generateCacheKey]',
             [$entitySchema, $collection, $command, $params]
         );
         $mock->shouldAllowMockingProtectedMethods();
