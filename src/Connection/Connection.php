@@ -23,6 +23,21 @@ class Connection
     protected $client;
 
     /**
+     * @var string
+     */
+    private $server;
+
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
+     * @var array
+     */
+    private $driverOptions;
+
+    /**
      * Constructs a new Mongolid connection. It uses the same constructor
      * parameters as the original MongoDB\Client constructor.
      *
@@ -37,12 +52,9 @@ class Connection
         array $options = [],
         array $driverOptions = []
     ) {
-        // In order to work with PHP arrays instead of with objects
-        $driverOptions['typeMap'] = ['array' => 'array'];
-
-        $this->findDefaultDatabase($server);
-
-        $this->client = new Client($server, $options, $driverOptions);
+        $this->server = $server;
+        $this->options = $options;
+        $this->driverOptions = $driverOptions;
     }
 
     /**
@@ -50,6 +62,15 @@ class Connection
      */
     public function getClient(): Client
     {
+        if (!$this->client) {
+            // In order to work with PHP arrays instead of with objects
+            $this->driverOptions['typeMap'] = ['array' => 'array'];
+
+            $this->findDefaultDatabase($this->server);
+
+            $this->client = new Client($this->server, $this->options, $this->driverOptions);
+        }
+
         return $this->client;
     }
 
