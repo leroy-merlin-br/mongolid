@@ -87,7 +87,7 @@ trait HasLegacyAttributesTrait
      * @param array $input the data that will be used to fill the attributes
      * @param bool  $force force fill
      */
-    public function fill(array $input, bool $force = false)
+    public function fill(array $input, bool $force = false): HasAttributesInterface
     {
         foreach ($input as $key => $value) {
             if ($force) {
@@ -100,6 +100,8 @@ trait HasLegacyAttributesTrait
                 $this->setAttribute($key, $value);
             }
         }
+
+        return $this;
     }
 
     /**
