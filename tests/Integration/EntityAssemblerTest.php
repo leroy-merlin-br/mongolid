@@ -1,16 +1,14 @@
 <?php
 
-namespace Mongolid\DataMapper;
+namespace Mongolid\Tests\Integration;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use Mongolid\Container\Container;
-use Mongolid\Model\HasAttributesInterface;
-use Mongolid\Model\HasLegacyAttributesTrait;
-use Mongolid\Model\ModelInterface;
-use Mongolid\Model\PolymorphableModelInterface;
+use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\LegacyRecordStudent;
 
 class EntityAssemblerTest extends TestCase
 {
@@ -21,10 +19,14 @@ class EntityAssemblerTest extends TestCase
     }
 
     /**
-     * @dataProvider EntityAssemblerFixture
+     * @dataProvider entityAssemblerFixture
      */
-    public function testShouldAssembleEntityForTheGivenSchema($inputValue, $availableSchemas, $inputSchema, $expectedOutput)
-    {
+    public function testShouldAssembleEntityForTheGivenSchema(
+        $inputValue,
+        $availableSchemas,
+        $inputSchema,
+        $expectedOutput
+    ) {
         // Arrange
         $entityAssembler = new EntityAssembler();
         $schemas = [];
@@ -44,11 +46,9 @@ class EntityAssemblerTest extends TestCase
         $this->assertEquals($expectedOutput, $result);
     }
 
-    public function EntityAssemblerFixture()
+    public function entityAssemblerFixture()
     {
         return [
-            //---------------------------
-
             'A simple schema to a entity' => [
                 'inputValue' => [ // Data that will be used to assembly the entity
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
@@ -58,7 +58,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -69,7 +69,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new LegacyRecordStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -89,7 +89,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -99,7 +99,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -108,7 +108,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new LegacyRecordStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -133,7 +133,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -143,7 +143,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -152,12 +152,12 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new LegacyRecordStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
-                        new _stubTestGrade([
+                        new LegacyRecordStudent([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
@@ -190,7 +190,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _stubStudent::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -200,7 +200,7 @@ class EntityAssemblerTest extends TestCase
                         ],
                     ],
                     'TestSchema' => [
-                        'entityClass' => _stubTestGrade::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'subject' => 'string',
@@ -209,17 +209,17 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new LegacyRecordStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
                     'tests' => [
-                        new _stubTestGrade([
+                        new LegacyRecordStudent([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
                             'subject' => 'math',
                             'grade' => 7.25,
                         ]),
-                        new _stubTestGrade([
+                        new LegacyRecordStudent([
                             '_id' => new ObjectID('507f1f77bcf86cd7994390eb'),
                             'subject' => 'english',
                             'grade' => 9.0,
@@ -240,7 +240,7 @@ class EntityAssemblerTest extends TestCase
                 ],
                 'availableSchmas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
-                        'entityClass' => _polymorphableStudent::class,
+                        'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
                             '_id' => 'objectId',
                             'name' => 'string',
@@ -251,7 +251,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new _stubStudent([ // Expected output
+                'expectedOutput' => new LegacyRecordStudent([ // Expected output
                     '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                     'name' => 'John Doe',
                     'age' => 25,
@@ -259,44 +259,5 @@ class EntityAssemblerTest extends TestCase
                 ]),
             ],
         ];
-    }
-}
-
-class _stubStudent extends \stdClass implements HasAttributesInterface
-{
-    use HasLegacyAttributesTrait;
-
-    public function __construct($attr = [])
-    {
-        foreach ($attr as $key => $value) {
-            $this->$key = $value;
-        }
-
-        $this->original = $this->attributes;
-    }
-}
-
-class _stubTestGrade extends \stdClass
-{
-    public function __construct($attr = [])
-    {
-        foreach ($attr as $key => $value) {
-            $this->$key = $value;
-        }
-    }
-}
-
-class _polymorphableStudent extends \stdClass implements PolymorphableModelInterface
-{
-    public function __construct($attr = [])
-    {
-        foreach ($attr as $key => $value) {
-            $this->$key = $value;
-        }
-    }
-
-    public function polymorph(array $input): string
-    {
-        return _stubStudent::class;
     }
 }
