@@ -13,6 +13,7 @@ use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Query\ModelMapper;
 use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 
 /**
@@ -20,7 +21,7 @@ use Mongolid\Schema\Schema;
  *
  * @deprecated Should use Model\AbstractModel instead.
  */
-class LegacyRecord implements ModelInterface
+class LegacyRecord implements ModelInterface, HasSchemaInterface
 {
     use HasLegacyAttributesTrait;
     use HasLegacyRelationsTrait;

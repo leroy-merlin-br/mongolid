@@ -65,7 +65,7 @@ class EntityAssembler
 
             if ($class !== get_class($entity)) {
                 $originalAttributes = $entity->getDocumentAttributes();
-                $entity = new $class();
+                $entity = Container::make($class);
 
                 foreach ($originalAttributes as $key => $value) {
                     $entity->setDocumentAttribute($key, $value);
