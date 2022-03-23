@@ -5,6 +5,7 @@ use Illuminate\Support\Str;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorFactory;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\LegacyRecord;
 use Mongolid\Model\Exception\NotARelationException;
@@ -108,7 +109,7 @@ trait HasLegacyRelationsTrait
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded documents are stored
      *
-     * @return EmbeddedCursor Array with the embedded documents
+     * @return CursorInterface Array with the embedded documents
      */
     protected function embedsMany(string $entity, string $field)
     {
