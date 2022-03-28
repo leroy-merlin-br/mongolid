@@ -378,10 +378,13 @@ class DataMapper implements HasSchemaInterface
     {
         $database = $this->connection->defaultDatabase;
         $collectionName = $this->schema->collection;
+        $options = [
+            'typeMap' => ['array' => 'array', 'document' => 'array']
+        ];
 
         $collection = $this->connection
             ->getClient()
-            ->selectDatabase($database, ['document' => 'array'])
+            ->selectDatabase($database, $options)
             ->selectCollection($collectionName);
 
         return $collection;
