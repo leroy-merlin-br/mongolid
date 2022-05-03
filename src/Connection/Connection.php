@@ -63,7 +63,7 @@ class Connection
     public function getClient(): Client
     {
         if (!$this->client) {
-            // In order to work with PHP arrays instead of with objects
+            // This will make the Mongo Driver return documents as arrays instead of objects
             $this->driverOptions['typeMap'] = ['array' => 'array'];
 
             $this->findDefaultDatabase($this->server);
