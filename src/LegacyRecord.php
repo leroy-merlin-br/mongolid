@@ -4,48 +4,30 @@ namespace Mongolid;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\BadMethodCallException;
-use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Model\AbstractModel;
-use Mongolid\Model\Exception\ModelNotFoundException;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
+use Mongolid\Schema\DynamicSchema;
+use Mongolid\Schema\HasSchemaInterface;
+use Mongolid\Schema\Schema;
 
 /**
  * This class was created to keep v2 compatibility.
  *
  * @deprecated Should use Model\AbstractModel instead.
  */
-class LegacyRecord implements ModelInterface
+class LegacyRecord implements ModelInterface, HasSchemaInterface
 {
     use HasLegacyAttributesTrait;
     use HasLegacyRelationsTrait;
 
     /**
-     * The $dynamic property tells if the object will accept additional fields
-     * that are not specified in the $fillable or $guarded properties.
-     * This is useful if you does not have a strict document format or
-     * if you want to take full advantage of the "schemaless" nature of MongoDB.
-     *
-     * @var bool
-     */
-    protected $dynamic = true;
-
-    /**
-     * Whether the model should manage the `created_at` and `updated_at`
-     * timestamps automatically.
-     *
-     * @var bool
-     */
-    protected $timestamps = true;
-
-    /**
-     * Name of the collection where this kind of Model is going to be saved or
+     * Name of the collection where this kind of Entity is going to be saved or
      * retrieved from.
      *
      * @var string
@@ -60,67 +42,163 @@ class LegacyRecord implements ModelInterface
     protected $writeConcern = 1;
 
     /**
-     * Embed a new document to an attribute. It will also generate an
-     * _id for the document if it's not present.
+     * Describes the Schema fields of the model. Optionally you can set it to
+     * the name of a Schema class to be used.
      *
-     * @param string $field field to where the $obj will be embedded
-     * @param mixed  $obj   document or model instance
+     * @see  Mongolid\Schema\Schema::$fields
+     *
+     * @var string|string[]
      */
-    public function embed(string $field, $obj)
-    {
-        $this->shouldReturnCursor = false;
-        $relation = $this->$field();
+    protected $fields = [
+        '_id' => 'objectId',
+        'created_at' => 'createdAtTimestamp',
+        'updated_at' => 'updatedAtTimestamp',
+    ];
 
-        $relation->add($obj);
-        $this->shouldReturnCursor = true;
+    /**
+     * The $dynamic property tells if the object will accept additional fields
+     * that are not specified in the $fields property. This is useful if you
+     * does not have a strict document format or if you want to take full
+     * advantage of the "schemaless" nature of MongoDB.
+     *
+     * @var bool
+     */
+    public $dynamic = true;
+
+    /**
+     * Whether the model should manage the `created_at` and `updated_at`
+     * timestamps automatically.
+     *
+     * @var bool
+     */
+    protected $timestamps = true;
+
+    /**
+     * Saves this object into database.
+     */
+    public function save(): bool
+    {
+        return $this->execute('save');
     }
 
     /**
-     * Removes an embedded document from the given field. It does that by using
-     * the _id of the given $obj.
+     * Insert this object into database.
      *
-     * @param string $field name of the field where the $obj is embeded
-     * @param mixed  $obj   document, model instance or _id
+     * @return bool Success
      */
-    public function unembed(string $field, $obj)
+    public function insert(): bool
     {
-        $this->shouldReturnCursor = false;
-        $relation = $this->$field();
-
-        $relation->remove($obj);
-        $this->shouldReturnCursor = true;
+        return $this->execute('insert');
     }
 
     /**
-     * Attach document _id reference to an attribute. It will also generate an
-     * _id for the document if it's not present.
-     *
-     * @param string $field name of the field where the reference will be stored
-     * @param mixed  $obj   document, model instance or _id to be referenced
+     * Updates this object in database.
      */
-    public function attach(string $field, $obj)
+    public function update(): bool
     {
-        $this->shouldReturnCursor = false;
-        $relation = $this->$field();
-
-        $relation->attach($obj);
-        $this->shouldReturnCursor = true;
+        return $this->execute('update');
     }
 
     /**
-     * Removes a document _id reference from an attribute. It will remove the
-     * _id of the given $obj from inside the given $field.
-     *
-     * @param string $field field where the reference is stored
-     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     * Deletes this object in database.
      */
-    public function detach(string $field, $obj)
+    public function delete(): bool
     {
-        $this->shouldReturnCursor = false;
-        $relation = $this->$field();
+        return $this->execute('delete');
+    }
 
-        $relation->detach($obj);
-        $this->shouldReturnCursor = true;
+    /**
+     * Gets a cursor of this kind of entities that matches the query from the
+     * database.
+     *
+     * @param array $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
+     */
+    public static function where(
+        array $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): CursorInterface {
+        return self::getDataMapperInstance()->where(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets a cursor of this kind of entities from the database.
+     */
+    public static function all(): CursorInterface
+    {
+        return self::getDataMapperInstance()->all();
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     *
+     * @return LegacyRecord
+     */
+    public static function first(
+        $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->first(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     *
+     * @throws ModelNotFoundException if no document was found
+     *
+     * @return LegacyRecord
+     */
+    public static function firstOrFail(
+        $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ) {
+        return self::getDataMapperInstance()->firstOrFail(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, a new entity will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     *
+     * @return LegacyRecord
+     */
+    public static function firstOrNew($id)
+    {
+        if ($entity = self::getDataMapperInstance()->first($id)) {
+            return $entity;
+        }
+
+        $entity = new static();
+        $entity->_id = $id;
+
+        return $entity;
     }
 
     /**
@@ -129,7 +207,7 @@ class LegacyRecord implements ModelInterface
      * @param mixed $method     name of the method that is being called
      * @param mixed $parameters parameters of $method
      *
-     * @Throws BadMethodCallException in case of invalid methods be called
+     * @throws BadMethodCallException in case of invalid methods be called
      *
      * @return mixed
      */
@@ -154,150 +232,28 @@ class LegacyRecord implements ModelInterface
         throw new BadMethodCallException(
             sprintf(
                 'The following method can not be reached or does not exist: %s@%s',
-                static::class,
+                get_class($this),
                 $method
             )
         );
     }
 
     /**
-     * @inheritdoc
-     */
-    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface
-    {
-        return self::getBuilderInstance()->where(new static(), $query, $projection, $useCache);
-    }
-
-    /**
-     * Gets a cursor of this kind of entities from the database.
-     */
-    public static function all(): CursorInterface
-    {
-        return self::getBuilderInstance()->all(new static());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function first($query = [], array $projection = [], bool $useCache = false)
-    {
-        return self::getBuilderInstance()->first(new static(), $query, $projection, $useCache);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false)
-    {
-        return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection, $useCache);
-    }
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, a new model will be returned with the
-     * _if field filled.
+     * Returns a DataMapper configured with the Schema and collection described
+     * in this entity.
      *
-     * @param mixed $id document id
-     *
-     * @return AbstractModel|null
+     * @return DataMapper
      */
-    public static function firstOrNew($id)
+    public function getDataMapper()
     {
-        if (!$model = self::first($id)) {
-            $model = new static();
-            $model->_id = $id;
-        }
+        $dataMapper = Container::make(DataMapper::class);
+        $dataMapper->setSchema($this->getSchema());
 
-        return $model;
+        return $dataMapper;
     }
 
     /**
-     * Returns a valid instance from Ioc.
-     */
-    private static function getBuilderInstance(): Builder
-    {
-        $instance = new static();
-
-        return $instance->getBuilder();
-    }
-
-    /**
-     * Saves this object into database.
-     */
-    public function save(): bool
-    {
-        return $this->execute('save');
-    }
-
-    /**
-     * Insert this object into database.
-     */
-    public function insert(): bool
-    {
-        return $this->execute('insert');
-    }
-
-    /**
-     * Updates this object in database.
-     */
-    public function update(): bool
-    {
-        return $this->execute('update');
-    }
-
-    /**
-     * Deletes this object in database.
-     */
-    public function delete(): bool
-    {
-        return $this->execute('delete');
-    }
-
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param string $key name of the attribute
-     *
-     * @return mixed
-     */
-    public function &__get(string $key)
-    {
-        return $this->getDocumentAttribute($key);
-    }
-
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * @param string $key   attribute name
-     * @param mixed  $value value to be set
-     */
-    public function __set(string $key, $value): void
-    {
-        $this->setDocumentAttribute($key, $value);
-    }
-
-    /**
-     * Determine if an attribute exists on the model.
-     *
-     * @param string $key attribute name
-     */
-    public function __isset(string $key): bool
-    {
-        return $this->hasDocumentAttribute($key);
-    }
-
-    /**
-     * Unset an attribute on the model.
-     *
-     * @param string $key attribute name
-     */
-    public function __unset(string $key): void
-    {
-        $this->cleanDocumentAttribute($key);
-    }
-
-    /**
-     * {@inheritdoc}
+     * Getter for the $collection attribute.
      */
     public function getCollectionName(): string
     {
@@ -305,24 +261,11 @@ class LegacyRecord implements ModelInterface
             throw new NoCollectionNameException();
         }
 
-        return $this->collection;
+        return $this->collection ? $this->collection : $this->getSchema()->collection;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getCollection(): Collection
-    {
-        $connection = Container::make(Connection::class);
-
-        $database = $connection->defaultDatabase;
-        $collectionName = $this->getCollectionName();
-
-        return $connection->getClient()->$database->$collectionName;
-    }
-
-    /**
-     * Getter for $writeConcern attribute.
+     * Getter for $writeConcern variable.
      */
     public function getWriteConcern(): int
     {
@@ -330,13 +273,94 @@ class LegacyRecord implements ModelInterface
     }
 
     /**
-     * Setter for $writeConcern attribute.
+     * Setter for $writeConcern variable.
      *
-     * @param int $writeConcern level of write concern for the transaction
+     * @param int $writeConcern level of write concern to the transation
      */
     public function setWriteConcern(int $writeConcern): void
     {
         $this->writeConcern = $writeConcern;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema(): Schema
+    {
+        if ($schema = $this->instantiateSchemaInFields()) {
+            return $schema;
+        }
+
+        $schema = new DynamicSchema();
+        $schema->entityClass = get_class($this);
+        $schema->fields = $this->fields;
+        $schema->dynamic = $this->dynamic;
+        $schema->collection = $this->collection;
+
+        return $schema;
+    }
+
+    /**
+     * Will check if the current value of $fields property is the name of a
+     * Schema class and instantiate it if possible.
+     *
+     * @return Schema|null
+     */
+    protected function instantiateSchemaInFields()
+    {
+        if (is_string($this->fields)) {
+            if (is_subclass_of($instance = Container::make($this->fields), Schema::class)) {
+                return $instance;
+            }
+        }
+    }
+
+    /**
+     * Performs the given action into database.
+     *
+     * @param string $action datamapper function to execute
+     *
+     * @return bool
+     */
+    protected function execute(string $action)
+    {
+        if (!$this->getCollectionName()) {
+            return false;
+        }
+
+        $options = [
+            'writeConcern' => new WriteConcern($this->getWriteConcern()),
+        ];
+
+        if ($result = $this->getDataMapper()->$action($this, $options)) {
+            $this->syncOriginalAttributes();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the a valid instance from Ioc.
+     *
+     * @throws NoCollectionNameException throws exception when has no collection filled
+     *
+     * @return mixed
+     */
+    private static function getDataMapperInstance()
+    {
+        $instance = Container::make(get_called_class());
+
+        if (!$instance->getCollectionName()) {
+            throw new NoCollectionNameException();
+        }
+
+        return $instance->getDataMapper();
+    }
+
+    public function getCollection(): Collection
+    {
+        return $this->getDataMapper()
+            ->getCollection();
     }
 
     public function bsonSerialize()
@@ -347,36 +371,8 @@ class LegacyRecord implements ModelInterface
 
     public function bsonUnserialize(array $data)
     {
-        unset($data['__pclass']);
         $this->fill($data, true);
 
         $this->syncOriginalDocumentAttributes();
-    }
-
-    /**
-     * Performs the given action into database.
-     *
-     * @param string $action Builder function to execute
-     */
-    protected function execute(string $action): bool
-    {
-        $options = [
-            'writeConcern' => new WriteConcern($this->getWriteConcern()),
-        ];
-
-        if ($result = $this->getBuilder()->$action($this, $options)) {
-            $this->syncOriginalDocumentAttributes();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns a Builder configured with the collection described
-     * in this model.
-     */
-    private function getBuilder(): Builder
-    {
-        return Container::make(Builder::class);
     }
 }

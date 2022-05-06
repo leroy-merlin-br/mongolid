@@ -23,7 +23,7 @@ class LegacyRecordUser extends LegacyRecord
     /**
      * @var bool
      */
-    protected $dynamic = false;
+    public $dynamic = false;
 
     /**
      * @var string[]
@@ -34,7 +34,7 @@ class LegacyRecordUser extends LegacyRecord
 
     public function siblings()
     {
-        return $this->embedsMany(LegacyRecordUser::class);
+        return $this->embedsMany(LegacyRecordUser::class, 'siblings');
     }
 
     public function grandsons()

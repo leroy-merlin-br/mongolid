@@ -2,9 +2,16 @@
 namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
+use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
+use Mongolid\Cursor\CursorFactory;
+use Mongolid\Cursor\CursorInterface;
+use Mongolid\DataMapper\DataMapper;
+use Mongolid\LegacyRecord;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
+use Mongolid\Schema\Schema;
+use Mongolid\Util\ObjectIdUtils;
 
 /**
  * It is supposed to be used on model classes in general.
@@ -12,217 +19,162 @@ use Mongolid\Model\Relations\RelationInterface;
 trait HasLegacyRelationsTrait
 {
     /**
-     * Relation cache.
+     * Returns the referenced documents as objects.
      *
-     * @var RelationInterface[]
-     */
-    private $relations = [];
-
-    /**
-     * The bound between relations and fields.
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _id is stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
      *
-     * @var array
+     * @return mixed
      */
-    private $fieldRelations = [];
-
-    /**
-     * @var bool
-     */
-    public $shouldReturnCursor = true;
-
-    /**
-     * Get a specified relationship.
-     */
-    public function &getRelation(string $relation): RelationInterface
+    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
-        return $this->relations[$relation];
-    }
+        $referenced_id = $this->$field;
 
-    /**
-     * Determine if the given relation is loaded.
-     */
-    public function relationLoaded(string $key): bool
-    {
-        return array_key_exists($key, $this->relations);
-    }
-
-    /**
-     * Set the given relationship on the model.
-     */
-    public function setRelation(string $relation, RelationInterface $value, string $field): void
-    {
-        $this->relations[$relation] = $value;
-        $this->fieldRelations[$field] = $relation;
-    }
-
-    /**
-     * Unset a loaded relationship.
-     */
-    public function unsetRelation(string $relation): void
-    {
-        unset($this->relations[$relation]);
-    }
-
-    public function &getRelationResults(string $relation)
-    {
-        if (!$this->relationLoaded($relation) && !$this->$relation() instanceof RelationInterface) {
-            throw new NotARelationException("Called method \"{$relation}\" is not a Relation!");
+        if (is_array($referenced_id) && isset($referenced_id[0])) {
+            $referenced_id = $referenced_id[0];
         }
 
-        return $this->getRelation($relation)->getResults();
-    }
+        $entityInstance = Container::make($entity);
 
-    public function hasFieldRelation(string $field): bool
-    {
-        return isset($this->fieldRelations[$field]);
-    }
+        if ($entityInstance instanceof Schema) {
+            $dataMapper = Container::make(DataMapper::class);
+            $dataMapper->setSchema($entityInstance);
 
-    public function getFieldRelation(string $field): string
-    {
-        return $this->fieldRelations[$field];
-    }
-
-    /**
-     * Create a ReferencesOne Relation.
-     *
-     * @param string      $modelClass class of the referenced model
-     * @param string|null $field      the field where the $key is stored
-     * @param string      $key        the field that the document will be referenced by (usually _id)
-     */
-    protected function referencesOne(string $modelClass, string $field = null, string $key = '_id')
-    {
-        $relationName = $this->guessRelationName();
-
-        $relation = $this->getRelationsService()->referencesOne($this, $relationName, $modelClass, $field, $key);
-
-        if ($this->shouldReturnCursor) {
-            return $relation->getResults();
+            return $dataMapper->first(['_id' => $referenced_id], [], $cacheable);
         }
 
-        return $relation;
+        return $entityInstance::first(['_id' => $referenced_id], [], $cacheable);
     }
 
     /**
-     * Create a ReferencesMany Relation.
+     * Returns the cursor for the referenced documents as objects.
      *
-     * @param string      $modelClass class of the referenced model
-     * @param string|null $field      the field where the _ids are stored
-     * @param string      $key        the field that the document will be referenced by (usually _id)
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _ids are stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
+     *
+     * @return array
      */
-    protected function referencesMany(string $modelClass, string $field = null, string $key = '_id')
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
     {
-        $relationName = $this->guessRelationName();
+        $referencedIds = (array) $this->$field;
 
-        $relation = $this->getRelationsService()->referencesMany($this, $relationName, $modelClass, $field, $key);
-
-        if ($this->shouldReturnCursor) {
-            return $relation->getResults();
+        if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
+            foreach ($referencedIds as $key => $value) {
+                $referencedIds[$key] = new ObjectId($value);
+            }
         }
 
-        return $relation;
-    }
+        $query = ['_id' => ['$in' => array_values($referencedIds)]];
 
-    /**
-     * Create a EmbedsOne Relation.
-     *
-     * @param string      $modelClass class of the embedded model
-     * @param string|null $field      field where the embedded document is stored
-     */
-    protected function embedsOne(string $modelClass, string $field = null)
-    {
-        $relationName = $this->guessRelationName();
+        $entityInstance = Container::make($entity);
 
-        $relation = $this->getRelationsService()->embedsOne($this, $relationName, $modelClass, $field);
+        if ($entityInstance instanceof Schema) {
+            $dataMapper = Container::make(DataMapper::class);
+            $dataMapper->setSchema($entityInstance);
 
-        if ($this->shouldReturnCursor) {
-            return $relation->getResults();
+            return $dataMapper->where($query, [], $cacheable);
         }
 
-        return $relation;
+        return $entityInstance::where($query, [], $cacheable);
     }
 
     /**
-     * Create a EmbedsMany Relation.
+     * Return a embedded documents as object.
      *
-     * @param string      $modelClass class of the embedded model
-     * @param string|null $field      field where the embedded documents are stored
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field  field where the embedded document is stored
+     *
+     * @return LegacyRecord|Schema|null
      */
-    protected function embedsMany(string $modelClass, string $field = null)
+    protected function embedsOne(string $entity, string $field)
     {
-        $relationName = $this->guessRelationName();
-
-        $relation = $this->getRelationsService()->embedsMany($this, $relationName, $modelClass, $field);
-
-        if ($this->shouldReturnCursor) {
-            return $relation->getResults();
+        if (is_subclass_of($entity, Schema::class)) {
+            $entity = (new $entity())->entityClass;
         }
 
-        return $relation;
-    }
-
-    private function getRelationsService(): RelationsService
-    {
-        if (!$this->relationsService) {
-            $this->relationsService = Container::make(RelationsService::class);
+        $items = (array) $this->$field;
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
+            $items = [$items];
         }
 
-        return $this->relationsService;
+        return Container::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items)->first();
     }
 
     /**
-     * Retrieve relation name. For example, if we have a code like this:
+     * Return array of embedded documents as objects.
      *
-     * ```
-     * class User extends AbstractModel
-     * {
-     *     public function brother()
-     *     {
-     *         return $this->referencesOne(User::class);
-     *     }
-     * }
-     * ```
-     * we will retrieve `brother` as the relation name.
-     * This is useful for storing the "Brother Reference"
-     * on a field called `brother_id`.
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field  field where the embedded documents are stored
+     *
+     * @return CursorInterface Array with the embedded documents
      */
-    public function guessRelationName(): string
+    protected function embedsMany(string $entity, string $field)
     {
-        [$method, $relationType, $relation] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        if (is_subclass_of($entity, Schema::class)) {
+            $entity = (new $entity())->entityClass;
+        }
 
-        return $relation['function'];
+        $items = (array) $this->$field;
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
+            $items = [$items];
+        }
+
+        return Container::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items);
     }
 
     /**
-     * Infer field name for reference relations.
-     * This is useful for storing the relation on
-     * a field based on both the relation name and the
-     * referenced key used.
+     * Embed a new document to an attribute. It will also generate an
+     * _id for the document if it's not present.
      *
-     * @example a `parent` relation on a `code` field
-     * would be inferred as `parent_code`.
-     * @example a `addresses` relation on `_id` field
-     * would be inferred as `addresses_ids`.
+     * @param string $field field to where the $obj will be embedded
+     * @param mixed  $obj   document or model instance
      */
-    private function inferFieldForReference(string $relationName, string $key, bool $plural): string
+    public function embed(string $field, &$obj)
     {
-        $relationName = Str::snake($relationName);
-        $key = $plural ? Str::plural($key) : $key;
-
-        return $relationName.'_'.ltrim($key, '_');
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->embed($this, $field, $obj);
     }
 
     /**
-     * Infer field name for embed relations.
-     * This is useful for storing the relation on
-     * a field based on the relation name.
+     * Removes an embedded document from the given field. It does that by using
+     * the _id of the given $obj.
      *
-     * @example a `comments` relation on would be inferred as `embedded_comments`.
-     * @example a `tag` relation on would be inferred as `embedded_tag`.
+     * @param string $field name of the field where the $obj is embeded
+     * @param mixed  $obj   document, model instance or _id
      */
-    private function inferFieldForEmbed(string $relationName): string
+    public function unembed(string $field, &$obj)
     {
-        $relationName = Str::snake($relationName);
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->unembed($this, $field, $obj);
+    }
 
-        return 'embedded_'.$relationName;
+    /**
+     * Attach document _id reference to an attribute. It will also generate an
+     * _id for the document if it's not present.
+     *
+     * @param string $field name of the field where the reference will be stored
+     * @param mixed  $obj   document, model instance or _id to be referenced
+     */
+    public function attach(string $field, &$obj)
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->attach($this, $field, $obj);
+    }
+
+    /**
+     * Removes a document _id reference from an attribute. It will remove the
+     * _id of the given $obj from inside the given $field.
+     *
+     * @param string $field field where the reference is stored
+     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     */
+    public function detach(string $field, &$obj)
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->detach($this, $field, $obj);
     }
 }
