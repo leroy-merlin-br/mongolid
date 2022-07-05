@@ -8,6 +8,7 @@ use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
+use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\AbstractModel;
@@ -530,6 +531,39 @@ final class BuilderTest extends TestCase
         $this->assertSame([$preparedQuery, ['projection' => $projection]], $paramsResult);
     }
 
+    public function testShouldGetCacheableCursor(): void
+    {
+        // Set
+        $connection = m::mock(Connection::class);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
+
+        $collection = m::mock(Collection::class);
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
+        $query = 123;
+        $preparedQuery = ['_id' => 123];
+        $projection = ['project' => true, '_id' => false, '__pclass' => true];
+
+        // Expectations
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
+            ->andReturn($preparedQuery);
+
+        // Actions
+        $result = $builder->where($model, $query, $projection, true);
+        $collectionResult = $this->getProtected($result, 'collection');
+        $commandResult = $this->getProtected($result, 'command');
+        $paramsResult = $this->getProtected($result, 'params');
+
+        // Assertions
+        $this->assertInstanceOf(CacheableCursor::class, $result);
+        $this->assertSame($collection, $collectionResult);
+        $this->assertSame('find', $commandResult);
+        $this->assertSame([$preparedQuery, ['projection' => $projection]], $paramsResult);
+    }
+
     public function testShouldGetAll(): void
     {
         // Set
@@ -581,6 +615,35 @@ final class BuilderTest extends TestCase
         $this->assertSame($model, $result);
     }
 
+    public function testShouldGetFirstWithCachedResults(): void
+    {
+        // Set
+        $connection = m::mock(Connection::class);
+        $builder = m::mock(Builder::class.'[where]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
+        $collection = m::mock(Collection::class);
+        $query = 123;
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
+        $cursor = m::mock(Cursor::class);
+
+        // Expectations
+        $builder
+            ->expects('where')
+            ->with($model, $query, [], true)
+            ->andReturn($cursor);
+
+        $cursor->expects()
+            ->first()
+            ->andReturn($model);
+
+        // Actions
+        $result = $builder->first($model, $query, [], true);
+
+        // Assertions
+        $this->assertSame($model, $result);
+    }
+
     public function testFirstWithNullShouldNotHitTheDatabase(): void
     {
         // Set
@@ -619,6 +682,36 @@ final class BuilderTest extends TestCase
 
         // Actions
         $result = $builder->firstOrFail($model, $query);
+
+        // Assertions
+        $this->assertSame($model, $result);
+    }
+
+    public function testShouldGetCachedResultsWhenCallingFirstOrFail(): void
+    {
+        // Set
+        $connection = m::mock(Connection::class);
+        $builder = m::mock(Builder::class.'[where]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
+        $collection = m::mock(Collection::class);
+        $query = 123;
+        $preparedQuery = ['_id' => 123];
+        $model = new ReplaceCollectionModel();
+        $model->setCollection($collection);
+        $cursor = m::mock(Cursor::class);
+
+        // Expectations
+        $builder
+            ->expects('where')
+            ->with($model, $query, [], true)
+            ->andReturn($cursor);
+
+        $cursor->expects()
+            ->first()
+            ->andReturn($model);
+
+        // Actions
+        $result = $builder->firstOrFail($model, $query, [], true);
 
         // Assertions
         $this->assertSame($model, $result);

@@ -22,8 +22,9 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @param array $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
      */
-    public static function where(array $query = [], array $projection = []): CursorInterface;
+    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface;
 
     /**
      * Gets a cursor of this kind of entities from the database.
@@ -38,7 +39,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function first($query = [], array $projection = []);
+    public static function first($query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no
@@ -51,7 +52,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function firstOrFail($query = [], array $projection = []);
+    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no

@@ -5,3 +5,5 @@
 .phpcs-cache
 .phpunit.result.cache
 docker-compose.override.yml
+coverage
+.idea

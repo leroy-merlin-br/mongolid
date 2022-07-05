@@ -79,4 +79,9 @@ class BulkWrite
 
         return $result;
     }
+
+    public function count(): int
+    {
+        return count($this->operations);
+    }
 }
