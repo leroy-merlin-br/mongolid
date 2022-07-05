@@ -192,7 +192,7 @@ $post->delete();
 
 If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
 
-`Mongolid\Model\AbstractModel` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
+`Mongolid\Model\AbstractModel` (and `Mongolid\Model\HasAttributesTrait`) will use the `fillable` or `guarded` properties on your model.
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 
@@ -245,12 +245,4 @@ Note that [cursors](#cursor) can be converted to array too:
 
 ```php
 return User::all()->toArray();
-```
-
-To convert a model to JSON, you may use the `toJson` method:
-
-**Converting A Model To JSON**
-
-```php
-return User::find(1)->toJson();
 ```

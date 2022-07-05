@@ -13,8 +13,6 @@ Of course, your database collections are probably related to one another. For ex
 
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) to learn more how to take advantage of document embedding.
 
-[Legacy](legacy/relationships)
-
 A Embeds One relationship is a very basic relation. For example, a `User` model might have one `Phone`. We can define this relation in Mongolid:
 
 **Defining A Embeds One Relation**
@@ -51,8 +49,6 @@ $phone = User::find('4af9f23d8ead0e1d32000000')->phone();
 Which will translate to:
 
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
-- Aqui vai retornar um objeto `EmbedsOne`
-- Precisa chamar o método `get` pra recuperar o objeto embedado.
 - Instantiate a **Phone** object with the attributes found in _'phone'_ attribute of the user
 - Return that object
 
