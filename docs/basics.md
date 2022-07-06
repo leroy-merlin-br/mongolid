@@ -55,13 +55,13 @@ Mongolid will also assume each collection has a primary key attribute named `_id
 
 Once a model is defined, you are ready to start retrieving and creating documents in your collection.
 
-**Retrieving All Models**
+#### Retrieving All Models
 
 ```php
 $posts = Post::all();
 ```
 
-**Retrieving A Document By Primary Key**
+#### Retrieving A Document By Primary Key
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -71,19 +71,19 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
 ```
 
-**Retrieving One Document By attribute**
+#### Retrieving One Document By attribute
 
 ```php
 $user = Post::first(['title' => 'How Mongolid saved the day']);
 ```
 
-**Retrieving Many Documents By attribute**
+#### Retrieving Many Documents By attribute
 
 ```php
 $posts = Post::where(['category' => 'coding']);
 ```
 
-**Querying Using Mongolid Models**
+#### Querying Using Mongolid Models
 
 ```php
 $posts = Post::where(['votes' => ['$gt' => 100]])->limit(10); // Mongolid\Cursor\Cursor
@@ -93,7 +93,7 @@ foreach ($posts as $post) {
 }
 ```
 
-**Mongolid Count**
+#### Mongolid Count
 
 ```php
 $count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
@@ -103,58 +103,13 @@ Pretty easy right?
 
 ## Mongolid Cursor
 
-In MongoDB, a cursor is used to iterate through the results of a database query. For example, to query the database and see all results:
-
-```php
-$cursor = User::where(['kind' => 'visitor']);
-```
-
-In the above example, the $cursor variable will be a `Mongolid\Cursor\Cursor`.
-
-The Mongolid's `Cursor` wraps the original `MongoDB\Driver\Cursor` object of the new MongoDB Driver in a way that you can build queries in a more fluent and easy way. Also the Mongolid's `Cursor` will make sure to return the instances of your model instead of stdClass or arrays.
-
-> **Note:** The [Cursor class of the new driver](http://php.net/manual/en/class.mongodb-driver-cursor.php) is not as user friendly as the old one. Mongolid's cursor also make it as easy to use as the old one.
-
-The `Mongolid\Cursor\Cursor` object has alot of methods that helps you to iterate, refine and get information. For example:
-
-```php
-$cursor = User::where(['kind'=>'visitor']);
-
-// Sorts the results by given fields. In the example bellow, it sorts by username DESC
-$cursor->sort(['username'=>-1]);
-
-// Limits the number of results returned.
-$cursor->limit(10);
-
-// Skips a number of results. Good for pagination
-$cursor->skip(20);
-
-// Checks if the cursor is reading a valid result.
-$cursor->valid();
-
-// Returns the first result
-$cursor->first();
-```
-
-You can also chain some methods:
-
-```php
-$page = 2;
-
-// In order to display 10 results per page
-$cursor = User::all()->sort(['_id'=>1])->skip(10 * $page)->limit(10);
-
-// Then iterate through it
-foreach($cursor as $user) {
-    // do something
-}
-```
+Learn more about [Mongolid Cursor](cursor.md)
 
 ## Insert, Update, Delete
 
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 
-**Saving A New Model**
+#### Saving A New Mode
 
 ```php
 $post = new Post();
@@ -168,7 +123,7 @@ $post->save();
 
 To update a model, you may retrieve it, change an attribute, and use the `save` method:
 
-**Updating A Retrieved Model**
+#### Updating A Retrieved Model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -180,7 +135,7 @@ $post->save();
 
 To delete a model, simply call the `delete` method on the instance:
 
-**Deleting An Existing Model**
+#### Deleting An Existing Model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -196,7 +151,7 @@ If you are extending `Mongolid\Model\AbstractModel` you can set an array of attr
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 
-**Defining Fillable Attributes On A Model**
+#### Defining Fillable Attributes On A Model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -210,7 +165,7 @@ In this example, only the three listed attributes will be mass-assignable.
 
 The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of a "white-list":
 
-**Defining Guarded Attributes On A Model**
+#### Defining Guarded Attributes On A Model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -229,11 +184,11 @@ $post = new Post;
 $post->fill(['title' => 'Bacon']);
 ```
 
-## Converting To Arrays / JSON
+## Converting To Arrays
 
 When building JSON APIs, you may often need to convert your models to arrays or JSON. So, Mongolid includes methods for doing so. To convert a model and its loaded relationship to an array, you may use the `toArray` method:
 
-**Converting A Model To An Array**
+#### Converting A Model To An Array
 
 ```php
 $user = User::first();
@@ -241,7 +196,7 @@ $user = User::first();
 return $user->toArray();
 ```
 
-Note that [cursors](#cursor) can be converted to array too:
+Note that [cursors](cursor.md) can be converted to array too:
 
 ```php
 return User::all()->toArray();
