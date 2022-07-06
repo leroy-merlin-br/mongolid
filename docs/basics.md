@@ -29,7 +29,7 @@ $manager->setConnection(new Connection('mongodb://localhost:27017'));
 
 Now you are ready to create your own models :smile:
 
-## Basic Usage
+## Basic usage
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel
@@ -59,13 +59,13 @@ The `_id` attribute can be of any type. The default type for this attribute is `
 
 Once a model is defined, you are ready to start retrieving and creating documents in your collection.
 
-#### Retrieving All Models
+#### Retrieving all models
 
 ```php
 $posts = Post::all();
 ```
 
-#### Retrieving A Document By Primary Key
+#### Retrieving a document by primary key
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -75,19 +75,19 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
 ```
 
-#### Retrieving One Document By attribute
+#### Retrieving a document by attribute
 
 ```php
 $user = Post::first(['title' => 'How Mongolid saved the day']);
 ```
 
-#### Retrieving Many Documents By attribute
+#### Retrieving many documents by attribute
 
 ```php
 $posts = Post::where(['category' => 'coding']); // where() method returns a MongolidCursor
 ```
 
-#### Querying Using Mongolid Models
+#### Querying using mongolid models
 
 ```php
 $posts = Post::where(['votes' => ['$gt' => 100]])->limit(10); // Mongolid\Cursor\Cursor
@@ -97,7 +97,7 @@ foreach ($posts as $post) {
 }
 ```
 
-#### Mongolid Count
+#### Mongolid count
 
 ```php
 $count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
@@ -105,7 +105,7 @@ $count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
 
 Pretty easy right?
 
-## Mongolid Cursor
+## Mongolid cursor
 
 Learn more about [Mongolid Cursor](cursor.md)
 
@@ -113,7 +113,7 @@ Learn more about [Mongolid Cursor](cursor.md)
 
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 
-#### Saving A New Mode
+#### Saving a new mode
 
 ```php
 $post = new Post();
@@ -128,7 +128,7 @@ $post->save();
 
 To update a model, you may retrieve it, change an attribute, and use the `save` method:
 
-#### Updating A Retrieved Model
+#### Updating a retrieved model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -140,7 +140,7 @@ $post->update();
 
 To delete a model, simply call the `delete` method on the instance:
 
-#### Deleting An Existing Model
+#### Deleting an existing model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -148,7 +148,7 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 $post->delete();
 ```
 
-## Mass Assignment
+## Mass assignment
 
 If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. 
 These attributes are then assigned to the model via mass-assignment. 
@@ -160,7 +160,7 @@ By default, all attributes are fillable.
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 
-#### Defining Fillable Attributes On A Model
+#### Defining fillable attributes on a model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -174,7 +174,7 @@ In this example, only the three listed attributes will be mass-assignable.
 
 The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of a "white-list":
 
-#### Defining Guarded Attributes On A Model
+#### Defining guarded attributes on a model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -187,19 +187,22 @@ class Post extends \Mongolid\Model\AbstractModel {
 In the example above, the `id` and `votes` attributes may **not** be mass assigned. 
 All other attributes will be mass assignable.
 
-You can mass assign attributes using the `fill` method:
+You can mass assign attributes using the `fill` static method:
 
 ```php
 $post = new Post;
-$post->fill(['title' => 'Bacon']);
+$post = $post::fill(['title' => 'Bacon'], $post);
+// or
+$post = Post::fill(['title' => 'Bacon'], $post);
+
 ```
 
-## Converting To Arrays
+## Converting to arrays
 
 When building JSON APIs, you may often need to convert your models to arrays. So, Mongolid includes methods for doing so. 
 To convert a model and its loaded relationship to an array, you may use the `toArray` method:
 
-#### Converting A Model To An Array
+#### Converting a model to an array
 
 ```php
 $user = User::first();
@@ -213,7 +216,7 @@ Note that [cursors](cursor.md) can be converted to array too:
 return User::all()->toArray();
 ```
 
-#### Converting A Model To A JSON
+#### Converting a model to json
 
 This resource is still present only on `LegacyRecord`. 
 
