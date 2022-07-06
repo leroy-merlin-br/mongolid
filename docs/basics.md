@@ -135,7 +135,7 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 
 $post->subject = 'technology';
 
-$post->save();
+$post->update();
 ```
 
 To delete a model, simply call the `delete` method on the instance:
@@ -215,5 +215,6 @@ return User::all()->toArray();
 
 #### Converting A Model To A JSON
 
-This resource is still present only on `LegacyRecord`.
-You can see here [LegacyRecord](legacy/record.md)
+This resource is still present only on `LegacyRecord`. 
+
+You can see here [LegacyRecord](legacy/record.md) *For compatibility with version 2.x*
