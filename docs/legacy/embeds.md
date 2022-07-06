@@ -9,7 +9,8 @@ Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-
 
 ### Embeds One
 
-An Embeds One relationship is a very basic relation. For example, a `User` model might have one `Phone`. We can define this relation in Mongolid:
+An Embeds One relationship is a very basic relation. For example, a `User` model might have one `Phone`. 
+We can define this relation in Mongolid:
 
 **Defining An Embeds One Relation**
 
