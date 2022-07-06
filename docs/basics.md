@@ -37,7 +37,8 @@ class Post extends \Mongolid\Model\AbstractModel
 }
 ```
 
-Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**. This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
+Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**. 
+This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
 
 You may specify a collection by defining a `collection` property on your model:
 
@@ -49,9 +50,12 @@ class Post extends \Mongolid\Model\AbstractModel {
 }
 ```
 
-Mongolid will also assume each collection has a primary key attribute named `_id`, since MongoDB requires an `_id` for every single document. The `_id` attribute can be of any type. The default type for this attribute is `ObjectId`. [Learn more about the MongoId](https://docs.mongodb.org/manual/reference/method/ObjectId/).
+Mongolid will also assume each collection has a primary key attribute named `_id`, since MongoDB requires an `_id` for every single document. 
+The `_id` attribute can be of any type. The default type for this attribute is `ObjectId`. 
+[Learn more about the MongoId](https://docs.mongodb.org/manual/reference/method/ObjectId/).
 
-> **Note:** Mongolid will automatically convert strings in ObjectId format (For example: "4af9f23d8ead0e1d32000000") to `ObjectId` when querying or saving an object.
+> **Note:** Mongolid will automatically convert strings in ObjectId format (For example: "4af9f23d8ead0e1d32000000") 
+> to `ObjectId` when querying or saving an object.
 
 Once a model is defined, you are ready to start retrieving and creating documents in your collection.
 
@@ -80,7 +84,7 @@ $user = Post::first(['title' => 'How Mongolid saved the day']);
 #### Retrieving Many Documents By attribute
 
 ```php
-$posts = Post::where(['category' => 'coding']);
+$posts = Post::where(['category' => 'coding']); // where() method returns a MongolidCursor
 ```
 
 #### Querying Using Mongolid Models
@@ -119,7 +123,8 @@ $post->title = 'Foo bar john doe';
 $post->save();
 ```
 
-> **Note:** Typically, your Mongolid models will have auto-generated `_id` keys. However, if you wish to specify your own keys, set the `_id` attribute.
+> **Note:** Typically, your Mongolid models will have auto-generated `_id` keys. 
+> However, if you wish to specify your own keys, set the `_id` attribute.
 
 To update a model, you may retrieve it, change an attribute, and use the `save` method:
 
@@ -145,7 +150,11 @@ $post->delete();
 
 ## Mass Assignment
 
-If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
+If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. 
+These attributes are then assigned to the model via mass-assignment. 
+This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. 
+If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. 
+By default, all attributes are fillable.
 
 `Mongolid\Model\AbstractModel` (and `Mongolid\Model\HasAttributesTrait`) will use the `fillable` or `guarded` properties on your model.
 
@@ -175,7 +184,8 @@ class Post extends \Mongolid\Model\AbstractModel {
 }
 ```
 
-In the example above, the `id` and `votes` attributes may **not** be mass assigned. All other attributes will be mass assignable.
+In the example above, the `id` and `votes` attributes may **not** be mass assigned. 
+All other attributes will be mass assignable.
 
 You can mass assign attributes using the `fill` method:
 
@@ -186,7 +196,8 @@ $post->fill(['title' => 'Bacon']);
 
 ## Converting To Arrays
 
-When building JSON APIs, you may often need to convert your models to arrays or JSON. So, Mongolid includes methods for doing so. To convert a model and its loaded relationship to an array, you may use the `toArray` method:
+When building JSON APIs, you may often need to convert your models to arrays. So, Mongolid includes methods for doing so. 
+To convert a model and its loaded relationship to an array, you may use the `toArray` method:
 
 #### Converting A Model To An Array
 
@@ -201,3 +212,8 @@ Note that [cursors](cursor.md) can be converted to array too:
 ```php
 return User::all()->toArray();
 ```
+
+#### Converting A Model To A JSON
+
+This resource is still present only on `LegacyRecord`.
+You can see here [LegacyRecord](legacy/record.md)

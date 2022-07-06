@@ -12,7 +12,8 @@ The Mongolid's `Cursor` wraps the original `MongoDB\Driver\Cursor` object of the
 
 > **Note:** The [Cursor class of the new driver](http://php.net/manual/en/class.mongodb-driver-cursor.php) is not as user friendly as the old one. Mongolid's cursor also make it as easy to use as the old one.
 
-The `Mongolid\Cursor\Cursor` object has alot of methods that helps you to iterate, refine and get information. For example:
+The `Mongolid\Cursor\Cursor` object has a lot of methods that helps you to iterate, refine and get information. 
+For example:
 
 ```php
 $cursor = User::where(['kind'=>'visitor']);
