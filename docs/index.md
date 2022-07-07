@@ -22,8 +22,8 @@ Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementatio
 
 ## What you'll find here
 
-[Basics usage](basics.md)
-[Relationships](relationships.md)
-[Cursor](cursor.md)
-[Legacy differences](legacy/record.md)
-[Troubleshooting](troubleshooting.md)
+- [Basics usage](basics.md)
+- [Relationships](relationships.md)
+- [Cursor](cursor.md)
+- [Legacy differences](legacy/record.md)
+- [Troubleshooting](troubleshooting.md)

@@ -225,5 +225,5 @@ You can see here [LegacyRecord](legacy/record.md) *For compatibility with versio
 
 ## More about
 
-[Relationships](relationships.md)
-[Troubleshooting](troubleshooting.md)
+- [Relationships](relationships.md)
+- [Troubleshooting](troubleshooting.md)
