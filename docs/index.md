@@ -19,4 +19,11 @@ Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementatio
 
 > **Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
+
+## What you'll find here
+
 [Basics usage](basics.md)
+[Relationships](relationships.md)
+[Cursor](cursor.md)
+[Legacy differences](legacy/record.md)
+[Troubleshooting](troubleshooting.md)

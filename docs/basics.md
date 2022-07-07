@@ -221,3 +221,9 @@ return User::all()->toArray();
 This resource is still present only on `LegacyRecord`. 
 
 You can see here [LegacyRecord](legacy/record.md) *For compatibility with version 2.x*
+
+
+## More about
+
+[Relationships](relationships.md)
+[Troubleshooting](troubleshooting.md)
