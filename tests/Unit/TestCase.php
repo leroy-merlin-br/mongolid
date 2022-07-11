@@ -27,8 +27,7 @@ class TestCase extends PHPUnitTestCase
      * Actually runs a protected method of the given object.
      *
      * @param object $obj
-     * @param string $method
-     * @param array $args
+     * @param array  $args
      *
      * @return mixed
      */
@@ -84,5 +83,28 @@ class TestCase extends PHPUnitTestCase
         );
 
         return $instance;
+    }
+
+    public function assertMongoQueryEquals($expectedQuery, $query)
+    {
+        $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
+
+        if (!is_array($expectedQuery)) {
+            return;
+        }
+
+        foreach ($expectedQuery as $key => $value) {
+            if (is_object($value)) {
+                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
+
+                if (method_exists($value, '__toString')) {
+                    $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
+                }
+            }
+
+            if (is_array($value)) {
+                $this->assertMongoQueryEquals($value, $query[$key]);
+            }
+        }
     }
 }

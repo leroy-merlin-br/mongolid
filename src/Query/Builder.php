@@ -5,6 +5,7 @@ use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
+use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Event\EventTriggerService;
@@ -195,10 +196,13 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve documents
      * @param array          $projection fields to project in MongoDB query
+     * @param bool           $useCache   retrieves a CacheableCursor instead
      */
-    public function where(ModelInterface $model, $query = [], array $projection = []): CursorInterface
+    public function where(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
-        return new Cursor(
+        $cursor = $useCache ? CacheableCursor::class : Cursor::class;
+
+        return new $cursor(
             $model->getCollection(),
             'find',
             [
@@ -224,18 +228,23 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve the model
      * @param array          $projection fields to project in MongoDB query
+     * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @return ModelInterface|array|null
      */
-    public function first(ModelInterface $model, $query = [], array $projection = [])
+    public function first(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
     {
         if (null === $query) {
             return null;
         }
 
+        if ($useCache) {
+            return $this->where($model, $query, $projection, $useCache)->first();
+        }
+
         return $model->getCollection()->findOne(
             $this->prepareValueQuery($query),
-            ['projection' => $this->prepareProjection($projection)]
+            ['projection' => $this->prepareProjection($projection)],
         );
     }
 
@@ -246,14 +255,15 @@ class Builder
      * @param ModelInterface $model      Model to query from collection
      * @param mixed          $query      MongoDB query to retrieve the model
      * @param array          $projection fields to project in MongoDB query
+     * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no model was found
      *
      * @return ModelInterface|null
      */
-    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [])
+    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
     {
-        if ($result = $this->first($model, $query, $projection)) {
+        if ($result = $this->first($model, $query, $projection, $useCache)) {
             return $result;
         }
 

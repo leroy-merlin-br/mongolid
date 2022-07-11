@@ -2,6 +2,7 @@
 namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
+use Mongolid\Container\Container;
 use Mongolid\Model\Exception\InvalidFieldNameException;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\EmbedsMany;
@@ -93,14 +94,7 @@ trait HasRelationsTrait
     {
         $relationName = $this->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
-            $field = $field ?: $this->inferFieldForReference($relationName, $key, false);
-
-            $relation = new ReferencesOne($this, $modelClass, $field, $key);
-            $this->setRelation($relationName, $relation, $field);
-        }
-
-        return $this->getRelation($relationName);
+        return $this->getRelationsService()->referencesOne($this, $relationName, $modelClass, $field, $key);
     }
 
     /**
@@ -114,14 +108,7 @@ trait HasRelationsTrait
     {
         $relationName = $this->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
-            $field = $field ?: $this->inferFieldForReference($relationName, $key, true);
-
-            $relation = new ReferencesMany($this, $modelClass, $field, $key);
-            $this->setRelation($relationName, $relation, $field);
-        }
-
-        return $this->getRelation($relationName);
+        return $this->getRelationsService()->referencesMany($this, $relationName, $modelClass, $field, $key);
     }
 
     /**
@@ -134,14 +121,7 @@ trait HasRelationsTrait
     {
         $relationName = $this->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
-            $field = $field ?: $this->inferFieldForEmbed($relationName);
-
-            $relation = new EmbedsOne($this, $modelClass, $field);
-            $this->setRelation($relationName, $relation, $field);
-        }
-
-        return $this->getRelation($relationName);
+        return $this->getRelationsService()->embedsOne($this, $relationName, $modelClass, $field);
     }
 
     /**
@@ -154,14 +134,16 @@ trait HasRelationsTrait
     {
         $relationName = $this->guessRelationName();
 
-        if (!$this->relationLoaded($relationName)) {
-            $field = $field ?: $this->inferFieldForEmbed($relationName);
+        return $this->getRelationsService()->embedsMany($this, $relationName, $modelClass, $field);
+    }
 
-            $relation = new EmbedsMany($this, $modelClass, $field);
-            $this->setRelation($relationName, $relation, $field);
+    private function getRelationsService(): RelationsService
+    {
+        if (!$this->relationsService) {
+            $this->relationsService = Container::make(RelationsService::class);
         }
 
-        return $this->getRelation($relationName);
+        return $this->relationsService;
     }
 
     /**
@@ -180,7 +162,7 @@ trait HasRelationsTrait
      * This is useful for storing the "Brother Reference"
      * on a field called `brother_id`.
      */
-    private function guessRelationName(): string
+    public function guessRelationName(): string
     {
         [$method, $relationType, $relation] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 

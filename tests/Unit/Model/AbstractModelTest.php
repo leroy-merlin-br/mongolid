@@ -216,7 +216,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('where')
-            ->with(m::type(get_class($this->model)), $query, $projection)
+            ->with(m::type(get_class($this->model)), $query, $projection, false)
             ->andReturn($cursor);
 
         // Actions
@@ -255,7 +255,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $query, $projection)
+            ->with(m::type(get_class($this->model)), $query, $projection, false)
             ->andReturn($this->model);
 
         // Actions
@@ -294,7 +294,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $id, [])
+            ->with(m::type(get_class($this->model)), $id, [], false)
             ->andReturn($this->model);
 
         // Actions
@@ -313,7 +313,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $id, [])
+            ->with(m::type(get_class($this->model)), $id, [], false)
             ->andReturn(null);
 
         // Actions

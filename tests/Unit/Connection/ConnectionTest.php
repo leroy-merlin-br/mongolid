@@ -14,6 +14,7 @@ final class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
+        $connection->getClient();
 
         // Assertions
         $this->assertSame('my_db', $connection->defaultDatabase);
@@ -28,6 +29,7 @@ final class ConnectionTest extends TestCase
 
         // Actions
         $connection = new Connection($server, $options, $driverOptions);
+        $connection->getClient();
 
         // Assertions
         $this->assertSame('my_db', $connection->defaultDatabase);

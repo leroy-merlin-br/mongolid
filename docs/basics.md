@@ -29,7 +29,7 @@ $manager->setConnection(new Connection('mongodb://localhost:27017'));
 
 Now you are ready to create your own models :smile:
 
-## Basic Usage
+## Basic usage
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel
@@ -37,7 +37,8 @@ class Post extends \Mongolid\Model\AbstractModel
 }
 ```
 
-Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**. This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
+Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**. 
+This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
 
 You may specify a collection by defining a `collection` property on your model:
 
@@ -49,19 +50,22 @@ class Post extends \Mongolid\Model\AbstractModel {
 }
 ```
 
-Mongolid will also assume each collection has a primary key attribute named `_id`, since MongoDB requires an `_id` for every single document. The `_id` attribute can be of any type. The default type for this attribute is `ObjectId`. [Learn more about the MongoId](https://docs.mongodb.org/manual/reference/method/ObjectId/).
+Mongolid will also assume each collection has a primary key attribute named `_id`, since MongoDB requires an `_id` for every single document. 
+The `_id` attribute can be of any type. The default type for this attribute is `ObjectId`. 
+[Learn more about the MongoId](https://docs.mongodb.org/manual/reference/method/ObjectId/).
 
-> **Note:** Mongolid will automatically convert strings in ObjectId format (For example: "4af9f23d8ead0e1d32000000") to `ObjectId` when querying or saving an object.
+> **Note:** Mongolid will automatically convert strings in ObjectId format (For example: "4af9f23d8ead0e1d32000000") 
+> to `ObjectId` when querying or saving an object.
 
 Once a model is defined, you are ready to start retrieving and creating documents in your collection.
 
-**Retrieving All Models**
+#### Retrieving all models
 
 ```php
 $posts = Post::all();
 ```
 
-**Retrieving A Document By Primary Key**
+#### Retrieving a document by primary key
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -71,19 +75,19 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
 ```
 
-**Retrieving One Document By attribute**
+#### Retrieving a document by attribute
 
 ```php
 $user = Post::first(['title' => 'How Mongolid saved the day']);
 ```
 
-**Retrieving Many Documents By attribute**
+#### Retrieving many documents by attribute
 
 ```php
-$posts = Post::where(['category' => 'coding']);
+$posts = Post::where(['category' => 'coding']); // where() method returns a MongolidCursor
 ```
 
-**Querying Using Mongolid Models**
+#### Querying using mongolid models
 
 ```php
 $posts = Post::where(['votes' => ['$gt' => 100]])->limit(10); // Mongolid\Cursor\Cursor
@@ -93,7 +97,7 @@ foreach ($posts as $post) {
 }
 ```
 
-**Mongolid Count**
+#### Mongolid count
 
 ```php
 $count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
@@ -101,60 +105,15 @@ $count = Post::where(['votes' => ['$gt' => 100]])->count(); // int
 
 Pretty easy right?
 
-## Mongolid Cursor
+## Mongolid cursor
 
-In MongoDB, a cursor is used to iterate through the results of a database query. For example, to query the database and see all results:
-
-```php
-$cursor = User::where(['kind' => 'visitor']);
-```
-
-In the above example, the $cursor variable will be a `Mongolid\Cursor\Cursor`.
-
-The Mongolid's `Cursor` wraps the original `MongoDB\Driver\Cursor` object of the new MongoDB Driver in a way that you can build queries in a more fluent and easy way. Also the Mongolid's `Cursor` will make sure to return the instances of your model instead of stdClass or arrays.
-
-> **Note:** The [Cursor class of the new driver](http://php.net/manual/en/class.mongodb-driver-cursor.php) is not as user friendly as the old one. Mongolid's cursor also make it as easy to use as the old one.
-
-The `Mongolid\Cursor\Cursor` object has alot of methods that helps you to iterate, refine and get information. For example:
-
-```php
-$cursor = User::where(['kind'=>'visitor']);
-
-// Sorts the results by given fields. In the example bellow, it sorts by username DESC
-$cursor->sort(['username'=>-1]);
-
-// Limits the number of results returned.
-$cursor->limit(10);
-
-// Skips a number of results. Good for pagination
-$cursor->skip(20);
-
-// Checks if the cursor is reading a valid result.
-$cursor->valid();
-
-// Returns the first result
-$cursor->first();
-```
-
-You can also chain some methods:
-
-```php
-$page = 2;
-
-// In order to display 10 results per page
-$cursor = User::all()->sort(['_id'=>1])->skip(10 * $page)->limit(10);
-
-// Then iterate through it
-foreach($cursor as $user) {
-    // do something
-}
-```
+Learn more about [Mongolid Cursor](cursor.md)
 
 ## Insert, Update, Delete
 
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 
-**Saving A New Model**
+#### Saving a new mode
 
 ```php
 $post = new Post();
@@ -164,23 +123,24 @@ $post->title = 'Foo bar john doe';
 $post->save();
 ```
 
-> **Note:** Typically, your Mongolid models will have auto-generated `_id` keys. However, if you wish to specify your own keys, set the `_id` attribute.
+> **Note:** Typically, your Mongolid models will have auto-generated `_id` keys. 
+> However, if you wish to specify your own keys, set the `_id` attribute.
 
 To update a model, you may retrieve it, change an attribute, and use the `save` method:
 
-**Updating A Retrieved Model**
+#### Updating a retrieved model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
 
 $post->subject = 'technology';
 
-$post->save();
+$post->update();
 ```
 
 To delete a model, simply call the `delete` method on the instance:
 
-**Deleting An Existing Model**
+#### Deleting an existing model
 
 ```php
 $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -188,15 +148,19 @@ $post = Post::first('4af9f23d8ead0e1d32000000');
 $post->delete();
 ```
 
-## Mass Assignment
+## Mass assignment
 
-If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. These attributes are then assigned to the model via mass-assignment. This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. By default, all attributes are fillable.
+If you are extending `Mongolid\Model\AbstractModel` you can set an array of attributes to the model using the `fill` method. 
+These attributes are then assigned to the model via mass-assignment. 
+This is convenient; however, can be a **serious** security concern when blindly passing user input into a model. 
+If user input is blindly passed into a model, the user is free to modify **any** and **all** of the model's attributes. 
+By default, all attributes are fillable.
 
-`Mongolid\Model\AbstractModel` (and `Mongolid\Model\Attributes` trait) will use the `fillable` or `guarded` properties on your model.
+`Mongolid\Model\AbstractModel` (and `Mongolid\Model\HasAttributesTrait`) will use the `fillable` or `guarded` properties on your model.
 
 The `fillable` property specifies which attributes should be mass-assignable. This can be set at the class or instance level.
 
-**Defining Fillable Attributes On A Model**
+#### Defining fillable attributes on a model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -210,7 +174,7 @@ In this example, only the three listed attributes will be mass-assignable.
 
 The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of a "white-list":
 
-**Defining Guarded Attributes On A Model**
+#### Defining guarded attributes on a model
 
 ```php
 class Post extends \Mongolid\Model\AbstractModel {
@@ -220,20 +184,25 @@ class Post extends \Mongolid\Model\AbstractModel {
 }
 ```
 
-In the example above, the `id` and `votes` attributes may **not** be mass assigned. All other attributes will be mass assignable.
+In the example above, the `id` and `votes` attributes may **not** be mass assigned. 
+All other attributes will be mass assignable.
 
-You can mass assign attributes using the `fill` method:
+You can mass assign attributes using the `fill` static method:
 
 ```php
 $post = new Post;
-$post->fill(['title' => 'Bacon']);
+$post = $post::fill(['title' => 'Bacon'], $post);
+// or
+$post = Post::fill(['title' => 'Bacon'], $post);
+
 ```
 
-## Converting To Arrays / JSON
+## Converting to arrays
 
-When building JSON APIs, you may often need to convert your models to arrays or JSON. So, Mongolid includes methods for doing so. To convert a model and its loaded relationship to an array, you may use the `toArray` method:
+When building JSON APIs, you may often need to convert your models to arrays. So, Mongolid includes methods for doing so. 
+To convert a model and its loaded relationship to an array, you may use the `toArray` method:
 
-**Converting A Model To An Array**
+#### Converting a model to an array
 
 ```php
 $user = User::first();
@@ -241,16 +210,20 @@ $user = User::first();
 return $user->toArray();
 ```
 
-Note that [cursors](#cursor) can be converted to array too:
+Note that [cursors](cursor.md) can be converted to array too:
 
 ```php
 return User::all()->toArray();
 ```
 
-To convert a model to JSON, you may use the `toJson` method:
+#### Converting a model to json
 
-**Converting A Model To JSON**
+This resource is still present only on `LegacyRecord`. 
 
-```php
-return User::find(1)->toJson();
-```
+You can see here [LegacyRecord](legacy/record.md) *For compatibility with version 2.x*
+
+
+## More about
+
+- [Relationships](relationships.md)
+- [Troubleshooting](troubleshooting.md)
