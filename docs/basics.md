@@ -191,7 +191,7 @@ You can mass assign attributes using the `fill` static method:
 
 ```php
 $post = new Post;
-$post = $post::fill(['title' => 'Bacon'], $post);
+$post = $post->fill(['title' => 'Bacon'], $post);
 // or
 $post = Post::fill(['title' => 'Bacon'], $post);
 
