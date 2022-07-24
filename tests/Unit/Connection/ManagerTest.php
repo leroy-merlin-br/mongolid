@@ -14,7 +14,7 @@ final class ManagerTest extends TestCase
     {
         // Set
         $manager = new Manager();
-        $connection = m::mock(IlluminateContainer::class);
+        $connection = m::mock(Connection::class);
         $client = m::mock(Client::class);
 
         // Expectations
