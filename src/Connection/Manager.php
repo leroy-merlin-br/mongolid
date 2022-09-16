@@ -51,9 +51,9 @@ class Manager
     public function setConnection(Connection $connection): bool
     {
         $this->init();
-        $this->container->instance(Connection::class, $this->connection);
 
         $this->connection = $connection;
+        $this->container->instance(Connection::class, $this->connection);
 
         return true;
     }

@@ -78,7 +78,7 @@ $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
 #### Retrieving a document by attribute
 
 ```php
-$user = Post::first(['title' => 'How Mongolid saved the day']);
+$post = Post::first(['title' => 'How Mongolid saved the day']);
 ```
 
 #### Retrieving many documents by attribute
