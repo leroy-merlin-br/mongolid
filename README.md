@@ -21,7 +21,7 @@ Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementatio
 **Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
 ## Requirements
-- PHP **7.1** or superior
+- PHP **7.3** or superior
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 
 ## Installation

@@ -25,10 +25,10 @@
         "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
-        "leroy-merlin-br/coding-standard": "^1.0",
-        "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
-        "symfony/var-dumper": "^5.4"
+        "leroy-merlin-br/coding-standard": "^3.0.2",
+        "mockery/mockery": "^1.5.1",
+        "phpunit/phpunit": "^9.5.24",
+        "symfony/var-dumper": "^5.4.11"
     },
     "autoload": {
         "psr-4": {
