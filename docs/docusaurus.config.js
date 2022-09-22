@@ -6,127 +6,163 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+    customFields: {
+        currentVersion: '3.2.0',
+    },
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+    title: 'MongoLid Doc',
+    tagline: 'Mongolid ODM (Object Document Mapper)',
+    url: 'https://leroy-merlin-br.github.io/',
+    baseUrl: '/',
+    onBrokenLinks: 'throw',
+    onBrokenMarkdownLinks: 'warn',
+    favicon: 'img/favicon.ico',
 
-  // Even if you don't use internalization, you can use this field to set useful
-  // metadata like html lang. For example, if your site is Chinese, you may want
-  // to replace "en" with "zh-Hans".
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
-  },
+    // GitHub pages deployment config.
+    // If you aren't using GitHub pages, you don't need these.
+    organizationName: 'Leroy Merlin Brasil', // Usually your GitHub org/user name.
+    projectName: 'MongoLid', // Usually your repo name.
 
-  presets: [
-    [
-      'classic',
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
-        docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-      }),
+    // Even if you don't use internalization, you can use this field to set useful
+    // metadata like html lang. For example, if your site is Chinese, you may want
+    // to replace "en" with "zh-Hans".
+    i18n: {
+        defaultLocale: 'en',
+        locales: ['en'],
+    },
+
+    presets: [
+        [
+            'classic',
+            /** @type {import('@docusaurus/preset-classic').Options} */
+            ({
+                docs: {
+                    path: 'docs',
+                    routeBasePath: 'docs',
+                    sidebarPath: require.resolve('./sidebars.js'),
+                    lastVersion: 'current',
+                    versions: {
+                        current: {
+                            label: '3.2.0',
+                            path: '3.2.0',
+                        },
+                    },
+                    // // Please change this to your repo.
+                    // // Remove this to remove the "edit this page" links.
+                    // editUrl:
+                    //     'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                },
+                // blog: {
+                //     showReadingTime: true,
+                //     // Please change this to your repo.
+                //     // Remove this to remove the "edit this page" links.
+                //     editUrl:
+                //         'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                // },
+                theme: {
+                    customCss: require.resolve('./src/css/custom.css'),
+                },
+            }),
+        ],
     ],
-  ],
 
-  themeConfig:
+    plugins: [
+        [
+            'content-docs',
+            /** @type {import('@docusaurus/plugin-content-docs').Options} */
+            ({
+                id: 'about',
+                path: 'about',
+                routeBasePath: 'about',
+            }),
+        ],
+    ],
+
+    themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
-      navbar: {
-        title: 'My Site',
-        logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
-        },
-        items: [
-          {
-            type: 'doc',
-            docId: 'intro',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          {to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: 'https://github.com/facebook/docusaurus',
-            label: 'GitHub',
-            position: 'right',
-          },
-        ],
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Tutorial',
-                to: '/docs/intro',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
-              {
-                label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
-    }),
+        ({
+            navbar: {
+                title: 'Mongolid',
+                logo: {
+                    alt: 'MongoLid ODM',
+                    src: 'img/mongolid.svg',
+                },
+                items: [
+                    {
+                        type: 'doc',
+                        docId: 'quick-start',
+                        position: 'left',
+                        label: 'Get started',
+                    },
+                    {
+                        to: '/about/license',
+                        label: 'About',
+                        position: 'left',
+                        activeBaseRegex: `/about/`,
+                    },
+                    {
+                        type: 'docsVersionDropdown',
+                        position: 'right',
+                    },
+                    {
+                        href: 'https://github.com/leroy-merlin-br/mongolid',
+                        label: 'GitHub',
+                        position: 'right',
+                    },
+                ],
+            },
+            footer: {
+                style: 'dark',
+                links: [
+                    {
+                        title: 'Related Projects',
+                        items: [
+                            {
+                                label: 'MongoLid Laravel',
+                                to: 'https://github.com/leroy-merlin-br/mongolid-laravel',
+                            },
+                            {
+                                label: 'MongoLid Passport',
+                                to: 'https://github.com/leroy-merlin-br/mongolid-passport',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Where we are',
+                        items: [
+                            {
+                                label: 'Ecommerce',
+                                href: 'https://www.leroymerlin.com.br',
+                            },
+                            {
+                                label: 'Twitter @LeroyMerlinBRA',
+                                href: 'https://twitter.com/LeroyMerlinBRA',
+                            },
+                            {
+                                label: 'Part of group Adeo',
+                                href: 'https://github.com/enterprises/groupe-adeo',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'More',
+                        items: [
+                            {
+                                label: 'GitHub',
+                                href: 'https://leroy-merlin-br.github.io/mongolid',
+                            },
+                        ],
+                    },
+                ],
+                copyright: `Copyright © ${new Date().getFullYear()} MongoLid Doc, Inc. Built with Docusaurus.`,
+            },
+            prism: {
+                // theme: require('prism-react-renderer/themes/dracula'),
+                theme: lightCodeTheme,
+                darkTheme: darkCodeTheme,
+                additionalLanguages: ['php'],
+            },
+        }),
 };
 
 module.exports = config;

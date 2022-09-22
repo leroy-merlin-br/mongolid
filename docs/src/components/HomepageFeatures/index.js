@@ -1,35 +1,36 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import Link from "@docusaurus/Link";
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'Keep Simple',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Mongolid provides a beautiful, simple implementation for working with MongoDB.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Easy to Use',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+          Each database collection can have a corresponding "Model" which is used to interact with that collection.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Laravel Integration',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+          If you are working with Laravel, take a look at&nbsp;
+          <Link to="https://github.com/leroy-merlin-br/mongolid-laravel" className="badge badge--secondary">
+              mongolid-laravel repository
+          </Link>.
       </>
     ),
   },
