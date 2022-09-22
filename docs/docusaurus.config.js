@@ -13,10 +13,11 @@ const config = {
     title: 'MongoLid Doc',
     tagline: 'Mongolid ODM (Object Document Mapper)',
     url: 'https://leroy-merlin-br.github.io/',
-    baseUrl: '/',
+    baseUrl: '/mongolid/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
-    favicon: 'img/favicon.ico',
+    trailingSlash: false,
+    favicon: 'img/mongolid.ico',
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.

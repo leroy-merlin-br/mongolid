@@ -14,7 +14,7 @@ So the model doesn't have a collection property defined.
 Upon retrieving this relationship, you will have a model filled with the data recorded in the parent document.
 
 You can see how it works here:
-- [Embeds](embeds)
+- [Embeds](embeds.md)
 
 ---
 
@@ -25,4 +25,4 @@ however, to resolve the references, client-side applications must issue follow-u
 In other words, using references requires more roundtrips to the server.
 
 You can see how it works here:
-- [References](references)
+- [References](references.md)

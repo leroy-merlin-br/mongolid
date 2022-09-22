@@ -3,7 +3,7 @@
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
 
-- [Legacy embeds](legacy/embeds.md) *For compatibility with version 2.x*
+- [Legacy embeds](docs/legacy/embeds.md) *For compatibility with version 2.x*
 
 ---
 

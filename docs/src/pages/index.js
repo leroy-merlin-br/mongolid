@@ -38,11 +38,10 @@ function HomepageHeader() {
 }
 
 export default function Home() {
-    const {siteConfig} = useDocusaurusContext();
     return (
         <Layout
-            title={`Hello from ${siteConfig.title}`}
-            description="Description will go into a meta tag in <head />">
+            title="Easy, powerful and ultrafast ODM"
+            description="Mongolid provides a beautiful, simple implementation for working with MongoDB.">
             <HomepageHeader />
             <main>
                 <HomepageFeatures />

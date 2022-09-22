@@ -1,9 +1,7 @@
 # Embeds Relationships
 
-Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) to learn more how to take advantage of document embedding.
-
-- [Embeds One](#embeds-one)
-- [Embeds Many](#embeds-many)
+Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
+to learn more how to take advantage of document embedding.
 
 ---
 
