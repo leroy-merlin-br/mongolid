@@ -20,8 +20,8 @@ const config = {
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
-    organizationName: 'Leroy Merlin Brasil', // Usually your GitHub org/user name.
-    projectName: 'MongoLid', // Usually your repo name.
+    organizationName: 'leroy-merlin-br', // Usually your GitHub org/user name.
+    projectName: 'mongolid', // Usually your repo name.
 
     // Even if you don't use internalization, you can use this field to set useful
     // metadata like html lang. For example, if your site is Chinese, you may want

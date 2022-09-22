@@ -135,7 +135,7 @@ This statement will perform the following:
 
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
 - Query for all the posts with the `_id` in the user's _posts_ attribute
-- Return the [`Mongolid\Cursor\Cursor`](/../cursor) with the related posts
+- Return the [`Mongolid\Cursor\Cursor`](docs/cursor.md) with the related posts
 :::
 
 In order to set a reference to a document use the attachment method, or it's alias. For example:

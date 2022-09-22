@@ -21,7 +21,7 @@ If you try to create references between documents like you would do in a relatio
 
 
 
-[Legacy References](/../legacy/references) *For compatibility with version 2.x*
+[Legacy References](docs/legacy/references.md) *For compatibility with version 2.x*
 
 ---
 
@@ -118,7 +118,7 @@ Once the relationship is defined, we may retrieve it using the following method:
 :::info Explanation:
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
 - Query for all the posts with the `_id` in the user's _posts_ attribute and return a relationship object
-- Method `get()` will return the [`Mongolid\Cursor\Cursor`](cursor.md) with the related posts
+- Method `get()` will return the [`Mongolid\Cursor\Cursor`](docs/cursor.md) with the related posts
 :::
 
 In order to set a reference to a document use the `attach` method. For example:
