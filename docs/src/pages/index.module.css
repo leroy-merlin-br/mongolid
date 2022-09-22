@@ -8,6 +8,11 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-image: url("../../static/img/mongolid-header.png"), linear-gradient(to right, #f8f8f8 25%, #e3e3e3, #f8f8f8 78%);
+  background-color: #f8f8f8;
+  background-repeat: no-repeat;
+  color: #6f4e38;
+  background-position: top;
 }
 
 @media screen and (max-width: 996px) {
