@@ -1,9 +1,9 @@
 name: docs-deployment-test
 
 on:
-  push:
+  pull_request:
     branches:
-      - docs/update-workflow
+      - v3.x
     paths:
       - 'docs/**'
 
@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
+#          cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
