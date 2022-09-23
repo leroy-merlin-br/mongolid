@@ -1,12 +1,11 @@
 name: docs-deploy-github-pages
 
-on: workflow_dispatch
-#on:
-#  push:
-#    branches:
-#      - v3.x
-#    paths:
-#      - 'docs/**'
+on:
+  push:
+    branches:
+      - v3.x
+    paths:
+      - 'docs/**'
 
 jobs:
   deploy:
