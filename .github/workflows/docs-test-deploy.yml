@@ -13,13 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: docs
+        working-directory: 'docs'
     steps:
       - uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          working-directory: docs
           node-version: 18
           cache: npm
 
