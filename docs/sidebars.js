@@ -23,7 +23,7 @@ const sidebars = {
 
   // But you can create a sidebar manually
   // tutorialSidebar: [
-  //   'quick-start',
+  //   'tutorial',
   //   {
   //     type: 'category',
   //     label: 'Tutorial',
