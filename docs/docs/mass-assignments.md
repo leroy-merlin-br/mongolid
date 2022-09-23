@@ -1,4 +1,5 @@
 ---
+id: mass-assignments
 sidebar_position: 4
 ---
 
