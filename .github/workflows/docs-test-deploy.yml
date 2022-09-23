@@ -17,9 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install node
-        run: cd docs
         uses: actions/setup-node@v3
         with:
+          working-directory: docs
           node-version: 18
           cache: npm
 
