@@ -7,20 +7,20 @@ on:
     paths:
       - 'docs/**'
 
-env:
-  GITHUB_WORKSPACE: docs
-
 jobs:
   test-deploy:
     name: Test docs deployment
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ env.GITHUB_WORKSPACE }}
+        working-directory: docs
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - name: Install node
+        run: cd docs
+        uses: actions/setup-node@v3
         with:
+          working-directory: docs
           node-version: 18
           cache: npm
 
