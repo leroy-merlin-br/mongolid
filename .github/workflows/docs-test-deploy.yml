@@ -1,9 +1,9 @@
 name: docs-deployment-test
 
 on:
-  pull_request:
+  push:
     branches:
-      - v3.x
+      - docs/update-workflow
     paths:
       - 'docs/**'
 
@@ -20,7 +20,6 @@ jobs:
         run: cd docs
         uses: actions/setup-node@v3
         with:
-          working-directory: docs
           node-version: 18
           cache: npm
 
