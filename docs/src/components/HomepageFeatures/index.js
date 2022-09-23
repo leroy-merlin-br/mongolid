@@ -5,8 +5,8 @@ import Link from "@docusaurus/Link";
 
 const FeatureList = [
   {
-    title: 'Keep Simple',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Keep It Simple',
+    Svg: require('@site/static/img/gummy-camping.svg').default,
     description: (
       <>
         Mongolid provides a beautiful, simple implementation for working with MongoDB.
@@ -15,22 +15,22 @@ const FeatureList = [
   },
   {
     title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/gummy-pocket-knife.svg').default,
     description: (
       <>
-          Each database collection can have a corresponding "Model" which is used to interact with that collection.
+        Each database collection can have a corresponding "Model" which is used to interact with that collection.
       </>
     ),
   },
   {
     title: 'Laravel Integration',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/gummy-experiment-lab.svg').default,
     description: (
       <>
-          If you are working with Laravel, take a look at&nbsp;
-          <Link to="https://github.com/leroy-merlin-br/mongolid-laravel" className="badge badge--secondary">
-              mongolid-laravel repository
-          </Link>.
+        If you are working with Laravel, take a look at&nbsp;
+        <Link to="https://github.com/leroy-merlin-br/mongolid-laravel" className="badge badge--secondary">
+          mongolid-laravel repository
+        </Link>.
       </>
     ),
   },
