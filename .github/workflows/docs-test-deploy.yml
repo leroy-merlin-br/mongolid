@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ GITHUB_WORKSPACE }}
+        working-directory: ${{ env.GITHUB_WORKSPACE }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
