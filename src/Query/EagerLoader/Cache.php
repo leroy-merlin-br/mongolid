@@ -5,9 +5,10 @@ use Iterator;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Query\EagerLoader\Extractor;
 use Mongolid\Util\CacheComponentInterface;
 
-class EagerLoader
+class Cache
 {
     public function cache(Iterator $models, array $eagerLoadModels = []): void
     {
@@ -17,32 +18,16 @@ class EagerLoader
 
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);
+        $extractor = new Extractor($eagerLoadModels);
 
         foreach ($models as $model) {
             // Convert to array to make sure the methods
             // and objects are always equals.
             $model = (array) $model;
-            foreach ($eagerLoadModels as $eagerLoadKey => $loadModel) {
-                $key = $loadModel['key'] ?? '_id';
-                if ($this->keyHasDot($key)) {
-                    $extractedDots = explode('.', $key);
-                    $method = $extractedDots[0];
-                    $attribute = $extractedDots[1];
-                    foreach ($model[$method] ?? [] as $sku) {
-                        $id = $sku[$attribute];
-                        if ($id instanceof ObjectId) {
-                            $id = (string) $id;
-                        }
-                        $eagerLoadModels[$eagerLoadKey]['ids'][$id] = $id;
-                    }
-                } else {
-                    $id = $model[$key];
-                    $eagerLoadModels[$eagerLoadKey]['ids'][] = $id;
-                }
-            }
+            $extractor->extractFrom($model);
         }
 
-        foreach ($eagerLoadModels as $loadModel) {
+        foreach ($extractor->getRelatedModels() as $loadModel) {
             $model = new $loadModel['model'];
             $ids = array_values($loadModel['ids']);
             $query = ['_id' => ['$in' => $ids]];
@@ -78,5 +63,28 @@ class EagerLoader
     {
         return empty($eagerLoadModels)
             || !count($models);
+    }
+
+    public function extractFromEmbeddedModel(array $model, string $key): array
+    {
+        list($method, $attribute) = explode('.', $key);
+        foreach ($model[$method] ?? [] as $embeddedModel) {
+            $ids = array_merge(
+                $ids ?? [],
+                $this->extractFromModel($embeddedModel, $attribute)
+            );
+        }
+
+        return $ids ?? [];
+    }
+
+    private function extractFromModel(array $model, string $key): array
+    {
+        $id = $model[$key];
+        if ($id instanceof ObjectId) {
+            $id = (string) $id;
+        }
+
+        return [$id => $id];
     }
 }

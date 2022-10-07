@@ -97,8 +97,7 @@ class SchemaCacheableCursor extends SchemaCursor
         // Return the documents iterator
         $this->documents = new ArrayIterator($this->documents);
 
-
-        (new EagerLoader())->cache(
+        Container::make(EagerLoader::class)->cache(
             $this->documents,
             $this->params[1]['eagerLoads'] ?? []
         );
