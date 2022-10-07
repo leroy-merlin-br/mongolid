@@ -11,6 +11,7 @@ use Mongolid\LegacyRecord;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
 use Mongolid\Schema\Schema;
+use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -29,6 +30,21 @@ trait HasLegacyRelationsTrait
      */
     protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
+        /** @var CacheComponentInterface $cacheComponent */
+        $cacheComponent = Container::make(CacheComponentInterface::class);
+
+//        $calledMethods = $this->guessCalledMethodFrom($entity);
+
+//        foreach ($calledMethods as $calledMethod) {
+//            // price, prices
+//            $eagerLoadedAttribute = "eager_loaded_{$calledMethod}";
+//
+//            if ($cachedField = $this->$eagerLoadedAttribute) {
+//                return current($cachedField);
+//            }
+//        }
+//        $calledMethod = debug_backtrace()[2]['function'];
+
         $referenced_id = $this->$field;
 
         if (is_array($referenced_id) && isset($referenced_id[0])) {
@@ -36,6 +52,12 @@ trait HasLegacyRelationsTrait
         }
 
         $entityInstance = Container::make($entity);
+
+        $cacheKey = $this->generateCacheKey($entityInstance->getCollectionName(), $referenced_id);
+
+        if ($document = $cacheComponent->get($cacheKey)) {
+            return $document;
+        }
 
         if ($entityInstance instanceof Schema) {
             $dataMapper = Container::make(DataMapper::class);
@@ -176,5 +198,20 @@ trait HasLegacyRelationsTrait
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
+    }
+
+    protected function guessCalledMethodFrom(string $entity): array
+    {
+        $namespaceAsArray = explode('\\', $entity); // Kameleon\Product\Price
+        $className = array_pop($namespaceAsArray); // Price
+        $method = lcfirst($className); // ->price
+        $pluralizedMethod = Str::plural($method);
+
+        return [$method, $pluralizedMethod];
+    }
+
+    protected function generateCacheKey(string $collection, $id): string
+    {
+        return sprintf('%s:%s', $collection, $id);
     }
 }

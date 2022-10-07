@@ -8,6 +8,7 @@ use Mongolid\Container\Container;
 use Mongolid\Cursor\CacheableCursor;
 use Mongolid\Cursor\Cursor;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\Cursor\EagerLoadingCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
@@ -207,7 +208,10 @@ class Builder
             'find',
             [
                 $this->prepareValueQuery($query),
-                ['projection' => $this->prepareProjection($projection)],
+                [
+                    'projection' => $this->prepareProjection($projection),
+                    'eagerLoads' => $model->with ?? [],
+                ],
             ]
         );
     }

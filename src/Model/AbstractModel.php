@@ -31,6 +31,8 @@ abstract class AbstractModel implements ModelInterface
      */
     protected $dynamic = true;
 
+    public $with = [];
+
     /**
      * Whether the model should manage the `created_at` and `updated_at`
      * timestamps automatically.
