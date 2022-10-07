@@ -53,7 +53,7 @@ final class EagerLoadingTest extends IntegrationTestCase
         $this->assertTrue($product2->save());
         $this->assertTrue($product3->save());
 
-        $cursor = Product::all();
+        $cursor = Product::where([], [], true);
 
         foreach ($cursor as $product) {
             echo 'Product: ' .$product->name . PHP_EOL;

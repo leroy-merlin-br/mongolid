@@ -259,10 +259,10 @@ class DataMapper implements HasSchemaInterface
         $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
 
         $model = new $this->schema->entityClass;
-
-        if ($model->with) {
-            $cursorClass = EagerLoadedCursor::class;
-        }
+//
+//        if ($model->with) {
+//            $cursorClass = EagerLoadedCursor::class;
+//        }
 
         return new $cursorClass(
             $this->schema,
@@ -272,7 +272,7 @@ class DataMapper implements HasSchemaInterface
                 $this->prepareValueQuery($query),
                 [
                     'projection' => $this->prepareProjection($projection),
-                    'eagerLoads' => $model->with,
+                    'eagerLoads' => $model->with ?? [],
                 ],
             ]
         );
