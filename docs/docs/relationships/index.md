@@ -1,8 +1,13 @@
-## Relationships
+# Relationships
 
 Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports four types of relationships:
 
-> **Note:** MongoDB **relationships doesn't works like in a Relational database**. In MongoDB, data modeling decisions involve determining how to structure the documents to model the data effectively. The primary decision is whether to embed or to use references. See [MongoDB - Data Modeling Decisions](https://docs.mongodb.org/manual/core/data-model-design/) for more information on this subject.
+:::info
+MongoDB **relationships doesn't work like in a Relational database**. 
+In MongoDB, data modeling decisions involve determining how to structure the documents to model the data effectively. 
+The primary decision is whether to embed or to use references. 
+See [MongoDB - Data Modeling Decisions](https://docs.mongodb.org/manual/core/data-model-design/) for more information on this subject.
+:::
 
 Embedding relationship is when the embedded document does not have a collection to be saved in the database. 
 So the model doesn't have a collection property defined. 

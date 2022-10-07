@@ -46,14 +46,14 @@ class Manager
      * pure PHP. After adding a connection into the Manager you are ready to
      * persist and query your models.
      *
-     * @param IlluminateContainer $connection connection instance to be used in database interactions
+     * @param Connection $connection connection instance to be used in database interactions
      */
-    public function setConnection(IlluminateContainer $connection): bool
+    public function setConnection(Connection $connection): bool
     {
         $this->init();
-        $this->container->instance(IlluminateContainer::class, $this->connection);
 
         $this->connection = $connection;
+        $this->container->instance(Connection::class, $this->connection);
 
         return true;
     }
