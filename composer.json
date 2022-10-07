@@ -22,7 +22,8 @@
         "ext-mongodb": "*",
         "illuminate/container": "^5.4 || ^6.0 || ^7.0 || ^8.0",
         "illuminate/support": "^5.4 || ^6.0 || ^7.0 || ^8.0",
-        "mongodb/mongodb": "^1.4"
+        "mongodb/mongodb": "^1.4",
+        "symfony/polyfill-php81": "^1.26"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^1.0",
