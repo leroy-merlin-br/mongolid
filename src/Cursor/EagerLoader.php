@@ -10,17 +10,10 @@ use Mongolid\Util\CacheComponentInterface;
 
 class EagerLoader
 {
-    public function where(Iterator $models, array $eagerLoadModels = []): Iterator
+    public function cache(Iterator $models, array $eagerLoadModels = []): void
     {
-        $documents = [];
-        $relatedModels = [];
-
-        if (empty($eagerLoadModels)) {
-            return $models;
-        }
-
-        if (!count($models)) {
-            return $models;
+        if ($this->shouldNotCache($models, $eagerLoadModels)) {
+            return;
         }
 
         /** @var CacheComponentInterface $cacheComponent */
@@ -30,7 +23,6 @@ class EagerLoader
             // Convert to array to make sure the methods
             // and objects are always equals.
             $model = (array) $model;
-            $documents[] = $model;
             foreach ($eagerLoadModels as $eagerLoadKey => $loadModel) {
                 $key = $loadModel['key'] ?? '_id';
                 if ($this->keyHasDot($key)) {
@@ -51,57 +43,16 @@ class EagerLoader
             }
         }
 
-        foreach ($eagerLoadModels as $eagerLoadKey => $loadModel) {
+        foreach ($eagerLoadModels as $loadModel) {
             $model = new $loadModel['model'];
             $ids = array_values($loadModel['ids']);
             $query = ['_id' => ['$in' => $ids]];
 
             foreach ($model->where($query) as $relatedModel) {
-                $id = $relatedModel->_id;
-                if ($id instanceof ObjectId) {
-                    $id = (string) $id;
-                }
                 $cacheKey = $this->generateCacheKey($relatedModel);
                 $cacheComponent->put($cacheKey, $relatedModel, 36);
-                $relatedModels[$eagerLoadKey][$id][] = $relatedModel;
             }
         }
-
-        return $models;
-
-//        $newDocuments = [];
-//
-//        foreach ($documents as $document) {
-//            foreach ($eagerLoadModels as $eagerLoadKey => $loadModel) {
-//                $key = $loadModel['key'];
-//                if ($this->keyHasDot($key)) {
-//                    $extractedDots = explode('.', $key);
-//                    $method = $extractedDots[0];
-//                    $attribute = $extractedDots[1];
-//                    $newEmbedded = [];
-//                    foreach ($document[$method] ?? [] as $sku) {
-//                        $id = $sku[$attribute];
-//                        if ($id instanceof ObjectId) {
-//                            $id = (string) $id;
-//                        }
-//                        $skuKey = "eager_loaded_{$eagerLoadKey}";
-//                        $sku[$skuKey] = $relatedModels[$eagerLoadKey][$id];
-//                        $newEmbedded[] = $sku;
-//                    }
-//                    $document[$method] = $newEmbedded;
-//                } else {
-//                    $id = $document[$key];
-//                    if ($id instanceof ObjectId) {
-//                        $id = (string) $id;
-//                    }
-//                    $relatedModelKey = "eager_loaded_{$eagerLoadKey}";
-//                    $document[$relatedModelKey] = $relatedModels[$eagerLoadKey][$id];
-//                }
-//            }
-//            $newDocuments[] = $document;
-//        }
-
-        return new ArrayIterator($newDocuments);
     }
 
     private function keyHasDot($key)
@@ -122,5 +73,11 @@ class EagerLoader
         }
 
         return sprintf('%s:%s', $model->getCollectionName(), $id);
+    }
+
+    private function shouldNotCache(Iterator $models, array $eagerLoadModels): bool
+    {
+        return empty($eagerLoadModels)
+            || !count($models);
     }
 }
