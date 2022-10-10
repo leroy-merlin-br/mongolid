@@ -6,6 +6,7 @@ use Iterator;
 use ArrayIterator;
 use ErrorException;
 use Mongolid\Container\Container;
+use Mongolid\Query\EagerLoader\Cache;
 use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
