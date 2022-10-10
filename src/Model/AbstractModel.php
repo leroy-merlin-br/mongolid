@@ -9,6 +9,7 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
+use Mongolid\Query\EagerLoader\EagerLoadsModelsTrait;
 use Mongolid\Query\ModelMapper;
 
 /**
@@ -20,6 +21,7 @@ abstract class AbstractModel implements ModelInterface
 {
     use HasAttributesTrait;
     use HasRelationsTrait;
+    use EagerLoadsModelsTrait;
 
     /**
      * The $dynamic property tells if the object will accept additional fields
@@ -30,8 +32,6 @@ abstract class AbstractModel implements ModelInterface
      * @var bool
      */
     protected $dynamic = true;
-
-    public $with = [];
 
     /**
      * Whether the model should manage the `created_at` and `updated_at`

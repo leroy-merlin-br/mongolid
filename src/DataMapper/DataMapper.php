@@ -268,7 +268,7 @@ class DataMapper implements HasSchemaInterface
                 $this->prepareValueQuery($query),
                 [
                     'projection' => $this->prepareProjection($projection),
-                    'eagerLoads' => $model->with ?? [],
+                    'eagerLoads' => $model->getEagerLoadedModels(),
                 ],
             ]
         );

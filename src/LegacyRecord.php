@@ -11,6 +11,7 @@ use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Query\EagerLoader\EagerLoadsModelsTrait;
 use Mongolid\Query\ModelMapper;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\HasSchemaInterface;
@@ -25,6 +26,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
 {
     use HasLegacyAttributesTrait;
     use HasLegacyRelationsTrait;
+    use EagerLoadsModelsTrait;
 
     /**
      * Name of the collection where this kind of Entity is going to be saved or
