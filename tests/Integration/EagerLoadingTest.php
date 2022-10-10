@@ -56,13 +56,15 @@ final class EagerLoadingTest extends IntegrationTestCase
         $cursor = Product::where([], [], true);
 
         foreach ($cursor as $product) {
-            echo 'Product: ' .$product->name . PHP_EOL;
-            echo 'Price: ' .$product->price()->value . PHP_EOL;
+            // Call product price.
+            $priceId = $product->price()->_id;
+            $this->assertTrue($cache->has("prices:$priceId"));
             foreach ($product->skus() as $sku) {
-                echo 'SKU: ' .$sku->name . PHP_EOL;
-                echo 'SKU Name: ' .$sku->shop()->name . PHP_EOL;
+                // Call shop on every sku instance.
+                $shopId = $sku->shop()->_id;
+                $this->assertTrue($cache->has("shops:$shopId"));
             }
-        };
+        }
     }
 
     private function createProductWithPrice(string $name, float $price): Product
