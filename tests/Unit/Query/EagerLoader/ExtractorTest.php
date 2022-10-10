@@ -83,27 +83,11 @@ class ExtractorTest extends TestCase
                 'shop_id' => 12345
             ]
         ];
-        $expected = [
-            'price' => [
-                'key' => '_id',
-                'model' => 'Mongolid\Tests\Stubs\Price',
-                'ids' => [
-                    123 => 123,
-                ],
-            ],
-            'shop' => [
-                'key' => 'skus.shop_id',
-                'model' => 'Mongolid\Tests\Stubs\Shop',
-                'ids' => [
-                    12345 => 12345,
-                ],
-            ],
-        ];
 
         // Expectations
         $this->expectException(EagerLoaderException::class);
 
         // Actions
-        $result = $extractor->extractFrom($product->toArray());
+        $extractor->extractFrom($product->toArray());
     }
 }
