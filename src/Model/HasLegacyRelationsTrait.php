@@ -30,9 +30,6 @@ trait HasLegacyRelationsTrait
      */
     protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
-        /** @var CacheComponentInterface $cacheComponent */
-        $cacheComponent = Container::make(CacheComponentInterface::class);
-
         $referencedId = $this->$field;
 
         if (is_array($referencedId) && isset($referencedId[0])) {
@@ -41,8 +38,13 @@ trait HasLegacyRelationsTrait
 
         $entityInstance = Container::make($entity);
 
+        /** @var CacheComponentInterface $cacheComponent */
+        $cacheComponent = Container::make(CacheComponentInterface::class);
         $cacheKey = $this->generateCacheKey($entityInstance->getCollectionName(), $referencedId);
 
+        // Checks if the model was already eager loaded.
+        // if so, we don't need to query database to
+        // use the document.
         if ($document = $cacheComponent->get($cacheKey)) {
             return $document;
         }
