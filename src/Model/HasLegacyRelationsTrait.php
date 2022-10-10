@@ -33,22 +33,10 @@ trait HasLegacyRelationsTrait
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);
 
-//        $calledMethods = $this->guessCalledMethodFrom($entity);
+        $referencedId = $this->$field;
 
-//        foreach ($calledMethods as $calledMethod) {
-//            // price, prices
-//            $eagerLoadedAttribute = "eager_loaded_{$calledMethod}";
-//
-//            if ($cachedField = $this->$eagerLoadedAttribute) {
-//                return current($cachedField);
-//            }
-//        }
-//        $calledMethod = debug_backtrace()[2]['function'];
-
-        $referenced_id = $this->$field;
-
-        if (is_array($referenced_id) && isset($referenced_id[0])) {
-            $referenced_id = $referenced_id[0];
+        if (is_array($referencedId) && isset($referencedId[0])) {
+            $referencedId = $referencedId[0];
         }
 
         $entityInstance = Container::make($entity);
@@ -198,16 +186,6 @@ trait HasLegacyRelationsTrait
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
-    }
-
-    protected function guessCalledMethodFrom(string $entity): array
-    {
-        $namespaceAsArray = explode('\\', $entity); // Kameleon\Product\Price
-        $className = array_pop($namespaceAsArray); // Price
-        $method = lcfirst($className); // ->price
-        $pluralizedMethod = Str::plural($method);
-
-        return [$method, $pluralizedMethod];
     }
 
     protected function generateCacheKey(string $collection, $id): string
