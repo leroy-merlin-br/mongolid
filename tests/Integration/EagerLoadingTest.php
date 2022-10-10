@@ -13,25 +13,6 @@ use Mongolid\Util\CacheComponentInterface;
 
 final class EagerLoadingTest extends IntegrationTestCase
 {
-    public function testShouldEagerLoadingAllPrices(): void
-    {
-        Container::instance(CacheComponentInterface::class, new CacheComponent);
-        $this->createProductWithPrice('Playstation', 299.90);
-        $this->createProductWithPrice('Xbox', 199.90);
-        $this->createProductWithPrice('Switch', 399.90);
-
-        $cursor = Product::all();
-
-        dd($cursor->first()->price());
-
-//        foreach ($cursor as $product) {
-//            dump(['felix',   $product->price->value, (string) $product->price->_id]);
-//        }
-
-//        $this->assertInstanceOf(Price::class, $product->price);
-//        $this->assertSame($product->price->value, 299.90);
-    }
-
     public function testShouldEagerLoadingAllShops(): void
     {
         $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
