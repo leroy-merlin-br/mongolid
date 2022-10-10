@@ -41,7 +41,7 @@ trait HasLegacyRelationsTrait
 
         $entityInstance = Container::make($entity);
 
-        $cacheKey = $this->generateCacheKey($entityInstance->getCollectionName(), $referenced_id);
+        $cacheKey = $this->generateCacheKey($entityInstance->getCollectionName(), $referencedId);
 
         if ($document = $cacheComponent->get($cacheKey)) {
             return $document;
@@ -51,10 +51,10 @@ trait HasLegacyRelationsTrait
             $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->first(['_id' => $referenced_id], [], $cacheable);
+            return $dataMapper->first(['_id' => $referencedId], [], $cacheable);
         }
 
-        return $entityInstance::first(['_id' => $referenced_id], [], $cacheable);
+        return $entityInstance::first(['_id' => $referencedId], [], $cacheable);
     }
 
     /**
