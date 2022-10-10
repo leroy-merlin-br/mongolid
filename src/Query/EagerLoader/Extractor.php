@@ -2,7 +2,6 @@
 namespace Mongolid\Query\EagerLoader;
 
 use MongoDB\BSON\ObjectId;
-use function Mongolid\Cursor\EagerLoader\str_contains;
 
 /**
  * Responsible for extract ids from the model based on its

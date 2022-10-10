@@ -1,11 +1,10 @@
 <?php
-namespace Mongolid\Cursor;
+namespace Mongolid\Query\EagerLoader;
 
 use Iterator;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Query\EagerLoader\Extractor;
 use Mongolid\Util\CacheComponentInterface;
 
 /**
