@@ -8,6 +8,12 @@ use Mongolid\Model\ModelInterface;
 use Mongolid\Query\EagerLoader\Extractor;
 use Mongolid\Util\CacheComponentInterface;
 
+/**
+ * This class is responsible for caching all related models
+ * from a previous query in order to avoid the N+1 problem.
+ * It also has a limit of models that can be cached
+ * for performance reasons.
+ */
 class Cache
 {
     public function cache(Iterator $models, array $eagerLoadModels = []): void
@@ -20,13 +26,21 @@ class Cache
         $cacheComponent = Container::make(CacheComponentInterface::class);
         $extractor = new Extractor($eagerLoadModels);
 
+        // Loops through all models returned by the previous query
+        // and cache all related ids. These ids can come from
+        // embedded models or referenced models.
         foreach ($models as $model) {
-            // Convert to array to make sure the methods
-            // and objects are always equals.
+            // The model received here may be either an array from mongodb
+            // or a cached model as a serialized array.
+            // That's why we always will force an array to be used here.
+            // It will ensure that we are only working with model arrays.
             $model = (array) $model;
             $extractor->extractFrom($model);
         }
 
+        // With all models ids in hand. We need to query mongodb
+        // to get all models instances and cache it into
+        // our cache component.
         foreach ($extractor->getRelatedModels() as $loadModel) {
             $model = new $loadModel['model'];
             $ids = array_values($loadModel['ids']);
@@ -39,15 +53,8 @@ class Cache
         }
     }
 
-    private function keyHasDot($key)
-    {
-        return str_contains($key, '.');
-    }
-
     /**
-     * Generates an unique cache key for the cursor in it's current state.
-     *
-     * @return string cache key to identify the query of the current cursor
+     * Generates a unique cache key for the cursor in its current state.
      */
     protected function generateCacheKey(ModelInterface $model): string
     {
@@ -63,28 +70,5 @@ class Cache
     {
         return empty($eagerLoadModels)
             || !count($models);
-    }
-
-    public function extractFromEmbeddedModel(array $model, string $key): array
-    {
-        list($method, $attribute) = explode('.', $key);
-        foreach ($model[$method] ?? [] as $embeddedModel) {
-            $ids = array_merge(
-                $ids ?? [],
-                $this->extractFromModel($embeddedModel, $attribute)
-            );
-        }
-
-        return $ids ?? [];
-    }
-
-    private function extractFromModel(array $model, string $key): array
-    {
-        $id = $model[$key];
-        if ($id instanceof ObjectId) {
-            $id = (string) $id;
-        }
-
-        return [$id => $id];
     }
 }

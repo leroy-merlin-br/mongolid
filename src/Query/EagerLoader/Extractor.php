@@ -1,14 +1,20 @@
 <?php
-
 namespace Mongolid\Query\EagerLoader;
-
 
 use MongoDB\BSON\ObjectId;
 use function Mongolid\Cursor\EagerLoader\str_contains;
 
+/**
+ * Responsible for extract ids from the model based on its
+ * relationship. You can use dot notations in order to
+ * extract ids from your embedded models.
+ */
 class Extractor
 {
     /**
+     * This array will handle all related models extracted
+     * from the models passed by.
+     *
      * @var array
      */
     private $relatedModels;
@@ -18,10 +24,19 @@ class Extractor
         $this->relatedModels = $relatedModels;
     }
 
+    /**
+     * The model received here may be either an array from mongodb
+     * or a cached model as a serialized array.
+     * That's why we always will force an array to be used here.
+     * It will ensure that we are only working with model arrays.
+     */
     public function extractFrom(array $model): array
     {
         foreach ($this->relatedModels as $eagerLoadKey => $loadModel) {
             $key = $this->extractKeyFrom($loadModel);
+
+            // If the key extract contains '.' notations means that
+            // we want to extract models from embedded relations.
             if ($this->keyHasDots($key)) {
                 $this->extractFromEmbeddedModel($eagerLoadKey, $model, $key);
 
@@ -44,14 +59,29 @@ class Extractor
         $this->relatedModels[$eagerLoadKey]['ids'][$id] = $id;
     }
 
-    private function keyHasDots($key)
+    /**
+     * The user can use dot notations to get models from an
+     * embedded relationship. For now, we are only getting
+     * the first children for performance reasons.
+     *
+     * @example 'skus.shop_id' => I want all shop ids from embedded skus.
+     */
+    private function keyHasDots($key): bool
     {
         return str_contains($key, '.');
     }
 
+    /**
+     * Using dot notations, the user can specify what ids on embedded
+     * models he wants to extract. So, our job is to loop on every
+     * embedded model to get the id specified on the key.
+     */
     public function extractFromEmbeddedModel(string $eagerLoadKey, array $model, string $key): array
     {
         list($method, $attribute) = explode('.', $key);
+
+        // As we are working with models as array, this give us
+        // flexibility to use it as array instead of calling methods.
         foreach ($model[$method] ?? [] as $embeddedModel) {
             $this->extractFromModel($eagerLoadKey, $embeddedModel, $attribute);
         }
@@ -62,6 +92,10 @@ class Extractor
     private function extractFromModel(string $eagerLoadKey, array $model, string $key): void
     {
         $id = $model[$key];
+
+        // We only want to object ids to string to give
+        // us some flexibility on array indexes.
+        // any other type of ids should remain the same.
         if ($id instanceof ObjectId) {
             $id = (string) $id;
         }
@@ -69,6 +103,9 @@ class Extractor
         $this->addIdFor($eagerLoadKey, $id);
     }
 
+    /**
+     * Gets the referenced key from model. Defaults to _id.
+     */
     private function extractKeyFrom(array $eagerLoadModel): string
     {
         return $eagerLoadModel['key'] ?? '_id';
