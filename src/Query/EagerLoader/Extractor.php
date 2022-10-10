@@ -2,6 +2,8 @@
 namespace Mongolid\Query\EagerLoader;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Query\EagerLoader\Exception\EagerLoaderException;
+use Mongolid\Query\EagerLoader\Exception\InvalidModelKeyException;
 
 /**
  * Responsible for extract ids from the model based on its
@@ -90,7 +92,12 @@ class Extractor
 
     private function extractFromModel(string $eagerLoadKey, array $model, string $key): void
     {
-        $id = $model[$key];
+        if (!$id = $model[$key] ?? false) {
+            // In case the referenced key on parent model was not
+            // found on related model, we should warn that the user
+            // is trying to eager load an invalid model.
+            throw new EagerLoaderException('Referenced key was not found on child model.');
+        }
 
         // We only want to object ids to string to give
         // us some flexibility on array indexes.

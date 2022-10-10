@@ -41,7 +41,7 @@ class Cache
         // to get all models instances and cache it into
         // our cache component.
         foreach ($extractor->getRelatedModels() as $loadModel) {
-            $model = new $loadModel['model'];
+            $model = Container::make($loadModel['model']);
             $ids = array_values($loadModel['ids']);
             $query = ['_id' => ['$in' => $ids]];
 
