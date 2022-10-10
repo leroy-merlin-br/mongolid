@@ -42,10 +42,6 @@ class ReferencesOne extends AbstractRelation
             $referencedKey = new ObjectId($referencedKey);
         }
 
-        if ($this->parent->eager_loaded_price) {
-            return $this->parent->eager_loaded_price;
-        }
-
         return $this->modelInstance->first([$this->key => $referencedKey]);
     }
 }
