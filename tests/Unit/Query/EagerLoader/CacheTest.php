@@ -50,6 +50,32 @@ class CacheTest extends TestCase
         $cache->cache($eagerLoadedModels);
     }
 
+    public function testShouldNotCacheIfModelDoesNotHaveIds(): void
+    {
+        // Set
+        $cacheComponent = $this->instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
+        $model = $this->instance(Product::class, m::mock(Product::class));
+        $cache = new Cache($cacheComponent);
+        $eagerLoadedModels = [
+            'key' => '_id',
+            'model' => Product::class,
+        ];
+
+        // Expectations
+        $model->allows('where')
+            ->never();
+
+        $cacheComponent->allows('put')
+            ->never();
+
+        // Actions
+        $cache->cache($eagerLoadedModels);
+    }
+
+
     public function testShouldCacheOnlyALimitedNumberOfProducts(): void
     {
         // Set
