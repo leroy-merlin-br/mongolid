@@ -55,9 +55,6 @@ class ExtractorTest extends TestCase
             ],
         ];
 
-
-        // Expectations
-
         // Actions
         $result = $extractor->extractFrom($product->toArray());
 
