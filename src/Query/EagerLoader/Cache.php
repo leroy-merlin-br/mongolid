@@ -2,10 +2,7 @@
 
 namespace Mongolid\Query\EagerLoader;
 
-
-use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
-use Mongolid\Model\ModelInterface;
 use Mongolid\Util\CacheComponentInterface;
 
 class Cache
@@ -36,7 +33,7 @@ class Cache
         $count = 0;
 
         foreach ($model->where($query) as $relatedModel) {
-            if ($count++ > self::DOCUMENT_LIMIT) {
+            if ($count++ >= self::DOCUMENT_LIMIT) {
                 break;
             }
 
