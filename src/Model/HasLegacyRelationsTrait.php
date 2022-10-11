@@ -10,6 +10,7 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\LegacyRecord;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
+use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
@@ -19,6 +20,8 @@ use Mongolid\Util\ObjectIdUtils;
  */
 trait HasLegacyRelationsTrait
 {
+    use CacheKeyGeneratorTrait;
+
     /**
      * Returns the referenced documents as objects.
      *
@@ -40,7 +43,7 @@ trait HasLegacyRelationsTrait
 
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);
-        $cacheKey = $this->generateCacheKey($entityInstance->getCollectionName(), $referencedId);
+        $cacheKey = $this->generateCacheKey($entityInstance, $referencedId);
 
         // Checks if the model was already eager loaded.
         // if so, we don't need to query database to
@@ -188,10 +191,5 @@ trait HasLegacyRelationsTrait
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
-    }
-
-    protected function generateCacheKey(string $collection, $id): string
-    {
-        return sprintf('%s:%s', $collection, $id);
     }
 }

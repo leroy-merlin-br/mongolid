@@ -12,14 +12,14 @@ use Mongolid\Tests\Stubs\Price;
 use Mongolid\Tests\Stubs\Product;
 use Mongolid\Util\CacheComponentInterface;
 
-class CacheTest extends TestCase
+class EagerLoaderTest extends TestCase
 {
     public function testShouldCacheQueries(): void
     {
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new Cache();
+        $cache = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
@@ -52,7 +52,7 @@ class CacheTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new Cache();
+        $cache = new EagerLoader();
         $product = new Product();
         $id = new ObjectId();
         $product->_id = $id;
@@ -86,7 +86,7 @@ class CacheTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new Cache();
+        $cache = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
@@ -110,7 +110,7 @@ class CacheTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new Cache();
+        $cache = new EagerLoader();
         $products = new ArrayIterator([]);
 
         // Expectations
@@ -136,7 +136,7 @@ class CacheTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new Cache();
+        $cache = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
