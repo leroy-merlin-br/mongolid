@@ -95,7 +95,6 @@ class SchemaCacheableCursor extends SchemaCursor
         // Drops the unserializable DriverCursor.
         $this->cursor = null;
 
-        // Return the documents iterator
         $this->documents = new ArrayIterator($this->documents);
 
         Container::make(EagerLoader::class)->cache(
@@ -103,6 +102,7 @@ class SchemaCacheableCursor extends SchemaCursor
             $this->params[1]['eagerLoads'] ?? []
         );
 
+        // Return the documents iterator
         return $this->documents;
     }
 
