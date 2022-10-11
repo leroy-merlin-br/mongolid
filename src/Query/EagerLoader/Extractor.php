@@ -77,7 +77,7 @@ class Extractor
      * models he wants to extract. So, our job is to loop on every
      * embedded model to get the id specified on the key.
      */
-    public function extractFromEmbeddedModel(string $eagerLoadKey, array $model, string $key): array
+    public function extractFromEmbeddedModel(string $eagerLoadKey, array $model, string $key): void
     {
         list($method, $attribute) = explode('.', $key);
 
@@ -86,8 +86,6 @@ class Extractor
         foreach ($model[$method] ?? [] as $embeddedModel) {
             $this->extractFromModel($eagerLoadKey, $embeddedModel, $attribute);
         }
-
-        return $ids ?? [];
     }
 
     private function extractFromModel(string $eagerLoadKey, array $model, string $key): void
