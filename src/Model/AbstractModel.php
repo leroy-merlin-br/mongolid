@@ -9,7 +9,6 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
-use Mongolid\Query\EagerLoader\EagerLoadsModelsTrait;
 use Mongolid\Query\ModelMapper;
 
 /**
@@ -21,7 +20,17 @@ abstract class AbstractModel implements ModelInterface
 {
     use HasAttributesTrait;
     use HasRelationsTrait;
-    use EagerLoadsModelsTrait;
+
+    /**
+     * This attribute is used to eager load models for
+     * referenced ids. You can eager load any children
+     * models using this parameter. Every time this
+     * model is queried, it will load its referenced
+     * models together.
+     *
+     * @var array
+     */
+    public $with = [];
 
     /**
      * The $dynamic property tells if the object will accept additional fields

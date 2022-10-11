@@ -11,7 +11,6 @@ use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Query\EagerLoader\EagerLoadsModelsTrait;
 use Mongolid\Query\ModelMapper;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\HasSchemaInterface;
@@ -26,7 +25,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
 {
     use HasLegacyAttributesTrait;
     use HasLegacyRelationsTrait;
-    use EagerLoadsModelsTrait;
 
     /**
      * Name of the collection where this kind of Entity is going to be saved or
@@ -66,6 +64,17 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * @var bool
      */
     public $dynamic = true;
+
+    /**
+     * This attribute is used to eager load models for
+     * referenced ids. You can eager load any children
+     * models using this parameter. Every time this
+     * model is queried, it will load its referenced
+     * models together.
+     *
+     * @var array
+     */
+    public $with = [];
 
     /**
      * Whether the model should manage the `created_at` and `updated_at`
