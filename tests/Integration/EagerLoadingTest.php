@@ -34,9 +34,9 @@ final class EagerLoadingTest extends IntegrationTestCase
         $this->assertTrue($product2->save());
         $this->assertTrue($product3->save());
 
-        $cursor = Product::where([], [], true);
+        $products = Product::where([], [], true);
 
-        foreach ($cursor as $product) {
+        foreach ($products as $product) {
             // Call product price.
             $priceId = $product->price()->_id;
             $this->assertTrue($cache->has("prices:$priceId"));
@@ -45,6 +45,27 @@ final class EagerLoadingTest extends IntegrationTestCase
                 $shopId = $sku->shop()->_id;
                 $this->assertTrue($cache->has("shops:$shopId"));
             }
+        }
+    }
+
+    public function testShouldEagerLoadOnlyACertainLimitOfProducts(): void
+    {
+        $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
+        $cacheLimit = 100;
+
+        for ($i = 1; $i < 101; $i++) { // DOCUMENT_LIMIT+1
+            $this->createProductWithPrice("Playstation $i", 100.0 + $i);
+        }
+
+        $products = Product::where([], [], true);
+
+        $count = 0;
+        foreach ($products as $product) {
+            $count++;
+            $hasCache = $count <= $cacheLimit;
+            // Call product price.
+            $priceId = $product->price()->_id;
+            $this->assertSame($cache->has("prices:$priceId"), $hasCache);
         }
     }
 

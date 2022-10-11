@@ -28,7 +28,15 @@ class Cache
     public function cache(array $eagerLoadedModel): void
     {
         $model = Container::make($eagerLoadedModel['model']);
-        $ids = array_values($eagerLoadedModel['ids']);
+        $ids = array_values($eagerLoadedModel['ids'] ?? []);
+
+        // In case there is no IDs, means that either we don't
+        // have any related models or models was not configured
+        // correctly, in both case, we should not cache it.
+        if (empty($ids)) {
+            return;
+        }
+
         $query = ['_id' => ['$in' => $ids]];
         $count = 0;
 
