@@ -15,6 +15,12 @@ use Mongolid\Util\CacheComponentInterface;
  */
 class EagerLoader
 {
+    /**
+     * Limits the number of documents that should be
+     * cached for performance reasons.
+     */
+    public const DOCUMENT_LIMIT = 100;
+
     public function cache(Iterator $models, array $eagerLoadModels = []): void
     {
         if ($this->shouldNotCache($models, $eagerLoadModels)) {
@@ -23,11 +29,16 @@ class EagerLoader
 
         $extractor = new Extractor($eagerLoadModels);
         $cache = Container::make(Cache::class);
+        $count = 0;
 
         // Loops through all models returned by the previous query
         // and cache all related ids. These ids can come from
         // embedded models or referenced models.
         foreach ($models as $model) {
+            if ($count++ >= self::DOCUMENT_LIMIT) {
+                break;
+            }
+
             // The model received here may be either an array from mongodb
             // or a cached model as a serialized array.
             // That's why we always will force an array to be used here.

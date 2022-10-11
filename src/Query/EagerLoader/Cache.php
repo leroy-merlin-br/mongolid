@@ -10,12 +10,6 @@ class Cache
     use CacheKeyGeneratorTrait;
 
     /**
-     * Limits the number of documents that should be
-     * cached for performance reasons.
-     */
-    private const DOCUMENT_LIMIT = 100;
-
-    /**
      * @var CacheComponentInterface
      */
     private $cacheComponent;
@@ -41,7 +35,7 @@ class Cache
         $count = 0;
 
         foreach ($model->where($query) as $relatedModel) {
-            if ($count++ >= self::DOCUMENT_LIMIT) {
+            if ($count++ >= EagerLoader::DOCUMENT_LIMIT) {
                 break;
             }
 
