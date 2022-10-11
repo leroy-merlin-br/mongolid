@@ -19,7 +19,7 @@ class EagerLoaderTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new EagerLoader();
+        $eagerLoader = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
@@ -39,7 +39,7 @@ class EagerLoaderTest extends TestCase
             ->andReturnTrue();
 
         // Actions
-        $cache->cache($products, [
+        $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
                 'model' => Price::class
@@ -52,7 +52,7 @@ class EagerLoaderTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new EagerLoader();
+        $eagerLoader = new EagerLoader();
         $product = new Product();
         $id = new ObjectId();
         $product->_id = $id;
@@ -73,7 +73,7 @@ class EagerLoaderTest extends TestCase
             ->andReturnTrue();
 
         // Actions
-        $cache->cache($products, [
+        $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
                 'model' => Price::class
@@ -86,7 +86,7 @@ class EagerLoaderTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new EagerLoader();
+        $eagerLoader = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
@@ -102,7 +102,7 @@ class EagerLoaderTest extends TestCase
             ->never();
 
         // Actions
-        $cache->cache($products, []);
+        $eagerLoader->cache($products, []);
     }
 
     public function testShouldNotCacheIfCursorIsEmpty(): void
@@ -110,7 +110,7 @@ class EagerLoaderTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new EagerLoader();
+        $eagerLoader = new EagerLoader();
         $products = new ArrayIterator([]);
 
         // Expectations
@@ -123,7 +123,7 @@ class EagerLoaderTest extends TestCase
             ->never();
 
         // Actions
-        $cache->cache($products, [
+        $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
                 'model' => Price::class
@@ -136,7 +136,7 @@ class EagerLoaderTest extends TestCase
         // Set
         $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
         $price = Container::instance(Price::class, m::mock(Price::class));
-        $cache = new EagerLoader();
+        $eagerLoader = new EagerLoader();
         $product = new Product();
         $product->_id = 1234;
 
@@ -154,7 +154,7 @@ class EagerLoaderTest extends TestCase
             ->never();
 
         // Actions
-        $cache->cache($products, [
+        $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
                 'model' => Price::class
