@@ -635,17 +635,14 @@ class DataMapper implements HasSchemaInterface
             }
         }
 
-        if (empty($oldData)) {
-            return;
-        }
-
         $isArrayAssoc = array_is_list($oldData);
-        $removedKeys = array_diff_key($oldData, array_filter($newData));
-        foreach ($removedKeys as $key => $value) {
-            if ($isArrayAssoc && is_integer($key)) {
-                $this->pullNullValues[rtrim($keyfix, '.')] = null;
+        foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
+            if (!isset($newData[$k])) { // removed field
+                if ($isArrayAssoc && is_integer($k)) {
+                    $this->pullNullValues[rtrim($keyfix, '.')] = null;
+                }
+                $changes['$unset']["{$keyfix}{$k}"] = '';
             }
-            $changes['$unset']["{$keyfix}{$key}"] = '';
         }
     }
 
