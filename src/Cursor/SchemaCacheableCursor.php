@@ -6,6 +6,7 @@ use Iterator;
 use ArrayIterator;
 use ErrorException;
 use Mongolid\Container\Container;
+use Mongolid\Query\EagerLoader\EagerLoader;
 use Mongolid\Util\CacheComponentInterface;
 use Traversable;
 
@@ -94,8 +95,15 @@ class SchemaCacheableCursor extends SchemaCursor
         // Drops the unserializable DriverCursor.
         $this->cursor = null;
 
+        $this->documents = new ArrayIterator($this->documents);
+
+        Container::make(EagerLoader::class)->cache(
+            $this->documents,
+            $this->params[1]['eagerLoads'] ?? []
+        );
+
         // Return the documents iterator
-        return $this->documents = new ArrayIterator($this->documents);
+        return $this->documents;
     }
 
     /**

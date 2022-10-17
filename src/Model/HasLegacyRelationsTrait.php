@@ -10,7 +10,9 @@ use Mongolid\DataMapper\DataMapper;
 use Mongolid\LegacyRecord;
 use Mongolid\Model\Exception\NotARelationException;
 use Mongolid\Model\Relations\RelationInterface;
+use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
+use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 /**
@@ -18,6 +20,8 @@ use Mongolid\Util\ObjectIdUtils;
  */
 trait HasLegacyRelationsTrait
 {
+    use CacheKeyGeneratorTrait;
+
     /**
      * Returns the referenced documents as objects.
      *
@@ -29,22 +33,33 @@ trait HasLegacyRelationsTrait
      */
     protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
-        $referenced_id = $this->$field;
+        $referencedId = $this->$field;
 
-        if (is_array($referenced_id) && isset($referenced_id[0])) {
-            $referenced_id = $referenced_id[0];
+        if (is_array($referencedId) && isset($referencedId[0])) {
+            $referencedId = $referencedId[0];
         }
 
         $entityInstance = Container::make($entity);
+
+        /** @var CacheComponentInterface $cacheComponent */
+        $cacheComponent = Container::make(CacheComponentInterface::class);
+        $cacheKey = $this->generateCacheKey($entityInstance, $referencedId);
+
+        // Checks if the model was already eager loaded.
+        // if so, we don't need to query database to
+        // use the document.
+        if ($document = $cacheComponent->get($cacheKey)) {
+            return $document;
+        }
 
         if ($entityInstance instanceof Schema) {
             $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->first(['_id' => $referenced_id], [], $cacheable);
+            return $dataMapper->first(['_id' => $referencedId], [], $cacheable);
         }
 
-        return $entityInstance::first(['_id' => $referenced_id], [], $cacheable);
+        return $entityInstance::first(['_id' => $referencedId], [], $cacheable);
     }
 
     /**

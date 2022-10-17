@@ -7,6 +7,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\Cursor\EagerLoadedCursor;
 use Mongolid\Cursor\SchemaCacheableCursor;
 use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
@@ -257,17 +258,20 @@ class DataMapper implements HasSchemaInterface
     ): CursorInterface {
         $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
 
-        $cursor = new $cursorClass(
+        $model = new $this->schema->entityClass;
+
+        return new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
             [
                 $this->prepareValueQuery($query),
-                ['projection' => $this->prepareProjection($projection)],
+                [
+                    'projection' => $this->prepareProjection($projection),
+                    'eagerLoads' => $model->with ?? [],
+                ],
             ]
         );
-
-        return $cursor;
     }
 
     /**

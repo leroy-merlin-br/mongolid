@@ -528,7 +528,58 @@ final class BuilderTest extends TestCase
         $this->assertInstanceOf(Cursor::class, $result);
         $this->assertSame($collection, $collectionResult);
         $this->assertSame('find', $commandResult);
-        $this->assertSame([$preparedQuery, ['projection' => $projection]], $paramsResult);
+        $this->assertSame([$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]], $paramsResult);
+    }
+
+    public function testShouldGetWithWhereQueryEagerLoadingModels(): void
+    {
+        // Set
+        $connection = m::mock(Connection::class);
+        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder->shouldAllowMockingProtectedMethods();
+
+        $collection = m::mock(Collection::class);
+        $model = new ReplaceCollectionModel();
+        $model->with = [
+            'other' => [
+                'key' => 'some key',
+                'model' => 'Some/Model',
+            ],
+        ];
+        $model->setCollection($collection);
+        $query = 123;
+        $preparedQuery = ['_id' => 123];
+        $projection = ['project' => true, '_id' => false, '__pclass' => true];
+        $expectedParams = [
+            $preparedQuery,
+            [
+                'projection' => $projection,
+                'eagerLoads' => [
+                    'other' => [
+                        'key' => 'some key',
+                        'model' => 'Some/Model',
+                    ],
+                ],
+            ],
+        ];
+
+        // Expectations
+        $builder
+            ->expects('prepareValueQuery')
+            ->with($query)
+            ->andReturn($preparedQuery);
+
+        // Actions
+        $result = $builder->where($model, $query, $projection);
+        $collectionResult = $this->getProtected($result, 'collection');
+        $commandResult = $this->getProtected($result, 'command');
+        $paramsResult = $this->getProtected($result, 'params');
+
+        // Assertions
+        $this->assertInstanceOf(Cursor::class, $result);
+        $this->assertSame($collection, $collectionResult);
+        $this->assertSame('find', $commandResult);
+        $this->assertSame($expectedParams, $paramsResult);
     }
 
     public function testShouldGetCacheableCursor(): void
@@ -561,7 +612,7 @@ final class BuilderTest extends TestCase
         $this->assertInstanceOf(CacheableCursor::class, $result);
         $this->assertSame($collection, $collectionResult);
         $this->assertSame('find', $commandResult);
-        $this->assertSame([$preparedQuery, ['projection' => $projection]], $paramsResult);
+        $this->assertSame([$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]], $paramsResult);
     }
 
     public function testShouldGetAll(): void

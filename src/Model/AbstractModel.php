@@ -22,9 +22,20 @@ abstract class AbstractModel implements ModelInterface
     use HasRelationsTrait;
 
     /**
+     * This attribute is used to eager load models for
+     * referenced ids. You can eager load any children
+     * models using this parameter. Every time this
+     * model is queried, it will load its referenced
+     * models together.
+     *
+     * @var array
+     */
+    public $with = [];
+
+    /**
      * The $dynamic property tells if the object will accept additional fields
      * that are not specified in the $fillable or $guarded properties.
-     * This is useful if you does not have a strict document format or
+     * This is useful if you do not have a strict document format or
      * if you want to take full advantage of the "schemaless" nature of MongoDB.
      *
      * @var bool
