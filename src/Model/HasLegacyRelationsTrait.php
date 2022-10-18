@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Model;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Str;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
@@ -14,6 +15,7 @@ use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
+use MongolidLaravel\MongolidModel;
 
 /**
  * It is supposed to be used on model classes in general.
@@ -25,11 +27,12 @@ trait HasLegacyRelationsTrait
     /**
      * Returns the referenced documents as objects.
      *
-     * @param string $entity    class of the entity or of the schema of the entity
-     * @param string $field     the field where the _id is stored
-     * @param bool   $cacheable retrieves a CacheableCursor instead
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field the field where the _id is stored
+     * @param bool $cacheable retrieves a CacheableCursor instead
      *
      * @return mixed
+     * @throws BindingResolutionException
      */
     protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
@@ -41,14 +44,7 @@ trait HasLegacyRelationsTrait
 
         $entityInstance = Container::make($entity);
 
-        /** @var CacheComponentInterface $cacheComponent */
-        $cacheComponent = Container::make(CacheComponentInterface::class);
-        $cacheKey = $this->generateCacheKey($entityInstance, $referencedId);
-
-        // Checks if the model was already eager loaded.
-        // if so, we don't need to query database to
-        // use the document.
-        if ($document = $cacheComponent->get($cacheKey)) {
+        if ($cacheable && $referencedId && $document = $this->getDocumentFromCache($entityInstance, $referencedId)) {
             return $document;
         }
 
@@ -191,5 +187,25 @@ trait HasLegacyRelationsTrait
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
+    }
+
+    /**
+     * @return mixed|null
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId)
+    {
+        /** @var CacheComponentInterface $cacheComponent */
+        $cacheComponent = Container::make(CacheComponentInterface::class);
+        $cacheKey = $this->generateCacheKey($entityInstance, $referencedId);
+
+        // Checks if the model was already eager loaded.
+        // if so, we don't need to query database to
+        // use the document.
+        if (!$document = $cacheComponent->get($cacheKey)) {
+            return null;
+        }
+
+        return $document;
     }
 }
