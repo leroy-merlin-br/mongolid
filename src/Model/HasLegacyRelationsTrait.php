@@ -42,11 +42,12 @@ trait HasLegacyRelationsTrait
             $referencedId = $referencedId[0];
         }
 
-        if ($cacheable && $document = $this->getDocumentFromCache($entity, $referencedId)) {
+        $entityInstance = Container::make($entity);
+
+        if ($cacheable && $referencedId && $document = $this->getDocumentFromCache($entityInstance, $referencedId)) {
             return $document;
         }
 
-        $entityInstance = Container::make($entity);
         if ($entityInstance instanceof Schema) {
             $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
@@ -192,14 +193,8 @@ trait HasLegacyRelationsTrait
      * @return mixed|null
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    private function getDocumentFromCache(string $entity, ?string $referencedId)
+    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId)
     {
-        if (!$referencedId) {
-            return null;
-        }
-
-        $entityInstance = Container::make($entity);
-
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);
         $cacheKey = $this->generateCacheKey($entityInstance, $referencedId);
