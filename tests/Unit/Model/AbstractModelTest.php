@@ -70,9 +70,9 @@ final class AbstractModelTest extends TestCase
         $this->assertSame(
             [
                 ModelInterface::class,
-                Unserializable::class,
                 Serializable::class,
                 Type::class,
+                Unserializable::class,
                 Persistable::class,
                 HasAttributesInterface::class,
             ],
