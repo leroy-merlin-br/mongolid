@@ -8,6 +8,7 @@ use Mongolid\Tests\Stubs\Product;
 use Mongolid\Tests\Stubs\ReferencedUser;
 use Mongolid\Tests\Stubs\Shop;
 use Mongolid\Tests\Stubs\Sku;
+use Mongolid\Tests\Stubs\Stock;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -48,6 +49,58 @@ final class EagerLoadingTest extends IntegrationTestCase
         }
     }
 
+    public function testShouldEagerStocksUsingForeignKeys(): void
+    {
+        $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
+        $product1 = $this->createProductWithPrice('Playstation', 299.90);
+        $product2 = $this->createProductWithPrice('Xbox', 199.90);
+        $product3 = $this->createProductWithPrice('Switch', 399.90);
+
+        $this->createStockFor($product1, 10);
+        $this->createStockFor($product2, 20);
+        $this->createStockFor($product3, 30);
+
+        $this->assertTrue($product1->save());
+        $this->assertTrue($product2->save());
+        $this->assertTrue($product3->save());
+
+        $products = Product::where([], [], true);
+
+        foreach ($products as $product) {
+            // Call product price.
+            $priceId = $product->price()->_id;
+            $stockId = $product->stock()->_id;
+            $this->assertTrue($cache->has("prices:$priceId"));
+            $this->assertTrue($cache->has("stocks:$stockId"));
+        }
+    }
+
+    public function testShouldEagerLoadUsingIntegerAsKeys(): void
+    {
+        $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
+        $product1 = $this->createProductWithPrice('Playstation', 299.90, 123);
+        $product2 = $this->createProductWithPrice('Xbox', 199.90, 456);
+        $product3 = $this->createProductWithPrice('Switch', 399.90, 789);
+
+        $this->createStockFor($product1, 10);
+        $this->createStockFor($product2, 20);
+        $this->createStockFor($product3, 30);
+
+        $this->assertTrue($product1->save());
+        $this->assertTrue($product2->save());
+        $this->assertTrue($product3->save());
+
+        $products = Product::where([], [], true);
+
+        foreach ($products as $product) {
+            // Call product price.
+            $priceId = $product->price()->_id;
+            $stockId = $product->stock()->_id;
+            $this->assertTrue($cache->has("prices:$priceId"));
+            $this->assertTrue($cache->has("stocks:$stockId"));
+        }
+    }
+
     public function testShouldEagerLoadOnlyACertainLimitOfProducts(): void
     {
         $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
@@ -69,15 +122,25 @@ final class EagerLoadingTest extends IntegrationTestCase
         }
     }
 
-    private function createProductWithPrice(string $name, float $price): Product
+    private function createProductWithPrice(string $name, float $price, $id = null): Product
     {
-        // Product
         $product = new Product();
+        $product->_id = $id ?? new ObjectId();
         $product->name = $name;
         $this->assertTrue($product->save());
         $this->createPriceFor($product, $price);
 
         return $product;
+    }
+
+    private function createStockFor(Product $product, float $amount): Stock
+    {
+        $stock = new Stock();
+        $stock->product_id = $product->_id;
+        $stock->stock = $amount;
+        $this->assertTrue($stock->save());
+
+        return $stock;
     }
 
     private function createPriceFor(Product $product, float $priceValue): Price
