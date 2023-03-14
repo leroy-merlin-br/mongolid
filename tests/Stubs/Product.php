@@ -2,7 +2,6 @@
 namespace Mongolid\Tests\Stubs;
 
 use Mongolid\LegacyRecord;
-use Mongolid\Model\Relations\ReferencesOne;
 
 class Product extends LegacyRecord
 {
