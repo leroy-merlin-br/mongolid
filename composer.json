@@ -18,17 +18,16 @@
         }
     ],
     "require": {
-        "php": ">=7.4",
+        "php": "^8.0",
         "ext-mongodb": "*",
-        "illuminate/container": "^5.4 || ^6.0 || ^7.0 || ^8.0",
-        "illuminate/support": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "illuminate/container": "^9.0 || ^10.0",
+        "illuminate/support": "^9.0 || ^10.0",
         "mongodb/mongodb": "^1.15"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^3.1.0",
-        "mockery/mockery": "^1.5.1",
-        "phpunit/phpunit": "^9.5.27",
-        "symfony/var-dumper": "^5.4.14"
+        "mockery/mockery": "^1.2",
+        "phpunit/phpunit": "^9.0"
     },
     "autoload": {
         "psr-4": {

@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\BadMethodCallException;
@@ -374,13 +375,21 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
             ->getCollection();
     }
 
-    public function bsonSerialize()
+    /**
+     * @return array|object
+     * @throws BindingResolutionException
+     */
+    public function bsonSerialize(): object|array
     {
         return Container::make(ModelMapper::class)
             ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
-    public function bsonUnserialize(array $data)
+    /**
+     * @param array $data
+     * @return void
+     */
+    public function bsonUnserialize(array $data): void
     {
         $this->fill($data, true);
 

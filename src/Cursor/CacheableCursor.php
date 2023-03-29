@@ -50,11 +50,11 @@ class CacheableCursor extends Cursor
      *
      * @return string serialized object
      */
-    public function serialize()
+    public function __serialize(): array
     {
         $this->documents = $this->cursor = null;
 
-        return parent::serialize();
+        return parent::__serialize();
     }
 
     /**

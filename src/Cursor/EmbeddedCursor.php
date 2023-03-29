@@ -95,9 +95,9 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Counts the number of results for this cursor.
      *
-     * @return int the number of documents returned by this cursor's query
+     * returns the number of documents returned by this cursor's query
      */
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }
@@ -105,7 +105,7 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Iterator interface rewind (used in foreach).
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -116,17 +116,15 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->items[$this->position] ?? null;
     }
 
     /**
      * Returns the first element of the cursor.
-     *
-     * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         $this->rewind();
 
@@ -135,10 +133,8 @@ class EmbeddedCursor implements CursorInterface
 
     /**
      * Iterator key method (used in foreach).
-     *
-     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -146,25 +142,21 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Iterator next method (used in foreach).
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
     /**
      * Iterator valid method (used in foreach).
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->items[$this->position]);
     }
 
     /**
      * Convert the cursor instance to an array of Items.
-     *
-     * @return array
      */
     public function all(): array
     {
@@ -177,8 +169,6 @@ class EmbeddedCursor implements CursorInterface
 
     /**
      * Return the raw cursor items.
-     *
-     * @return array
      */
     public function toArray(): array
     {

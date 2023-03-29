@@ -22,7 +22,7 @@ use Mongolid\Schema\Schema;
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
  */
-class SchemaCursor implements CursorInterface, Serializable
+class SchemaCursor implements CursorInterface
 {
     /**
      * Schema that describes the entity that will be retrieved when iterating through the cursor.
@@ -185,7 +185,7 @@ class SchemaCursor implements CursorInterface, Serializable
     /**
      * Iterator interface rewind (used in foreach).
      */
-    public function rewind()
+    public function rewind(): void
     {
         try {
             $this->getCursor()->rewind();
@@ -200,10 +200,8 @@ class SchemaCursor implements CursorInterface, Serializable
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach).
-     *
-     * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         $document = $this->getCursor()->current();
 
@@ -222,16 +220,14 @@ class SchemaCursor implements CursorInterface, Serializable
 
     /**
      * Returns the first element of the cursor.
-     *
-     * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         $this->rewind();
         $document = $this->getCursor()->current();
 
         if (!$document) {
-            return;
+            return null;
         }
 
         return $this->getAssembler()->assemble($document, $this->entitySchema);
@@ -242,17 +238,15 @@ class SchemaCursor implements CursorInterface, Serializable
      * through it again. A new request to the database will be made in the next
      * iteration.
      */
-    public function fresh()
+    public function fresh(): void
     {
         $this->cursor = null;
     }
 
     /**
      * Iterator key method (used in foreach).
-     *
-     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -260,7 +254,7 @@ class SchemaCursor implements CursorInterface, Serializable
     /**
      * Iterator next method (used in foreach).
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
         $this->getCursor()->next();
@@ -268,8 +262,6 @@ class SchemaCursor implements CursorInterface, Serializable
 
     /**
      * Iterator valid method (used in foreach).
-     *
-     * @return bool
      */
     public function valid(): bool
     {
@@ -278,8 +270,6 @@ class SchemaCursor implements CursorInterface, Serializable
 
     /**
      * Convert the cursor instance to an array of Objects.
-     *
-     * @return array
      */
     public function all(): array
     {
@@ -292,8 +282,6 @@ class SchemaCursor implements CursorInterface, Serializable
 
     /**
      * Convert the cursor instance to a full associative array.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -342,12 +330,12 @@ class SchemaCursor implements CursorInterface, Serializable
      *
      * @return string serialized object
      */
-    public function serialize()
+    public function __serialize(): array
     {
         $properties = get_object_vars($this);
         $properties['collection'] = $this->collection->getCollectionName();
 
-        return serialize($properties);
+        return $properties;
     }
 
     /**
@@ -355,10 +343,8 @@ class SchemaCursor implements CursorInterface, Serializable
      *
      * @param mixed $serialized serialized cursor
      */
-    public function unserialize($serialized)
+    public function __unserialize($attributes): void
     {
-        $attributes = unserialize($serialized);
-
         $connection = Container::make(Connection::class);
 
         $client = $connection->getClient();

@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Model;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
@@ -264,13 +265,16 @@ abstract class AbstractModel implements ModelInterface
         $this->writeConcern = $writeConcern;
     }
 
-    public function bsonSerialize()
+    /**
+     * @throws BindingResolutionException
+     */
+    public function bsonSerialize(): object|array
     {
         return Container::make(ModelMapper::class)
             ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
-    public function bsonUnserialize(array $data)
+    public function bsonUnserialize(array $data): void
     {
         unset($data['__pclass']);
         static::fill($data, $this, true);
