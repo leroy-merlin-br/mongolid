@@ -25,7 +25,7 @@
         "mongodb/mongodb": "^1.17.0"
     },
     "require-dev": {
-        "leroy-merlin-br/coding-standard": "^3.1.0",
+        "leroy-merlin-br/coding-standard": "^v3.1.0",
         "mockery/mockery": "^1.2",
         "phpunit/phpunit": "^9.0"
     },
