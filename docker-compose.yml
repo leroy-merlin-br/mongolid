@@ -11,7 +11,7 @@ services:
       - DB_HOST=db
 
   db:
-    image: mongo:4.2
+    image: mongo:5.0
     command: mongod --wiredTigerCacheSizeGB 0.25
     deploy:
       resources:
