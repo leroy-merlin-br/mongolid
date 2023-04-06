@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Container;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
@@ -13,17 +14,15 @@ class Container
 {
     /**
      * Illuminate instance.
-     *
-     * @var IlluminateContainer
      */
-    protected static $container;
+    protected static IlluminateContainer $container;
 
     /**
      * Setter for static::$container.
      *
      * @param IlluminateContainer $container the IoC container that will be used by mongolid
      */
-    public static function setContainer(IlluminateContainer $container)
+    public static function setContainer(IlluminateContainer $container): void
     {
         static::$container = $container;
     }
