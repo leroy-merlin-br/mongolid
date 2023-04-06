@@ -14,15 +14,12 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     // register a single rule
-    $rectorConfig->rule(InlineConstructorDefaultToPropertyRector::class);
+//    $rectorConfig->rule(InlineConstructorDefaultToPropertyRector::class);
 
     // define sets of rules
     $rectorConfig->sets([
         SetList::ACTION_INJECTION_TO_CONSTRUCTOR_INJECTION,
-        SetList::CODE_QUALITY,
-        SetList::CODING_STYLE,
         SetList::DEAD_CODE,
-        SetList::PRIVATIZATION,
         SetList::PSR_4,
         SetList::TYPE_DECLARATION,
         SetList::EARLY_RETURN,
