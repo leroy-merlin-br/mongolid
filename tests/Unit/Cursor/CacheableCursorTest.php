@@ -12,16 +12,12 @@ use Mongolid\TestCase;
 
 class CacheableCursorTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
     public function testShouldGetCursorFromPreviousIteration(): void
     {
         // Arrange
-        $documentsFromDb = new ArrayIterator([['name' => 'joe'], ['name' => 'doe']]);
+        $documentsFromDb = new ArrayIterator(
+            [['name' => 'joe'], ['name' => 'doe']]
+        );
         $cursor = $this->getCacheableCursor();
         $this->setProtected(
             $cursor,
@@ -67,7 +63,7 @@ class CacheableCursorTest extends TestCase
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
         $cacheKey = 'find:collection:123';
 
         $this->setProtected(
@@ -111,7 +107,7 @@ class CacheableCursorTest extends TestCase
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
 
         $this->setProtected(
             $cursor,
@@ -150,7 +146,7 @@ class CacheableCursorTest extends TestCase
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
         $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
 
         $this->setProtected(
             $cursor,
@@ -175,7 +171,10 @@ class CacheableCursorTest extends TestCase
             ->never();
 
         $rawCollection->shouldReceive('find')
-            ->with([], ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
+            ->with(
+                [],
+                ['skip' => CacheableCursor::DOCUMENT_LIMIT, 'limit' => 49]
+            )
             ->andReturn(new ArrayIterator($documentsFromDb));
 
         $cacheComponent->shouldReceive('put')
@@ -191,7 +190,11 @@ class CacheableCursorTest extends TestCase
     public function testShouldGenerateUniqueCacheKey(): void
     {
         // Arrange
-        $cursor = $this->getCacheableCursor(null, 'find', [['color' => 'red']]);
+        $cursor = $this->getCacheableCursor(
+            null,
+            'find',
+            [['color' => 'red']]
+        );
 
         // Act
         $cursor->shouldReceive('generateCacheKey')
@@ -239,4 +242,3 @@ class CacheableCursorTest extends TestCase
         return $mock;
     }
 }
-

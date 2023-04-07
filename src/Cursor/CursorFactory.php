@@ -28,7 +28,9 @@ class CursorFactory
         array $params,
         bool $cacheable = false
     ): SchemaCursor {
-        $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
+        $cursorClass = $cacheable
+            ? SchemaCacheableCursor::class
+            : SchemaCursor::class;
 
         return new $cursorClass($entitySchema, $collection, $command, $params);
     }
@@ -38,8 +40,6 @@ class CursorFactory
      *
      * @param string $entityClass class of the objects that will be retrieved by the cursor
      * @param array  $items       the items array
-     *
-     * @return CursorInterface
      */
     public function createEmbeddedCursor($entityClass, array $items): CursorInterface
     {
