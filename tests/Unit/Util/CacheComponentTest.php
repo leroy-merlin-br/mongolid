@@ -64,7 +64,7 @@ class CacheComponentTest extends TestCase
     /**
      * Skips $seconds of time.
      */
-    protected function tick($seconds): void
+    protected function tick(int $seconds): void
     {
         $this->time += $seconds;
     }
