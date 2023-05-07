@@ -9,7 +9,7 @@ final class ObjectIdUtilsTest extends TestCase
     /**
      * @dataProvider objectIdStringScenarios
      */
-    public function testShouldEvaluateIfValueIsAnObjectId($value, bool $expectation): void
+    public function testShouldEvaluateIfValueIsAnObjectId(mixed $value, bool $expectation): void
     {
         // Actions
         $result = ObjectIdUtils::isObjectId($value);
@@ -21,7 +21,7 @@ final class ObjectIdUtilsTest extends TestCase
     public function objectIdStringScenarios(): array
     {
         $object = new class {
-            public function __toString()
+            public function __toString(): string
             {
                 return '577a68c44d3cec1f6c7796a2';
             }
@@ -41,7 +41,7 @@ final class ObjectIdUtilsTest extends TestCase
             ['value' => 123456, 'expectation' => false],
             ['value' => 'abcdefgh1234567890123456', 'expectation' => false],
             ['value' => '+07f191e810c19729de860ea', 'expectation' => false],
-            ['value' => 1234567, 'expectation' => false],
+            ['value' => 1_234_567, 'expectation' => false],
             ['value' => 0.5, 'expectation' => false],
             ['value' => null, 'expectation' => false],
             ['value' => true, 'expectation' => false],

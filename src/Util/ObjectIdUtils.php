@@ -14,7 +14,7 @@ class ObjectIdUtils
      *
      * @param mixed $value string to be evaluated if it can be used as a valid ObjectId
      */
-    public static function isObjectId($value): bool
+    public static function isObjectId(mixed $value): bool
     {
         if ($value instanceof ObjectId) {
             return true;
