@@ -16,10 +16,7 @@ use stdClass;
 
 class LegacyRecordTest extends TestCase
 {
-    /**
-     * @var LegacyRecord
-     */
-    protected $entity;
+    protected LegacyRecord $entity;
 
     /**
      * {@inheritdoc}
@@ -159,7 +156,7 @@ class LegacyRecordTest extends TestCase
         $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -182,7 +179,7 @@ class LegacyRecordTest extends TestCase
         $cursor = m::mock(CursorInterface::class);
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -205,7 +202,7 @@ class LegacyRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -229,7 +226,7 @@ class LegacyRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -252,7 +249,7 @@ class LegacyRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -275,7 +272,7 @@ class LegacyRecordTest extends TestCase
         $dataMapper = m::mock();
 
         // Act
-        Container::instance(get_class($entity), $entity);
+        Container::instance($entity::class, $entity);
 
         $entity->shouldReceive('getDataMapper')
             ->andReturn($dataMapper);
@@ -317,10 +314,10 @@ class LegacyRecordTest extends TestCase
         $this->assertEquals($fields, $result->fields);
         $this->assertEquals($this->entity->dynamic, $result->dynamic);
         $this->assertEquals($this->entity->getCollectionName(), $result->collection);
-        $this->assertEquals(get_class($this->entity), $result->entityClass);
+        $this->assertEquals($this->entity::class, $result->entityClass);
     }
 
-    public function testShouldGetDataMapper()
+    public function testShouldGetDataMapper(): void
     {
         // Arrage
         $entity = m::mock(LegacyRecord::class.'[getSchema]');

@@ -53,8 +53,8 @@ abstract class Schema
     public string $entityClass = 'stdClass';
 
     /**
-     * Filters any field in the $fields that has it's value specified as a
-     * 'objectId'. It will wraps the $value, if any, into a ObjectId object.
+     * Filters any field in the $fields that has its value specified as a
+     * 'objectId'. It will wrap the $value, if any, into a ObjectId object.
      *
      * @param mixed $value value that may be converted to ObjectId
      */

@@ -145,10 +145,10 @@ class SchemaTest extends TestCase
         // Arrange
         $schema = new class extends Schema {
         };
-        $value = (new UTCDateTime(25));
+        new UTCDateTime(25);
 
         // Assertion
-        $result = $schema->updatedAtTimestamp($value);
+        $result = $schema->updatedAtTimestamp();
         $this->assertInstanceOf(UTCDateTime::class, $result);
         $this->assertNotEquals(25000, (string) $result);
     }
@@ -157,9 +157,9 @@ class SchemaTest extends TestCase
      * @dataProvider createdAtTimestampsFixture
      */
     public function testShouldNotRefreshCreatedAtTimestamps(
-        $value,
-        $expectation,
-        $compareTimestamp = true
+        mixed       $value,
+        UTCDateTime $expectation,
+        bool        $compareTimestamp = true
     ): void {
         // Arrange
         $schema = new class extends Schema {
