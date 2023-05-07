@@ -149,7 +149,7 @@ class SchemaTest extends TestCase
         // Assertion
         $result = $schema->updatedAtTimestamp();
         $this->assertInstanceOf(UTCDateTime::class, $result);
-        $this->assertNotEquals(25000, (string)$result);
+        $this->assertNotEquals(25000, (string) $result);
     }
 
     /**
