@@ -33,7 +33,7 @@ class SchemaMapper
          * The actual schema to maps the data.
          */
         public Schema $schema
-    ){
+    ) {
     }
 
     /**
