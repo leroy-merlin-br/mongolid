@@ -18,42 +18,40 @@ trait HasLegacyAttributesTrait
     /**
      * The model's attributes.
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * The model attribute's original state.
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    protected $original = [];
+    protected array $original = [];
 
     /**
      * Once you put at least one string in this array, only
      * the attributes specified here will be changed
      * with the setAttributes method.
      *
-     * @var array
+     * @var string[]
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that are not mass assignable. The opposite
      * to the fillable array;.
      *
-     * @var array
+     * @var string[]
      */
-    protected $guarded = [];
+    protected array $guarded = [];
 
     /**
      * Check if model should mutate attributes checking
      * the existence of a specific method on model
      * class. Default is false.
-     *
-     * @var bool
      */
-    public $mutable = false;
+    public bool $mutable = false;
 
     /**
      * Attributes that are cast to another types when fetched from database.
@@ -64,10 +62,8 @@ trait HasLegacyAttributesTrait
      * Get an attribute from the model.
      *
      * @param string $key the attribute to be accessed
-     *
-     * @return mixed
      */
-    public function getAttribute(string $key)
+    public function getAttribute(string $key): mixed
     {
         $inAttributes = array_key_exists($key, $this->attributes);
 
@@ -79,17 +75,19 @@ trait HasLegacyAttributesTrait
 
         if ($inAttributes) {
             return $this->attributes[$key];
-        } elseif ('attributes' == $key) {
+        }
+
+        if ('attributes' == $key) {
             return $this->attributes;
         }
+
+        return null;
     }
 
     /**
      * Get all attributes from the model.
-     *
-     * @return mixed
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -122,7 +120,7 @@ trait HasLegacyAttributesTrait
      *
      * @param string $key name of the attribute to be unset
      */
-    public function cleanAttribute(string $key)
+    public function cleanAttribute(string $key): void
     {
         unset($this->attributes[$key]);
     }
@@ -133,7 +131,7 @@ trait HasLegacyAttributesTrait
      * @param string $key   name of the attribute to be set
      * @param mixed  $value value to be set
      */
-    public function setAttribute(string $key, $value)
+    public function setAttribute(string $key, mixed $value): void
     {
         if ($casterName = $this->casts[$key] ?? null) {
             $caster = CastResolver::resolve($casterName);
@@ -146,7 +144,7 @@ trait HasLegacyAttributesTrait
     /**
      * Get original attributes.
      */
-    public function originalAttributes()
+    public function originalAttributes(): array
     {
         return $this->original;
     }
@@ -158,7 +156,7 @@ trait HasLegacyAttributesTrait
      * Ideally should be called once right after retrieving data from
      * the database.
      */
-    public function syncOriginalAttributes()
+    public function syncOriginalAttributes(): void
     {
         $this->original = $this->attributes;
     }
@@ -168,10 +166,8 @@ trait HasLegacyAttributesTrait
      *
      * @param mixed $key    attribute name
      * @param mixed $prefix method prefix to be used
-     *
-     * @return bool
      */
-    protected function hasMutatorMethod($key, $prefix)
+    protected function hasMutatorMethod(string $key, mixed $prefix): bool
     {
         $method = $this->buildMutatorMethod($key, $prefix);
 
@@ -183,20 +179,16 @@ trait HasLegacyAttributesTrait
      *
      * @param mixed $key    attribute name
      * @param mixed $prefix method prefix to be used
-     *
-     * @return string
      */
-    protected function buildMutatorMethod($key, $prefix)
+    protected function buildMutatorMethod(string $key, mixed $prefix): string
     {
         return $prefix.ucfirst($key).'Attribute';
     }
 
     /**
      * Returns the model instance as an Array.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->getAttributes();
     }
@@ -205,10 +197,8 @@ trait HasLegacyAttributesTrait
      * Dynamically retrieve attributes on the model.
      *
      * @param mixed $key name of the attribute
-     *
-     * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             return $this->{$this->buildMutatorMethod($key, 'get')}();
@@ -223,7 +213,7 @@ trait HasLegacyAttributesTrait
      * @param mixed $key   attribute name
      * @param mixed $value value to be set
      */
-    public function __set($key, $value)
+    public function __set(string $key, mixed $value): void
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
@@ -236,10 +226,8 @@ trait HasLegacyAttributesTrait
      * Determine if an attribute exists on the model.
      *
      * @param mixed $key attribute name
-     *
-     * @return bool
      */
-    public function __isset($key)
+    public function __isset(mixed $key): bool
     {
         return !is_null($this->{$key});
     }
@@ -249,7 +237,7 @@ trait HasLegacyAttributesTrait
      *
      * @param mixed $key attribute name
      */
-    public function __unset($key)
+    public function __unset(string $key): void
     {
         unset($this->attributes[$key]);
     }
@@ -265,7 +253,7 @@ trait HasLegacyAttributesTrait
         return $this->hasAttribute($key);
     }
 
-    public function getDocumentAttribute(string $key)
+    public function getDocumentAttribute(string $key): mixed
     {
         return $this->getAttribute($key);
     }
@@ -284,12 +272,12 @@ trait HasLegacyAttributesTrait
         }
     }
 
-    public function setDocumentAttribute(string $key, $value): void
+    public function setDocumentAttribute(string $key, mixed $value): void
     {
         $this->setAttribute($key, $value);
     }
 
-    public function syncOriginalDocumentAttributes()
+    public function syncOriginalDocumentAttributes(): void
     {
         $this->syncOriginalAttributes();
     }

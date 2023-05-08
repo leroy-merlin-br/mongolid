@@ -6,58 +6,31 @@ use Mongolid\Model\ModelInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
-    /**
-     * @var ModelInterface
-     */
-    protected $parent;
-
-    /**
-     * @var string
-     */
-    protected $model;
-
-    /**
-     * @var string
-     */
-    protected $field;
-
-    /**
-     * @var bool
-     */
-    protected $pristine = false;
+    protected bool $pristine = false;
 
     /**
      * Cached results.
-     *
-     * @var mixed
      */
-    protected $results;
+    protected mixed $results;
 
-    /**
-     * @var string
-     */
-    protected $key = '_id';
+    protected string $key = '_id';
 
-    public function __construct(ModelInterface $parent, string $model, string $field)
-    {
-        $this->parent = $parent;
-        $this->model = $model;
-        $this->field = $field;
+    public function __construct(
+        protected ModelInterface $parent,
+        protected string $model,
+        protected string $field
+    ) {
     }
 
     /**
      * Retrieve Relation Results.
-     *
-     * @return mixed
      */
-    abstract public function get();
+    abstract public function get(): mixed;
 
     /**
      * Retrieve cached Relation Results.
-     *
-     * @return mixed
      */
-    public function &getResults()
+    public function &getResults(): mixed
     {
         if (!$this->pristine()) {
             $this->results = $this->get();
@@ -77,10 +50,8 @@ abstract class AbstractRelation implements RelationInterface
      * a new key will be generated and set on the model (while still returning it).
      *
      * @param ModelInterface $model the object that the key will be retrieved from
-     *
-     * @return ObjectId|mixed
      */
-    protected function getKey(ModelInterface $model)
+    protected function getKey(ModelInterface $model): mixed
     {
         if (!$model->{$this->key}) {
             $model->{$this->key} = new ObjectId();

@@ -20,7 +20,7 @@ class DocumentEmbedder
      *
      * @return bool Success
      */
-    public function embed($parent, string $field, &$entity): bool
+    public function embed(mixed $parent, string $field, mixed &$entity): bool
     {
         // In order to update the document if it exists inside the $parent
         $this->unembed($parent, $field, $entity);
@@ -39,10 +39,8 @@ class DocumentEmbedder
      * @param mixed  $parent the object where the $entity will be removed
      * @param string $field  name of the field of the object where the document is
      * @param mixed  $entity entity that will be removed from $parent
-     *
-     * @return bool Success
      */
-    public function unembed($parent, string $field, &$entity): bool
+    public function unembed(mixed $parent, string $field, mixed &$entity): bool
     {
         $fieldValue = (array) $parent->$field;
         $id = $this->getId($entity);
@@ -61,21 +59,19 @@ class DocumentEmbedder
     /**
      * Attach a new _id reference into $field of $parent.
      *
-     * @param mixed        $parent the object where $entity will be referenced
-     * @param string       $field  the field where the _id reference of $entity will be stored
-     * @param object|array $entity the object that is being attached
+     * @param mixed   $parent the object where $entity will be referenced
+     * @param string  $field  the field where the _id reference of $entity will be stored
+     * @param mixed   $entity the object that is being attached
      *
      * @return bool Success
      */
-    public function attach($parent, string $field, &$entity): bool
+    public function attach(mixed $parent, string $field, mixed &$entity): bool
     {
         $fieldValue = (array) $parent->$field;
         $newId = $this->getId($entity);
 
-        foreach ($fieldValue as $id) {
-            if ($id == $newId) {
-                return true;
-            }
+        if (in_array($newId, $fieldValue)) {
+            return true;
         }
 
         $fieldValue[] = $newId;
@@ -93,7 +89,7 @@ class DocumentEmbedder
      *
      * @return bool Success
      */
-    public function detach($parent, string $field, &$entity): bool
+    public function detach(mixed $parent, string $field, mixed &$entity): bool
     {
         $fieldValue = (array) $parent->$field;
         $newId = $this->getId($entity);
@@ -114,10 +110,8 @@ class DocumentEmbedder
      * _id will be generated and set on the object (while still returning it).
      *
      * @param mixed $object the object|array that the _id will be retrieved from
-     *
-     * @return ObjectId|mixed
      */
-    protected function getId(&$object)
+    protected function getId(mixed &$object): mixed
     {
         if (is_array($object)) {
             if (isset($object['_id']) && $object['_id']) {
