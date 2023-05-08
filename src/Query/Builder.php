@@ -21,22 +21,16 @@ class Builder
     private bool $ignoreSoftDelete = false;
 
     /**
-     * Connection that is going to be used to interact with the database.
-     *
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * In order to dispatch events when necessary.
-     *
-     * @var EventTriggerService
      */
-    protected $eventService;
+    protected ?EventTriggerService $eventService = null;
 
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        /**
+         * Connection that is going to be used to interact with the database.
+         */
+        protected Connection $connection
+    ) {
     }
 
     /**
@@ -199,7 +193,7 @@ class Builder
      * @param array          $projection fields to project in MongoDB query
      * @param bool           $useCache   retrieves a CacheableCursor instead
      */
-    public function where(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false): CursorInterface
+    public function where(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
         $cursor = $useCache ? CacheableCursor::class : Cursor::class;
 
@@ -238,10 +232,8 @@ class Builder
      * @param mixed          $query      MongoDB query to retrieve the model
      * @param array          $projection fields to project in MongoDB query
      * @param boolean        $useCache   retrieves the first through a CacheableCursor
-     *
-     * @return ModelInterface|array|null
      */
-    public function first(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
+    public function first(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): mixed
     {
         if (null === $query) {
             return null;
@@ -272,16 +264,14 @@ class Builder
      * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no model was found
-     *
-     * @return ModelInterface|null
      */
-    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
+    public function firstOrFail(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): mixed
     {
         if ($result = $this->first($model, $query, $projection, $useCache)) {
             return $result;
         }
 
-        throw (new ModelNotFoundException())->setModel(get_class($model));
+        throw (new ModelNotFoundException())->setModel($model::class);
     }
 
     public function withoutSoftDelete(): self
@@ -302,9 +292,11 @@ class Builder
      */
     protected function fireEvent(string $event, ModelInterface $model, bool $halt = false)
     {
-        $event = "mongolid.{$event}: ".get_class($model);
+        $event = "mongolid.{$event}: ".$model::class;
 
-        $this->eventService ?: $this->eventService = Container::make(EventTriggerService::class);
+        if (!$this->eventService) {
+            $this->eventService = Container::make(EventTriggerService::class);
+        }
 
         return $this->eventService->fire($event, $model, $halt);
     }
@@ -329,8 +321,6 @@ class Builder
      * @param array $fields fields to project
      *
      * @throws InvalidArgumentException If the given $fields are not a valid projection
-     *
-     * @return array
      */
     protected function prepareProjection(array $fields): array
     {
@@ -351,7 +341,7 @@ class Builder
 
             if (is_int($key) && is_string($value)) {
                 $key = $value;
-                if (0 === strpos($value, '-')) {
+                if (str_starts_with($value, '-')) {
                     $key = substr($key, 1);
                     $value = false;
                 } else {
@@ -414,8 +404,6 @@ class Builder
      *
      * @param array $defaultOptions default options array
      * @param array $toMergeOptions to merge options array
-     *
-     * @return array
      */
     private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = []): array
     {
@@ -430,7 +418,7 @@ class Builder
         $model->syncOriginalDocumentAttributes();
     }
 
-    private function getUpdateData($model, array $data): array
+    private function getUpdateData(ModelInterface $model, array $data): array
     {
         $changes = [];
         $this->calculateChanges($changes, $data, $model->getOriginalDocumentAttributes());
