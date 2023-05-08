@@ -17,19 +17,15 @@ class ModelNotFoundException extends RuntimeException
 
     /**
      * Name of the affected Mongolid model.
-     *
-     * @var string
      */
-    protected $model;
+    protected string $model;
 
     /**
      * Set the affected Mongolid model.
      *
      * @param string $model name of the model
-     *
-     * @return $this
      */
-    public function setModel(string $model)
+    public function setModel(string $model): self
     {
         $this->model = $model;
 
@@ -40,10 +36,8 @@ class ModelNotFoundException extends RuntimeException
 
     /**
      * Get the affected Mongolid model.
-     *
-     * @return string
      */
-    public function getModel()
+    public function getModel(): string
     {
         return $this->model;
     }
