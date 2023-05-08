@@ -51,9 +51,6 @@ class AttributesService
      */
     private array $originalAttributes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public static function fill(
         array $input,
         HasAttributesInterface $object = null,
