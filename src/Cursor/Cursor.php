@@ -18,7 +18,7 @@ use Serializable;
  * 'where'. Because the mongodb library's MongoDB\Cursor is much more
  * limited (in that regard) than the old driver MongoCursor.
  */
-class Cursor implements CursorInterface, Serializable
+class Cursor implements CursorInterface
 {
     /**
      * @var Collection
@@ -159,7 +159,7 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Iterator interface rewind (used in foreach).
      */
-    public function rewind()
+    public function rewind(): void
     {
         try {
             $this->getCursor()->rewind();
@@ -174,10 +174,8 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach).
-     *
-     * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         $cursor = $this->getCursor();
 
@@ -186,10 +184,8 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Returns the first element of the cursor.
-     *
-     * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         $this->rewind();
 
@@ -208,10 +204,8 @@ class Cursor implements CursorInterface, Serializable
 
     /**
      * Iterator key method (used in foreach).
-     *
-     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -219,7 +213,7 @@ class Cursor implements CursorInterface, Serializable
     /**
      * Iterator next method (used in foreach).
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
         $this->getCursor()->next();
@@ -265,15 +259,14 @@ class Cursor implements CursorInterface, Serializable
      * Serializes this object storing the collection name instead of the actual
      * MongoDb\Collection (which is unserializable).
      *
-     * @return string serialized object
      */
-    public function serialize()
+    public function __serialize(): array
     {
         $properties = get_object_vars($this);
         $properties['collection'] = $this->collection->getCollectionName();
         unset($properties['cursor']);
 
-        return serialize($properties);
+        return $properties;
     }
 
     /**
@@ -281,10 +274,8 @@ class Cursor implements CursorInterface, Serializable
      *
      * @param mixed $serialized serialized cursor
      */
-    public function unserialize($serialized)
+    public function __unserialize($attributes): void
     {
-        $attributes = unserialize($serialized);
-
         $connection = Container::make(Connection::class);
         $db = $connection->defaultDatabase;
         $collectionObject = $connection->getClient()->$db->{$attributes['collection']};

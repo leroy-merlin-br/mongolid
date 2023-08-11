@@ -9,9 +9,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - "7.4"
           - "8.0"
           - "8.1"
+          - "8.2"
         mongo:
           - "4.0"
           - "4.2"
@@ -24,7 +24,7 @@ jobs:
           - "27017:27017"
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: PHP setup
         uses: shivammathur/setup-php@v2
@@ -32,7 +32,7 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Composer
-        uses: ramsey/composer-install@v1
+        uses: ramsey/composer-install@v2
 
       - name: Running tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=./coverage/clover.xml

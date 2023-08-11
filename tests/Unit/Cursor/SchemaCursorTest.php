@@ -394,13 +394,13 @@ class SchemaCursorTest extends TestCase
         /*
          * Emulates a MongoDB\Collection non serializable behavior.
          */
-        return new class() implements \Serializable {
-            public function serialize()
+        return new class() {
+            public function __serialize()
             {
                 throw new Exception('Unable to serialize', 1);
             }
 
-            public function unserialize($serialized)
+            public function __unserialize($serialized)
             {
             }
 

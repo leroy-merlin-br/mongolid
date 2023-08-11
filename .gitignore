@@ -7,3 +7,4 @@
 docker-compose.override.yml
 coverage
 .idea
+phpunit.xml

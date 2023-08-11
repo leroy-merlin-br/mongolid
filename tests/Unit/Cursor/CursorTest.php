@@ -499,23 +499,22 @@ final class CursorTest extends TestCase
      * Since the MongoDB\Collection is not serializable. This method will
      * emulate an unserializable collection from mongoDb driver.
      */
-    protected function getDriverCollection(): Serializable
+    protected function getDriverCollection()
     {
         /*
          * Emulates a MongoDB\Collection non serializable behavior.
          */
-        return new class() implements Serializable
-        {
-            public function serialize()
+        return new class() {
+            public function __serialize()
             {
                 throw new Exception('Unable to serialize', 1);
             }
 
-            public function unserialize($serialized)
+            public function __unserialize($serialized)
             {
             }
 
-            public function getCollectionName(): string
+            public function getCollectionName()
             {
                 return 'my_collection';
             }
