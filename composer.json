@@ -22,7 +22,7 @@
         "ext-mongodb": "*",
         "illuminate/container": "^9.0 || ^10.0",
         "illuminate/support": "^9.0 || ^10.0",
-        "mongodb/mongodb": "^1.15"
+        "mongodb/mongodb": "^1.16"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^3.1.0",
