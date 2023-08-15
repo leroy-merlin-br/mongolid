@@ -16,6 +16,7 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\Schema;
+use Mongolid\Tests\Stubs\Product;
 use stdClass;
 use Mongolid\TestCase;
 
@@ -696,7 +697,7 @@ class DataMapperTest extends TestCase
         $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, '_id' => false];
 
-        $schema->entityClass = 'stdClass';
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
@@ -751,9 +752,19 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => ['$exists' => false],
+                ],
+            ],
+        ];
 
-        $schema->entityClass = 'stdClass';
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
@@ -792,10 +803,19 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false];
-
-        $schema->entityClass = 'stdClass';
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => ['$exists' => false],
+                ],
+            ],
+        ];
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();

@@ -2,8 +2,10 @@
 
 namespace Mongolid\DataMapper;
 
+use DateTime;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
@@ -17,6 +19,7 @@ use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Connection\Connection;
+Use Mongolid\Util\SoftDeleteQueries;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -221,6 +224,11 @@ class DataMapper implements HasSchemaInterface
      */
     public function delete($entity, array $options = []): bool
     {
+        if ($entity->enabledSoftDeletes ?? false) {
+            return $this->executeSoftDelete($entity, $options);
+        }
+
+
         if (false === $this->fireEvent('deleting', $entity, true)) {
             return false;
         }
@@ -259,13 +267,14 @@ class DataMapper implements HasSchemaInterface
         $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
 
         $model = new $this->schema->entityClass;
+        $query =   $this->prepareValueQuery($query);
 
         return new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
             [
-                $this->prepareValueQuery($query),
+                SoftDeleteQueries::insertFilterForSoftDelete($query, $model),
                 [
                     'projection' => $this->prepareProjection($projection),
                     'eagerLoads' => $model->with ?? [],
@@ -302,8 +311,11 @@ class DataMapper implements HasSchemaInterface
             return $this->where($query, $projection, true)->first();
         }
 
+        $model = new $this->schema->entityClass;
+        $query =   $this->prepareValueQuery($query);
+
         $document = $this->getCollection()->findOne(
-            $this->prepareValueQuery($query),
+            SoftDeleteQueries::insertFilterForSoftDelete($query, $model),
             ['projection' => $this->prepareProjection($projection)]
         );
 
@@ -664,5 +676,13 @@ class DataMapper implements HasSchemaInterface
         }
 
         return $filtered;
+    }
+
+    private function executeSoftDelete(ModelInterface $entity, $options): bool
+    {
+        $deletedAtCoullum = SoftDeleteQueries::getDeletedAtColumn($entity);
+        $entity->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
+
+        return $this->update($entity, $options);
     }
 }
