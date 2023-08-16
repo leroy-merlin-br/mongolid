@@ -4,7 +4,6 @@ namespace Mongolid\DataMapper;
 
 use DateTime;
 use InvalidArgumentException;
-use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use Mongolid\Container\Container;
@@ -17,9 +16,8 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Util\ObjectIdUtils;
 use Mongolid\Connection\Connection;
-Use Mongolid\Util\SoftDeleteQueries;
+Use Mongolid\Util\QueryBuilder;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -224,10 +222,9 @@ class DataMapper implements HasSchemaInterface
      */
     public function delete($entity, array $options = []): bool
     {
-        if ($entity->enabledSoftDeletes ?? false) {
+        if (($entity->enabledSoftDeletes ?? false) && !($entity->forceDelete ?? false)) {
             return $this->executeSoftDelete($entity, $options);
         }
-
 
         if (false === $this->fireEvent('deleting', $entity, true)) {
             return false;
@@ -267,14 +264,13 @@ class DataMapper implements HasSchemaInterface
         $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
 
         $model = new $this->schema->entityClass;
-        $query =   $this->prepareValueQuery($query);
 
         return new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
             [
-                SoftDeleteQueries::insertFilterForSoftDelete($query, $model),
+                QueryBuilder::resolveQuery($query, $model),
                 [
                     'projection' => $this->prepareProjection($projection),
                     'eagerLoads' => $model->with ?? [],
@@ -312,10 +308,9 @@ class DataMapper implements HasSchemaInterface
         }
 
         $model = new $this->schema->entityClass;
-        $query =   $this->prepareValueQuery($query);
 
         $document = $this->getCollection()->findOne(
-            SoftDeleteQueries::insertFilterForSoftDelete($query, $model),
+            QueryBuilder::resolveQuery($query, $model),
             ['projection' => $this->prepareProjection($projection)]
         );
 
@@ -404,62 +399,6 @@ class DataMapper implements HasSchemaInterface
             ->selectCollection($collectionName);
 
         return $collection;
-    }
-
-    /**
-     * Transforms a value that is not an array into an MongoDB query (array).
-     * This method will take care of converting a single value into a query for
-     * an _id, including when a objectId is passed as a string.
-     *
-     * @param mixed $value the _id of the document
-     *
-     * @return array Query for the given _id
-     */
-    protected function prepareValueQuery($value): array
-    {
-        if (!is_array($value)) {
-            $value = ['_id' => $value];
-        }
-
-        if (isset($value['_id']) &&
-            is_string($value['_id']) &&
-            ObjectIdUtils::isObjectId($value['_id'])
-        ) {
-            $value['_id'] = new ObjectId($value['_id']);
-        }
-
-        if (isset($value['_id']) &&
-            is_array($value['_id'])
-        ) {
-            $value['_id'] = $this->prepareArrayFieldOfQuery($value['_id']);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Prepares an embedded array of an query. It will convert string ObjectIds
-     * in operators into actual objects.
-     *
-     * @param array $value array that will be treated
-     *
-     * @return array prepared array
-     */
-    protected function prepareArrayFieldOfQuery(array $value): array
-    {
-        foreach (['$in', '$nin'] as $operator) {
-            if (isset($value[$operator]) &&
-                is_array($value[$operator])
-            ) {
-                foreach ($value[$operator] as $index => $id) {
-                    if (ObjectIdUtils::isObjectId($id)) {
-                        $value[$operator][$index] = new ObjectId($id);
-                    }
-                }
-            }
-        }
-
-        return $value;
     }
 
     /**
@@ -680,7 +619,7 @@ class DataMapper implements HasSchemaInterface
 
     private function executeSoftDelete(ModelInterface $entity, $options): bool
     {
-        $deletedAtCoullum = SoftDeleteQueries::getDeletedAtColumn($entity);
+        $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($entity);
         $entity->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
 
         return $this->update($entity, $options);

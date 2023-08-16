@@ -2,18 +2,21 @@
 
 namespace Mongolid\Model;
 
+use Mongolid\Cursor\CursorInterface;
+use Mongolid\Util\QueryBuilder;
+
 trait SoftDeletesTrait
 {
-    public $enabledSoftDeletes = true;
+    public bool $enabledSoftDeletes = true;
 
     public function isTrashed(): bool
     {
-        return !is_null($this->{$this->getDeletedAtColumn()});
+        return !is_null($this->{ self::getDeletedAtColumn()});
     }
 
     public function restore(): bool
     {
-        $collumn = $this->getDeletedAtColumn();
+        $collumn = self::getDeletedAtColumn();
 
         if (!$this->{$collumn}) {
             return false;
@@ -31,7 +34,20 @@ trait SoftDeletesTrait
         return $this->execute('delete');
     }
 
-    private function getDeletedAtColumn(): string
+    public static function withTrashed(
+        array $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): CursorInterface {
+        $query = QueryBuilder::prepareValueQuery($query);
+        $query = array_merge($query, [
+            'withTrashed' => true,
+        ]);
+
+        return parent::where($query, $projection, $useCache);
+    }
+
+    private static function getDeletedAtColumn(): string
     {
         return defined(
             static::class . '::DELETED_AT'

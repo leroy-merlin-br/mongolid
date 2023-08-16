@@ -21,7 +21,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         // Actions
         $result = ProductWithSoftDelete::where()->first();
 
-        // Assertion
+        // Assertions
         $this->assertEquals($product, $result);
     }
 
@@ -33,8 +33,28 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         // Actions
         $result = ProductWithSoftDelete::where()->first();
 
-        // Assertion
+        // Assertions
         $this->assertNull($result);
+    }
+
+    public function testFindDeletedProductTrashed(): void
+    {
+        // Set
+        $this->persiteProduct(true);
+        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a123');
+        $this->persiteProduct();
+
+        // Actions
+        $result = ProductWithSoftDelete::withTrashed();
+        $resultArray = $result->toArray();
+
+        // Assertions
+        $this->assertSame(2, $result->count());
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $resultArray[0]['deleted_at']
+        );
+        $this->assertNull($resultArray[1]['deleted_at'] ?? null);
     }
 
     public function testFindDeletedProductWithFirst(): void
@@ -45,7 +65,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         // Actions
         $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertEquals($product, $result);
     }
 
@@ -57,7 +77,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         // Actions
         $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertNull($result);
     }
 
@@ -70,7 +90,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $isRestored = $product->restore();
         $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertTrue($isRestored);
         $this->assertEquals($product, $result);
     }
@@ -84,7 +104,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $isRestored = $product->restore();
         $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertFalse($isRestored);
         $this->assertEquals($product, $result);
     }
@@ -98,10 +118,27 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
          $isDeleted = $product->delete();
          $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertTrue($isDeleted);
         $this->assertNull($result);
         $this->assertInstanceOf(UTCDateTime::class, $product->deleted_at);
+    }
+
+    public function testExecuteForceDeleteOnProduct(): void
+    {
+        // Set
+        $product = $this->persiteProduct();
+        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a123');
+        $product2 = $this->persiteProduct();
+
+        // Actions
+         $isDeleted = $product->forceDelete();
+         $result = ProductWithSoftDelete::all();
+
+        // Assertions
+        $this->assertTrue($isDeleted);
+        $this->assertSame(1, $result->count());
+        $this->assertEquals($product2, $result->first());
     }
 
     public function testCannotExecuteSoftDeleteOnProduct(): void
@@ -113,7 +150,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
          $isDeleted = $product->delete();
          $result = ProductWithSoftDelete::first($this->_id);
 
-        // Assertion
+        // Assertions
         $this->assertTrue($isDeleted);
         $this->assertNull($result);
         $this->assertNull($result->deleted_at ?? null);
