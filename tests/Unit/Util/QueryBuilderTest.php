@@ -2,11 +2,11 @@
 
 namespace Mongolid\Util;
 
+use Mockery as m;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
-use Mockery as m;
-use Mongolid\Tests\Stubs\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
 
 final class QueryBuilderTest extends TestCase
 {

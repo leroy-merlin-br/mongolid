@@ -502,21 +502,26 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
-
-        // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
 
         // Actions
         $result = $builder->where($model, $query, $projection);
@@ -535,7 +540,7 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
+        $builder = m::mock(Builder::class, [$connection])->makePartial();
         $builder->shouldAllowMockingProtectedMethods();
 
         $collection = m::mock(Collection::class);
@@ -548,7 +553,19 @@ final class BuilderTest extends TestCase
         ];
         $model->setCollection($collection);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
         $expectedParams = [
             $preparedQuery,
@@ -564,10 +581,7 @@ final class BuilderTest extends TestCase
         ];
 
         // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
+
 
         // Actions
         $result = $builder->where($model, $query, $projection);
@@ -586,21 +600,26 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
-
-        // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
 
         // Actions
         $result = $builder->where($model, $query, $projection, true);
@@ -640,24 +659,30 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
 
         // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
-
-        $collection
-            ->expects('findOne')
+        $collection->expects('findOne')
             ->with($preparedQuery, ['projection' => []])
             ->andReturn($model);
+
 
         // Actions
         $result = $builder->first($model, $query);
@@ -712,20 +737,26 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
 
         // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
-
         $collection
             ->expects('findOne')
             ->with($preparedQuery, ['projection' => []])
@@ -746,7 +777,6 @@ final class BuilderTest extends TestCase
         $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
         $cursor = m::mock(Cursor::class);
@@ -789,20 +819,26 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
 
         // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
-
         $collection
             ->expects('findOne')
             ->with($preparedQuery, ['projection' => []])
@@ -819,22 +855,28 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[prepareValueQuery]', [$connection]);
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+            '$or' => [
+                [
+                    'deleted_at' => null,
+                ],
+                [
+                    'deleted_at' => [
+                        '$exists' => false,
+                    ],
+                ],
+            ],
+        ];
         $projection = ['project' => true, 'fields' => false, '__pclass' => true];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
 
         // Expectations
-        $builder
-            ->expects('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
-
         $collection
             ->expects('findOne')
             ->with($preparedQuery, ['projection' => $projection])
@@ -845,22 +887,6 @@ final class BuilderTest extends TestCase
 
         // Assertions
         $this->assertNull($result);
-    }
-
-    /**
-     * @dataProvider queryValueScenarios
-     */
-    public function testShouldPrepareQueryValue($value, $expectation): void
-    {
-        // Set
-        $connection = m::mock(Connection::class);
-        $builder = new Builder($connection);
-
-        // Actions
-        $result = $this->callProtected($builder, 'prepareValueQuery', [$value]);
-
-        // Assertions
-        $this->assertEquals($expectation, $result, 'Queries are not equals');
     }
 
     /**
@@ -916,43 +942,6 @@ final class BuilderTest extends TestCase
                 'operation' => 'delete',
                 'dbOperation' => 'deleteOne',
                 'eventName' => 'deleting',
-            ],
-        ];
-    }
-
-    public function queryValueScenarios(): array
-    {
-        return [
-            'An array' => [
-                'value' => ['age' => ['$gt' => 25]],
-                'expectation' => ['age' => ['$gt' => 25]],
-            ],
-            'An ObjectId string' => [
-                'value' => '507f1f77bcf86cd799439011',
-                'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
-            ],
-            'An ObjectId string within a query' => [
-                'value' => ['_id' => '507f1f77bcf86cd799439011'],
-                'expectation' => ['_id' => new ObjectId('507f1f77bcf86cd799439011')],
-            ],
-            'Other type of _id, sequence for example' => [
-                'value' => 7,
-                'expectation' => ['_id' => 7],
-            ],
-            'Series of string _ids as the $in parameter' => [
-                'value' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
-                'expectation' => [
-                    '_id' => [
-                        '$in' => [
-                            new ObjectId('507f1f77bcf86cd799439011'),
-                            new ObjectId('507f1f77bcf86cd799439012'),
-                        ],
-                    ],
-                ],
-            ],
-            'Series of string _ids as the $nin parameter' => [
-                'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
-                'expectation' => ['_id' => ['$nin' => [new ObjectId('507f1f77bcf86cd799439011')]]],
             ],
         ];
     }

@@ -10,7 +10,7 @@ use Mongolid\Query\EagerLoader\Exception\EagerLoaderException;
 use Mongolid\TestCase;
 use Mockery as m;
 use Mongolid\Tests\Stubs\Price;
-use Mongolid\Tests\Stubs\Product;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use Mongolid\Tests\Stubs\Shop;
 use Mongolid\Util\CacheComponentInterface;
 

@@ -15,7 +15,7 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Tests\Stubs\Product;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use stdClass;
 use Mongolid\TestCase;
 

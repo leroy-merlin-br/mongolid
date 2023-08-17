@@ -3,14 +3,14 @@
 namespace Mongolid\Model;
 
 use DateTime;
+use Mockery as m;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
-use Mongolid\Tests\Stubs\Product;
-use Mockery as m;
-use Mongolid\Tests\Stubs\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\Product;
 
 class SoftDeletesTraitTest extends TestCase
 {

@@ -4,7 +4,7 @@ namespace Mongolid\Tests\Integration;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Tests\Stubs\Price;
-use Mongolid\Tests\Stubs\Product;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use Mongolid\Tests\Stubs\ReferencedUser;
 use Mongolid\Tests\Stubs\Shop;
 use Mongolid\Tests\Stubs\Sku;
