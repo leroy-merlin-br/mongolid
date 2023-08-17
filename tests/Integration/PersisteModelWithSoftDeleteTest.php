@@ -13,16 +13,18 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
 {
     private ObjectId $_id;
 
-    public function testFindNotDeletedProduct(): void
+    public function testShouldFindNotDeletedProduct(): void
     {
         // Set
         $product = $this->persiteProduct();
 
         // Actions
-        $result = ProductWithSoftDelete::where()->first();
+        $actualWhereResult = ProductWithSoftDelete::where()->first();
+        $actualFirstResult = ProductWithSoftDelete::first($this->_id);
 
         // Assertions
-        $this->assertEquals($product, $result);
+        $this->assertEquals($product, $actualWhereResult);
+        $this->assertEquals($product, $actualFirstResult);
     }
 
     public function testCannotFindDeletedProduct(): void
@@ -31,13 +33,15 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $this->persiteProduct(true);
 
         // Actions
-        $result = ProductWithSoftDelete::where()->first();
+        $actualWhereResult = ProductWithSoftDelete::where()->first();
+        $actualFirstResult = ProductWithSoftDelete::first($this->_id);
 
         // Assertions
-        $this->assertNull($result);
+        $this->assertNull($actualWhereResult);
+        $this->assertNull($actualFirstResult);
     }
 
-    public function testFindDeletedProductTrashed(): void
+    public function testShouldFindATrashedProduct(): void
     {
         // Set
         $this->persiteProduct(true);
@@ -57,34 +61,11 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $this->assertNull($resultArray[1]['deleted_at'] ?? null);
     }
 
-    public function testFindDeletedProductWithFirst(): void
-    {
-        // Set
-        $product = $this->persiteProduct();
-
-        // Actions
-        $result = ProductWithSoftDelete::first($this->_id);
-
-        // Assertions
-        $this->assertEquals($product, $result);
-    }
-
-    public function testCannotFindDeletedProductWithFirst(): void
-    {
-        // Set
-        $this->persiteProduct(true);
-
-        // Actions
-        $result = ProductWithSoftDelete::first($this->_id);
-
-        // Assertions
-        $this->assertNull($result);
-    }
-
     public function testRestoreDeletedProduct(): void
     {
         // Set
-        $product = $this->persiteProduct(true);
+        $product = $this->persiteProduct();
+        $product->delete();
 
         // Actions
         $isRestored = $product->restore();
@@ -121,7 +102,10 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         // Assertions
         $this->assertTrue($isDeleted);
         $this->assertNull($result);
-        $this->assertInstanceOf(UTCDateTime::class, $product->deleted_at);
+        $this->assertEquals(
+            $product,
+            ProductWithSoftDelete::withTrashed()->first()
+        );
     }
 
     public function testExecuteForceDeleteOnProduct(): void
@@ -133,7 +117,7 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
          $isDeleted = $product->forceDelete();
-         $result = ProductWithSoftDelete::all();
+         $result = ProductWithSoftDelete::withTrashed();
 
         // Assertions
         $this->assertTrue($isDeleted);

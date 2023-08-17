@@ -14,18 +14,45 @@ use Mongolid\Tests\Stubs\ProductWithSoftDelete;
 
 class SoftDeletesTraitTest extends TestCase
 {
-    public function testShouldReturnStatusOfSoftDelete(): void
-    {
+    /**
+     * @dataProvider getSoftDeleteStatus
+     */
+    public function testShouldReturnStatusOfSoftDelete(
+        ?UTCDateTime $date,
+        bool $expected,
+        bool $isFillable = true
+    ): void {
         // Set
-        $date = new UTCDateTime(new DateTime('today'));
         $product = new ProductWithSoftDelete();
-        $product->deleted_at = $date;
+
+        if ($isFillable) {
+            $product->deleted_at = $date;
+        }
 
         // Actions
         $actual = $product->isTrashed();
 
         // Assertions
-        $this->assertTrue($actual);
+        $this->assertSame($expected, $actual);
+    }
+
+    public function getSoftDeleteStatus(): array
+    {
+        return [
+            'When deleted_at field is filled' => [
+                'deletedAt' => new UTCDateTime(new DateTime('today')),
+                'expected' => true,
+            ],
+            'When deleted_at field is null' => [
+                'deletedAt' => null,
+                'expected' => false,
+            ],
+            'When there is not an deleted_at field' => [
+                'deletedAt' => null,
+                'expected' => false,
+                'isFillable ' => false,
+            ],
+        ];
     }
 
     public function testShouldRestoreProduct(): void
@@ -34,6 +61,7 @@ class SoftDeletesTraitTest extends TestCase
         $product = new ProductWithSoftDelete();
         $date = new UTCDateTime(new DateTime('today'));
         $product->deleted_at = $date;
+
         $dataMapper = $this->instance(
             DataMapper::class,
             m::mock(DataMapper::class)
@@ -107,11 +135,11 @@ class SoftDeletesTraitTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->where(['withTrashed' => true], [], false)
+            ->where(['_id' => '123', 'withTrashed' => true], [], false)
             ->andReturn($cursor);
 
         // Actions
-        $actual = $product->withTrashed();
+        $actual = $product->withTrashed('123');
 
         // Assertions
         $this->assertInstanceOf(CursorInterface::class, $actual);

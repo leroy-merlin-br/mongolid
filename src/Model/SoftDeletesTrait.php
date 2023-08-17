@@ -11,7 +11,7 @@ trait SoftDeletesTrait
 
     public function isTrashed(): bool
     {
-        return !is_null($this->{ self::getDeletedAtColumn()});
+        return !is_null($this->{self::getDeletedAtColumn()});
     }
 
     public function restore(): bool
@@ -35,7 +35,7 @@ trait SoftDeletesTrait
     }
 
     public static function withTrashed(
-        array $query = [],
+        array|string|int $query = [],
         array $projection = [],
         bool $useCache = false
     ): CursorInterface {

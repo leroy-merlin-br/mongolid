@@ -7,7 +7,7 @@ use Mongolid\Model\ModelInterface;
 
 class QueryBuilder
 {
-    public static function resolveQuery($query, ModelInterface $model): array
+    public static function resolveQuery(int|array|string $query, ModelInterface $model): array
     {
         $query = self::prepareValueQuery($query);
 
@@ -27,12 +27,8 @@ class QueryBuilder
      * Transforms a value that is not an array into an MongoDB query (array).
      * This method will take care of converting a single value into a query for
      * an _id, including when a objectId is passed as a string.
-     *
-     * @param mixed $value the _id of the document
-     *
-     * @return array Query for the given _id
      */
-    public static function prepareValueQuery($value): array
+    public static function prepareValueQuery(int|array|string $value): array
     {
         if (!is_array($value)) {
             $value = ['_id' => $value];
@@ -84,10 +80,6 @@ class QueryBuilder
     /**
      * Prepares an embedded array of an query. It will convert string ObjectIds
      * in operators into actual objects.
-     *
-     * @param array $value array that will be treated
-     *
-     * @return array prepared array
      */
     private static function prepareArrayFieldOfQuery(array $value): array
     {

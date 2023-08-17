@@ -3,15 +3,20 @@
 namespace Mongolid\Util;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
+use Mockery as m;
+use Mongolid\Tests\Stubs\ProductWithSoftDelete;
 
 final class QueryBuilderTest extends TestCase
 {
     /**
      * @dataProvider queryValueScenarios
      */
-    public function testShouldPrepareQueryValue($value, $expectation)
-    {
+    public function testShouldPrepareQueryValue(
+        int|array|string $value,
+        array $expectation
+    ): void {
         // Actions
         $result = QueryBuilder::prepareValueQuery($value);
 
@@ -69,5 +74,94 @@ final class QueryBuilderTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider getQuery
+     */
+    public function testShouldResolveQuery(
+        int|array|string $query,
+        array $expected
+    ): void {
+        // Set
+        $model = m::mock(ModelInterface::class);
+
+        // Actions
+        $actual = QueryBuilder::resolveQuery($query, $model);
+
+        // Assertions
+        $this->assertSame($expected, $actual);
+    }
+
+    public function getQuery(): array
+    {
+        return [
+            'When query is a string' => [
+                'query' => '123',
+                'expected' => [
+                    '_id' => '123',
+                    '$or' => [
+                        ['deleted_at' => null],
+                        ['deleted_at' => ['$exists' => false]],
+                    ],
+                ],
+            ],
+            'When query is a int' => [
+                'query' => 123,
+                'expected' => [
+                    '_id' => 123,
+                    '$or' => [
+                        ['deleted_at' => null],
+                        ['deleted_at' => ['$exists' => false]],
+                    ],
+                ],
+            ],
+            'When query have withTrashed field' => [
+                'query' => ['_id' => 123,'withTrashed' => true],
+                'expected' => [
+                    '_id' => 123,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider  setDefaultClass
+     */
+    public function testShouldGetDeleteAtColumn(bool $isDefault, string $expected): void
+    {
+        // Set
+        $model = $this->buildProduct($isDefault);
+
+        // Actions
+        $actual = QueryBuilder::getDeletedAtColumn($model);
+
+        // Assertions
+        $this->assertSame($expected, $actual);
+    }
+
+    public function setDefaultClass(): array
+    {
+        return [
+            'Get class with DELETED_AT default' => [
+                'isDefault' => false,
+                'expected' => 'custom_deleted_at',
+            ],
+            'Get class with DELETED_AT custom' => [
+                'isDefault' => true,
+                'expected' => 'deleted_at',
+            ],
+        ];
+    }
+
+    public function buildProduct(bool $isDefault): ProductWithSoftDelete
+    {
+        if ($isDefault) {
+            return new ProductWithSoftDelete();
+        }
+
+        return new class extends ProductWithSoftDelete {
+            public const DELETED_AT = 'custom_deleted_at';
+        };
     }
 }
