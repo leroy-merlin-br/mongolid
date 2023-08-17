@@ -158,7 +158,6 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
 
         if ($softDeleted) {
             $date = new UTCDateTime(new DateTime('today'));
-            var_dump('oi');
             $product->deleted_at = $date;
         }
 

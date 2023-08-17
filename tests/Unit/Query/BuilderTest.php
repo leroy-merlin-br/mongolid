@@ -510,16 +510,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
@@ -540,8 +531,7 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class, [$connection])->makePartial();
-        $builder->shouldAllowMockingProtectedMethods();
+        $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
         $model = new ReplaceCollectionModel();
@@ -555,16 +545,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
         $expectedParams = [
@@ -608,16 +589,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
@@ -664,16 +636,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -742,16 +705,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -824,16 +778,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -861,16 +806,7 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, 'fields' => false, '__pclass' => true];
         $model = new ReplaceCollectionModel();

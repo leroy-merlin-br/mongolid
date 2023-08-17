@@ -428,7 +428,7 @@ class Builder
         return $changes;
     }
 
-    private function executeSoftDelete(ModelInterface $entity, $options): bool
+    private function executeSoftDelete(ModelInterface $entity, array $options): bool
     {
         $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($entity);
         $entity->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));

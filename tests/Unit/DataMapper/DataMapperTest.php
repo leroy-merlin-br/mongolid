@@ -758,16 +758,7 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false];
 
@@ -825,14 +816,7 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => ['$exists' => false],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
 
         $schema->entityClass = Product::class;
@@ -873,15 +857,9 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, 'fields' => false];
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => ['$exists' => false],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
+
         $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 

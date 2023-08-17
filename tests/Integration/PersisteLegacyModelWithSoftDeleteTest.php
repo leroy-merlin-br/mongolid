@@ -79,7 +79,7 @@ final class PersisteLegacyModelWithSoftDeleteTest extends IntegrationTestCase
     public function testCannotRestoreAlreadyRestoredProduct(): void
     {
         // Set
-        $product = $this->persiteProduct(isRestored: true);
+        $product = $this->persiteProduct();
 
         // Actions
         $isRestored = $product->restore();
@@ -151,7 +151,6 @@ final class PersisteLegacyModelWithSoftDeleteTest extends IntegrationTestCase
 
     private function persiteProduct(
         bool $softDeleted = false,
-        bool $isRestored = false,
         string $model = ProductWithSoftDelete::class
     ): ModelInterface {
         $product = new $model();
@@ -163,10 +162,6 @@ final class PersisteLegacyModelWithSoftDeleteTest extends IntegrationTestCase
             $date = new UTCDateTime(new DateTime('today'));
 
             $product->deleted_at = $date;
-        }
-
-        if ($isRestored) {
-            $product->deleted_at = null;
         }
 
         $product->save();
