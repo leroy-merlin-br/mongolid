@@ -1,8 +1,7 @@
 <?php
-namespace Mongolid\Tests\Stubs;
+namespace Mongolid\Tests\Stubs\Legacy;
 
 use Mongolid\LegacyRecord;
-use Mongolid\Model\Relations\ReferencesOne;
 
 class Sku extends LegacyRecord
 {

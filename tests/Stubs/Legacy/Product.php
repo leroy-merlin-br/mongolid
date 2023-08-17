@@ -2,10 +2,7 @@
 namespace Mongolid\Tests\Stubs\Legacy;
 
 use Mongolid\LegacyRecord;
-use Mongolid\Model\Relations\ReferencesOne;
 use Mongolid\Tests\Stubs\Price;
-use Mongolid\Tests\Stubs\Shop;
-use Mongolid\Tests\Stubs\Sku;
 
 class Product extends LegacyRecord
 {

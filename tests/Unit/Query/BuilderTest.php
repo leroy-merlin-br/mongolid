@@ -3,7 +3,6 @@ namespace Mongolid\Query;
 
 use InvalidArgumentException;
 use Mockery as m;
-use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
