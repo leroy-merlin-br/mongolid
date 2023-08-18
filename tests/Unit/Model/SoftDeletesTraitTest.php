@@ -119,6 +119,56 @@ class SoftDeletesTraitTest extends TestCase
         $this->assertTrue($actual);
     }
 
+    public function testShouldExecuteSoftDeleteProduct(): void
+    {
+        // Set
+        $product = new ProductWithSoftDelete();
+
+        $dataMapper = $this->instance(
+            DataMapper::class,
+            m::mock(DataMapper::class)
+        );
+
+        // Expectations
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
+
+        $dataMapper->expects()
+            ->update(m::type(Product::class), m::type('array'))
+            ->andReturnTrue();
+
+        // Actions
+        $actual = $product->delete();
+
+        // Assertions
+        $this->assertTrue($actual);
+    }
+
+    public function testShouldNotExecuteSoftDelete(): void
+    {
+        // Set
+        $product = new Product();
+
+        $dataMapper = $this->instance(
+            DataMapper::class,
+            m::mock(DataMapper::class)
+        );
+
+        // Expectations
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
+
+        $dataMapper->expects()
+            ->delete(m::type(Product::class), m::type('array'))
+            ->andReturnTrue();
+
+        // Actions
+        $actual = $product->delete();
+
+        // Assertions
+        $this->assertTrue($actual);
+    }
+
     public function testShouldFindWithTrashedProducts(): void
     {
         // Set

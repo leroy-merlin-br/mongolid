@@ -2,6 +2,8 @@
 
 namespace Mongolid\Model;
 
+use DateTime;
+use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Util\QueryBuilder;
 
@@ -33,6 +35,14 @@ trait SoftDeletesTrait
         $this->forceDelete = true;
 
         return $this->execute('delete');
+    }
+
+    public function executeSoftDelete(): bool
+    {
+        $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($this);
+        $this->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
+
+        return $this->update();
     }
 
     public static function withTrashed(

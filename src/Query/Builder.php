@@ -174,10 +174,6 @@ class Builder
      */
     public function delete(ModelInterface $model, array $options = []): bool
     {
-        if (($model->enabledSoftDeletes ?? false) && !($model->forceDelete ?? false)) {
-            return $this->executeSoftDelete($model, $options);
-        }
-
         if (false === $this->fireEvent('deleting', $model, true)) {
             return false;
         }
@@ -426,13 +422,5 @@ class Builder
         $this->calculateChanges($changes, $data, $model->getOriginalDocumentAttributes());
 
         return $changes;
-    }
-
-    private function executeSoftDelete(ModelInterface $entity, array $options): bool
-    {
-        $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($entity);
-        $entity->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
-
-        return $this->update($entity, $options);
     }
 }

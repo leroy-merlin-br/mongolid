@@ -222,10 +222,6 @@ class DataMapper implements HasSchemaInterface
      */
     public function delete($entity, array $options = []): bool
     {
-        if (($entity->enabledSoftDeletes ?? false) && !($entity->forceDelete ?? false)) {
-            return $this->executeSoftDelete($entity, $options);
-        }
-
         if (false === $this->fireEvent('deleting', $entity, true)) {
             return false;
         }
@@ -615,13 +611,5 @@ class DataMapper implements HasSchemaInterface
         }
 
         return $filtered;
-    }
-
-    private function executeSoftDelete(ModelInterface $entity, array $options): bool
-    {
-        $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($entity);
-        $entity->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
-
-        return $this->update($entity, $options);
     }
 }

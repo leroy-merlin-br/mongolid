@@ -116,6 +116,10 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     public function delete(): bool
     {
+        if (($this->enabledSoftDeletes ?? false) && !($this->forceDelete ?? false)) {
+            return $this->executeSoftDelete();
+        }
+
         return $this->execute('delete');
     }
 
