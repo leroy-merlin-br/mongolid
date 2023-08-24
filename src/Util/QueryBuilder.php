@@ -65,14 +65,7 @@ class QueryBuilder
         return array_merge(
             $query,
             [
-                '$or' => [
-                    [
-                        $field => null,
-                    ],
-                    [
-                        $field => ['$exists' => false],
-                    ],
-                ],
+                $field => ['$exists' => false],
             ]
         );
     }

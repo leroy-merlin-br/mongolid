@@ -3,14 +3,14 @@
 namespace Mongolid\Model;
 
 use DateTime;
+use Mockery as m;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\TestCase;
-use Mongolid\Tests\Stubs\Product;
-use Mockery as m;
-use Mongolid\Tests\Stubs\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\Product;
 
 class SoftDeletesTraitTest extends TestCase
 {
@@ -114,6 +114,56 @@ class SoftDeletesTraitTest extends TestCase
 
         // Actions
         $actual = $product->forceDelete();
+
+        // Assertions
+        $this->assertTrue($actual);
+    }
+
+    public function testShouldExecuteSoftDeleteProduct(): void
+    {
+        // Set
+        $product = new ProductWithSoftDelete();
+
+        $dataMapper = $this->instance(
+            DataMapper::class,
+            m::mock(DataMapper::class)
+        );
+
+        // Expectations
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
+
+        $dataMapper->expects()
+            ->update(m::type(Product::class), m::type('array'))
+            ->andReturnTrue();
+
+        // Actions
+        $actual = $product->delete();
+
+        // Assertions
+        $this->assertTrue($actual);
+    }
+
+    public function testShouldNotExecuteSoftDelete(): void
+    {
+        // Set
+        $product = new Product();
+
+        $dataMapper = $this->instance(
+            DataMapper::class,
+            m::mock(DataMapper::class)
+        );
+
+        // Expectations
+        $dataMapper->expects()
+            ->setSchema(m::type(DynamicSchema::class));
+
+        $dataMapper->expects()
+            ->delete(m::type(Product::class), m::type('array'))
+            ->andReturnTrue();
+
+        // Actions
+        $actual = $product->delete();
 
         // Assertions
         $this->assertTrue($actual);

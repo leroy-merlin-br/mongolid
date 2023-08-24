@@ -2,12 +2,15 @@
 
 namespace Mongolid\Model;
 
+use DateTime;
+use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Util\QueryBuilder;
 
 trait SoftDeletesTrait
 {
     public bool $enabledSoftDeletes = true;
+    public bool $forceDelete = false;
 
     public function isTrashed(): bool
     {
@@ -18,11 +21,11 @@ trait SoftDeletesTrait
     {
         $collumn = self::getDeletedAtColumn();
 
-        if (!$this->{$collumn}) {
+        if (!$this->isTrashed()) {
             return false;
         }
 
-        $this->{$collumn} = null;
+        unset($this->{$collumn});
 
         return $this->execute('save');
     }
@@ -32,6 +35,14 @@ trait SoftDeletesTrait
         $this->forceDelete = true;
 
         return $this->execute('delete');
+    }
+
+    public function executeSoftDelete(): bool
+    {
+        $deletedAtCoullum = QueryBuilder::getDeletedAtColumn($this);
+        $this->$deletedAtCoullum = new UTCDateTime(new DateTime('now'));
+
+        return $this->update();
     }
 
     public static function withTrashed(

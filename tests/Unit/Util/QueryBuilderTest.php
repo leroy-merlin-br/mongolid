@@ -2,11 +2,11 @@
 
 namespace Mongolid\Util;
 
+use Mockery as m;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
-use Mockery as m;
-use Mongolid\Tests\Stubs\ProductWithSoftDelete;
+use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
 
 final class QueryBuilderTest extends TestCase
 {
@@ -100,20 +100,14 @@ final class QueryBuilderTest extends TestCase
                 'query' => '123',
                 'expected' => [
                     '_id' => '123',
-                    '$or' => [
-                        ['deleted_at' => null],
-                        ['deleted_at' => ['$exists' => false]],
-                    ],
+                    'deleted_at' => ['$exists' => false],
                 ],
             ],
             'When query is a int' => [
                 'query' => 123,
                 'expected' => [
                     '_id' => 123,
-                    '$or' => [
-                        ['deleted_at' => null],
-                        ['deleted_at' => ['$exists' => false]],
-                    ],
+                    'deleted_at' => ['$exists' => false],
                 ],
             ],
             'When query have withTrashed field' => [

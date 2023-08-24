@@ -4,7 +4,6 @@ namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use ErrorException;
-use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
 use Mongolid\Container\Container;

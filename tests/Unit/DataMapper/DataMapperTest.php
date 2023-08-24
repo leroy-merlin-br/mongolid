@@ -15,7 +15,7 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Tests\Stubs\Product;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use stdClass;
 use Mongolid\TestCase;
 
@@ -645,71 +645,6 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->delete($entity, $options));
     }
 
-    public function testShouldExecuteSoftDelete()
-    {
-        // Set
-        $entity = m::mock(ModelInterface::class);
-        $writeConcern = 1;
-        $connection = m::mock(Connection::class);
-        $mapper = m::mock(
-            DataMapper::class . '[parseToDocument,getCollection]',
-            [$connection]
-        );
-
-        $collection = m::mock(Collection::class);
-        $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
-        $options = ['writeConcern' => new WriteConcern($writeConcern)];
-
-        $entity->_id = 123;
-        $entity->enabledSoftDeletes = true;
-
-        // Expectations
-        $mapper->shouldAllowMockingProtectedMethods();
-
-        $mapper->shouldReceive('parseToDocument')
-            ->once()
-            ->with($entity)
-            ->andReturn($parsedObject);
-
-        $mapper->shouldReceive('getCollection')
-            ->once()
-            ->andReturn($collection);
-
-        $collection->shouldReceive('updateOne')
-            ->once()
-            ->with(
-                ['_id' => 123],
-                ['$set' => $parsedObject],
-                ['writeConcern' => new WriteConcern($writeConcern)]
-            )->andReturn($operationResult);
-
-        $operationResult->shouldReceive('isAcknowledged')
-            ->once()
-            ->andReturn((bool) $writeConcern);
-
-        $operationResult->shouldReceive('getModifiedCount')
-            ->andReturn(1);
-
-        $entity->shouldReceive('syncOriginalDocumentAttributes')
-            ->once()
-            ->with();
-
-        $entity->expects()
-            ->getOriginalDocumentAttributes()
-            ->andReturn([]);
-
-        $this->expectEventToBeFired('updating', $entity, true);
-
-        $this->expectEventToBeFired('updated', $entity, false);
-
-        // Actions
-        $actual = $mapper->delete($entity, $options);
-
-        // Assert
-        $this->assertTrue($actual);
-    }
-
     /**
      * @dataProvider eventsToBailOperations
      */
@@ -758,16 +693,7 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => [
-                        '$exists' => false,
-                    ],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false];
 
@@ -825,14 +751,7 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => ['$exists' => false],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
 
         $schema->entityClass = Product::class;
@@ -873,15 +792,9 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, 'fields' => false];
         $preparedQuery = [
             '_id' => 123,
-            '$or' => [
-                [
-                    'deleted_at' => null,
-                ],
-                [
-                    'deleted_at' => ['$exists' => false],
-                ],
-            ],
+            'deleted_at' => ['$exists' => false],
         ];
+
         $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
