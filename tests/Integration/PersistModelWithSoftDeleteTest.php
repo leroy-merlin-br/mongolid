@@ -9,32 +9,33 @@ use Mongolid\Model\ModelInterface;
 use Mongolid\Tests\Stubs\ProductWithSoftDelete;
 use Mongolid\Tests\Stubs\Product;
 
-final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
+final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
 {
     private ObjectId $_id;
 
-    public function testShouldFindNotDeletedProduct(): void
+    public function testShouldFindUndeletedProduct(): void
     {
         // Set
-        $product = $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first($this->_id);
+        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertEquals($product, $actualWhereResult);
         $this->assertEquals($product, $actualFirstResult);
     }
 
-    public function testCannotFindDeletedProduct(): void
+    public function testShouldNotFindDeletedProduct(): void
     {
         // Set
-        $this->persiteProduct(true);
+        $product = $this->persitProductWithSoftDeleteTrait();
+        $product->delete();
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first($this->_id);
+        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertNull($actualWhereResult);
@@ -44,9 +45,9 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldFindATrashedProduct(): void
     {
         // Set
-        $this->persiteProduct(true);
-        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a123');
-        $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
+        $product->delete();
+        $this->persitProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
 
         // Actions
         $result = ProductWithSoftDelete::withTrashed();
@@ -61,43 +62,43 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $this->assertNull($result->current()->deleted_at ?? null);
     }
 
-    public function testRestoreDeletedProduct(): void
+    public function testShouldRestoreDeletedProduct(): void
     {
         // Set
-        $product = $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
         $product->delete();
 
         // Actions
         $isRestored = $product->restore();
-        $result = ProductWithSoftDelete::first($this->_id);
+        $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertTrue($isRestored);
         $this->assertEquals($product, $result);
     }
 
-    public function testCannotRestoreAlreadyRestoredProduct(): void
+    public function testShouldNotRestoreAlreadyRestoredProduct(): void
     {
         // Set
-        $product = $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
 
         // Actions
         $isRestored = $product->restore();
-        $result = ProductWithSoftDelete::first($this->_id);
+        $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertFalse($isRestored);
         $this->assertNull($result->deleted_at);
     }
 
-    public function testExecuteSoftDeleteOnProduct(): void
+    public function testShouldExecuteSoftDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
 
         // Actions
          $isDeleted = $product->delete();
-         $result = ProductWithSoftDelete::first($this->_id);
+         $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertTrue($isDeleted);
@@ -108,12 +109,11 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         );
     }
 
-    public function testExecuteForceDeleteOnProduct(): void
+    public function testShouldExecuteForceDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persiteProduct();
-        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a123');
-        $product2 = $this->persiteProduct();
+        $product = $this->persitProductWithSoftDeleteTrait();
+        $product2 = $this->persitProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
 
         // Actions
          $isDeleted = $product->forceDelete();
@@ -125,10 +125,10 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $this->assertEquals($product2, $result->first());
     }
 
-    public function testCannotExecuteSoftDeleteOnProduct(): void
+    public function testShouldNotExecuteSoftDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persiteProduct(model:Product::class);
+        $product = $this->persitProduct();
 
         // Actions
          $isDeleted = $product->delete();
@@ -147,19 +147,25 @@ final class PersisteModelWithSoftDeleteTest extends IntegrationTestCase
         $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a672');
     }
 
-    private function persiteProduct(
-        bool $softDeleted = false,
-        string $model = ProductWithSoftDelete::class
+    private function persitProductWithSoftDeleteTrait(
+        string $id = '5bcb310783a7fcdf1bf1a672'
     ): ModelInterface {
-        $product = new $model();
-        $product->_id = $this->_id;
+        $product = new ProductWithSoftDelete();
+        $product->_id = new ObjectId($id);
         $product->short_name = 'Furadeira de Impacto Bosch com Chave de Mandril ';
         $product->name = 'Furadeira de Impacto Bosch com Chave de Mandril e Acessórios 550W 1/2 GSB 550 RE 127V (110V)';
 
-        if ($softDeleted) {
-            $date = new UTCDateTime(new DateTime('today'));
-            $product->deleted_at = $date;
-        }
+        $product->save();
+
+        return $product;
+    }
+    private function persitProduct(
+        string $id = '5bcb310783a7fcdf1bf1a672'
+    ): ModelInterface {
+        $product = new Product();
+        $product->_id = new ObjectId($id);
+        $product->short_name = 'Furadeira de Impacto Bosch com Chave de Mandril ';
+        $product->name = 'Furadeira de Impacto Bosch com Chave de Mandril e Acessórios 550W 1/2 GSB 550 RE 127V (110V)';
 
         $product->save();
 

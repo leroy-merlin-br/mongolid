@@ -509,7 +509,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
@@ -544,7 +543,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
         $expectedParams = [
@@ -588,7 +586,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false, '__pclass' => true];
 
@@ -635,7 +632,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -704,7 +700,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -777,7 +772,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $model = new ReplaceCollectionModel();
         $model->setCollection($collection);
@@ -805,7 +799,6 @@ final class BuilderTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, 'fields' => false, '__pclass' => true];
         $model = new ReplaceCollectionModel();

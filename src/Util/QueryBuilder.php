@@ -7,9 +7,9 @@ use Mongolid\Model\ModelInterface;
 
 class QueryBuilder
 {
-    public static function resolveQuery(int|array|string $query, ModelInterface $model): array
+    public static function prepareValueForSoftDeleteCompatibility(mixed $query, ModelInterface $model): array
     {
-        $query = self::prepareValueQuery($query);
+        $query = self::prepareValueForQueryCompatibility($query);
 
         return self::addSoftDeleteFilterIfRequired($query, $model);
     }
@@ -23,72 +23,74 @@ class QueryBuilder
             : 'deleted_at';
     }
 
-    /**
-     * Transforms a value that is not an array into an MongoDB query (array).
-     * This method will take care of converting a single value into a query for
-     * an _id, including when a objectId is passed as a string.
-     */
-    public static function prepareValueQuery(int|array|string $value): array
+    public static function prepareValueForQueryCompatibility(mixed $query): array
     {
-        if (!is_array($value)) {
-            $value = ['_id' => $value];
+        if (!is_array($query)) {
+            $query = ['_id' => $query];
         }
 
         if (
-            isset($value['_id']) &&
-            is_string($value['_id']) &&
-            ObjectIdUtils::isObjectId($value['_id'])
+            isset($query['_id']) &&
+            is_string($query['_id']) &&
+            ObjectIdUtils::isObjectId($query['_id'])
         ) {
-            $value['_id'] = new ObjectId($value['_id']);
+            $query['_id'] = new ObjectId($query['_id']);
         }
 
         if (
-            isset($value['_id']) &&
-            is_array($value['_id'])
+            isset($query['_id']) &&
+            is_array($query['_id'])
         ) {
-            $value['_id'] = self::prepareArrayFieldOfQuery($value['_id']);
+            $query['_id'] = self::convertStringIdsToObjectIds($query['_id']);
         }
 
-        return $value;
+        return $query;
     }
 
     private static function addSoftDeleteFilterIfRequired(array $query, ModelInterface $model): array
     {
-        $field = self::getDeletedAtColumn($model);
+        if ($model->isSoftDeleteEnabled) {
+            $field = self::getDeletedAtColumn($model);
 
-        if (isset($query['withTrashed'])) {
-            unset($query['withTrashed']);
-
-            return $query;
+            return array_merge(
+                $query,
+                [
+                    $field => ['$exists' => false],
+                ]
+            );
         }
 
-        return array_merge(
-            $query,
-            [
-                $field => ['$exists' => false],
-            ]
-        );
+        return $query;
     }
 
-    /**
-     * Prepares an embedded array of an query. It will convert string ObjectIds
-     * in operators into actual objects.
-     */
-    private static function prepareArrayFieldOfQuery(array $value): array
+    private static function convertStringIdsToObjectIds(array $query): array
     {
         foreach (['$in', '$nin'] as $operator) {
             if (
-                isset($value[$operator]) &&
-                is_array($value[$operator])
+                self::verifyIdsNeedConversion($query, $operator)
             ) {
-                foreach ($value[$operator] as $index => $id) {
-                    if (ObjectIdUtils::isObjectId($id)) {
-                        $value[$operator][$index] = new ObjectId($id);
-                    }
-                }
+                $query[$operator] = self::convertIdsToObjects(
+                    $query[$operator]
+                );
             }
         }
 
-        return $value;
+        return $query;
+    }
+
+    private static function convertIdsToObjects(array $ids): array
+    {
+        foreach ($ids as $index => $id) {
+            if (ObjectIdUtils::isObjectId($id)) {
+                $ids[$index] = new ObjectId($id);
+            }
+        }
+
+        return $ids;
+    }
+
+    private static function verifyIdsNeedConversion(array $query, string $operator): bool
+    {
+        return isset($query[$operator]) && is_array($query[$operator]);
     }
 }

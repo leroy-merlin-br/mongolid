@@ -1,10 +1,7 @@
 <?php
 namespace Mongolid\Query;
 
-use DateTime;
 use InvalidArgumentException;
-use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\UTCDateTime;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CacheableCursor;
@@ -23,6 +20,8 @@ use Mongolid\Util\QueryBuilder;
  */
 class Builder
 {
+    public bool $withTrashed = false;
+
     /**
      * Connection that is going to be used to interact with the database.
      *
@@ -206,11 +205,15 @@ class Builder
     {
         $cursor = $useCache ? CacheableCursor::class : Cursor::class;
 
+        $query = $this->withTrashed ?
+            QueryBuilder::prepareValueForQueryCompatibility($query) :
+            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
+
         return new $cursor(
             $model->getCollection(),
             'find',
             [
-                QueryBuilder::resolveQuery($query, $model),
+                $query,
                 [
                     'projection' => $this->prepareProjection($projection),
                     'eagerLoads' => $model->with ?? [],
@@ -250,7 +253,7 @@ class Builder
         }
 
         return $model->getCollection()->findOne(
-            QueryBuilder::resolveQuery($query, $model),
+            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model),
             ['projection' => $this->prepareProjection($projection)],
         );
     }

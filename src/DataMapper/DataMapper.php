@@ -2,9 +2,7 @@
 
 namespace Mongolid\DataMapper;
 
-use DateTime;
 use InvalidArgumentException;
-use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
@@ -27,6 +25,8 @@ Use Mongolid\Util\QueryBuilder;
  */
 class DataMapper implements HasSchemaInterface
 {
+    public bool $withTrashed = false;
+
     /**
      * Name of the schema class to be used.
      *
@@ -261,12 +261,16 @@ class DataMapper implements HasSchemaInterface
 
         $model = new $this->schema->entityClass;
 
+        $query = $this->withTrashed ?
+            QueryBuilder::prepareValueForQueryCompatibility($query) :
+            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
+
         return new $cursorClass(
             $this->schema,
             $this->getCollection(),
             'find',
             [
-                QueryBuilder::resolveQuery($query, $model),
+                $query,
                 [
                     'projection' => $this->prepareProjection($projection),
                     'eagerLoads' => $model->with ?? [],
@@ -306,7 +310,7 @@ class DataMapper implements HasSchemaInterface
         $model = new $this->schema->entityClass;
 
         $document = $this->getCollection()->findOne(
-            QueryBuilder::resolveQuery($query, $model),
+            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model),
             ['projection' => $this->prepareProjection($projection)]
         );
 

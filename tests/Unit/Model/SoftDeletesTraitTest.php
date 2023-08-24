@@ -72,7 +72,7 @@ class SoftDeletesTraitTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->save(m::type(Product::class), m::type('array'))
+            ->update(m::type(Product::class), m::type('array'))
             ->andReturnTrue();
 
         // Actions
@@ -94,7 +94,7 @@ class SoftDeletesTraitTest extends TestCase
         $this->assertFalse($actual);
     }
 
-    public function testShouldforceDeleteProduct(): void
+    public function testShouldForceDeleteOnProduct(): void
     {
         // Set
         $product = new ProductWithSoftDelete();
@@ -185,7 +185,7 @@ class SoftDeletesTraitTest extends TestCase
             ->setSchema(m::type(DynamicSchema::class));
 
         $dataMapper->expects()
-            ->where(['_id' => '123', 'withTrashed' => true], [], false)
+            ->where('123', [], false)
             ->andReturn($cursor);
 
         // Actions

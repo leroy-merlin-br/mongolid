@@ -14,11 +14,11 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider queryValueScenarios
      */
     public function testShouldPrepareQueryValue(
-        int|array|string $value,
+        mixed $value,
         array $expectation
     ): void {
         // Actions
-        $result = QueryBuilder::prepareValueQuery($value);
+        $result = QueryBuilder::prepareValueForQueryCompatibility($value);
 
         // Assertions
         $this->assertMongoQueryEquals($expectation, $result);
@@ -79,15 +79,17 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider getQuery
      */
-    public function testShouldResolveQuery(
-        int|array|string $query,
+    public function testShouldPrepareValueForSoftDeleteCompatibility(
+        mixed $query,
+        bool $isSoftDeleteEnabled,
         array $expected
     ): void {
         // Set
         $model = m::mock(ModelInterface::class);
+        $model->isSoftDeleteEnabled = $isSoftDeleteEnabled;
 
         // Actions
-        $actual = QueryBuilder::resolveQuery($query, $model);
+        $actual = QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
 
         // Assertions
         $this->assertSame($expected, $actual);
@@ -95,25 +97,51 @@ final class QueryBuilderTest extends TestCase
 
     public function getQuery(): array
     {
+        $objectId = new ObjectId('64e8963b1de34f08a40502e0');
         return [
-            'When query is a string' => [
+            'When query is a string and softDelete is enabled' => [
                 'query' => '123',
+                'isSoftDeleteEnabled' => true,
                 'expected' => [
                     '_id' => '123',
                     'deleted_at' => ['$exists' => false],
                 ],
             ],
-            'When query is a int' => [
+            'When query is a string and softDelete is disabled' => [
+                'query' => '123',
+                'isSoftDeleteEnabled' => false,
+                'expected' => [
+                    '_id' => '123',
+                ],
+            ],
+            'When query is a int and softDelete is enabled' => [
                 'query' => 123,
+                'isSoftDeleteEnabled' => true,
                 'expected' => [
                     '_id' => 123,
                     'deleted_at' => ['$exists' => false],
                 ],
             ],
-            'When query have withTrashed field' => [
-                'query' => ['_id' => 123,'withTrashed' => true],
+            'When query is a int and softDelete is disabled' => [
+                'query' => 123,
+                'isSoftDeleteEnabled' => false,
                 'expected' => [
                     '_id' => 123,
+                ],
+            ],
+            'When query is a objectId and softDelete is enabled' => [
+                'query' => $objectId,
+                'isSoftDeleteEnabled' => true,
+                'expected' => [
+                    '_id' => $objectId,
+                    'deleted_at' => ['$exists' => false],
+                ],
+            ],
+            'When query is a objectId and softDelete is disabled' => [
+                'query' => $objectId,
+                'isSoftDeleteEnabled' => false,
+                'expected' => [
+                    '_id' => $objectId,
                 ],
             ],
         ];

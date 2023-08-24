@@ -693,7 +693,6 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
         $projection = ['project' => true, '_id' => false];
 
@@ -751,7 +750,6 @@ class DataMapperTest extends TestCase
         $query = 123;
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
 
         $schema->entityClass = Product::class;
@@ -792,7 +790,6 @@ class DataMapperTest extends TestCase
         $projection = ['project' => true, 'fields' => false];
         $preparedQuery = [
             '_id' => 123,
-            'deleted_at' => ['$exists' => false],
         ];
 
         $schema->entityClass = Product::class;

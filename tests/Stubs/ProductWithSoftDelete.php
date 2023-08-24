@@ -2,9 +2,9 @@
 
 namespace Mongolid\Tests\Stubs;
 
-use Mongolid\Model\SoftDeletesTrait;
+use Mongolid\Model\SoftDeleteTrait;
 
 class ProductWithSoftDelete extends Product
 {
-    use SoftDeletesTrait;
+    use SoftDeleteTrait;
 }
