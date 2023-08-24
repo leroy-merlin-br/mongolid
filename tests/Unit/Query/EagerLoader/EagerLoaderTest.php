@@ -4,7 +4,6 @@ namespace Mongolid\Query\EagerLoader;
 use ArrayIterator;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
-use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Cursor\SchemaEmbeddedCursor;
 use Mongolid\TestCase;
 use Mockery as m;

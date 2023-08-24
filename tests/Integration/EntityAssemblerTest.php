@@ -8,7 +8,7 @@ use Mongolid\Container\Container;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
-use Mongolid\Tests\Stubs\LegacyRecordStudent;
+use Mongolid\Tests\Stubs\Legacy\LegacyRecordStudent;
 
 class EntityAssemblerTest extends TestCase
 {
