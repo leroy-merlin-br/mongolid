@@ -24,6 +24,11 @@ class Cache
         $model = Container::make($eagerLoadedModel['model']);
         $ids = array_values($eagerLoadedModel['ids'] ?? []);
 
+        // By default, the foreign key will always be the _id, but
+        // you can override this behavior by setting it on your
+        // model on the eager load settings.
+        $foreignKey = $eagerLoadedModel['foreignKey'] ?? '_id';
+
         // In case there is no IDs, means that either we don't
         // have any related models or models was not configured
         // correctly, in both case, we should not cache it.
@@ -31,7 +36,7 @@ class Cache
             return;
         }
 
-        $query = ['_id' => ['$in' => $ids]];
+        $query = [$foreignKey => ['$in' => $ids]];
         $count = 0;
 
         foreach ($model->where($query) as $relatedModel) {

@@ -77,7 +77,42 @@ class EagerLoaderTest extends TestCase
             'price' => [
                 'key' => '_id',
                 'model' => Price::class
-            ]
+            ],
+        ]);
+    }
+
+    public function testShouldCacheQueriesWithForeignKeys(): void
+    {
+        // Set
+        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $price = Container::instance(Price::class, m::mock(Price::class));
+        $eagerLoader = new EagerLoader();
+        $product = new Product();
+        $id = new ObjectId();
+        $product->_id = $id;
+
+        $priceModel = new Price();
+        $priceModel->_id = $id;
+        $prices = new SchemaEmbeddedCursor(Price::class, [$priceModel]);
+
+        $products = new ArrayIterator([$product->toArray()]);
+
+        // Expectations
+        $price->expects()
+            ->where(['product_id' => ['$in' => [$id]]])
+            ->andReturn($prices);
+
+        $cacheComponent->expects()
+            ->put("prices:$id", m::any(), 36)
+            ->andReturnTrue();
+
+        // Actions
+        $eagerLoader->cache($products, [
+            'price' => [
+                'key' => '_id',
+                'foreignKey' => 'product_id',
+                'model' => Price::class
+            ],
         ]);
     }
 

@@ -57,7 +57,7 @@ class Extractor
 
     private function addIdFor(string $eagerLoadKey, $id): void
     {
-        $this->relatedModels[$eagerLoadKey]['ids'][$id] = $id;
+        $this->relatedModels[$eagerLoadKey]['ids'][(string) $id] = $id;
     }
 
     /**
@@ -95,13 +95,6 @@ class Extractor
             // found on related model, we should warn that the user
             // is trying to eager load an invalid model.
             throw new EagerLoaderException('Referenced key was not found on child model.');
-        }
-
-        // We only want to object ids to string to give
-        // us some flexibility on array indexes.
-        // any other type of ids should remain the same.
-        if ($id instanceof ObjectId) {
-            $id = (string) $id;
         }
 
         $this->addIdFor($eagerLoadKey, $id);

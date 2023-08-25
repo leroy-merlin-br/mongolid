@@ -2,7 +2,6 @@
 namespace Mongolid\Tests\Stubs;
 
 use Mongolid\LegacyRecord;
-use Mongolid\Model\Relations\ReferencesOne;
 
 class Product extends LegacyRecord
 {
@@ -16,6 +15,11 @@ class Product extends LegacyRecord
             'key' => '_id',
             'model' => Price::class
         ],
+        'stock' => [
+            'key' => '_id',
+            'foreignKey' => 'product_id',
+            'model' => Stock::class,
+        ],
         'shop' => [
             'key' => 'skus.shop_id',
             'model' => Shop::class,
@@ -25,6 +29,11 @@ class Product extends LegacyRecord
     public function price()
     {
         return $this->referencesOne(Price::class, '_id');
+    }
+
+    public function stock()
+    {
+        return $this->referencesOne(Stock::class, '_id', true, 'product_id');
     }
 
     public function skus()

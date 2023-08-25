@@ -34,7 +34,7 @@ trait HasLegacyRelationsTrait
      * @return mixed
      * @throws BindingResolutionException
      */
-    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
+    protected function referencesOne(string $entity, string $field, bool $cacheable = true, string $foreignKey = '_id')
     {
         $referencedId = $this->$field;
 
@@ -52,10 +52,10 @@ trait HasLegacyRelationsTrait
             $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->first(['_id' => $referencedId], [], $cacheable);
+            return $dataMapper->first([$foreignKey => $referencedId], [], $cacheable);
         }
 
-        return $entityInstance::first(['_id' => $referencedId], [], $cacheable);
+        return $entityInstance::first([$foreignKey => $referencedId], [], $cacheable);
     }
 
     /**

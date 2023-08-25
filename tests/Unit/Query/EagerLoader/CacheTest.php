@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Query\EagerLoader;
 
+use MongoDB\BSON\ObjectId;
 use Mongolid\Cursor\SchemaEmbeddedCursor;
 use Mongolid\TestCase;
 use Mockery as m;
@@ -44,6 +45,48 @@ class CacheTest extends TestCase
 
         $cacheComponent->expects()
             ->put('products:456', m::any(), 36)
+            ->andReturnTrue();
+
+        // Actions
+        $cache->cache($eagerLoadedModels);
+    }
+
+    public function testShouldCacheAllDocumentsUsingItsForeignKey(): void
+    {
+        // Set
+        $cacheComponent = $this->instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
+        $model = $this->instance(Product::class, m::mock(Product::class));
+        $product1 = new Product();
+        $product1->_id = new ObjectId('64107cf651480c08a03b88d1');
+        $product2 = new Product();
+        $product2->_id = new ObjectId('64107cf651480c08a03b88d2');
+        $products = new SchemaEmbeddedCursor(Product::class, [$product1, $product2]);
+
+        $cache = new Cache($cacheComponent);
+        $eagerLoadedModels = [
+            'key' => '_id',
+            'foreignKey' => 'product_id',
+            'model' => Product::class,
+            'ids' => [
+                123 => 123,
+                456 => 456,
+            ],
+        ];
+
+        // Expectations
+        $model->expects()
+            ->where(['product_id' => ['$in' => [123, 456]]])
+            ->andReturn($products);
+
+        $cacheComponent->expects()
+            ->put('products:64107cf651480c08a03b88d1', m::any(), 36)
+            ->andReturnTrue();
+
+        $cacheComponent->expects()
+            ->put('products:64107cf651480c08a03b88d2', m::any(), 36)
             ->andReturnTrue();
 
         // Actions
