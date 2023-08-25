@@ -11,7 +11,7 @@
 </p>
 
 ## About Mongolid
-Easy, powerful and ultrafast ODM for PHP 7.1+ build on top of the [new mongodb driver](https://docs.mongodb.org/ecosystem/drivers/php/).
+Easy, powerful and ultrafast ODM for PHP 8.0+ build on top of the [new mongodb driver](https://docs.mongodb.org/ecosystem/drivers/php/).
 
 Mongolid supports **ActiveRecord** pattern.
 
@@ -21,7 +21,7 @@ Mongolid ODM (Object Document Mapper) provides a beautiful, simple implementatio
 **Note:** If you are working with Laravel, take a look at [mongolid-laravel repository](https://github.com/leroy-merlin-br/mongolid-laravel).
 
 ## Requirements
-- PHP **7.3** or superior
+- PHP **8.0** or superior
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 
 ## Installation

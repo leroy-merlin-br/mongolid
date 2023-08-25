@@ -5,7 +5,7 @@ sidebar_position: 1
 # Quick Start
 
 :::info Requirements
-- PHP **7.1**
+- PHP **8.0**
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 :::
 
