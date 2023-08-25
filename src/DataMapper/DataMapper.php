@@ -4,6 +4,7 @@ namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
 use MongoDB\Collection;
+use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EagerLoadedCursor;
@@ -12,10 +13,9 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Query\Resolver;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
-use Mongolid\Connection\Connection;
-Use Mongolid\Util\QueryBuilder;
 
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
@@ -25,7 +25,7 @@ Use Mongolid\Util\QueryBuilder;
  */
 class DataMapper implements HasSchemaInterface
 {
-    public bool $withTrashed = false;
+    private bool $ignoreSoftDelete = false;
 
     /**
      * Name of the schema class to be used.
@@ -261,9 +261,11 @@ class DataMapper implements HasSchemaInterface
 
         $model = new $this->schema->entityClass;
 
-        $query = $this->withTrashed ?
-            QueryBuilder::prepareValueForQueryCompatibility($query) :
-            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
+        $query = Resolver::resolveQuery(
+            $query,
+            $model,
+            $this->ignoreSoftDelete
+        );
 
         return new $cursorClass(
             $this->schema,
@@ -309,8 +311,13 @@ class DataMapper implements HasSchemaInterface
 
         $model = new $this->schema->entityClass;
 
+        $query = Resolver::resolveQuery(
+            $query,
+            $model,
+        );
+
         $document = $this->getCollection()->findOne(
-            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model),
+            $query,
             ['projection' => $this->prepareProjection($projection)]
         );
 
@@ -345,6 +352,13 @@ class DataMapper implements HasSchemaInterface
         }
 
         throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
+    }
+
+    public function withoutSoftDelete(): self
+    {
+        $this->ignoreSoftDelete = true;
+
+        return $this;
     }
 
     /**

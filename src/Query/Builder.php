@@ -11,8 +11,6 @@ use Mongolid\Cursor\EagerLoadingCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Util\ObjectIdUtils;
-use Mongolid\Util\QueryBuilder;
 
 /**
  * This class will abstract how a Model is persisted and retrieved
@@ -20,7 +18,7 @@ use Mongolid\Util\QueryBuilder;
  */
 class Builder
 {
-    public bool $withTrashed = false;
+    private bool $ignoreSoftDelete = false;
 
     /**
      * Connection that is going to be used to interact with the database.
@@ -205,10 +203,11 @@ class Builder
     {
         $cursor = $useCache ? CacheableCursor::class : Cursor::class;
 
-        $query = $this->withTrashed ?
-            QueryBuilder::prepareValueForQueryCompatibility($query) :
-            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
-
+        $query = Resolver::resolveQuery(
+            $query,
+            $model,
+            $this->ignoreSoftDelete
+        );
         return new $cursor(
             $model->getCollection(),
             'find',
@@ -252,8 +251,13 @@ class Builder
             return $this->where($model, $query, $projection, $useCache)->first();
         }
 
+        $query = Resolver::resolveQuery(
+            $query,
+            $model,
+        );
+
         return $model->getCollection()->findOne(
-            QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model),
+            $query,
             ['projection' => $this->prepareProjection($projection)],
         );
     }
@@ -278,6 +282,13 @@ class Builder
         }
 
         throw (new ModelNotFoundException())->setModel(get_class($model));
+    }
+
+    public function withoutSoftDelete(): self
+    {
+        $this->ignoreSoftDelete = true;
+
+        return $this;
     }
 
     /**

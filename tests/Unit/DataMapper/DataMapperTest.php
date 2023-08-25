@@ -601,7 +601,6 @@ class DataMapperTest extends TestCase
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $entity->_id = null;
-        $entity->forceDelete = true;
 
         // Act
         $mapper->shouldAllowMockingProtectedMethods();

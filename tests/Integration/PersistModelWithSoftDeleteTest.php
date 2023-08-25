@@ -16,7 +16,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldFindUndeletedProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
@@ -30,7 +30,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldNotFindDeletedProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
         $product->delete();
 
         // Actions
@@ -45,9 +45,9 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldFindATrashedProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
         $product->delete();
-        $this->persitProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
+        $this->persistProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
 
         // Actions
         $result = ProductWithSoftDelete::withTrashed();
@@ -65,7 +65,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldRestoreDeletedProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
         $product->delete();
 
         // Actions
@@ -80,7 +80,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldNotRestoreAlreadyRestoredProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
 
         // Actions
         $isRestored = $product->restore();
@@ -94,7 +94,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldExecuteSoftDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
+        $product = $this->persistProductWithSoftDeleteTrait();
 
         // Actions
          $isDeleted = $product->delete();
@@ -112,8 +112,8 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldExecuteForceDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persitProductWithSoftDeleteTrait();
-        $product2 = $this->persitProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
+        $product = $this->persistProductWithSoftDeleteTrait();
+        $product2 = $this->persistProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
 
         // Actions
          $isDeleted = $product->forceDelete();
@@ -128,7 +128,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     public function testShouldNotExecuteSoftDeleteOnProduct(): void
     {
         // Set
-        $product = $this->persitProduct();
+        $product = $this->persistProduct();
 
         // Actions
          $isDeleted = $product->delete();
@@ -147,7 +147,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
         $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a672');
     }
 
-    private function persitProductWithSoftDeleteTrait(
+    private function persistProductWithSoftDeleteTrait(
         string $id = '5bcb310783a7fcdf1bf1a672'
     ): ModelInterface {
         $product = new ProductWithSoftDelete();
@@ -159,7 +159,7 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
 
         return $product;
     }
-    private function persitProduct(
+    private function persistProduct(
         string $id = '5bcb310783a7fcdf1bf1a672'
     ): ModelInterface {
         $product = new Product();

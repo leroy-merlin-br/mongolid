@@ -5,7 +5,7 @@ namespace Mongolid\Model;
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Util\QueryBuilder;
+use Mongolid\Query\Resolver;
 
 trait SoftDeleteTrait
 {
@@ -13,12 +13,12 @@ trait SoftDeleteTrait
 
     public function isTrashed(): bool
     {
-        return !is_null($this->{QueryBuilder::getDeletedAtColumn($this)});
+        return !is_null($this->{Resolver::getDeletedAtColumn($this)});
     }
 
     public function restore(): bool
     {
-        $collumn = QueryBuilder::getDeletedAtColumn($this);
+        $collumn = Resolver::getDeletedAtColumn($this);
 
         if (!$this->isTrashed()) {
             return false;
@@ -36,7 +36,7 @@ trait SoftDeleteTrait
 
     public function executeSoftDelete(): bool
     {
-        $deletedAtColumn = QueryBuilder::getDeletedAtColumn($this);
+        $deletedAtColumn = Resolver::getDeletedAtColumn($this);
         $this->$deletedAtColumn = new UTCDateTime(new DateTime('now'));
 
         return $this->update();
@@ -52,25 +52,16 @@ trait SoftDeleteTrait
 
     private static function searchWithDataMapper(mixed $query, array $projection, bool $useCache): CursorInterface
     {
-        $mapper = self::getDataMapperInstance();
-
-        $mapper->withTrashed = true;
-
-        return $mapper->where($query, $projection, $useCache);
+        return self::getDataMapperInstance()
+            ->withoutSoftDelete()
+            ->where($query, $projection, $useCache);
     }
 
     private static function searchWithBuilder(mixed $query, array $projection, bool $useCache): CursorInterface
     {
-        $mapper = self::getBuilderInstance();
-
-        $mapper->withTrashed = true;
-
-        return $mapper->where(
-            new static(),
-            $query,
-            $projection,
-            $useCache
-        );
+        return self::getBuilderInstance()
+            ->withoutSoftDelete()
+            ->where(new static(), $query, $projection, $useCache);
     }
 
     private static function performSearch(mixed $query, array $projection, bool $useCache): CursorInterface

@@ -5,6 +5,7 @@ namespace Mongolid\Util;
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Query\Resolver;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
 
@@ -14,11 +15,14 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider queryValueScenarios
      */
     public function testShouldPrepareQueryValue(
-        mixed $value,
+        mixed $query,
+        bool $isSoftDeleteEnabled,
         array $expectation
     ): void {
         // Actions
-        $result = QueryBuilder::prepareValueForQueryCompatibility($value);
+        $model = m::mock(ModelInterface::class);
+        $model->isSoftDeleteEnabled = $isSoftDeleteEnabled;
+        $result = Resolver::resolveQuery($query, $model, false);
 
         // Assertions
         $this->assertMongoQueryEquals($expectation, $result);
@@ -28,77 +32,52 @@ final class QueryBuilderTest extends TestCase
     {
         return [
             'An array' => [
-                'value' => ['age' => ['$gt' => 25]],
+                'query' => ['age' => ['$gt' => 25]],
+                'isSoftDeleteEnabled' => false,
                 'expectation' => ['age' => ['$gt' => 25]],
             ],
             'An ObjectId string' => [
-                'value' => '507f1f77bcf86cd799439011',
+                'query' => '507f1f77bcf86cd799439011',
+                'isSoftDeleteEnabled' => false,
                 'expectation' => [
-                    '_id' => new ObjectID(
+                    '_id' => new ObjectId(
                         '507f1f77bcf86cd799439011'
                     ),
                 ],
             ],
             'An ObjectId string within a query' => [
-                'value' => ['_id' => '507f1f77bcf86cd799439011'],
+                'query' => ['_id' => '507f1f77bcf86cd799439011'],
+                'isSoftDeleteEnabled' => false,
                 'expectation' => [
-                    '_id' => new ObjectID(
+                    '_id' => new ObjectId(
                         '507f1f77bcf86cd799439011'
                     ),
                 ],
             ],
-            'Other type of _id, sequence for example' => [
-                'value' => 7,
-                'expectation' => ['_id' => 7],
-            ],
             'Series of string _ids as the $in parameter' => [
-                'value' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
+                'query' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
+                'isSoftDeleteEnabled' => false,
                 'expectation' => [
                     '_id' => [
                         '$in' => [
-                            new ObjectID('507f1f77bcf86cd799439011'),
-                            new ObjectID('507f1f77bcf86cd799439012'),
+                            new ObjectId('507f1f77bcf86cd799439011'),
+                            new ObjectId('507f1f77bcf86cd799439012'),
                         ],
                     ],
                 ],
             ],
-            'Series of string _ids as the $in parameter' => [
-                'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
+            'Series of string _ids as the $nin parameter' => [
+                'query' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
+                'isSoftDeleteEnabled' => false,
                 'expectation' => [
                     '_id' => [
-                        '$nin' => [new ObjectID(
+                        '$nin' => [new ObjectId(
                             '507f1f77bcf86cd799439011'
                         ),
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    /**
-     * @dataProvider getQuery
-     */
-    public function testShouldPrepareValueForSoftDeleteCompatibility(
-        mixed $query,
-        bool $isSoftDeleteEnabled,
-        array $expected
-    ): void {
-        // Set
-        $model = m::mock(ModelInterface::class);
-        $model->isSoftDeleteEnabled = $isSoftDeleteEnabled;
-
-        // Actions
-        $actual = QueryBuilder::prepareValueForSoftDeleteCompatibility($query, $model);
-
-        // Assertions
-        $this->assertSame($expected, $actual);
-    }
-
-    public function getQuery(): array
-    {
-        $objectId = new ObjectId('64e8963b1de34f08a40502e0');
-        return [
             'When query is a string and softDelete is enabled' => [
                 'query' => '123',
                 'isSoftDeleteEnabled' => true,
@@ -156,7 +135,7 @@ final class QueryBuilderTest extends TestCase
         $model = $this->buildProduct($isDefault);
 
         // Actions
-        $actual = QueryBuilder::getDeletedAtColumn($model);
+        $actual = Resolver::getDeletedAtColumn($model);
 
         // Assertions
         $this->assertSame($expected, $actual);

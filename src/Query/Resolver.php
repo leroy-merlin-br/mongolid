@@ -1,15 +1,24 @@
 <?php
 
-namespace Mongolid\Util;
+namespace Mongolid\Query;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\ModelInterface;
+use Mongolid\Util\ObjectIdUtils;
 
-class QueryBuilder
+class Resolver
 {
-    public static function prepareValueForSoftDeleteCompatibility(mixed $query, ModelInterface $model): array
+    public static function resolveQuery(mixed $query, ModelInterface $model, bool $ignoreSoftDelete = false): array
     {
-        $query = self::prepareValueForQueryCompatibility($query);
+        $query = self::prepareIdForQueryCompatibility($query);
+
+        if (!$model->isSoftDeleteEnabled ?? false) {
+            return $query;
+        }
+
+        if ($ignoreSoftDelete) {
+            return $query;
+        }
 
         return self::addSoftDeleteFilterIfRequired($query, $model);
     }
@@ -23,7 +32,7 @@ class QueryBuilder
             : 'deleted_at';
     }
 
-    public static function prepareValueForQueryCompatibility(mixed $query): array
+    private static function prepareIdForQueryCompatibility(mixed $query): array
     {
         if (!is_array($query)) {
             $query = ['_id' => $query];
@@ -49,18 +58,14 @@ class QueryBuilder
 
     private static function addSoftDeleteFilterIfRequired(array $query, ModelInterface $model): array
     {
-        if ($model->isSoftDeleteEnabled) {
-            $field = self::getDeletedAtColumn($model);
+        $field = self::getDeletedAtColumn($model);
 
-            return array_merge(
-                $query,
-                [
-                    $field => ['$exists' => false],
-                ]
-            );
-        }
-
-        return $query;
+        return array_merge(
+            $query,
+            [
+                $field => ['$exists' => false],
+            ]
+        );
     }
 
     private static function convertStringIdsToObjectIds(array $query): array
