@@ -3,13 +3,9 @@ namespace Mongolid\Model;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
-use Mongolid\Cursor\EmbeddedCursor;
-use Mongolid\Query\Builder;
 use Mongolid\TestCase;
-use Mongolid\Tests\Stubs\EmbeddedUser;
 use Mongolid\Tests\Stubs\Price;
-use Mongolid\Tests\Stubs\Product;
-use Mongolid\Tests\Stubs\ReferencedUser;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 

@@ -4,12 +4,11 @@ namespace Mongolid\Query\EagerLoader;
 use ArrayIterator;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
-use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Cursor\SchemaEmbeddedCursor;
 use Mongolid\TestCase;
 use Mockery as m;
 use Mongolid\Tests\Stubs\Price;
-use Mongolid\Tests\Stubs\Product;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use Mongolid\Util\CacheComponentInterface;
 
 class EagerLoaderTest extends TestCase

@@ -2,7 +2,7 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Tests\Stubs\LegacyRecordUser;
+use Mongolid\Tests\Stubs\Legacy\LegacyRecordUser;
 
 class LegacyRecordTest extends IntegrationTestCase
 {

@@ -15,7 +15,6 @@ use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
-use Serializable;
 use Traversable;
 
 final class CursorTest extends TestCase

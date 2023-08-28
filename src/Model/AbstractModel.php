@@ -140,7 +140,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Returns a valid instance from Ioc.
      */
-    private static function getBuilderInstance(): Builder
+    protected static function getBuilderInstance(): Builder
     {
         $instance = new static();
 
@@ -176,6 +176,10 @@ abstract class AbstractModel implements ModelInterface
      */
     public function delete(): bool
     {
+        if ($this->isSoftDeleteEnabled ?? false) {
+            return $this->executeSoftDelete();
+        }
+
         return $this->execute('delete');
     }
 

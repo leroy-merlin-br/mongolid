@@ -4,7 +4,6 @@ namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
@@ -16,15 +15,13 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\Schema;
+use Mongolid\Tests\Stubs\Legacy\Product;
 use stdClass;
 use Mongolid\TestCase;
 
 class DataMapperTest extends TestCase
 {
-    /**
-     * @var m\MockInterface|EventTriggerService
-     */
-    protected $eventService;
+    protected m\MockInterface|EventTriggerService $eventService;
 
     public function tearDown(): void
     {
@@ -688,24 +685,22 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $mapper = m::mock(DataMapper::class.'[getCollection]', [$connection]);
         $schema = m::mock(Schema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+        ];
         $projection = ['project' => true, '_id' => false];
 
-        $schema->entityClass = 'stdClass';
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->with($query)
-            ->andReturn($preparedQuery);
-
         $mapper->shouldReceive('getCollection')
             ->andReturn($collection);
 
@@ -717,6 +712,7 @@ class DataMapperTest extends TestCase
         $this->assertInstanceOf(SchemaCursor::class, $result);
         $this->assertNotInstanceOf(SchemaCacheableCursor::class, $result);
         $this->assertEquals($schema, $result->entitySchema);
+        $this->assertSame($preparedQuery, $result->params()[0]);
 
         $this->assertInstanceOf(SchemaCacheableCursor::class, $cacheableResult);
         $this->assertEquals($schema, $cacheableResult->entitySchema);
@@ -746,23 +742,21 @@ class DataMapperTest extends TestCase
     {
         // Arrange
         $connection = m::mock(Connection::class);
-        $mapper = m::mock(DataMapper::class.'[prepareValueQuery,getCollection]', [$connection]);
+        $mapper = m::mock(DataMapper::class.'[getCollection]', [$connection]);
         $schema = m::mock(Schema::class);
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
+        $preparedQuery = [
+            '_id' => 123,
+        ];
 
-        $schema->entityClass = 'stdClass';
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->once()
-            ->with($query)
-            ->andReturn($preparedQuery);
 
         $mapper->shouldReceive('getCollection')
             ->once()
@@ -792,20 +786,17 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $query = 123;
-        $preparedQuery = ['_id' => 123];
         $projection = ['project' => true, 'fields' => false];
+        $preparedQuery = [
+            '_id' => 123,
+        ];
 
-        $schema->entityClass = 'stdClass';
+        $schema->entityClass = Product::class;
         $mapper->setSchema($schema);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
         // Expect
-        $mapper->shouldReceive('prepareValueQuery')
-            ->once()
-            ->with($query)
-            ->andReturn($preparedQuery);
-
         $mapper->shouldReceive('getCollection')
             ->once()
             ->andReturn($collection);
@@ -959,22 +950,6 @@ class DataMapperTest extends TestCase
     }
 
     /**
-     * @dataProvider queryValueScenarios
-     */
-    public function testShouldPrepareQueryValue($value, $expectation)
-    {
-        // Arrange
-        $connection = m::mock(Connection::class);
-        $mapper = new DataMapper($connection);
-
-        // Act
-        $result = $this->callProtected($mapper, 'prepareValueQuery', [$value]);
-
-        // Assert
-        $this->assertMongoQueryEquals($expectation, $result);
-    }
-
-    /**
      * @dataProvider getProjections
      */
     public function testPrepareProjectionShouldConvertArray($data, $expectation)
@@ -1059,48 +1034,6 @@ class DataMapperTest extends TestCase
                 'operation' => 'delete',
                 'dbOperation' => 'deleteOne',
                 'eventName' => 'deleting',
-            ],
-        ];
-    }
-
-    public function queryValueScenarios()
-    {
-        return [
-            'An array' => [
-                'value' => ['age' => ['$gt' => 25]],
-                'expectation' => ['age' => ['$gt' => 25]],
-            ],
-            // ------------------------
-            'An ObjectId string' => [
-                'value' => '507f1f77bcf86cd799439011',
-                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
-            ],
-            // ------------------------
-            'An ObjectId string within a query' => [
-                'value' => ['_id' => '507f1f77bcf86cd799439011'],
-                'expectation' => ['_id' => new ObjectID('507f1f77bcf86cd799439011')],
-            ],
-            // ------------------------
-            'Other type of _id, sequence for example' => [
-                'value' => 7,
-                'expectation' => ['_id' => 7],
-            ],
-            // ------------------------
-            'Series of string _ids as the $in parameter' => [
-                'value' => ['_id' => ['$in' => ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']]],
-                'expectation' => [
-                    '_id' => [
-                        '$in' => [
-                            new ObjectID('507f1f77bcf86cd799439011'),
-                            new ObjectID('507f1f77bcf86cd799439012'),
-                        ],
-                    ],
-                ],
-            ],
-            // ------------------------
-            'Series of string _ids as the $in parameter' => [
-                'value' => ['_id' => ['$nin' => ['507f1f77bcf86cd799439011']]],
-                'expectation' => ['_id' => ['$nin' => [new ObjectID('507f1f77bcf86cd799439011')]]],
             ],
         ];
     }

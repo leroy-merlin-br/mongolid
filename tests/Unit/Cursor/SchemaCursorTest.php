@@ -16,7 +16,6 @@ use Mongolid\Connection\Connection;
 use Mongolid\LegacyRecord;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
-use stdClass;
 use Mongolid\TestCase;
 use Traversable;
 

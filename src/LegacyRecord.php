@@ -116,6 +116,10 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     public function delete(): bool
     {
+        if ($this->isSoftDeleteEnabled ?? false) {
+            return $this->executeSoftDelete();
+        }
+
         return $this->execute('delete');
     }
 
@@ -358,7 +362,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      *
      * @return mixed
      */
-    private static function getDataMapperInstance()
+    protected static function getDataMapperInstance()
     {
         $instance = Container::make(get_called_class());
 
