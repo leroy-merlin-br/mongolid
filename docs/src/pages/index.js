@@ -14,7 +14,7 @@ function HomepageHeader() {
         <header className={clsx('hero hero--primary', styles.heroBanner)}>
             <div className="container" style={{marginTop: "155px", marginBottom: "-60px"}}>
                 <p>
-                    <b>Easy</b>, <b>powerful</b> and <b>ultrafast</b> ODM for PHP 7.1+ build on top of the&nbsp;
+                    <b>Easy</b>, <b>powerful</b> and <b>ultrafast</b> ODM for PHP 8.0+ build on top of the&nbsp;
                     <Link to="https://docs.mongodb.org/ecosystem/drivers/php/" className="badge badge--success">
                         <strong>mongodb driver</strong>
                     </Link>.

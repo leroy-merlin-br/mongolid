@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     customFields: {
-        currentVersion: '3.2.0',
+        currentVersion: '3.6.0',
     },
 
     title: 'MongoLid Doc',
@@ -44,8 +44,8 @@ const config = {
                     lastVersion: 'current',
                     versions: {
                         current: {
-                            label: '3.2.0',
-                            path: '3.2.0',
+                            label: '3.6.0',
+                            path: '3.6.0',
                         },
                     },
                     // // Please change this to your repo.

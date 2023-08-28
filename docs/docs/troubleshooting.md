@@ -27,7 +27,7 @@ mongodb support => enabled
 mongodb version => 1.1.3
 ```
 
-## This package requires php >=7.0 but your PHP version (X.X.X) does not satisfy that requirement.
+## This package requires php >=8.0 but your PHP version (X.X.X) does not satisfy that requirement.
 
-The new (and improved) version 2.0 of Mongolid requires php7. If you are looking for the old PHP 5.x version, head to 
+The new (and improved) version 2.0 of Mongolid requires php 8.0. If you are looking for the old PHP 5.x version, head to 
 the [v0.8 branch](https://github.com/leroy-merlin-br/mongolid/tree/v0.8-dev).
