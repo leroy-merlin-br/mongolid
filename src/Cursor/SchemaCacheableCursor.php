@@ -8,7 +8,6 @@ use ErrorException;
 use Mongolid\Container\Container;
 use Mongolid\Query\EagerLoader\EagerLoader;
 use Mongolid\Util\CacheComponentInterface;
-use Traversable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver
@@ -19,32 +18,26 @@ use Traversable;
 class SchemaCacheableCursor extends SchemaCursor
 {
     /**
-     * The documents that were retrieved from the database in a serializable way.
-     *
-     * @var array
+     * Limits the amount of documents that will be cached for performance reasons.
      */
-    protected $documents;
+    public const DOCUMENT_LIMIT = 100;
+
+    /**
+     * The documents that were retrieved from the database in a serializable way.
+     */
+    protected ?Iterator $documents = null;
 
     /**
      * Limit of the query. It is stored because when caching the documents
      * the DOCUMENT_LIMIT const will be used.
-     *
-     * @var int
      */
-    protected $originalLimit;
+    protected int $originalLimit = 0;
 
     /**
      * Means that the CacheableCursor is wapping the original cursor and not
      * reading from Cache anymore.
-     *
-     * @var bool
      */
-    protected $ignoreCache = false;
-
-    /**
-     * Limits the amount of documents that will be cached for performance reasons.
-     */
-    const DOCUMENT_LIMIT = 100;
+    protected bool $ignoreCache = false;
 
     /**
      * Actually returns a Traversable object with the DriverCursor within.
@@ -73,7 +66,7 @@ class SchemaCacheableCursor extends SchemaCursor
 
         try {
             $cachedDocuments = $cacheComponent->get($cacheKey, null);
-        } catch (ErrorException $error) {
+        } catch (ErrorException) {
             $cachedDocuments = [];
         }
 
@@ -85,17 +78,17 @@ class SchemaCacheableCursor extends SchemaCursor
         $this->storeOriginalLimit();
 
         // Stores the documents within the object and cache then for later use
-        $this->documents = [];
+        $documents = [];
         foreach (parent::getCursor() as $document) {
-            $this->documents[] = $document;
+            $documents[] = $document;
         }
 
-        $cacheComponent->put($cacheKey, $this->documents, 36);
+        $cacheComponent->put($cacheKey, $documents, 36);
 
         // Drops the unserializable DriverCursor.
         $this->cursor = null;
 
-        $this->documents = new ArrayIterator($this->documents);
+        $this->documents = new ArrayIterator($documents);
 
         Container::make(EagerLoader::class)->cache(
             $this->documents,
@@ -108,8 +101,6 @@ class SchemaCacheableCursor extends SchemaCursor
 
     /**
      * Generates an unique cache key for the cursor in it's current state.
-     *
-     * @return string cache key to identify the query of the current cursor
      */
     protected function generateCacheKey(): string
     {
@@ -124,7 +115,7 @@ class SchemaCacheableCursor extends SchemaCursor
     /**
      * Stores the original "limit" clause of the query.
      */
-    protected function storeOriginalLimit()
+    protected function storeOriginalLimit(): void
     {
         if (isset($this->params[1]['limit'])) {
             $this->originalLimit = $this->params[1]['limit'];
@@ -137,10 +128,8 @@ class SchemaCacheableCursor extends SchemaCursor
 
     /**
      * Gets the limit clause of the query if any.
-     *
-     * @return mixed Int or null
      */
-    protected function getLimit()
+    protected function getLimit(): ?int
     {
         return $this->originalLimit ?: ($this->params[1]['limit'] ?? null);
     }
@@ -171,8 +160,6 @@ class SchemaCacheableCursor extends SchemaCursor
     /**
      * Serializes this object. Drops the unserializable DriverCursor. In order
      * to make the CacheableCursor object serializable.
-     *
-     * @return string serialized object
      */
     public function __serialize(): array
     {

@@ -11,51 +11,46 @@ class AttributesService
      * the attributes specified here will be changed
      * with the setDocumentAttribute method.
      *
-     * @var array
+     * @var string[]
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that are not mass assignable. The opposite
      * to the fillable array;.
      *
-     * @var array
+     * @var string[]
      */
-    protected $guarded = [];
+    protected array $guarded = [];
 
     /**
      * Check if model should mutate attributes checking
      * the existence of a specific method on model
      * class. Default is false.
-     *
-     * @var bool
      */
-    protected $mutable = false;
+    protected bool $mutable = false;
 
     /**
      * Store mutable attribute values to work with `&__get()`.
      *
-     * @var array
+     * @var string[]
      */
-    protected $mutableCache = [];
+    protected array $mutableCache = [];
 
     /**
      * The model's attributes.
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * The model attribute's original state.
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    private $originalAttributes = [];
+    private array $originalAttributes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public static function fill(
         array $input,
         HasAttributesInterface $object = null,
@@ -68,7 +63,7 @@ class AttributesService
         if ($object instanceof PolymorphableModelInterface) {
             $class = $object->polymorph(array_merge($object->getDocumentAttributes(), $input));
 
-            if ($class !== get_class($object)) {
+            if ($class !== $object::class) {
                 $originalAttributes = $object->getDocumentAttributes();
                 $object = new $class();
 
@@ -92,18 +87,12 @@ class AttributesService
         return $object;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasDocumentAttribute(string $key): bool
     {
         return !is_null($this->getDocumentAttribute($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &getDocumentAttribute(string $key)
+    public function &getDocumentAttribute(string $key): mixed
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
             $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
@@ -124,9 +113,6 @@ class AttributesService
         return $this->attributes[$key];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDocumentAttributes(): array
     {
         foreach ($this->attributes as $field => $value) {
@@ -138,10 +124,7 @@ class AttributesService
         return $this->attributes ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function cleanDocumentAttribute(string $key)
+    public function cleanDocumentAttribute(string $key): void
     {
         unset($this->attributes[$key]);
 
@@ -150,10 +133,7 @@ class AttributesService
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDocumentAttribute(string $key, $value)
+    public function setDocumentAttribute(string $key, mixed $value): void
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
@@ -172,29 +152,20 @@ class AttributesService
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function syncOriginalDocumentAttributes()
+    public function syncOriginalDocumentAttributes(): void
     {
         try {
             $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->originalAttributes = $this->getDocumentAttributes();
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOriginalDocumentAttributes(): array
     {
         return $this->originalAttributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         return $this->getDocumentAttributes();
@@ -206,7 +177,7 @@ class AttributesService
      * @param string $key    attribute name
      * @param string $prefix method prefix to be used (get, set)
      */
-    protected function hasMutatorMethod(string $key, $prefix): bool
+    protected function hasMutatorMethod(string $key, string $prefix): bool
     {
         $method = $this->buildMutatorMethod($key, $prefix);
 

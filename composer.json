@@ -20,14 +20,16 @@
     "require": {
         "php": "^8.0",
         "ext-mongodb": "^1.15.0",
+        "ext-ctype": "*",
         "illuminate/container": "^9.0 || ^10.0",
         "illuminate/support": "^9.0 || ^10.0",
         "mongodb/mongodb": "~1.15.0"
     },
     "require-dev": {
-        "leroy-merlin-br/coding-standard": "^3.1.0",
+        "leroy-merlin-br/coding-standard": "^v3.1.0",
         "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.0",
+        "rector/rector": "^0.15.23"
     },
     "autoload": {
         "psr-4": {

@@ -9,10 +9,8 @@ class CacheComponentTest extends TestCase
 {
     /**
      * Current time that will be retrieved by CacheComponent::time().
-     *
-     * @var int
      */
-    public $time = 1466710000;
+    public int $time = 1_466_710_000;
 
     public function tearDown(): void
     {
@@ -55,15 +53,13 @@ class CacheComponentTest extends TestCase
         $this->assertNull($cacheComponent->get('saveThe'));
     }
 
-    protected function getCacheComponent()
+    protected function getCacheComponent(): CacheComponent
     {
         $test = $this;
         $cacheComponent = m::mock(CacheComponent::class.'[time]');
         $cacheComponent->shouldAllowMockingProtectedMethods();
         $cacheComponent->shouldReceive('time')
-            ->andReturnUsing(function () use ($test) {
-                return $test->time;
-            });
+            ->andReturnUsing(fn(): int => $test->time);
 
         return $cacheComponent;
     }
@@ -71,7 +67,7 @@ class CacheComponentTest extends TestCase
     /**
      * Skips $seconds of time.
      */
-    protected function tick($seconds)
+    protected function tick(int $seconds): void
     {
         $this->time += $seconds;
     }

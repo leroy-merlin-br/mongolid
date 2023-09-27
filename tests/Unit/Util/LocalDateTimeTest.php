@@ -8,15 +8,8 @@ use Mongolid\TestCase;
 
 final class LocalDateTimeTest extends TestCase
 {
-    /**
-     * @var DateTime
-     */
-    protected $date;
-
-    /**
-     * @var string
-     */
-    protected $format = 'd/m/Y H:i:s';
+    protected DateTime $date;
+    protected string $format = 'd/m/Y H:i:s';
 
     /**
      * {@inheritdoc}

@@ -9,7 +9,7 @@ use Mongolid\TestCase;
 
 class CursorFactoryTest extends TestCase
 {
-    public function testShouldCreateACursor()
+    public function testShouldCreateACursor(): void
     {
         // Set
         $factory = new CursorFactory();
@@ -30,7 +30,7 @@ class CursorFactoryTest extends TestCase
         $this->assertEquals($schema, $result->entitySchema);
     }
 
-    public function testShouldCreateACacheableCursor()
+    public function testShouldCreateACacheableCursor(): void
     {
         // Set
         $factory = new CursorFactory();
@@ -52,14 +52,17 @@ class CursorFactoryTest extends TestCase
         $this->assertEquals($schema, $result->entitySchema);
     }
 
-    public function testShouldCreateAEmbeddedCursor()
+    public function testShouldCreateAEmbeddedCursor(): void
     {
         // Set
         $factory = new CursorFactory();
         $entityClass = 'MyModelClass';
 
         // Assert
-        $result = $factory->createEmbeddedCursor($entityClass, [['foo' => 'bar']]);
+        $result = $factory->createEmbeddedCursor(
+            $entityClass,
+            [['foo' => 'bar']]
+        );
 
         $this->assertInstanceOf(SchemaEmbeddedCursor::class, $result);
         $this->assertNotInstanceOf(SchemaCursor::class, $result);

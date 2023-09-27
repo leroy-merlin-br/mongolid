@@ -25,15 +25,10 @@ class TestCase extends PHPUnitTestCase
 
     /**
      * Actually runs a protected method of the given object.
-     *
-     * @param object $obj
-     * @param array  $args
-     *
-     * @return mixed
      */
-    protected function callProtected($obj, string $method, array $args = [])
+    protected function callProtected(object $obj, string $method, array $args = []): mixed
     {
-        $methodObj = new ReflectionMethod(get_class($obj), $method);
+        $methodObj = new ReflectionMethod($obj::class, $method);
         $methodObj->setAccessible(true);
 
         return $methodObj->invokeArgs($obj, $args);
@@ -46,7 +41,7 @@ class TestCase extends PHPUnitTestCase
      * @param string $property property name
      * @param mixed  $value    value to be set
      */
-    protected function setProtected($obj, string $property, $value): void
+    protected function setProtected(mixed $obj, string $property, mixed $value): void
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
@@ -62,7 +57,7 @@ class TestCase extends PHPUnitTestCase
      *
      * @return mixed property value
      */
-    protected function getProtected($obj, string $property)
+    protected function getProtected(mixed $obj, string $property): mixed
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
@@ -73,19 +68,17 @@ class TestCase extends PHPUnitTestCase
     /**
      * Replace instance on Ioc
      */
-    protected function instance(string $abstract, $instance)
+    protected function instance(string $abstract, mixed $instance): mixed
     {
         Container::bind(
             $abstract,
-            function () use ($instance) {
-                return $instance;
-            }
+            fn() => $instance
         );
 
         return $instance;
     }
 
-    public function assertMongoQueryEquals($expectedQuery, $query)
+    public function assertMongoQueryEquals(mixed $expectedQuery, mixed $query): void
     {
         $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
 
@@ -95,10 +88,10 @@ class TestCase extends PHPUnitTestCase
 
         foreach ($expectedQuery as $key => $value) {
             if (is_object($value)) {
-                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
+                $this->assertInstanceOf($value::class, $query[$key], 'Type of an object within the query is not equals');
 
                 if (method_exists($value, '__toString')) {
-                    $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
+                    $this->assertEquals((string) $value, (string) $query[$key], 'Object within the query is not equals');
                 }
             }
 

@@ -12,5 +12,5 @@ class DynamicSchema extends Schema
     /**
      * {@inheritdoc}
      */
-    public $dynamic = true;
+    public bool $dynamic = true;
 }
