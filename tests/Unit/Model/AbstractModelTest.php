@@ -2,6 +2,7 @@
 namespace Mongolid\Model;
 
 use Mockery as m;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Persistable;
 use MongoDB\BSON\Serializable;
 use MongoDB\BSON\Type;
@@ -587,5 +588,24 @@ final class AbstractModelTest extends TestCase
 
         // Assertions
         $this->assertSame('MY AWESOME NAME', $result);
+    }
+
+    public function testShouldRefreshModels(): void
+    {
+        // Set
+        $builder = $this->instance(Builder::class, m::mock(Builder::class));
+        $this->model->_id = 'some-id-value';
+
+        // Expectations
+        $builder
+            ->expects('first')
+            ->with(m::type(get_class($this->model)), 'some-id-value', [], false)
+            ->andReturn($this->model);
+
+        // Actions
+        $result = $this->model->refresh();
+
+        // Assertions
+        $this->assertSame($this->model, $result);
     }
 }
