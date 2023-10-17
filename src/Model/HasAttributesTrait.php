@@ -4,6 +4,8 @@ namespace Mongolid\Model;
 use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
+use Mongolid\Model\Casts\CastResolver;
+use Mongolid\Model\Casts\DateTime\BaseDateTimeCast;
 use stdClass;
 
 /**
@@ -66,6 +68,14 @@ trait HasAttributesTrait
     private $originalAttributes = [];
 
     /**
+     * Attributes that are cast to another types when fetched from database.
+     *
+     * @var array
+     */
+    protected $casts = [];
+
+
+    /**
      * {@inheritdoc}
      */
     public static function fill(
@@ -123,6 +133,12 @@ trait HasAttributesTrait
             return $this->mutableCache[$key];
         }
 
+        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
+            $value = $caster->get($this->attributes[$key] ?? null);
+
+            return $value;
+        }
+
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
@@ -169,6 +185,10 @@ trait HasAttributesTrait
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+
+        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
+            $value = $caster->set($value);
         }
 
         if (null === $value) {
