@@ -55,4 +55,26 @@ class LegacyRecordTest extends IntegrationTestCase
 
         $this->assertSame($expected, $entity->getAttributes());
     }
+
+    public function testRefreshModel(): void
+    {
+        // Set
+        $entity = new LegacyRecordUser();
+        $entity->dynamic = true;
+        $entity->fill([
+            'name' => 'John Doe',
+        ]);
+        $entity->save();
+
+        // Actions
+        $entity->name = 'Jane Doe';
+        $entity = $entity->refresh();
+
+        // Assertions
+        /**
+         * In this test, User must have his old name after refresh because its model wasn't persisted after setting its name to Jane Doe.
+         */
+        $this->assertInstanceOf(LegacyRecordUser::class, $entity);
+        $this->assertSame('John Doe', $entity->name);
+    }
 }
