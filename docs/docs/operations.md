@@ -38,3 +38,12 @@ To delete a model, simply call the `delete` method on the instance:
     
     $post->delete();
 ```
+## Reload a model from database
+
+You can reload an instance from database by using `refresh()` method:
+
+```php
+    $post = Post::first('4af9f23d8ead0e1d32000000');
+
+    $updatedPost = $post->refresh();
+```
