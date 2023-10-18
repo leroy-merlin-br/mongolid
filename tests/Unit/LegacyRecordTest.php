@@ -9,7 +9,7 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
-use Mongolid\Model\HasLegacyAttributesTrait;
+use Mongolid\Model\Attributes\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Schema\Schema;
 use stdClass;

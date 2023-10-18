@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Attributes;
 
 use Mongolid\Model\Attributes\HasAttributesInterface;
 

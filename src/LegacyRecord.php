@@ -9,7 +9,7 @@ use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Exception\NoCollectionNameException;
-use Mongolid\Model\HasLegacyAttributesTrait;
+use Mongolid\Model\Attributes\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Query\ModelMapper;
