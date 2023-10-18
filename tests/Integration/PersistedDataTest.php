@@ -134,6 +134,22 @@ final class PersistedDataTest extends IntegrationTestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testRefreshModel(): void
+    {
+        // Set
+        $user = $this->getUser(true);
+        $user->name = 'Jane Doe';
+
+        // Actions
+        $result = $user->refresh();
+
+        // Assertions
+        /**
+         * In this test, User must have his old name after refresh because its model wasn't persisted after setting its name to Jane Doe.
+         */
+        $this->assertSame('John Doe', $result->name);
+    }
+
     private function getUser(bool $save = false): ReferencedUser
     {
         $user = new ReferencedUser();
