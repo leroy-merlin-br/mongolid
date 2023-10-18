@@ -3,6 +3,7 @@ namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
+use Mongolid\Model\Attributes\HasAttributesInterface;
 
 class AttributesService
 {

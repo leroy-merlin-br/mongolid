@@ -1,5 +1,5 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Attributes;
 
 /**
  * This interface declares attribute getter, setters and also a useful

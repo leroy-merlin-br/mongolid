@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use MongoDB\BSON\Persistable;
 use MongoDB\Collection;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\Model\Attributes\HasAttributesInterface;
 
 /**
  * @property array                     $fillable

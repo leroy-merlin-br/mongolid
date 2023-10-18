@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
+use Mongolid\Model\Attributes\HasAttributesInterface;
+
 /**
  * This trait adds attribute getter, setters and also a useful
  * `fill` method that can be used with $fillable and $guarded

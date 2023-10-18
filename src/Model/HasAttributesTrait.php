@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
+use Mongolid\Model\Attributes\HasAttributesInterface;
 use stdClass;
 
 /**

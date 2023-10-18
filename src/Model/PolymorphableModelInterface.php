@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
+use Mongolid\Model\Attributes\HasAttributesInterface;
+
 /**
  * If a model implements this interface it means that it can change its own class
  * based on given input. For example, a model specialization can be created.

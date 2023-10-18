@@ -8,6 +8,7 @@ use MongoDB\BSON\Type;
 use MongoDB\BSON\Unserializable;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\Model\Attributes\HasAttributesInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\TestCase;
