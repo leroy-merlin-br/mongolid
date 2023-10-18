@@ -77,10 +77,7 @@ trait HasLegacyAttributesTrait
         $inAttributes = array_key_exists($key, $this->attributes);
 
         if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
-            $value = $caster->get($this->attributes[$key] ?? null);
-            $this->attributes[$key] = $value;
-
-            return $this->attributes[$key];
+            return  $caster->get($this->attributes[$key] ?? null);
         }
 
         if ($inAttributes) {
