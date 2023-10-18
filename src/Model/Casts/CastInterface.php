@@ -6,7 +6,7 @@ use MongoDB\BSON\UTCDateTime;
 
 interface CastInterface
 {
-    public static function get(mixed $value): mixed;
+    public function get(mixed $value): mixed;
 
-    public static function set(mixed $value): mixed;
+    public function set(mixed $value): mixed;
 }

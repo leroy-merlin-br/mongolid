@@ -14,11 +14,12 @@ class ImmutableDateTimeCastTest extends TestCase
         $timestamp = new UTCDateTime(
             DateTimeImmutable::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45')
         );
+        $immutableDateTimeCast = new ImmutableDateTimeCast();
 
         // Actions
-        $revoked_at = ImmutableDateTimeCast::get(null);
-        $birthdate = ImmutableDateTimeCast::get($timestamp);
-        $created_at = ImmutableDateTimeCast::get($timestamp);
+        $revoked_at = $immutableDateTimeCast->get(null);
+        $birthdate = $immutableDateTimeCast->get($timestamp);
+        $created_at = $immutableDateTimeCast->get($timestamp);
 
         // Assertions
         $this->assertNull($revoked_at);

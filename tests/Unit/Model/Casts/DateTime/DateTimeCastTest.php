@@ -14,11 +14,12 @@ class DateTimeCastTest extends TestCase
         $timestamp = new UTCDateTime(
             DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45')
         );
+        $dateTimeCast = new DateTimeCast();
 
         // Actions
-        $revoked_at = DateTimeCast::get(null);
-        $expires_at = DateTimeCast::get($timestamp);
-        $validated_at = DateTimeCast::get($timestamp);
+        $revoked_at = $dateTimeCast->get(null);
+        $expires_at = $dateTimeCast->get($timestamp);
+        $validated_at = $dateTimeCast->get($timestamp);
 
         // Assertions
         $this->assertNull($revoked_at);

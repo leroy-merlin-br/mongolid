@@ -12,11 +12,12 @@ class BaseDateTimeCastTest extends TestCase
     {
         // Set
         $dateInDateTime = DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45');
+        $dateTimeCast = new DateTimeCast();
 
         // Actions
-        $expires_at = DateTimeCast::set($dateInDateTime);
-        $nulled_at = DateTimeCast::set(null);
-        $restored_at = DateTimeCast::set(
+        $expires_at = $dateTimeCast->set($dateInDateTime);
+        $nulled_at = $dateTimeCast->set(null);
+        $restored_at = $dateTimeCast->set(
             new UTCDateTime($dateInDateTime)
         );
 
