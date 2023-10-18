@@ -1,8 +1,9 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Attributes;
 
 use MongoDB\BSON\ObjectId;
-use Mongolid\Model\Attributes\HasAttributesInterface;
+use Mongolid\Model\AbstractModel;
+use Mongolid\Model\HasRelationsTrait;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\PolymorphedReferencedUser;
 use Mongolid\Tests\Stubs\ReferencedUser;

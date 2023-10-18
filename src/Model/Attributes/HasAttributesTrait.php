@@ -1,10 +1,11 @@
 <?php
-namespace Mongolid\Model;
+namespace Mongolid\Model\Attributes;
 
 use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
 use Mongolid\Model\Attributes\HasAttributesInterface;
+use Mongolid\Model\PolymorphableModelInterface;
 use stdClass;
 
 /**
