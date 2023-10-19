@@ -18,7 +18,7 @@ class CastResolver
         self::IMMUTABLE_DATE_TIME,
     ];
 
-    public static function resolve(?string $castName): CastInterface
+    public static function resolve(string $castName): CastInterface
     {
         if ($cast = self::$cache[$castName] ?? null) {
             return $cast;
