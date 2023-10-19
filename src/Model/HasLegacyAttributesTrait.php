@@ -60,10 +60,8 @@ trait HasLegacyAttributesTrait
 
     /**
      * Attributes that are cast to another types when fetched from database.
-     *
-     * @var array
      */
-    protected $casts = [];
+    protected array $casts = [];
 
     /**
      * Get an attribute from the model.
