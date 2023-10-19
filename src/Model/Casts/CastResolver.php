@@ -16,7 +16,7 @@ class CastResolver
         self::IMMUTABLE_DATE_TIME,
     ];
 
-    public static function resolve(?string $cast): ?object
+    public static function resolve(?string $cast): ?CastInterface
     {
         if (is_null($cast)) {
             return null;

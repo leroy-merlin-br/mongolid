@@ -7,6 +7,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\Tests\Integration\IntegrationTestCase;
 use Mongolid\Tests\Stubs\ExpirablePrice;
 use Mongolid\Tests\Stubs\Legacy\LegacyRecordUser;
+use Mongolid\Util\LocalDateTime;
 
 class DateTimeCastTest extends IntegrationTestCase
 {
@@ -28,7 +29,9 @@ class DateTimeCastTest extends IntegrationTestCase
         $this->assertSame('02/10/2025', $price->expires_at->format('d/m/Y'));
         $this->assertSame(
             '02/10/2025',
-            $price->getOriginalDocumentAttributes()['expires_at']->toDateTime()->format('d/m/Y')
+            LocalDateTime::get(
+                $price->getOriginalDocumentAttributes()['expires_at']->toDateTime()->format('d/m/Y')
+            )
         );
     }
 
