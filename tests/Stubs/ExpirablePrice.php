@@ -6,7 +6,7 @@ use DateTime;
 
 class ExpirablePrice extends Price
 {
-    protected $casts = [
+    protected array $casts = [
         'expires_at' => 'datetime',
     ];
 }

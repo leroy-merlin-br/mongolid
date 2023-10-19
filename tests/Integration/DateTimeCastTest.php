@@ -53,7 +53,7 @@ class DateTimeCastTest extends IntegrationTestCase
     {
         // Set
         $entity = new class extends LegacyRecordUser {
-            protected $casts = [
+            protected array $casts = [
                 'expires_at' => 'datetime',
             ];
         };
