@@ -29,9 +29,8 @@ class DateTimeCastTest extends IntegrationTestCase
         $this->assertSame('02/10/2025', $price->expires_at->format('d/m/Y'));
         $this->assertSame(
             '02/10/2025',
-            LocalDateTime::get(
-                $price->getOriginalDocumentAttributes()['expires_at']->toDateTime()->format('d/m/Y')
-            )
+            LocalDateTime::get($price->getOriginalDocumentAttributes()['expires_at'])
+                ->format('d/m/Y')
         );
     }
 
