@@ -10,7 +10,6 @@ class ImmutableDateTimeCast extends BaseDateTimeCast
 {
     /**
      * @param UTCDateTime|null $value
-     * @return DateTimeImmutable|null
      */
     public function get(mixed $value): DateTimeImmutable|null
     {
