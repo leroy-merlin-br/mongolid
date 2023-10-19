@@ -76,8 +76,10 @@ trait HasLegacyAttributesTrait
     {
         $inAttributes = array_key_exists($key, $this->attributes);
 
-        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
-            return  $caster->get($this->attributes[$key] ?? null);
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+
+            return $caster->get($this->attributes[$key] ?? null);
         }
 
         if ($inAttributes) {
@@ -138,7 +140,8 @@ trait HasLegacyAttributesTrait
      */
     public function setAttribute(string $key, $value)
     {
-        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
             $value = $caster->set($value);
         }
 

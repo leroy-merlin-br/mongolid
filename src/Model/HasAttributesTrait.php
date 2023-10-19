@@ -133,7 +133,8 @@ trait HasAttributesTrait
             return $this->mutableCache[$key];
         }
 
-        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
             $value = $caster->get($this->attributes[$key] ?? null);
 
             return $value;
@@ -187,7 +188,8 @@ trait HasAttributesTrait
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
         }
 
-        if ($caster = CastResolver::resolve($this->casts[$key] ?? null)) {
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
             $value = $caster->set($value);
         }
 
