@@ -402,7 +402,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
 
     /**
      * Query model on database to retrieve an updated version of its attributes.
-     * @return self
      */
     public function refresh(): self
     {
