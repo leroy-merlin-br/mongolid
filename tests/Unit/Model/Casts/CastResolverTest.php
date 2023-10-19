@@ -20,6 +20,17 @@ class CastResolverTest extends TestCase
         $this->assertInstanceOf(ImmutableDateTimeCast::class, $dateTimeImmutableCast);
     }
 
+    public function testShouldResolveFromCache(): void
+    {
+        // Actions
+        $dateTimeCast = CastResolver::resolve('datetime');
+        $secondDateTimeCast = CastResolver::resolve('datetime');
+
+        // Assertions
+        $this->assertInstanceOf(DateTimeCast::class, $dateTimeCast);
+        $this->assertInstanceOf(DateTimeCast::class, $secondDateTimeCast);
+    }
+
     public function testShouldThrowExceptionWhenGivenInvalidCastToBeResolved(): void
     {
         // Expectations

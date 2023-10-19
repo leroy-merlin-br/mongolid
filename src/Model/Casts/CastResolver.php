@@ -11,17 +11,25 @@ class CastResolver
     private const DATE_TIME = 'datetime';
     private const IMMUTABLE_DATE_TIME = 'immutable_datetime';
 
+    private static array $cache = [];
+
     public static array $validCasts = [
         self::DATE_TIME,
         self::IMMUTABLE_DATE_TIME,
     ];
 
-    public static function resolve(?string $cast): CastInterface
+    public static function resolve(?string $castName): CastInterface
     {
-        return match($cast) {
+        if ($cast = self::$cache[$castName] ?? null) {
+            return $cast;
+        }
+
+        self::$cache[$castName] = match($castName) {
             self::DATE_TIME => new DateTimeCast(),
             self::IMMUTABLE_DATE_TIME => new ImmutableDateTimeCast(),
-            default => throw new InvalidCastException($cast),
+            default => throw new InvalidCastException($castName),
         };
+
+        return self::$cache[$castName];
     }
 }
