@@ -2,9 +2,6 @@
 namespace Mongolid\Model;
 
 use Mongolid\Model\Casts\CastResolver;
-use Mongolid\Model\Casts\DateTime\BaseDateTimeCast;
-use Mongolid\Model\Casts\DateTime\DateTimeCast;
-use Mongolid\Model\Casts\DateTime\ImmutableDateTimeCast;
 
 /**
  * This trait adds attribute getter, setters and also a useful

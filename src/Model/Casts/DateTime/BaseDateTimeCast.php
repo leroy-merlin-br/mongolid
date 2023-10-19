@@ -5,7 +5,6 @@ namespace Mongolid\Model\Casts\DateTime;
 use DateTimeInterface;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\UTCDateTimeInterface;
-use Mongolid\Model\Casts\CasterInterface;
 use Mongolid\Model\Casts\CastInterface;
 
 abstract class BaseDateTimeCast implements CastInterface

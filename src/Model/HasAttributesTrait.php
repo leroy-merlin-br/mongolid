@@ -5,7 +5,6 @@ use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
 use Mongolid\Model\Casts\CastResolver;
-use Mongolid\Model\Casts\DateTime\BaseDateTimeCast;
 use stdClass;
 
 /**
