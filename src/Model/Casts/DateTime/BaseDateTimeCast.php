@@ -12,7 +12,7 @@ abstract class BaseDateTimeCast implements CastInterface
     /**
      * @param UTCDateTime|null $value
      */
-    abstract public function get(mixed $value): DateTimeInterface|null;
+    abstract public function get(mixed $value): ?DateTimeInterface;
 
     /**
      * @param DateTimeInterface|UTCDateTimeInterface|null $value
