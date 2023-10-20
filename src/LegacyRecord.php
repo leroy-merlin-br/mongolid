@@ -403,7 +403,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Query model on database to retrieve an updated version of its attributes.
      */
-    public function refresh(): self
+    public function fresh(): self
     {
         return $this->first($this->_id);
     }

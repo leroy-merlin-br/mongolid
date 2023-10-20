@@ -187,7 +187,7 @@ abstract class AbstractModel implements ModelInterface
      * Query model on database to retrieve an updated version of its attributes.
      * @return self
      */
-    public function refresh(): self
+    public function fresh(): self
     {
         return $this->first($this->_id);
     }

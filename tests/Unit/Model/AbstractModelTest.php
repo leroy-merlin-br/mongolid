@@ -590,7 +590,7 @@ final class AbstractModelTest extends TestCase
         $this->assertSame('MY AWESOME NAME', $result);
     }
 
-    public function testShouldRefreshModels(): void
+    public function testShouldFreshModels(): void
     {
         // Set
         $builder = $this->instance(Builder::class, m::mock(Builder::class));
@@ -603,7 +603,7 @@ final class AbstractModelTest extends TestCase
             ->andReturn($this->model);
 
         // Actions
-        $result = $this->model->refresh();
+        $result = $this->model->fresh();
 
         // Assertions
         $this->assertSame($this->model, $result);

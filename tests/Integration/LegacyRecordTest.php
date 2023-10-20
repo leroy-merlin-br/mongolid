@@ -56,7 +56,7 @@ class LegacyRecordTest extends IntegrationTestCase
         $this->assertSame($expected, $entity->getAttributes());
     }
 
-    public function testRefreshModel(): void
+    public function testShouldFreshModel(): void
     {
         // Set
         $entity = new LegacyRecordUser();
@@ -68,7 +68,7 @@ class LegacyRecordTest extends IntegrationTestCase
 
         // Actions
         $entity->name = 'Jane Doe';
-        $entity = $entity->refresh();
+        $entity = $entity->fresh();
 
         // Assertions
         /**
