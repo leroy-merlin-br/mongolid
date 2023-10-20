@@ -73,3 +73,45 @@ $box->box_size = Size::Small; // Set box_size with enum instance
 $box->box_size; // Returns box_size as enum instance
 $box->getDocumentAttributes()['box_size']; // Returns box_size backing value
 ```
+
+## Custom Casting
+
+With Mongolid, you can define a custom cast implement a CastInterface.
+
+```php
+class HashCast implements \Mongolid\Model\Casts\CastInterface
+{
+    public function __construct(
+        private string $algo
+    ) {
+    }
+
+    public function get(mixed $value): ?string
+    {
+        return $value
+    }
+
+    public function set(mixed $value): ?string
+    {
+        if (is_null($value)) {
+            return $value;
+        }
+
+        return hash($this->algo, $value);     
+    } 
+}
+
+class Person extends \Mongolid\Model\AbstractModel {
+    protected $casts = [
+        'password' => HashCast::class . ':sha256',
+    ];
+}
+```
+
+Check out some usages and examples:
+```php
+$person = Person::first();
+$person->password; // Returns saved hash
+$person->password = 123; // Set sha256 hash to 123
+$person->password; // Returns saved hash to 123
+```

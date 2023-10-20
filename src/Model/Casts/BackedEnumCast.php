@@ -15,7 +15,6 @@ class BackedEnumCast implements CastInterface
     ) {
     }
 
-
     /**
      * @param int|string|null $value
      */
