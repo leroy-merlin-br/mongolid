@@ -437,4 +437,31 @@ class LegacyRecordTest extends TestCase
         $this->entity->setWriteConcern(0);
         $this->assertEquals(0, $this->entity->getWriteConcern());
     }
+
+    public function testShouldRefreshModels(): void
+    {
+        // Set
+        $id = 'some-id-value';
+        $entity = m::mock(LegacyRecord::class.'[getDataMapper]');
+        $this->setProtected($entity, 'collection', 'mongolid');
+        $entity->_id = $id;
+        $dataMapper = m::mock();
+        Container::instance(get_class($entity), $entity);
+
+        // Expectations
+        $entity->shouldReceive('getDataMapper')
+            ->andReturn($dataMapper);
+
+        $dataMapper->shouldReceive('first')
+            ->once()
+            ->with('some-id-value', [], false)
+            ->andReturn($entity);
+
+        // Actions
+        $result = $entity->refresh();
+
+        // Assertions
+        $this->assertSame($entity, $result);
+    }
+
 }
