@@ -38,7 +38,38 @@ $user->getOriginalDocumentAttributes()['birthdate']; // Returns birthdate as an 
 // To set a new birthdate, you can pass both UTCDateTime or native's PHP DateTime
 $user->birthdate = new \MongoDB\BSON\UTCDateTime($anyDateTime);
 $user->birthdate = DateTime::createFromFormat('d/m/Y', '01/03/1970');
-
-
 ```
 
+## Casting to Enum with backing value (aka BackedEnum)
+
+With Mongolid, you can define attributes to be cast to enum using `$casts` property in your models. 
+
+```php
+enum Size: string
+{
+    case Small = 'small';
+    case Big = 'big';
+}
+
+class Box extends \Mongolid\Model\AbstractModel {
+    protected $casts = [
+        'box_size' => Size::class,
+    ];
+}
+```
+
+When you define an attribute to be cast as a enum type, Mongolid will load it from database will do its trick to return an enum instance anytime you try to access it with property accessor operator (`->`).
+
+If you need to manipulate its raw value, then you can access it through `getDocumentAttributes()` method.
+
+To write a value on an attribute with enum cast, you should pass the enum instance like `Size::Small`
+Internally, Mongolid will manage to set the property as enum backing value.
+
+Check out some usages and examples:
+
+```php
+$box = Box::first();
+$box->box_size = Size::Small; // Set box_size with enum instance
+$box->box_size; // Returns box_size as enum instance
+$box->getDocumentAttributes()['box_size']; // Returns box_size backing value
+```

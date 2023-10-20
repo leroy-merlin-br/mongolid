@@ -372,14 +372,22 @@ class DataMapper implements HasSchemaInterface
     {
         $schemaMapper = $this->getSchemaMapper();
         $parsedDocument = $schemaMapper->map($entity);
-
         if (is_object($entity)) {
+            $setter = $this->getAttributeSetter($entity);
+
             foreach ($parsedDocument as $field => $value) {
-                $entity->$field = $value;
+                $setter($field, $value);
             }
         }
 
         return $parsedDocument;
+    }
+
+    private function getAttributeSetter($entity): callable
+    {
+        return $entity instanceof ModelInterface
+            ? fn ($field, $value) => $entity->setDocumentAttribute($field, $value)
+            : fn ($field, $value) => $entity->$field = $value;
     }
 
     /**

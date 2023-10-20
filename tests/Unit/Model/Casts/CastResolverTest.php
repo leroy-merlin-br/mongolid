@@ -6,6 +6,7 @@ use Mongolid\Model\Casts\DateTime\DateTimeCast;
 use Mongolid\Model\Casts\DateTime\ImmutableDateTimeCast;
 use Mongolid\Model\Casts\Exceptions\InvalidCastException;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\Size;
 
 class CastResolverTest extends TestCase
 {
@@ -17,7 +18,22 @@ class CastResolverTest extends TestCase
 
         // Assertions
         $this->assertInstanceOf(DateTimeCast::class, $dateTimeCast);
-        $this->assertInstanceOf(ImmutableDateTimeCast::class, $dateTimeImmutableCast);
+        $this->assertInstanceOf(
+            ImmutableDateTimeCast::class,
+            $dateTimeImmutableCast
+        );
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testShouldResolveBackedEnumCast(): void
+    {
+        // Actions
+        $backedEnumCast = CastResolver::resolve(Size::class);
+
+        // Assertions
+        $this->assertInstanceOf(BackedEnumCast::class, $backedEnumCast);
     }
 
     public function testShouldResolveFromCache(): void
@@ -35,7 +51,7 @@ class CastResolverTest extends TestCase
     {
         // Expectations
         $this->expectException(InvalidCastException::class);
-        $this->expectExceptionMessage('Invalid cast attribute: invalid. Use a valid one like datetime,immutable_datetime');
+        $this->expectExceptionMessage('Invalid cast attribute: invalid');
 
         // Actions
         CastResolver::resolve('invalid');
