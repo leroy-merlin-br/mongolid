@@ -40,10 +40,10 @@ To delete a model, simply call the `delete` method on the instance:
 ```
 ## Reload a model from database
 
-You can reload an instance from database by using `refresh()` method:
+You can reload an instance from database by using `fresh()` method:
 
 ```php
     $post = Post::first('4af9f23d8ead0e1d32000000');
 
-    $updatedPost = $post->refresh();
+    $updatedPost = $post->fresh();
 ```

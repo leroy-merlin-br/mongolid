@@ -458,7 +458,7 @@ class LegacyRecordTest extends TestCase
             ->andReturn($entity);
 
         // Actions
-        $result = $entity->refresh();
+        $result = $entity->fresh();
 
         // Assertions
         $this->assertSame($entity, $result);

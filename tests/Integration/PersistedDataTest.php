@@ -134,14 +134,14 @@ final class PersistedDataTest extends IntegrationTestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    public function testRefreshModel(): void
+    public function testShouldFreshModel(): void
     {
         // Set
         $user = $this->getUser(true);
         $user->name = 'Jane Doe';
 
         // Actions
-        $result = $user->refresh();
+        $result = $user->fresh();
 
         // Assertions
         /**
