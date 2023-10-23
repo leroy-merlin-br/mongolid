@@ -386,8 +386,8 @@ class DataMapper implements HasSchemaInterface
     private function getAttributeSetter($entity): callable
     {
         return $entity instanceof ModelInterface
-            ? fn ($field, $value) => $entity->setDocumentAttribute($field, $value)
-            : fn ($field, $value) => $entity->$field = $value;
+            ? fn (string $field, mixed $value) => $entity->setDocumentAttribute($field, $value)
+            : fn (string $field, mixed $value) => $entity->$field = $value;
     }
 
     /**

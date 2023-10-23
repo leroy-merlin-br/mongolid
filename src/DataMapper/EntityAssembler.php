@@ -52,8 +52,8 @@ class EntityAssembler
     private function getAttributeSetter($model): callable
     {
         return $model instanceof ModelInterface
-            ? fn ($field, $value) => $model->setDocumentAttribute($field, $value)
-            : fn ($field, $value) => $model->$field = $value;
+            ? fn (string $field, mixed $value) => $model->setDocumentAttribute($field, $value)
+            : fn (string $field, mixed $value) => $model->$field = $value;
     }
 
     /**
