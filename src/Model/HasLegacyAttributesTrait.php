@@ -1,6 +1,8 @@
 <?php
 namespace Mongolid\Model;
 
+use Mongolid\Model\Casts\CastResolver;
+
 /**
  * This trait adds attribute getter, setters and also a useful
  * `fill` method that can be used with $fillable and $guarded
@@ -54,6 +56,11 @@ trait HasLegacyAttributesTrait
     public $mutable = false;
 
     /**
+     * Attributes that are cast to another types when fetched from database.
+     */
+    protected array $casts = [];
+
+    /**
      * Get an attribute from the model.
      *
      * @param string $key the attribute to be accessed
@@ -63,6 +70,12 @@ trait HasLegacyAttributesTrait
     public function getAttribute(string $key)
     {
         $inAttributes = array_key_exists($key, $this->attributes);
+
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+
+            return $caster->get($this->attributes[$key] ?? null);
+        }
 
         if ($inAttributes) {
             return $this->attributes[$key];
@@ -122,6 +135,11 @@ trait HasLegacyAttributesTrait
      */
     public function setAttribute(string $key, $value)
     {
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+            $value = $caster->set($value);
+        }
+
         $this->attributes[$key] = $value;
     }
 

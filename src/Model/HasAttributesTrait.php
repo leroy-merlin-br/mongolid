@@ -4,6 +4,7 @@ namespace Mongolid\Model;
 use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
+use Mongolid\Model\Casts\CastResolver;
 use stdClass;
 
 /**
@@ -66,6 +67,11 @@ trait HasAttributesTrait
     private $originalAttributes = [];
 
     /**
+     * Attributes that are cast to another types when fetched from database.
+     */
+    protected array $casts = [];
+
+    /**
      * {@inheritdoc}
      */
     public static function fill(
@@ -123,6 +129,13 @@ trait HasAttributesTrait
             return $this->mutableCache[$key];
         }
 
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+            $value = $caster->get($this->attributes[$key] ?? null);
+
+            return $value;
+        }
+
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
@@ -169,6 +182,11 @@ trait HasAttributesTrait
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+            $value = $caster->set($value);
         }
 
         if (null === $value) {
