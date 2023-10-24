@@ -1,16 +1,20 @@
 <?php
 namespace Mongolid\Model;
 
+use DateTime;
 use Mockery as m;
 use MongoDB\BSON\Persistable;
 use MongoDB\BSON\Serializable;
 use MongoDB\BSON\Type;
 use MongoDB\BSON\Unserializable;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\TestCase;
+use Mongolid\Tests\Stubs\Box;
+use Mongolid\Tests\Stubs\Size;
 use stdClass;
 
 final class AbstractModelTest extends TestCase
@@ -475,6 +479,60 @@ final class AbstractModelTest extends TestCase
         $this->assertFalse(isset($model->nonexistant));
         $this->assertFalse(isset($model->ignored));
     }
+
+    public function testShouldFillWithCast(): void
+    {
+        // Set
+        $model = new class() extends AbstractModel
+        {
+            protected array $casts = [
+                'birthdate' => 'datetime',
+            ];
+        };
+
+        // Actions
+        $model = $model::fill(['birthdate' => new DateTime()]);
+
+        // Assertions
+        $this->assertInstanceOf(DateTime::class, $model->birthdate);
+        $this->assertInstanceOf(UTCDateTime::class, $model->getDocumentAttributes()['birthdate']);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testShouldBsonSerializeWithCast(): void
+    {
+        // Set
+        $model = new Box();
+        $model->box_size = Size::Small;
+
+        // Actions
+        $serializedModel = $model->bsonSerialize();
+
+        // Assertions
+        $this->assertSame(Size::Small->value, $serializedModel['box_size']);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testShouldBsonUnserializeWithCast(): void
+    {
+        // Set
+        $model = new Box();
+        $model->box_size = Size::Small;
+        $serializedModel = $model->bsonSerialize();
+
+        // Actions
+        $unserializedModel = new Box();
+        $unserializedModel->bsonUnserialize($serializedModel);
+
+        // Assertions
+        $this->assertSame(Size::Small->value, $unserializedModel->getDocumentAttributes()['box_size']);
+        $this->assertSame(Size::Small, $unserializedModel->box_size);
+    }
+
 
     public function testShouldCheckIfMutatedAttributeIsSet(): void
     {
