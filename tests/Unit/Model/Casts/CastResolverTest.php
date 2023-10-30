@@ -15,6 +15,7 @@ class CastResolverTest extends TestCase
         // Actions
         $dateTimeCast = CastResolver::resolve('datetime');
         $dateTimeImmutableCast = CastResolver::resolve('immutable_datetime');
+        $customCasting = CastResolver::resolve(DateTimeCast::class);
 
         // Assertions
         $this->assertInstanceOf(DateTimeCast::class, $dateTimeCast);
@@ -22,6 +23,7 @@ class CastResolverTest extends TestCase
             ImmutableDateTimeCast::class,
             $dateTimeImmutableCast
         );
+        $this->assertInstanceOf(DateTimeCast::class, $customCasting);
     }
 
     /**
@@ -31,20 +33,39 @@ class CastResolverTest extends TestCase
     {
         // Actions
         $backedEnumCast = CastResolver::resolve(Size::class);
+        $customCasting = CastResolver::resolve(BackedEnumCast::class . ':' . Size::class);
 
         // Assertions
         $this->assertInstanceOf(BackedEnumCast::class, $backedEnumCast);
+        $this->assertInstanceOf(BackedEnumCast::class, $customCasting);
+
     }
 
     public function testShouldResolveFromCache(): void
     {
+        $realCastResolver = \Mockery::mock(CastResolverInterface::class);
+        $cacheCastResolver = \Mockery::mock(CastResolverCache::class, [$realCastResolver]);
+        $caster = \Mockery::mock(CastInterface::class);
+        $this->instance(CastResolverInterface::class, $cacheCastResolver);
+
+        // Expectations
+        $realCastResolver->expects()
+            ->resolve('datetime')
+            ->andReturn($caster)
+            ->once();
+
+        $cacheCastResolver->expects()
+            ->resolve('datetime')
+            ->passthru()
+            ->twice();
+
         // Actions
         $dateTimeCast = CastResolver::resolve('datetime');
         $secondDateTimeCast = CastResolver::resolve('datetime');
 
         // Assertions
-        $this->assertInstanceOf(DateTimeCast::class, $dateTimeCast);
-        $this->assertInstanceOf(DateTimeCast::class, $secondDateTimeCast);
+        $this->assertSame($caster, $dateTimeCast);
+        $this->assertSame($caster, $secondDateTimeCast);
     }
 
     public function testShouldThrowExceptionWhenGivenInvalidCastToBeResolved(): void

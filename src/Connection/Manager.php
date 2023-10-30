@@ -6,6 +6,9 @@ use MongoDB\Client;
 use Mongolid\Container\Container;
 use Mongolid\Event\EventTriggerInterface;
 use Mongolid\Event\EventTriggerService;
+use Mongolid\Model\Casts\CastResolverCache;
+use Mongolid\Model\Casts\CastResolverInterface;
+use Mongolid\Model\Casts\CastResolverStandalone;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
 
@@ -94,6 +97,7 @@ class Manager
         $this->container = new IlluminateContainer();
         $this->cacheComponent = new CacheComponent();
         $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
+        $this->container->instance(CastResolverInterface::class, new CastResolverCache(new CastResolverStandalone()));
 
         Container::setContainer($this->container);
     }

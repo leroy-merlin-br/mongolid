@@ -4,6 +4,10 @@ namespace Mongolid;
 use Illuminate\Container\Container as IlluminateContainer;
 use Mockery as m;
 use Mongolid\Container\Container;
+use Mongolid\Model\Casts\CastResolver;
+use Mongolid\Model\Casts\CastResolverCache;
+use Mongolid\Model\Casts\CastResolverInterface;
+use Mongolid\Model\Casts\CastResolverStandalone;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -13,7 +17,12 @@ class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Container::setContainer(new IlluminateContainer());
+
+        $castResolver = new CastResolverCache(new CastResolverStandalone());
+        $container = new IlluminateContainer();
+        $container->instance(CastResolverInterface::class, $castResolver);
+
+        Container::setContainer($container);
     }
 
     protected function tearDown(): void
