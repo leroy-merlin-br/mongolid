@@ -71,12 +71,6 @@ trait HasLegacyAttributesTrait
     {
         $inAttributes = array_key_exists($key, $this->attributes);
 
-        if ($casterName = $this->casts[$key] ?? null) {
-            $caster = CastResolver::resolve($casterName);
-
-            return $caster->get($this->attributes[$key] ?? null);
-        }
-
         if ($inAttributes) {
             return $this->attributes[$key];
         } elseif ('attributes' == $key) {
@@ -135,11 +129,6 @@ trait HasLegacyAttributesTrait
      */
     public function setAttribute(string $key, $value)
     {
-        if ($casterName = $this->casts[$key] ?? null) {
-            $caster = CastResolver::resolve($casterName);
-            $value = $caster->set($value);
-        }
-
         $this->attributes[$key] = $value;
     }
 
@@ -214,6 +203,12 @@ trait HasLegacyAttributesTrait
             return $this->{$this->buildMutatorMethod($key, 'get')}();
         }
 
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+
+            return $caster->get($this->attributes[$key] ?? null);
+        }
+
         return $this->getAttribute($key);
     }
 
@@ -227,6 +222,11 @@ trait HasLegacyAttributesTrait
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+
+        if ($casterName = $this->casts[$key] ?? null) {
+            $caster = CastResolver::resolve($casterName);
+            $value = $caster->set($value);
         }
 
         $this->setAttribute($key, $value);

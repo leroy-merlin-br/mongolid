@@ -79,6 +79,7 @@ trait HasAttributesTrait
         HasAttributesInterface $object = null,
         bool $force = false
     ): HasAttributesInterface {
+
         if (!$object) {
             $object = Container::make(static::class);
         }

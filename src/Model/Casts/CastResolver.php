@@ -2,6 +2,7 @@
 
 namespace Mongolid\Model\Casts;
 
+use BackedEnum;
 use Mongolid\Model\Casts\DateTime\DateTimeCast;
 use Mongolid\Model\Casts\DateTime\ImmutableDateTimeCast;
 use Mongolid\Model\Casts\Exceptions\InvalidCastException;
@@ -27,7 +28,9 @@ class CastResolver
         self::$cache[$castName] = match($castName) {
             self::DATE_TIME => new DateTimeCast(),
             self::IMMUTABLE_DATE_TIME => new ImmutableDateTimeCast(),
-            default => throw new InvalidCastException($castName),
+            default => is_subclass_of($castName, BackedEnum::class)
+                ? new BackedEnumCast($castName)
+                : throw new InvalidCastException($castName),
         };
 
         return self::$cache[$castName];
