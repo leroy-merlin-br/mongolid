@@ -384,51 +384,6 @@ final class HasAttributesTraitTest extends TestCase
         $this->assertFalse(isset($model->nonexistant));
     }
 
-    public function testShouldCastAttributeToDateTimeWhenLoadingFromDatabase(): void
-    {
-        // Set
-        $model = new class() extends AbstractModel
-        {
-            protected array $casts = [
-                'expires_at' => 'datetime',
-                'birthdate' => 'immutable_datetime',
-            ];
-
-        };
-        $model->expires_at = new UTCDateTime(
-            DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45')
-        );
-        $model->birthdate = new UTCDateTime(
-            DateTimeImmutable::createFromFormat('d/m/Y', '02/04/1990')
-        );
-
-        // Assertions
-        $this->assertInstanceOf(DateTime::class, $model->expires_at);
-        $this->assertSame('08/10/2025 12:30:45', $model->expires_at->format('d/m/Y H:i:s'));
-
-        $this->assertInstanceOf(DateTimeImmutable::class, $model->birthdate);
-        $this->assertSame('02/04/1990', $model->birthdate->format('d/m/Y'));
-    }
-
-    public function testShouldCastAttributeToUTCDateTimeWhenSettingAttributes(): void
-    {
-        // Set
-        $model = new class() extends AbstractModel
-        {
-            protected array $casts = [
-                'expires_at' => 'datetime',
-                'birthdate' => 'immutable_datetime',
-            ];
-        };
-
-        // Actions
-        $model->expires_at = DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45');
-
-        // Assertions
-        $this->assertInstanceOf(UTCDateTime::class, $model->getDocumentAttributes()['expires_at']);
-        $this->assertInstanceOf(DateTime::class, $model->expires_at);
-    }
-
     public function getFillableOptions(): array
     {
         return [

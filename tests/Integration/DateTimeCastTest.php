@@ -23,15 +23,9 @@ class DateTimeCastTest extends IntegrationTestCase
 
         // Assertions
         $this->assertInstanceOf(DateTime::class, $price->expires_at);
-        $this->assertInstanceOf(UTCDateTime::class, $price->getOriginalDocumentAttributes()['expires_at']);
 
         $price = ExpirablePrice::first($price->_id);
         $this->assertSame('02/10/2025', $price->expires_at->format('d/m/Y'));
-        $this->assertSame(
-            '02/10/2025',
-            LocalDateTime::get($price->getOriginalDocumentAttributes()['expires_at'])
-                ->format('d/m/Y')
-        );
     }
 
     public function testShouldUpdatePriceWithCastedAttributes(): void

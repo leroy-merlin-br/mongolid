@@ -7,6 +7,7 @@ use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\Model\Casts\CastResolver;
 use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
@@ -284,12 +285,17 @@ abstract class AbstractModel implements ModelInterface
     public function bsonSerialize(): object|array
     {
         return Container::make(ModelMapper::class)
-            ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
+            ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps, $this->casts);
     }
 
     public function bsonUnserialize(array $data): void
     {
         unset($data['__pclass']);
+
+        foreach ($this->casts as $attributeName => $cast) {
+            $data[$attributeName] = CastResolver::resolve($cast)->get($data[$attributeName]);
+        }
+
         static::fill($data, $this, true);
 
         $this->syncOriginalDocumentAttributes();

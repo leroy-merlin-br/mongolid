@@ -212,4 +212,34 @@ final class ModelMapperTest extends TestCase
         $this->assertNotSame($updatedAt, $model->updated_at);
         $this->assertGreaterThan($updatedAt, $model->updated_at);
     }
+
+    public function testShouldHandleCasts(): void
+    {
+        // Set
+        $model = new class extends AbstractModel
+        {
+            protected array $casts = [
+                'expirable_date' => 'datetime',
+            ];
+
+            public function getCasts(): array
+            {
+                return $this->casts;
+            }
+        };
+
+        $modelMapper = new ModelMapper();
+        $id = '5bfd396038b5fa0001462681';
+        $model->_id = $id;
+        $model->expirable_date = new DateTime('2023-01-01 00:00');
+
+        // Actions
+        $result = $modelMapper->map($model, [], true, true, $model->getCasts());
+
+        // Assertions
+        $this->assertInstanceOf(ObjectId::class, $result['_id']);
+        $this->assertSame($model->_id, $result['_id']);
+        $this->assertEquals(new ObjectId($id), $model->_id);
+        $this->assertEquals(new UTCDateTime($model->expirable_date), $result['expirable_date']);
+    }
 }

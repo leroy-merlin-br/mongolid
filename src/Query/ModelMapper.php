@@ -4,6 +4,7 @@ namespace Mongolid\Query;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Container;
+use Mongolid\Model\Casts\CastResolver;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
@@ -16,14 +17,14 @@ class ModelMapper
     /**
      * Maps model to a document to be inserted on database.
      */
-    public function map(ModelInterface $model, array $allowedFields, bool $dynamic, bool $timestamps): array
+    public function map(ModelInterface $model, array $allowedFields, bool $dynamic, bool $timestamps, array $casts = []): array
     {
         $this->clearNullFields($model);
         $this->clearDynamicFields($model, $allowedFields, $dynamic, $timestamps);
         $this->manageTimestamps($model, $timestamps);
         $this->manageId($model);
 
-        return $model->getDocumentAttributes();
+        return $this->castDocumentAttributes($model, $casts);
     }
 
     /**
@@ -85,5 +86,20 @@ class ModelMapper
         }
 
         $model->_id = $value;
+    }
+
+    private function castDocumentAttributes(ModelInterface $model, array $casts): array
+    {
+        if (empty($casts)) {
+            return $model->getDocumentAttributes();
+        }
+
+        $attributes = $model->getDocumentAttributes();
+
+        foreach ($casts as $attributeName => $cast) {
+            $attributes[$attributeName] = CastResolver::resolve($cast)->set($attributes[$attributeName]);
+        }
+
+        return $attributes;
     }
 }
