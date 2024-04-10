@@ -99,7 +99,7 @@ class TestCase extends PHPUnitTestCase
     /**
      * Replace instance on Ioc
      */
-    protected function instance(string $abstract, mixed $instance): mixed
+    protected function instance(string $abstract, object $instance): object
     {
         Container::bind(
             $abstract,
