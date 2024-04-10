@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   php:
     build: docker/php
@@ -9,6 +7,8 @@ services:
       - .:/var/www/html
     environment:
       - DB_HOST=db
+    networks:
+      - mongolid
 
   db:
     image: mongo:5.0
@@ -21,6 +21,8 @@ services:
           memory: 512M
     volumes:
       - db:/data/db
+    networks:
+      - mongolid
 
   mkdocs:
     image: polinux/mkdocs
@@ -30,3 +32,6 @@ services:
 volumes:
   db:
     driver: local
+
+networks:
+  mongolid:
