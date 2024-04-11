@@ -12,10 +12,8 @@ interface CacheComponentInterface
      * Retrieve an item from the cache by key.
      *
      * @param string $key cache key of the item to be retrieved
-     *
-     * @return mixed
      */
-    public function get(string $key);
+    public function get(string $key): mixed;
 
     /**
      * Store an item in the cache for a given number of minutes.
@@ -24,7 +22,7 @@ interface CacheComponentInterface
      * @param mixed  $value   value being stored in cache
      * @param float  $minutes cache ttl
      */
-    public function put(string $key, $value, float $minutes);
+    public function put(string $key, mixed $value, float $minutes): void;
 
     /**
      * Determine if an item exists in the cache. This method will also check
