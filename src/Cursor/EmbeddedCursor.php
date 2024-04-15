@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 /**
@@ -10,25 +11,16 @@ namespace Mongolid\Cursor;
 class EmbeddedCursor implements CursorInterface
 {
     /**
-     * The actual array of embedded documents.
-     *
-     * @var array
-     */
-    protected $items = [];
-
-    /**
      * Iterator position (to be used with foreach).
-     *
-     * @var int
      */
-    private $position = 0;
+    private int $position = 0;
 
-    /**
-     * @param array $items
-     */
-    public function __construct(array $items)
-    {
-        $this->items = $items;
+    public function __construct(
+        /**
+         * The actual array of embedded documents.
+         */
+        protected array $items
+    ) {
     }
 
     /**
@@ -38,7 +30,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return EmbeddedCursor returns this cursor
      */
-    public function limit(int $amount): CursorInterface
+    public function limit(int $amount): static
     {
         $this->items = array_slice($this->items, 0, $amount);
 
@@ -54,14 +46,14 @@ class EmbeddedCursor implements CursorInterface
      *
      * @return EmbeddedCursor returns this cursor
      */
-    public function sort(array $fields): CursorInterface
+    public function sort(array $fields): static
     {
         foreach (array_reverse($fields) as $key => $direction) {
             // Uses usort with a function that will access the $key and sort in
             // the $direction. It mimics how MongoDB does sorting internally.
             usort(
                 $this->items,
-                function ($a, $b) use ($key, $direction) {
+                function ($a, $b) use ($key, $direction): int {
                     $a = is_object($a)
                         ? ($a->$key ?? null)
                         : ($a[$key] ?? null);
@@ -82,10 +74,8 @@ class EmbeddedCursor implements CursorInterface
      * Skips a number of results.
      *
      * @param int $amount the number of results to skip
-     *
-     * @return EmbeddedCursor returns this cursor
      */
-    public function skip(int $amount): CursorInterface
+    public function skip(int $amount): static
     {
         $this->items = array_slice($this->items, $amount);
 
@@ -113,8 +103,6 @@ class EmbeddedCursor implements CursorInterface
     /**
      * Iterator interface current. Return a model object
      * with cursor document. (used in foreach).
-     *
-     * @return mixed
      */
     public function current(): mixed
     {
