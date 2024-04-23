@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Cursor;
 
 use Mongolid\Model\AbstractModel;
@@ -112,7 +113,7 @@ final class EmbeddedCursorTest extends TestCase
         $object = new class extends AbstractModel
         {
         };
-        $class = get_class($object);
+        $class = $object::class;
         $itemA = new $class();
         $itemA->name = 'A';
 
@@ -175,7 +176,7 @@ final class EmbeddedCursorTest extends TestCase
     public function testShouldGetCurrentUsingModelClassMorphingIt(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
         $model->name = 'John';
@@ -198,7 +199,7 @@ final class EmbeddedCursorTest extends TestCase
         $object = new class extends AbstractModel
         {
         };
-        $class = get_class($object);
+        $class = $object::class;
         $modelA = new $class();
         $modelA->name = 'A';
         $modelA->syncOriginalDocumentAttributes();
