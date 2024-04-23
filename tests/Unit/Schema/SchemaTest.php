@@ -1,12 +1,12 @@
 <?php
 
-namespace Mongolid;
+namespace Mongolid\Schema;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Container;
-use Mongolid\Schema\Schema;
+use Mongolid\TestCase;
 use Mongolid\Util\SequenceService;
 
 class SchemaTest extends TestCase
@@ -14,28 +14,29 @@ class SchemaTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+
         m::close();
     }
 
-    public function testShouldNotBeDynamicByDefault()
+    public function testShouldNotBeDynamicByDefault(): void
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class . '[]');
 
         // Assert
-        $this->assertEquals(false,  $schema->dynamic);
+        $this->assertEquals(false, $schema->dynamic);
     }
 
-    public function testMustHaveAnEntityClass()
+    public function testMustHaveAnEntityClass(): void
     {
         // Arrange
-        $schema = m::mock(Schema::class.'[]');
+        $schema = m::mock(Schema::class . '[]');
 
         // Assert
         $this->assertEquals('stdClass', $schema->entityClass);
     }
 
-    public function testShouldCastNullIntoObjectId()
+    public function testShouldCastNullIntoObjectId(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -49,7 +50,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testShouldNotCastRandomStringIntoObjectId()
+    public function testShouldNotCastRandomStringIntoObjectId(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -63,7 +64,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testShouldCastObjectIdStringIntoObjectId()
+    public function testShouldCastObjectIdStringIntoObjectId(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -82,7 +83,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testShouldCastNullIntoAutoIncrementSequence()
+    public function testShouldCastNullIntoAutoIncrementSequence(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -104,7 +105,7 @@ class SchemaTest extends TestCase
         $this->assertEquals(7, $schema->sequence($value));
     }
 
-    public function testShouldNotAutoIncrementSequenceIfValueIsNotNull()
+    public function testShouldNotAutoIncrementSequenceIfValueIsNotNull(): void
     {
         $schema = new class extends Schema {
         };
@@ -125,7 +126,7 @@ class SchemaTest extends TestCase
         $this->assertEquals(3, $schema->sequence($value));
     }
 
-    public function testShouldCastDocumentTimestamps()
+    public function testShouldCastDocumentTimestamps(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -139,7 +140,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testShouldRefreshUpdatedAtTimestamps()
+    public function testShouldRefreshUpdatedAtTimestamps(): void
     {
         // Arrange
         $schema = new class extends Schema {
@@ -159,20 +160,20 @@ class SchemaTest extends TestCase
         $value,
         $expectation,
         $compareTimestamp = true
-    ) {
+    ): void {
         // Arrange
         $schema = new class extends Schema {
         };
 
         // Assertion
         $result = $schema->createdAtTimestamp($value);
-        $this->assertInstanceOf(get_class($expectation), $result);
+        $this->assertInstanceOf($expectation::class, $result);
         if ($compareTimestamp) {
             $this->assertEquals((string) $expectation, (string) $result);
         }
     }
 
-    public function createdAtTimestampsFixture()
+    public function createdAtTimestampsFixture(): array
     {
         return [
             'MongoDB driver UTCDateTime' => [

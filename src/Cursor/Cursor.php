@@ -1,16 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mongolid\Cursor;
 
 use Iterator;
 use LogicException as BaseLogicException;
 use MongoDB\Collection;
-use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
-use Serializable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -21,37 +22,16 @@ use Serializable;
 class Cursor implements CursorInterface
 {
     /**
-     * @var Collection
-     */
-    protected $collection;
-
-    /**
-     * The command that is being called in the $collection.
-     *
-     * @var string
-     */
-    protected $command;
-
-    /**
-     * The parameters of the $command.
-     *
-     * @var array
-     */
-    protected $params;
-
-    /**
      * The MongoDB cursor used to interact with db.
      *
-     * @var DriverCursor
      */
-    protected $cursor = null;
+    protected ?Iterator $cursor = null;
 
     /**
      * Iterator position (to be used with foreach).
      *
-     * @var int
      */
-    protected $position = 0;
+    protected int $position = 0;
 
     /**
      * @param Collection $collection the raw collection object that will be used to retrieve the documents
@@ -59,14 +39,10 @@ class Cursor implements CursorInterface
      * @param array      $params     the parameters of the $command
      */
     public function __construct(
-        Collection $collection,
-        string $command,
-        array $params
+        protected Collection $collection,
+        protected string $command,
+        protected array $params
     ) {
-        $this->cursor = null;
-        $this->collection = $collection;
-        $this->command = $command;
-        $this->params = $params;
     }
 
     /**
@@ -76,7 +52,7 @@ class Cursor implements CursorInterface
      *
      * @return static
      */
-    public function limit(int $amount): CursorInterface
+    public function limit(int $amount): static
     {
         $this->params[1]['limit'] = $amount;
 
@@ -92,7 +68,7 @@ class Cursor implements CursorInterface
      *
      * @return static
      */
-    public function sort(array $fields): CursorInterface
+    public function sort(array $fields): static
     {
         $this->params[1]['sort'] = $fields;
 
@@ -106,7 +82,7 @@ class Cursor implements CursorInterface
      *
      * @return static
      */
-    public function skip(int $amount): CursorInterface
+    public function skip(int $amount): static
     {
         $this->params[1]['skip'] = $amount;
 
@@ -118,10 +94,8 @@ class Cursor implements CursorInterface
      * This method should be called before the cursor was started.
      *
      * @param bool $flag toggle timeout on or off
-     *
-     * @return static
      */
-    public function disableTimeout(bool $flag = true)
+    public function disableTimeout(bool $flag = true): static
     {
         $this->params[1]['noCursorTimeout'] = $flag;
 
@@ -139,7 +113,7 @@ class Cursor implements CursorInterface
      *
      * @return $this
      */
-    public function setReadPreference(int $mode)
+    public function setReadPreference(int $mode): static
     {
         $this->params[1]['readPreference'] = new ReadPreference($mode);
 
@@ -153,7 +127,7 @@ class Cursor implements CursorInterface
      */
     public function count(): int
     {
-        return $this->collection->count(...$this->params);
+        return $this->collection->countDocuments(...$this->params);
     }
 
     /**
@@ -163,7 +137,7 @@ class Cursor implements CursorInterface
     {
         try {
             $this->getCursor()->rewind();
-        } catch (LogicException | BaseLogicException $e) {
+        } catch (LogicException | BaseLogicException) {
             $this->fresh();
             $this->getCursor();
         }
@@ -197,7 +171,7 @@ class Cursor implements CursorInterface
      * through it again. A new request to the database will be made in the next
      * iteration.
      */
-    public function fresh()
+    public function fresh(): void
     {
         $this->cursor = null;
     }
@@ -229,8 +203,6 @@ class Cursor implements CursorInterface
 
     /**
      * Convert the cursor instance to an array of Objects.
-     *
-     * @return array
      */
     public function all(): array
     {
@@ -243,8 +215,6 @@ class Cursor implements CursorInterface
 
     /**
      * Convert the cursor instance to a full associative array.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -256,9 +226,23 @@ class Cursor implements CursorInterface
     }
 
     /**
+     * Actually returns a Traversable object with the DriverCursor within.
+     * If it does not exist yet, create it using the $collection, $command and
+     * $params given.
+     */
+    protected function getCursor(): Iterator
+    {
+        if (!$this->cursor) {
+            $driverCursor = $this->collection->{$this->command}(...$this->params);
+            $this->cursor = new CachingIterator($driverCursor);
+        }
+
+        return $this->cursor;
+    }
+
+    /**
      * Serializes this object storing the collection name instead of the actual
      * MongoDb\Collection (which is unserializable).
-     *
      */
     public function __serialize(): array
     {
@@ -272,33 +256,22 @@ class Cursor implements CursorInterface
     /**
      * Unserializes this object. Re-creating the database connection.
      *
-     * @param mixed $serialized serialized cursor
+     * @param array $serialized serialized cursor
      */
-    public function __unserialize($attributes): void
+    public function __unserialize(array $attributes): void
     {
         $connection = Container::make(Connection::class);
         $db = $connection->defaultDatabase;
         $collectionObject = $connection->getClient()->$db->{$attributes['collection']};
 
         foreach ($attributes as $key => $value) {
+            if ('collection' === $key) {
+                continue;
+            }
+
             $this->$key = $value;
         }
 
         $this->collection = $collectionObject;
-    }
-
-    /**
-     * Actually returns a Traversable object with the DriverCursor within.
-     * If it does not exists yet, create it using the $collection, $command and
-     * $params given.
-     */
-    protected function getCursor(): Iterator
-    {
-        if (!$this->cursor) {
-            $driverCursor = $this->collection->{$this->command}(...$this->params);
-            $this->cursor = new CachingIterator($driverCursor);
-        }
-
-        return $this->cursor;
     }
 }

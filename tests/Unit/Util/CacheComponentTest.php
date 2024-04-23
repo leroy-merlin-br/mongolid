@@ -3,22 +3,15 @@
 namespace Mongolid\Util;
 
 use Mockery as m;
+use Mockery\MockInterface;
 use Mongolid\TestCase;
 
 class CacheComponentTest extends TestCase
 {
     /**
      * Current time that will be retrieved by CacheComponent::time().
-     *
-     * @var int
      */
-    public $time = 1466710000;
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    private int $time = 1466710000;
 
     public function testShouldImplementCacheComponentInterface(): void
     {
@@ -26,7 +19,10 @@ class CacheComponentTest extends TestCase
         $cacheComponent = (new CacheComponent());
 
         // Assertion
-        $this->assertInstanceOf(CacheComponentInterface::class, $cacheComponent);
+        $this->assertInstanceOf(
+            CacheComponentInterface::class,
+            $cacheComponent
+        );
     }
 
     public function testShouldPutAndRetrieveValues(): void
@@ -55,15 +51,12 @@ class CacheComponentTest extends TestCase
         $this->assertNull($cacheComponent->get('saveThe'));
     }
 
-    protected function getCacheComponent()
+    protected function getCacheComponent(): MockInterface
     {
-        $test = $this;
-        $cacheComponent = m::mock(CacheComponent::class.'[time]');
+        $cacheComponent = m::mock(CacheComponent::class . '[time]');
         $cacheComponent->shouldAllowMockingProtectedMethods();
         $cacheComponent->shouldReceive('time')
-            ->andReturnUsing(function () use ($test) {
-                return $test->time;
-            });
+            ->andReturnUsing(fn () => $this->time);
 
         return $cacheComponent;
     }
@@ -71,7 +64,7 @@ class CacheComponentTest extends TestCase
     /**
      * Skips $seconds of time.
      */
-    protected function tick($seconds)
+    protected function tick($seconds): void
     {
         $this->time += $seconds;
     }
