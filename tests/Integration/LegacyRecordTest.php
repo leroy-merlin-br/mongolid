@@ -2,7 +2,9 @@
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
+use Mongolid\LegacyRecord;
 use Mongolid\Tests\Stubs\Legacy\LegacyRecordUser;
+use Mongolid\Tests\Stubs\Size;
 
 class LegacyRecordTest extends IntegrationTestCase
 {
@@ -41,6 +43,71 @@ class LegacyRecordTest extends IntegrationTestCase
         $entity->fill($data);
 
         $this->assertSame($expected, $entity->getAttributes());
+    }
+
+    /**
+     * @requires >= PHP 8.1
+     */
+    public function testLegacyFillShouldNotSupportCast(): void
+    {
+        // Set
+        $model = new class() extends LegacyRecord
+        {
+            protected array $casts = [
+                'birthdate' => 'datetime',
+            ];
+        };
+
+        // Actions
+        $model = $model->fill(['birthdate' => 123456]);
+
+        // Assertions
+        $this->assertEquals($model->getDocumentAttributes()['birthdate'], 123456);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testShouldBsonSerializeWithCast(): void
+    {
+        // Set
+        $model = new class() extends LegacyRecord
+        {
+            protected array $casts = [
+                'size' => Size::class,
+            ];
+        };
+        $model->size = Size::Small;
+
+        // Actions
+        $serializedModel = $model->bsonSerialize();
+
+        // Assertions
+        $this->assertSame(Size::Small->value, $serializedModel['size']);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testShouldBsonUnserializeWithCast(): void
+    {
+        // Set
+        $model = new class() extends LegacyRecord
+        {
+            protected array $casts = [
+                'size' => Size::class,
+            ];
+        };
+        $model->size = Size::Small;
+        $serializedModel = $model->bsonSerialize();
+        $unserializedModel = new (get_class($model));
+
+        // Actions
+        $unserializedModel->bsonUnserialize($serializedModel);
+
+        // Assertions
+        $this->assertSame(Size::Small->value, $unserializedModel->getDocumentAttributes()['size']);
+        $this->assertSame(Size::Small, $unserializedModel->size);
     }
 
     public function testShouldOverrideSetAttributeMethods(): void

@@ -290,7 +290,14 @@ abstract class AbstractModel implements ModelInterface
     public function bsonUnserialize(array $data): void
     {
         unset($data['__pclass']);
-        static::fill($data, $this, true);
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof \stdClass) {
+                $value = json_decode(json_encode($value), true); // cast to array
+            }
+
+            $this->attributes[$key] = $value;
+        }
 
         $this->syncOriginalDocumentAttributes();
     }

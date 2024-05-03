@@ -4,8 +4,8 @@ namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Container;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Schema\Schema;
 use Mongolid\Model\PolymorphableModelInterface;
+use Mongolid\Schema\Schema;
 
 /**
  * EntityAssembler have the responsibility of assembling the data coming from
@@ -32,6 +32,7 @@ class EntityAssembler
     {
         $entityClass = $schema->entityClass;
         $model = Container::make($entityClass);
+        $setter = $this->getAttributeSetter($model);
 
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
@@ -40,12 +41,19 @@ class EntityAssembler
                 $value = $this->assembleDocumentsRecursively($value, substr($fieldType, 7));
             }
 
-            $model->$field = $value;
+            $setter($field, $value);
         }
 
         $entity = $this->morphingTime($model);
 
         return $this->prepareOriginalAttributes($entity);
+    }
+
+    private function getAttributeSetter($model): callable
+    {
+        return $model instanceof ModelInterface
+            ? fn (string $field, mixed $value) => $model->setDocumentAttribute($field, $value)
+            : fn (string $field, mixed $value) => $model->$field = $value;
     }
 
     /**
