@@ -36,6 +36,7 @@ class Connection
         private array $options = [],
         private array $driverOptions = []
     ) {
+        $this->findDefaultDatabase($server);
     }
 
     /**
@@ -46,8 +47,6 @@ class Connection
         if (!$this->client) {
             // This will make the Mongo Driver return documents as arrays instead of objects
             $this->driverOptions['typeMap'] = ['array' => 'array'];
-
-            $this->findDefaultDatabase($this->server);
 
             $this->client = new Client(
                 $this->server,
