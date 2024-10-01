@@ -120,7 +120,7 @@ class SchemaCursor implements CursorInterface
     }
 
     /**
-     * Counts the number of results documents returned by this cursor's query.
+     * Counts the number of documents returned by this cursor's query.
      */
     public function count(): int
     {
