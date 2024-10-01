@@ -7,7 +7,6 @@ use MongoDB\Collection;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
-use Mongolid\Cursor\EagerLoadedCursor;
 use Mongolid\Cursor\SchemaCacheableCursor;
 use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
@@ -20,7 +19,7 @@ use Mongolid\Schema\Schema;
 /**
  * The DataMapper class will abstract how an Entity is persisted and retrieved
  * from the database.
- * The DataMapper will always use a Schema trough the SchemaMapper to parse the
+ * The DataMapper will always use a Schema through the SchemaMapper to parse the
  * document in and out of the database.
  */
 class DataMapper implements HasSchemaInterface
@@ -29,47 +28,35 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Name of the schema class to be used.
-     *
-     * @var string
      */
-    public $schemaClass = Schema::class;
+    public string $schemaClass = Schema::class;
 
     /**
      * Schema object. Will be set after the $schemaClass.
-     *
-     * @var Schema
      */
-    protected $schema;
-
-    /**
-     * Connections that are going to be used to interact with the database.
-     *
-     * @var Connection
-     */
-    protected $connection;
+    protected ?Schema $schema = null;
 
     /**
      * Have the responsibility of assembling the data coming from the database into actual entities.
-     *
-     * @var EntityAssembler
      */
-    protected $assembler;
+    protected ?EntityAssembler $assembler = null;
 
     /**
      * In order to dispatch events when necessary.
-     *
-     * @var EventTriggerService
      */
-    protected $eventService;
+    protected ?EventTriggerService $eventService = null;
 
     /**
-     * @var array
+     * @var array<string,null>
      */
-    private $pullNullValues = [];
+    private array $pullNullValues = [];
 
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        /**
+         * Connections that are going to be used to interact with the database.
+         */
+        protected Connection $connection
+    ) {
     }
 
     /**
@@ -83,7 +70,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save($entity, array $options = [])
+    public function save(mixed $entity, array $options = []): bool
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to
@@ -125,7 +112,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function insert($entity, array $options = [], bool $fireEvents = true): bool
+    public function insert(mixed $entity, array $options = [], bool $fireEvents = true): bool
     {
         if ($fireEvents && false === $this->fireEvent('inserting', $entity, true)) {
             return false;
@@ -163,7 +150,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function update($entity, array $options = []): bool
+    public function update(mixed $entity, array $options = []): bool
     {
         if (false === $this->fireEvent('updating', $entity, true)) {
             return false;
@@ -220,7 +207,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function delete($entity, array $options = []): bool
+    public function delete(mixed $entity, array $options = []): bool
     {
         if (false === $this->fireEvent('deleting', $entity, true)) {
             return false;
@@ -253,7 +240,7 @@ class DataMapper implements HasSchemaInterface
      * @param bool  $cacheable  retrieves a SchemaCacheableCursor instead
      */
     public function where(
-        $query = [],
+        mixed $query = [],
         array $projection = [],
         bool $cacheable = false
     ): CursorInterface {
@@ -301,10 +288,10 @@ class DataMapper implements HasSchemaInterface
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
     public function first(
-        $query = [],
+        mixed $query = [],
         array $projection = [],
         bool $cacheable = false
-    ) {
+    ): mixed {
         if ($cacheable) {
             return $this->where($query, $projection, true)->first();
         }
@@ -322,12 +309,10 @@ class DataMapper implements HasSchemaInterface
         );
 
         if (!$document) {
-            return;
+            return null;
         }
 
-        $model = $this->getAssembler()->assemble($document, $this->schema);
-
-        return $model;
+        return $this->getAssembler()->assemble($document, $this->schema);
     }
 
     /**
@@ -343,10 +328,10 @@ class DataMapper implements HasSchemaInterface
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
     public function firstOrFail(
-        $query = [],
+        mixed $query = [],
         array $projection = [],
         bool $cacheable = false
-    ) {
+    ): mixed {
         if ($result = $this->first($query, $projection, $cacheable)) {
             return $result;
         }
@@ -368,7 +353,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return array Document
      */
-    protected function parseToDocument($entity)
+    protected function parseToDocument(mixed $entity): array
     {
         $schemaMapper = $this->getSchemaMapper();
         $parsedDocument = $schemaMapper->map($entity);
@@ -384,10 +369,8 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Returns a SchemaMapper with the $schema or $schemaClass instance.
-     *
-     * @return SchemaMapper
      */
-    protected function getSchemaMapper()
+    protected function getSchemaMapper(): SchemaMapper
     {
         if (!$this->schema) {
             $this->schema = Container::make($this->schemaClass);
@@ -407,20 +390,16 @@ class DataMapper implements HasSchemaInterface
             'typeMap' => ['array' => 'array', 'document' => 'array']
         ];
 
-        $collection = $this->connection
+        return $this->connection
             ->getClient()
             ->selectDatabase($database, $options)
             ->selectCollection($collectionName);
-
-        return $collection;
     }
 
     /**
      * Retrieves an EntityAssembler instance.
-     *
-     * @return EntityAssembler
      */
-    protected function getAssembler()
+    protected function getAssembler(): EntityAssembler
     {
         if (!$this->assembler) {
             $this->assembler = Container::make(EntityAssembler::class);
@@ -438,11 +417,13 @@ class DataMapper implements HasSchemaInterface
      *
      * @return mixed event handler return
      */
-    protected function fireEvent(string $event, $entity, bool $halt = false)
+    protected function fireEvent(string $event, mixed $entity, bool $halt = false): mixed
     {
-        $event = "mongolid.{$event}: ".get_class($entity);
+        $event = "mongolid.{$event}: ".$entity::class;
 
-        $this->eventService ? $this->eventService : $this->eventService = Container::make(EventTriggerService::class);
+        if (!$this->eventService) {
+            $this->eventService = Container::make(EventTriggerService::class);
+        }
 
         return $this->eventService->fire($event, $entity, $halt);
     }
@@ -468,9 +449,9 @@ class DataMapper implements HasSchemaInterface
      *
      * @throws InvalidArgumentException if the given $fields are not a valid projection
      *
-     * @return array
+     * @return array<string, bool>
      */
-    protected function prepareProjection(array $fields)
+    protected function prepareProjection(array $fields): array
     {
         $projection = [];
         foreach ($fields as $key => $value) {
@@ -489,7 +470,7 @@ class DataMapper implements HasSchemaInterface
 
             if (is_int($key) && is_string($value)) {
                 $key = $value;
-                if (0 === strpos($value, '-')) {
+                if (str_starts_with($value, '-')) {
                     $key = substr($key, 1);
                     $value = false;
                 } else {
@@ -518,20 +499,16 @@ class DataMapper implements HasSchemaInterface
      *
      * @param array $defaultOptions default options array
      * @param array $toMergeOptions to merge options array
-     *
-     * @return array
      */
-    private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = [])
+    private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = []): array
     {
         return array_merge($defaultOptions, $toMergeOptions);
     }
 
     /**
      * Perform actions on object before firing the after event.
-     *
-     * @param mixed $entity
      */
-    private function afterSuccess($entity)
+    private function afterSuccess(mixed $entity): void
     {
         if ($entity instanceof ModelInterface) {
             $entity->syncOriginalDocumentAttributes();
@@ -548,10 +525,8 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Set a Schema object  that describes an Entity in MongoDB.
-     *
-     * @param Schema $schema
      */
-    public function setSchema(Schema $schema)
+    public function setSchema(Schema $schema): void
     {
         $this->schema = $schema;
     }
@@ -580,7 +555,7 @@ class DataMapper implements HasSchemaInterface
      * @see https://jira.mongodb.org/browse/SERVER-1014
      * @see https://github.com/bjori/mongo-php-transistor/blob/70f5af00795d67f4d5a8c397e831435814df9937/src/Transistor.php#L108
      */
-    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = '')
+    private function calculateChanges(array &$changes, array $newData, array $oldData, string $keyfix = ''): void
     {
         foreach ($newData as $k => $v) {
             if (is_null($v)) {
@@ -610,22 +585,19 @@ class DataMapper implements HasSchemaInterface
                     $this->pullNullValues[rtrim($keyfix, '.')] = null;
                 }
                 $changes['$unset']["{$keyfix}{$k}"] = '';
-                continue;
             }
         }
     }
 
     private function filterNullValues(array $data): array
     {
-        $filtered =  array_filter(
+        $filtered = array_filter(
             $data,
-            function ($value) {
-                return !is_null($value);
-            }
+            fn($value): bool => !is_null($value)
         );
 
         if ($data == array_values($data)) {
-            $filtered = array_values($filtered);
+            return array_values($filtered);
         }
 
         return $filtered;

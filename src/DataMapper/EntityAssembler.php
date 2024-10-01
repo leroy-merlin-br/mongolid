@@ -25,10 +25,8 @@ class EntityAssembler
      *
      * @param array|object $document the attributes that will be used to compose the entity
      * @param Schema       $schema   schema that will be used to map each field
-     *
-     * @return mixed
      */
-    public function assemble($document, Schema $schema)
+    public function assemble(array|object $document, Schema $schema): mixed
     {
         $entityClass = $schema->entityClass;
         $model = Container::make($entityClass);
@@ -36,7 +34,7 @@ class EntityAssembler
         foreach ($document as $field => $value) {
             $fieldType = $schema->fields[$field] ?? null;
 
-            if ($fieldType && 'schema.' == substr($fieldType, 0, 7)) {
+            if ($fieldType && str_starts_with($fieldType, 'schema.')) {
                 $value = $this->assembleDocumentsRecursively($value, substr($fieldType, 7));
             }
 
@@ -58,12 +56,12 @@ class EntityAssembler
      *
      * @return mixed the result of $entity->polymorph or the $entity itself
      */
-    protected function morphingTime(ModelInterface $entity)
+    protected function morphingTime(ModelInterface $entity): mixed
     {
         if ($entity instanceof PolymorphableModelInterface) {
             $class = $entity->polymorph($entity->getDocumentAttributes());
 
-            if ($class !== get_class($entity)) {
+            if ($class !== $entity::class) {
                 $originalAttributes = $entity->getDocumentAttributes();
                 $entity = Container::make($class);
                 $entity->fill($originalAttributes, true);
@@ -80,7 +78,7 @@ class EntityAssembler
      *
      * @return mixed the entity with original attributes
      */
-    protected function prepareOriginalAttributes($entity)
+    protected function prepareOriginalAttributes(mixed $entity): mixed
     {
         if ($entity instanceof ModelInterface) {
             $entity->syncOriginalDocumentAttributes();
@@ -94,15 +92,13 @@ class EntityAssembler
      *
      * @param mixed  $value       a value of an embeded field containing entity data to be assembled
      * @param string $schemaClass the schemaClass to be used when assembling the entities within $value
-     *
-     * @return mixed
      */
-    protected function assembleDocumentsRecursively($value, string $schemaClass)
+    protected function assembleDocumentsRecursively(mixed $value, string $schemaClass): ?array
     {
         $value = (array) $value;
 
         if (empty($value)) {
-            return;
+            return null;
         }
 
         $schema = Container::make($schemaClass);
