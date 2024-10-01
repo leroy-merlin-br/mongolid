@@ -92,7 +92,7 @@ class SchemaEmbeddedCursor implements CursorInterface
     }
 
     /**
-     * Counts the number of results for this cursor.
+     * Counts the number of documents returned by this cursor's query.
      */
     public function count(): int
     {

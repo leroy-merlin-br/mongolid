@@ -10,9 +10,7 @@ use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\LegacyRecord;
-use Traversable;
 use MongoDB\Collection;
-use MongoDB\Driver\Cursor as DriverCursor;
 use MongoDB\Driver\Exception\LogicException;
 use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
@@ -122,9 +120,7 @@ class SchemaCursor implements CursorInterface
     }
 
     /**
-     * Counts the number of results for this cursor.
-     *
-     * @return int the number of documents returned by this cursor's query
+     * Counts the number of results documents returned by this cursor's query.
      */
     public function count(): int
     {
