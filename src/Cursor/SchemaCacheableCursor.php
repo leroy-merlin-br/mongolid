@@ -32,14 +32,12 @@ class SchemaCacheableCursor extends SchemaCursor
     /**
      * Limit of the query. It is stored because when caching the documents
      * the DOCUMENT_LIMIT const will be used.
-     *
      */
     protected int $originalLimit = 0;
 
     /**
      * Means that the CacheableCursor is wapping the original cursor and not
      * reading from Cache anymore.
-     *
      */
     protected bool $ignoreCache = false;
 
@@ -105,8 +103,6 @@ class SchemaCacheableCursor extends SchemaCursor
 
     /**
      * Generates an unique cache key for the cursor in it's current state.
-     *
-     * @return string cache key to identify the query of the current cursor
      */
     protected function generateCacheKey(): string
     {

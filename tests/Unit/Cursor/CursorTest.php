@@ -536,7 +536,7 @@ final class CursorTest extends TestCase
                 return 'my_collection';
             }
 
-            public function __serialize()
+            public function __serialize(): array
             {
                 throw new Exception('Unable to serialize', 1);
             }
