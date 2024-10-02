@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mongolid\Schema;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Container;
@@ -53,8 +54,8 @@ abstract class Schema
     public string $entityClass = 'stdClass';
 
     /**
-     * Filters any field in the $fields that has it's value specified as a
-     * 'objectId'. It will wraps the $value, if any, into a ObjectId object.
+     * Filters any field in the $fields that has its value specified as a
+     * 'objectId'. It will wrap the $value, if any, into a ObjectId object.
      *
      * @param mixed $value value that may be converted to ObjectId
      */
@@ -77,6 +78,7 @@ abstract class Schema
      * the schema. The sequence generation is done by the SequenceService.
      *
      * @param int|null $value value that will be evaluated
+     * @throws BindingResolutionException
      */
     public function sequence(?int $value = null): int
     {
