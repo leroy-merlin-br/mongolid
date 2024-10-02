@@ -76,7 +76,7 @@ class ModelMapper
         }
     }
 
-    private function manageId(ModelInterface $model)
+    private function manageId(ModelInterface $model): void
     {
         $value = $model->_id;
 
