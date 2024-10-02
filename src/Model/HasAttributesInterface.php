@@ -22,10 +22,8 @@ interface HasAttributesInterface
      * Get an attribute from the model.
      *
      * @param string $key the attribute to be accessed
-     *
-     * @return mixed
      */
-    public function getDocumentAttribute(string $key);
+    public function getDocumentAttribute(string $key): mixed;
 
     /**
      * Get all attributes from the model.
@@ -37,7 +35,7 @@ interface HasAttributesInterface
      *
      * @param string $key name of the attribute to be unset
      */
-    public function cleanDocumentAttribute(string $key);
+    public function cleanDocumentAttribute(string $key): void;
 
     /**
      * Set a given attribute on the model.
@@ -45,7 +43,7 @@ interface HasAttributesInterface
      * @param string $key   name of the attribute to be set
      * @param mixed  $value value to be set
      */
-    public function setDocumentAttribute(string $key, $value);
+    public function setDocumentAttribute(string $key, mixed $value): mixed;
 
     /**
      * Stores original attributes from actual data from attributes
@@ -54,7 +52,7 @@ interface HasAttributesInterface
      * Ideally should be called once right after retrieving data from
      * the database.
      */
-    public function syncOriginalDocumentAttributes();
+    public function syncOriginalDocumentAttributes(): mixed;
 
     /**
      * Retrieve original attributes.

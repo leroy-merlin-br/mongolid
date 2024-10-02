@@ -29,42 +29,34 @@ abstract class AbstractModel implements ModelInterface
      * model is queried, it will load its referenced
      * models together.
      *
-     * @var array
+     * @var string[]
      */
-    public $with = [];
+    public array $with = [];
 
     /**
      * The $dynamic property tells if the object will accept additional fields
      * that are not specified in the $fillable or $guarded properties.
      * This is useful if you do not have a strict document format or
      * if you want to take full advantage of the "schemaless" nature of MongoDB.
-     *
-     * @var bool
      */
-    protected $dynamic = true;
+    protected bool $dynamic = true;
 
     /**
      * Whether the model should manage the `created_at` and `updated_at`
      * timestamps automatically.
-     *
-     * @var bool
      */
-    protected $timestamps = true;
+    protected bool $timestamps = true;
 
     /**
      * Name of the collection where this kind of Model is going to be saved or
      * retrieved from.
-     *
-     * @var string
      */
-    protected $collection = null;
+    protected ?string $collection = null;
 
     /**
      * @see https://docs.mongodb.com/manual/reference/write-concern/
-     *
-     * @var int
      */
-    protected $writeConcern = 1;
+    protected int $writeConcern = 1;
 
     /**
      * Gets a cursor of this kind of entities that matches the query from the
@@ -93,10 +85,8 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed   $query      mongoDB selection criteria
      * @param array   $projection fields to project in Mongo query
      * @param boolean $useCache   retrieves the first through a CacheableCursor
-     *
-     * @return AbstractModel|null
      */
-    public static function first($query = [], array $projection = [], bool $useCache = false)
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
     {
         return self::getBuilderInstance()->first(new static(), $query, $projection, $useCache);
     }
@@ -110,10 +100,8 @@ abstract class AbstractModel implements ModelInterface
      * @param boolean $useCache   retrieves the first through a CacheableCursor
      *
      * @throws ModelNotFoundException If no document was found
-     *
-     * @return AbstractModel|null
      */
-    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false)
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
     {
         return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection);
     }
@@ -124,10 +112,8 @@ abstract class AbstractModel implements ModelInterface
      * _if field filled.
      *
      * @param mixed $id document id
-     *
-     * @return AbstractModel|null
      */
-    public static function firstOrNew($id)
+    public static function firstOrNew(mixed $id): ?static
     {
         if (!$model = self::first($id)) {
             $model = new static();
@@ -196,10 +182,8 @@ abstract class AbstractModel implements ModelInterface
      * Dynamically retrieve attributes on the model.
      *
      * @param string $key name of the attribute
-     *
-     * @return mixed
      */
-    public function &__get(string $key)
+    public function &__get(string $key): mixed
     {
         return $this->getDocumentAttribute($key);
     }
@@ -210,7 +194,7 @@ abstract class AbstractModel implements ModelInterface
      * @param string $key   attribute name
      * @param mixed  $value value to be set
      */
-    public function __set(string $key, $value): void
+    public function __set(string $key, mixed $value): void
     {
         $this->setDocumentAttribute($key, $value);
     }
