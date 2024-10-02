@@ -4,6 +4,7 @@ namespace Mongolid\Query;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BulkWriteResult;
 use MongoDB\Driver\WriteConcern;
+use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\ModelInterface;
 
 /**
@@ -15,20 +16,13 @@ use Mongolid\Model\ModelInterface;
 class BulkWrite
 {
     /**
-     * @var ModelInterface
-     */
-    private $model;
-
-    /**
      * Hold bulk write operations to run.
-     *
-     * @var array
      */
-    private $operations = [];
+    private array $operations = [];
 
-    public function __construct(ModelInterface $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private ModelInterface $model
+    ){
     }
 
     public function isEmpty(): bool
@@ -43,12 +37,9 @@ class BulkWrite
      *
      * @see https://docs.mongodb.com/manual/reference/operator/update/set/#set-top-level-fields
      *
-     * @param ObjectId|string|array $filter
-     * @param array                 $dataToSet
-     * @param array                 $options
      */
     public function updateOne(
-        $filter,
+        ObjectId|string|array $filter,
         array $dataToSet,
         array $options = ['upsert' => true],
         string $operator = '$set'
@@ -64,7 +55,7 @@ class BulkWrite
      * Execute the BulkWrite, using connection.
      * The collection is inferred from model's collection name.
      *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     * @throws NoCollectionNameException
      */
     public function execute(int $writeConcern = 1): BulkWriteResult
     {
