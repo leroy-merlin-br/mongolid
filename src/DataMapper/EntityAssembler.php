@@ -56,7 +56,7 @@ class EntityAssembler
      *
      * @return mixed the result of $entity->polymorph or the $entity itself
      */
-    protected function morphingTime(ModelInterface $entity): mixed
+    protected function morphingTime(ModelInterface $entity): ModelInterface
     {
         if ($entity instanceof PolymorphableModelInterface) {
             $class = $entity->polymorph($entity->getDocumentAttributes());

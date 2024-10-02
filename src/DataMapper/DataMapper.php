@@ -70,7 +70,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @return bool Success (but always false if write concern is Unacknowledged)
      */
-    public function save(mixed $entity, array $options = []): bool
+    public function save(ModelInterface $entity, array $options = []): bool
     {
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This gives an opportunities to

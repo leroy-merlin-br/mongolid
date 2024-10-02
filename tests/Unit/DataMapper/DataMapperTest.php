@@ -657,7 +657,7 @@ class DataMapperTest extends TestCase
         $connection = m::mock(Connection::class);
         $mapper = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
-        $entity = m::mock();
+        $entity = m::mock(ModelInterface::class);
 
         $mapper->shouldAllowMockingProtectedMethods();
 
@@ -1043,7 +1043,7 @@ class DataMapperTest extends TestCase
     {
         return [
             'acknowledged write concern with plain object' => [
-                'object' => m::mock(),
+                'object' => m::mock(ModelInterface::class),
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
@@ -1055,7 +1055,7 @@ class DataMapperTest extends TestCase
                 'expected' => true,
             ],
             'unacknowledged write concern with plain object' => [
-                'object' => m::mock(),
+                'object' => m::mock(ModelInterface::class),
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
                 'expected' => false,
