@@ -9,7 +9,7 @@ use Mongolid\Util\LocalDateTime;
 class ImmutableDateTimeCast extends BaseDateTimeCast
 {
     /**
-     * @param UTCDateTime|null $value
+     * @param UTCDateTime $value
      */
     public function get(mixed $value): ?DateTimeImmutable
     {

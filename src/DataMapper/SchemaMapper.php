@@ -82,7 +82,10 @@ class SchemaMapper
             return $this->schema->$fieldType($value);
         }
         // Returns null or an empty array
-        if (null === $value || is_array($value) && empty($value)) {
+        if (null === $value) {
+            return $value;
+        }
+        if (is_array($value) && empty($value)) {
             return $value;
         }
 
@@ -106,8 +109,6 @@ class SchemaMapper
      *
      * @param mixed  $value value to be casted
      * @param string $type  type to which the $value should be casted to
-     *
-     * @return mixed
      */
     protected function cast(mixed $value, string $type): mixed
     {

@@ -52,10 +52,12 @@ class CacheableCursor extends Cursor
     protected function getCursor(): Iterator
     {
         // Returns original (non-cached) cursor
-        if ($this->ignoreCache || $this->position >= self::DOCUMENT_LIMIT) {
+        if ($this->ignoreCache) {
             return $this->getOriginalCursor();
         }
-
+        if ($this->position >= self::DOCUMENT_LIMIT) {
+            return $this->getOriginalCursor();
+        }
         // Returns cached set of documents
         if ($this->documents) {
             return $this->documents;

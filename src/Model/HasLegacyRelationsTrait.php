@@ -96,10 +96,8 @@ trait HasLegacyRelationsTrait
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded document is stored
-     *
-     * @return LegacyRecord|Schema|null
      */
-    protected function embedsOne(string $entity, string $field)
+    protected function embedsOne(string $entity, string $field): \Mongolid\LegacyRecord|\Mongolid\Schema\Schema|null
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
@@ -144,7 +142,7 @@ trait HasLegacyRelationsTrait
      * @param string $field field to where the $obj will be embedded
      * @param mixed  $obj   document or model instance
      */
-    public function embed(string $field, &$obj)
+    public function embed(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->embed($this, $field, $obj);
@@ -157,7 +155,7 @@ trait HasLegacyRelationsTrait
      * @param string $field name of the field where the $obj is embeded
      * @param mixed  $obj   document, model instance or _id
      */
-    public function unembed(string $field, &$obj)
+    public function unembed(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->unembed($this, $field, $obj);
@@ -170,7 +168,7 @@ trait HasLegacyRelationsTrait
      * @param string $field name of the field where the reference will be stored
      * @param mixed  $obj   document, model instance or _id to be referenced
      */
-    public function attach(string $field, &$obj)
+    public function attach(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->attach($this, $field, $obj);
@@ -183,7 +181,7 @@ trait HasLegacyRelationsTrait
      * @param string $field field where the reference is stored
      * @param mixed  $obj   document, model instance or _id that have been referenced by $field
      */
-    public function detach(string $field, &$obj)
+    public function detach(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);

@@ -106,10 +106,13 @@ trait HasLegacyAttributesTrait
 
                 continue;
             }
-
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && !in_array($key, $this->guarded)) {
-                $this->setAttribute($key, $value);
+            if (!(empty($this->fillable) || in_array($key, $this->fillable))) {
+                continue;
             }
+            if (in_array($key, $this->guarded)) {
+                continue;
+            }
+            $this->setAttribute($key, $value);
         }
 
         return $this;
