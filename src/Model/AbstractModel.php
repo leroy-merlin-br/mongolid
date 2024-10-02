@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -59,81 +60,6 @@ abstract class AbstractModel implements ModelInterface
     protected int $writeConcern = 1;
 
     /**
-     * Gets a cursor of this kind of entities that matches the query from the
-     * database.
-     *
-     * @param array $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves a CacheableCursor instead
-     */
-    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface
-    {
-        return self::getBuilderInstance()->where(new static(), $query, $projection, $useCache);
-    }
-
-    /**
-     * Gets a cursor of this kind of entities from the database.
-     */
-    public static function all(): CursorInterface
-    {
-        return self::getBuilderInstance()->all(new static());
-    }
-
-    /**
-     * Gets the first model of this kind that matches the query.
-     *
-     * @param mixed   $query      mongoDB selection criteria
-     * @param array   $projection fields to project in Mongo query
-     * @param boolean $useCache   retrieves the first through a CacheableCursor
-     */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
-        return self::getBuilderInstance()->first(new static(), $query, $projection, $useCache);
-    }
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, throws ModelNotFoundException.
-     *
-     * @param mixed   $query      mongoDB selection criteria
-     * @param array   $projection fields to project in Mongo quer
-     * @param boolean $useCache   retrieves the first through a CacheableCursor
-     *
-     * @throws ModelNotFoundException If no document was found
-     */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
-        return self::getBuilderInstance()->firstOrFail(new static(), $query, $projection);
-    }
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, a new model will be returned with the
-     * _if field filled.
-     *
-     * @param mixed $id document id
-     */
-    public static function firstOrNew(mixed $id): ?static
-    {
-        if (!$model = self::first($id)) {
-            $model = new static();
-            $model->_id = $id;
-        }
-
-        return $model;
-    }
-
-    /**
-     * Returns a valid instance from Ioc.
-     */
-    protected static function getBuilderInstance(): Builder
-    {
-        $instance = new static();
-
-        return $instance->getBuilder();
-    }
-
-    /**
      * Saves this object into database.
      */
     public function save(): bool
@@ -175,47 +101,6 @@ abstract class AbstractModel implements ModelInterface
     public function fresh(): self
     {
         return static::first($this->_id);
-    }
-
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param string $key name of the attribute
-     */
-    public function &__get(string $key): mixed
-    {
-        return $this->getDocumentAttribute($key);
-    }
-
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * @param string $key   attribute name
-     * @param mixed  $value value to be set
-     */
-    public function __set(string $key, mixed $value): void
-    {
-        $this->setDocumentAttribute($key, $value);
-    }
-
-    /**
-     * Determine if an attribute exists on the model.
-     *
-     * @param string $key attribute name
-     */
-    public function __isset(string $key): bool
-    {
-        return $this->hasDocumentAttribute($key);
-    }
-
-    /**
-     * Unset an attribute on the model.
-     *
-     * @param string $key attribute name
-     */
-    public function __unset(string $key): void
-    {
-        $this->cleanDocumentAttribute($key);
     }
 
     /**
@@ -267,7 +152,12 @@ abstract class AbstractModel implements ModelInterface
     public function bsonSerialize(): object|array
     {
         return Container::make(ModelMapper::class)
-            ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
+            ->map(
+                $this,
+                array_merge($this->fillable, $this->guarded),
+                $this->dynamic,
+                $this->timestamps
+            );
     }
 
     public function bsonUnserialize(array $data): void
@@ -276,6 +166,85 @@ abstract class AbstractModel implements ModelInterface
         static::fill($data, $this, true);
 
         $this->syncOriginalDocumentAttributes();
+    }
+
+    /**
+     * Gets a cursor of this kind of entities that matches the query from the
+     * database.
+     *
+     * @param array $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
+     */
+    public static function where(array $query = [], array $projection = [], bool $useCache = false): CursorInterface
+    {
+        return self::getBuilderInstance()->where(
+            new static(),
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets a cursor of this kind of entities from the database.
+     */
+    public static function all(): CursorInterface
+    {
+        return self::getBuilderInstance()->all(new static());
+    }
+
+    /**
+     * Gets the first model of this kind that matches the query.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the first through a CacheableCursor
+     */
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
+    {
+        return self::getBuilderInstance()->first(
+            new static(),
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo quer
+     * @param bool  $useCache   retrieves the first through a CacheableCursor
+     *
+     * @throws ModelNotFoundException If no document was found
+     */
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
+    {
+        return self::getBuilderInstance()->firstOrFail(
+            new static(),
+            $query,
+            $projection
+        );
+    }
+
+    /**
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, a new model will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     */
+    public static function firstOrNew(mixed $id): ?static
+    {
+        if (!$model = self::first($id)) {
+            $model = new static();
+            $model->_id = $id;
+        }
+
+        return $model;
     }
 
     /**
@@ -297,11 +266,62 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * Returns a valid instance from Ioc.
+     */
+    protected static function getBuilderInstance(): Builder
+    {
+        $instance = new static();
+
+        return $instance->getBuilder();
+    }
+
+    /**
      * Returns a Builder configured with the collection described
      * in this model.
      */
     private function getBuilder(): Builder
     {
         return Container::make(Builder::class);
+    }
+
+    /**
+     * Dynamically retrieve attributes on the model.
+     *
+     * @param string $key name of the attribute
+     */
+    public function &__get(string $key): mixed
+    {
+        return $this->getDocumentAttribute($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param string $key   attribute name
+     * @param mixed  $value value to be set
+     */
+    public function __set(string $key, mixed $value): void
+    {
+        $this->setDocumentAttribute($key, $value);
+    }
+
+    /**
+     * Determine if an attribute exists on the model.
+     *
+     * @param string $key attribute name
+     */
+    public function __isset(string $key): bool
+    {
+        return $this->hasDocumentAttribute($key);
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param string $key attribute name
+     */
+    public function __unset(string $key): void
+    {
+        $this->cleanDocumentAttribute($key);
     }
 }

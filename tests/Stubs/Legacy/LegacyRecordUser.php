@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Stubs\Legacy;
 
 use Mongolid\Cursor\CursorInterface;
@@ -6,22 +7,13 @@ use Mongolid\LegacyRecord;
 
 class LegacyRecordUser extends LegacyRecord
 {
-    /**
-     * @var string
-     */
-    protected $collection = 'users';
-
     public bool $mutable = true;
 
-    /**
-     * @var bool
-     */
-    protected $timestamps = true;
+    public bool $dynamic = false;
 
-    /**
-     * @var bool
-     */
-    public $dynamic = false;
+    protected ?string $collection = 'users';
+
+    protected bool $timestamps = true;
 
     protected array $fillable = [
         'name',

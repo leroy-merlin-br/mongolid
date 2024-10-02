@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use Mongolid\Tests\Stubs\ReferencedUser;
@@ -18,7 +19,10 @@ final class AttributesKeyTest extends IntegrationTestCase
         $this->assertSame('John', $user->name);
         $this->assertSame('john@doe.com', $user->email);
         $this->assertSame(['my', 'attributes'], $user->attributes);
-        $this->assertSame(['my', 'original', 'attributes'], $user->originalAttributes);
+        $this->assertSame(
+            ['my', 'original', 'attributes'],
+            $user->originalAttributes
+        );
         $this->assertSame(
             [
                 'name' => 'John',
@@ -37,7 +41,10 @@ final class AttributesKeyTest extends IntegrationTestCase
         $this->assertSame('John', $user->name);
         $this->assertSame('john@doe.com', $user->email);
         $this->assertSame(['my', 'attributes'], $user->attributes);
-        $this->assertSame(['my', 'original', 'attributes'], $user->originalAttributes);
+        $this->assertSame(
+            ['my', 'original', 'attributes'],
+            $user->originalAttributes
+        );
         $this->assertSame(
             [
                 '_id' => $user->_id,

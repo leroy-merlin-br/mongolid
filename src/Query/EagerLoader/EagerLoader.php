@@ -1,11 +1,9 @@
 <?php
+
 namespace Mongolid\Query\EagerLoader;
 
 use Iterator;
-use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
-use Mongolid\Model\ModelInterface;
-use Mongolid\Util\CacheComponentInterface;
 
 /**
  * This class is responsible for caching all related models

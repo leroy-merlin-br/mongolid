@@ -59,9 +59,9 @@ class DocumentEmbedder
     /**
      * Attach a new _id reference into $field of $parent.
      *
-     * @param mixed        $parent the object where $entity will be referenced
-     * @param string       $field  the field where the _id reference of $entity will be stored
-     * @param mixed $entity the object that is being attached
+     * @param mixed  $parent the object where $entity will be referenced
+     * @param string $field  the field where the _id reference of $entity will be stored
+     * @param mixed  $entity the object that is being attached
      *
      * @return bool Success
      */

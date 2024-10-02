@@ -1,21 +1,17 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Support\Str;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\LegacyRecord;
-use Mongolid\Model\Exception\NotARelationException;
-use Mongolid\Model\Relations\RelationInterface;
 use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
-use MongolidLaravel\MongolidModel;
 
 /**
  * It is supposed to be used on model classes in general.
@@ -23,117 +19,6 @@ use MongolidLaravel\MongolidModel;
 trait HasLegacyRelationsTrait
 {
     use CacheKeyGeneratorTrait;
-
-    /**
-     * Returns the referenced documents as objects.
-     *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field the field where the _id is stored
-     * @param bool $cacheable retrieves a CacheableCursor instead
-     *
-     * @return mixed
-     * @throws BindingResolutionException
-     */
-    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
-    {
-        $referencedId = $this->$field;
-
-        if (is_array($referencedId) && isset($referencedId[0])) {
-            $referencedId = $referencedId[0];
-        }
-
-        $entityInstance = Container::make($entity);
-
-        if ($cacheable && $referencedId && $document = $this->getDocumentFromCache($entityInstance, $referencedId)) {
-            return $document;
-        }
-
-        if ($entityInstance instanceof Schema) {
-            $dataMapper = Container::make(DataMapper::class);
-            $dataMapper->setSchema($entityInstance);
-
-            return $dataMapper->first(['_id' => $referencedId], [], $cacheable);
-        }
-
-        return $entityInstance::first(['_id' => $referencedId], [], $cacheable);
-    }
-
-    /**
-     * Returns the cursor for the referenced documents as objects.
-     *
-     * @param string $entity    class of the entity or of the schema of the entity
-     * @param string $field     the field where the _ids are stored
-     * @param bool   $cacheable retrieves a CacheableCursor instead
-     *
-     * @return array
-     */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
-    {
-        $referencedIds = (array) $this->$field;
-
-        if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
-            foreach ($referencedIds as $key => $value) {
-                $referencedIds[$key] = new ObjectId($value);
-            }
-        }
-
-        $query = ['_id' => ['$in' => array_values($referencedIds)]];
-
-        $entityInstance = Container::make($entity);
-
-        if ($entityInstance instanceof Schema) {
-            $dataMapper = Container::make(DataMapper::class);
-            $dataMapper->setSchema($entityInstance);
-
-            return $dataMapper->where($query, [], $cacheable);
-        }
-
-        return $entityInstance::where($query, [], $cacheable);
-    }
-
-    /**
-     * Return a embedded documents as object.
-     *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded document is stored
-     */
-    protected function embedsOne(string $entity, string $field): \Mongolid\LegacyRecord|\Mongolid\Schema\Schema|null
-    {
-        if (is_subclass_of($entity, Schema::class)) {
-            $entity = (new $entity())->entityClass;
-        }
-
-        $items = (array) $this->$field;
-        if (false === empty($items) && false === array_key_exists(0, $items)) {
-            $items = [$items];
-        }
-
-        return Container::make(CursorFactory::class)
-            ->createEmbeddedCursor($entity, $items)->first();
-    }
-
-    /**
-     * Return array of embedded documents as objects.
-     *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded documents are stored
-     *
-     * @return CursorInterface Array with the embedded documents
-     */
-    protected function embedsMany(string $entity, string $field)
-    {
-        if (is_subclass_of($entity, Schema::class)) {
-            $entity = (new $entity())->entityClass;
-        }
-
-        $items = (array) $this->$field;
-        if (false === empty($items) && false === array_key_exists(0, $items)) {
-            $items = [$items];
-        }
-
-        return Container::make(CursorFactory::class)
-            ->createEmbeddedCursor($entity, $items);
-    }
 
     /**
      * Embed a new document to an attribute. It will also generate an
@@ -185,6 +70,130 @@ trait HasLegacyRelationsTrait
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
+    }
+
+    /**
+     * Returns the referenced documents as objects.
+     *
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _id is stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
+     *
+     * @return mixed
+     * @throws BindingResolutionException
+     */
+    protected function referencesOne(string $entity, string $field, bool $cacheable = true)
+    {
+        $referencedId = $this->$field;
+
+        if (is_array($referencedId) && isset($referencedId[0])) {
+            $referencedId = $referencedId[0];
+        }
+
+        $entityInstance = Container::make($entity);
+
+        if (
+            $cacheable && $referencedId && $document = $this->getDocumentFromCache(
+                $entityInstance,
+                $referencedId
+            )
+        ) {
+            return $document;
+        }
+
+        if ($entityInstance instanceof Schema) {
+            $dataMapper = Container::make(DataMapper::class);
+            $dataMapper->setSchema($entityInstance);
+
+            return $dataMapper->first(
+                ['_id' => $referencedId],
+                [],
+                $cacheable
+            );
+        }
+
+        return $entityInstance::first(
+            ['_id' => $referencedId],
+            [],
+            $cacheable
+        );
+    }
+
+    /**
+     * Returns the cursor for the referenced documents as objects.
+     *
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _ids are stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
+     *
+     * @return array
+     */
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
+    {
+        $referencedIds = (array) $this->$field;
+
+        if (ObjectIdUtils::isObjectId($referencedIds[0] ?? '')) {
+            foreach ($referencedIds as $key => $value) {
+                $referencedIds[$key] = new ObjectId($value);
+            }
+        }
+
+        $query = ['_id' => ['$in' => array_values($referencedIds)]];
+
+        $entityInstance = Container::make($entity);
+
+        if ($entityInstance instanceof Schema) {
+            $dataMapper = Container::make(DataMapper::class);
+            $dataMapper->setSchema($entityInstance);
+
+            return $dataMapper->where($query, [], $cacheable);
+        }
+
+        return $entityInstance::where($query, [], $cacheable);
+    }
+
+    /**
+     * Return a embedded documents as object.
+     *
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field  field where the embedded document is stored
+     */
+    protected function embedsOne(string $entity, string $field): LegacyRecord|Schema|null
+    {
+        if (is_subclass_of($entity, Schema::class)) {
+            $entity = (new $entity())->entityClass;
+        }
+
+        $items = (array) $this->$field;
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
+            $items = [$items];
+        }
+
+        return Container::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items)->first();
+    }
+
+    /**
+     * Return array of embedded documents as objects.
+     *
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field  field where the embedded documents are stored
+     *
+     * @return CursorInterface Array with the embedded documents
+     */
+    protected function embedsMany(string $entity, string $field)
+    {
+        if (is_subclass_of($entity, Schema::class)) {
+            $entity = (new $entity())->entityClass;
+        }
+
+        $items = (array) $this->$field;
+        if (false === empty($items) && false === array_key_exists(0, $items)) {
+            $items = [$items];
+        }
+
+        return Container::make(CursorFactory::class)
+            ->createEmbeddedCursor($entity, $items);
     }
 
     /**
