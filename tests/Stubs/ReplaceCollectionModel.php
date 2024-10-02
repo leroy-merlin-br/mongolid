@@ -6,20 +6,11 @@ use Mongolid\Model\AbstractModel;
 
 class ReplaceCollectionModel extends AbstractModel
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $timestamps = false;
+    protected bool $timestamps = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected $collection = 'models';
+    protected ?string $collection = 'models';
 
-    /**
-     * @var Collection
-     */
-    protected $rawCollection;
+    protected Collection $rawCollection;
 
     public function setCollection(Collection $collection): void
     {

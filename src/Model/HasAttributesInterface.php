@@ -43,7 +43,7 @@ interface HasAttributesInterface
      * @param string $key   name of the attribute to be set
      * @param mixed  $value value to be set
      */
-    public function setDocumentAttribute(string $key, mixed $value): mixed;
+    public function setDocumentAttribute(string $key, mixed $value): void;
 
     /**
      * Stores original attributes from actual data from attributes
@@ -52,7 +52,7 @@ interface HasAttributesInterface
      * Ideally should be called once right after retrieving data from
      * the database.
      */
-    public function syncOriginalDocumentAttributes(): mixed;
+    public function syncOriginalDocumentAttributes(): void;
 
     /**
      * Retrieve original attributes.

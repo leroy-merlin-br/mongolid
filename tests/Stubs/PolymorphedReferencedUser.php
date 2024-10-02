@@ -3,10 +3,7 @@ namespace Mongolid\Tests\Stubs;
 
 class PolymorphedReferencedUser extends ReferencedUser
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $fillable = [
+    protected array $fillable = [
         'type',
         'new_field',
     ];
