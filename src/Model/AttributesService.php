@@ -40,7 +40,7 @@ class AttributesService
     /**
      * The model's attributes.
      *
-     * @var string[]
+     * @var array<string,mixed>
      */
     private array $attributes = [];
 
@@ -136,7 +136,7 @@ class AttributesService
         }
     }
 
-    public function setDocumentAttribute(string $key, $value): void
+    public function setDocumentAttribute(string $key, mixed $value): void
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);

@@ -18,7 +18,7 @@ class Extractor
          * from the models passed by.
          */
         private array $relatedModels
-    ){
+    ) {
     }
 
     /**

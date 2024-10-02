@@ -359,7 +359,7 @@ final class BuilderTest extends TestCase
         int $writeConcern,
         bool $shouldFireEventAfter,
         bool $expected
-    ):void {
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
@@ -632,7 +632,6 @@ final class BuilderTest extends TestCase
             ->with($preparedQuery, ['projection' => []])
             ->andReturn($model);
 
-
         // Actions
         $result = $builder->first($model, $query);
 
@@ -811,7 +810,7 @@ final class BuilderTest extends TestCase
     /**
      * @dataProvider getProjections
      */
-    public function testPrepareProjectionShouldConvertArray($data, $expectation): void
+    public function testPrepareProjectionShouldConvertArray(array $data, array $expectation): void
     {
         // Set
         $connection = m::mock(Connection::class);
