@@ -19,7 +19,6 @@ final class HasLegacyRelationTraitTest extends TestCase
         // Set
         $model = new Product();
         $model->_id = $fieldValue;
-        $expected = new Price();
         $priceModel = $this->instance(Price::class, m::mock(Price::class)->makePartial());
         $cacheComponent = $this->instance(
             CacheComponentInterface::class,
@@ -33,13 +32,13 @@ final class HasLegacyRelationTraitTest extends TestCase
 
         $priceModel->expects('first')
             ->with($expectedQuery, [], true)
-            ->andReturn($expected);
+            ->andReturnSelf();
 
         // Actions
         $result = $model->price();
 
         // Assertions
-        $this->assertSame($expected, $result);
+        $this->assertSame($priceModel, $result);
     }
 
     /**

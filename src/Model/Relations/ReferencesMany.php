@@ -3,15 +3,13 @@ namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesMany extends AbstractRelation
 {
-    /**
-     * @var ModelInterface
-     */
-    protected $modelInstance;
+    protected ModelInterface $modelInstance;
 
     public function __construct(ModelInterface $parent, string $model, string $field, string $key)
     {
@@ -29,10 +27,8 @@ class ReferencesMany extends AbstractRelation
         $referencedKey = $this->getKey($model);
         $fieldValue = (array) $this->parent->{$this->field};
 
-        foreach ($fieldValue as $key) {
-            if ($key == $referencedKey) {
-                return;
-            }
+        if (in_array($referencedKey, $fieldValue)) {
+            return;
         }
 
         $fieldValue[] = $referencedKey;
@@ -89,7 +85,7 @@ class ReferencesMany extends AbstractRelation
         $this->pristine = false;
     }
 
-    public function get()
+    public function get(): CursorInterface
     {
         $referencedKeys = (array) $this->parent->{$this->field};
 

@@ -8,10 +8,7 @@ use Mongolid\Util\ObjectIdUtils;
 
 class ReferencesOne extends AbstractRelation
 {
-    /**
-     * @var ModelInterface
-     */
-    protected $modelInstance;
+    protected ModelInterface $modelInstance;
 
     public function __construct(ModelInterface $parent, string $model, string $field, string $key)
     {
@@ -32,7 +29,7 @@ class ReferencesOne extends AbstractRelation
         $this->pristine = false;
     }
 
-    public function get()
+    public function get(): ?ModelInterface
     {
         if (!$referencedKey = $this->parent->{$this->field}) {
             return null;

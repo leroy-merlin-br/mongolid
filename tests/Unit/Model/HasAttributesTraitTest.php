@@ -368,12 +368,9 @@ final class HasAttributesTraitTest extends TestCase
         // Set
         $model = new class() extends AbstractModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            public $mutable = true;
+            public bool $mutable = true;
 
-            public function getNameDocumentAttribute()
+            public function getNameDocumentAttribute(): string
             {
                 return 'John';
             }

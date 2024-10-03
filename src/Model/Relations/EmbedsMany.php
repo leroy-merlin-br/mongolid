@@ -34,8 +34,6 @@ class EmbedsMany extends AbstractRelation
 
     /**
      * Replace embedded documents.
-     *
-     * @param array $entities
      */
     public function replace(array $entities): void
     {
@@ -69,10 +67,7 @@ class EmbedsMany extends AbstractRelation
         $this->pristine = false;
     }
 
-    /**
-     * @return EmbeddedCursor
-     */
-    public function get()
+    public function get(): EmbeddedCursor
     {
         $items = $this->parent->{$this->field} ?? [];
 

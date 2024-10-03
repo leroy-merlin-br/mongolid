@@ -29,12 +29,9 @@ final class AbstractModelTest extends TestCase
         parent::setUp();
         $this->model = new class() extends AbstractModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            protected $collection = 'mongolid';
+            protected ?string $collection = 'mongolid';
 
-            public function unsetCollection()
+            public function unsetCollection(): void
             {
                 unset($this->collection);
             }
@@ -482,10 +479,7 @@ final class AbstractModelTest extends TestCase
         // Set
         $model = new class() extends AbstractModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            public $mutable = true;
+            public bool $mutable = true;
 
             public function getNameDocumentAttribute(): string
             {
@@ -524,10 +518,7 @@ final class AbstractModelTest extends TestCase
         // Set
         $model = new class() extends AbstractModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            public $mutable = true;
+            public bool $mutable = true;
 
             public function getShortNameDocumentAttribute(): string
             {
@@ -571,10 +562,7 @@ final class AbstractModelTest extends TestCase
         // Set
         $model = new class() extends AbstractModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            protected $mutable = true;
+            protected bool $mutable = true;
 
             public function setShortNameDocumentAttribute($value): string
             {

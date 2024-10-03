@@ -245,18 +245,12 @@ final class BuilderTest extends TestCase
 
         $model = new class() extends ReplaceCollectionModel
         {
-            /**
-             * {@inheritdoc}
-             */
-            public $fillable = [
+            public array $fillable = [
                 'name',
                 'unchanged',
             ];
 
-            /**
-             * {@inheritdoc}
-             */
-            protected $dynamic = false;
+            protected bool $dynamic = false;
         };
         $collection = m::mock(Collection::class);
         $operationResult = m::mock();
