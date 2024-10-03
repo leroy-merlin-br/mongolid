@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Relations;
 
 use Mongolid\Model\ModelInterface;

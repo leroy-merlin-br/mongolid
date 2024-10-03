@@ -5,5 +5,5 @@ use Mongolid\LegacyRecord;
 
 class Shop extends LegacyRecord
 {
-    protected $collection = 'shops';
+    protected ?string $collection = 'shops';
 }

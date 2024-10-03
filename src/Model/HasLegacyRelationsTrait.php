@@ -61,13 +61,13 @@ trait HasLegacyRelationsTrait
     /**
      * Returns the cursor for the referenced documents as objects.
      *
-     * @param string $entity    class of the entity or of the schema of the entity
-     * @param string $field     the field where the _ids are stored
-     * @param bool   $cacheable retrieves a CacheableCursor instead
+     * @param string $entity class of the entity or of the schema of the entity
+     * @param string $field the field where the _ids are stored
+     * @param bool $cacheable retrieves a CacheableCursor instead
      *
-     * @return array
+     * @throws BindingResolutionException
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {
         $referencedIds = (array) $this->$field;
 
@@ -95,11 +95,10 @@ trait HasLegacyRelationsTrait
      * Return a embedded documents as object.
      *
      * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded document is stored
-     *
-     * @return LegacyRecord|Schema|null
+     * @param string $field field where the embedded document is stored
+     * @throws BindingResolutionException
      */
-    protected function embedsOne(string $entity, string $field)
+    protected function embedsOne(string $entity, string $field): LegacyRecord|Schema|null
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
@@ -118,11 +117,12 @@ trait HasLegacyRelationsTrait
      * Return array of embedded documents as objects.
      *
      * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded documents are stored
+     * @param string $field field where the embedded documents are stored
      *
      * @return CursorInterface Array with the embedded documents
+     * @throws BindingResolutionException
      */
-    protected function embedsMany(string $entity, string $field)
+    protected function embedsMany(string $entity, string $field): CursorInterface
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
@@ -142,9 +142,10 @@ trait HasLegacyRelationsTrait
      * _id for the document if it's not present.
      *
      * @param string $field field to where the $obj will be embedded
-     * @param mixed  $obj   document or model instance
+     * @param mixed $obj document or model instance
+     * @throws BindingResolutionException
      */
-    public function embed(string $field, &$obj)
+    public function embed(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->embed($this, $field, $obj);
@@ -155,9 +156,10 @@ trait HasLegacyRelationsTrait
      * the _id of the given $obj.
      *
      * @param string $field name of the field where the $obj is embeded
-     * @param mixed  $obj   document, model instance or _id
+     * @param mixed $obj document, model instance or _id
+     * @throws BindingResolutionException
      */
-    public function unembed(string $field, &$obj)
+    public function unembed(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->unembed($this, $field, $obj);
@@ -168,9 +170,10 @@ trait HasLegacyRelationsTrait
      * _id for the document if it's not present.
      *
      * @param string $field name of the field where the reference will be stored
-     * @param mixed  $obj   document, model instance or _id to be referenced
+     * @param mixed $obj document, model instance or _id to be referenced
+     * @throws BindingResolutionException
      */
-    public function attach(string $field, &$obj)
+    public function attach(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->attach($this, $field, $obj);
@@ -181,9 +184,10 @@ trait HasLegacyRelationsTrait
      * _id of the given $obj from inside the given $field.
      *
      * @param string $field field where the reference is stored
-     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     * @param mixed $obj document, model instance or _id that have been referenced by $field
+     * @throws BindingResolutionException
      */
-    public function detach(string $field, &$obj)
+    public function detach(string $field, mixed &$obj): void
     {
         $embedder = Container::make(DocumentEmbedder::class);
         $embedder->detach($this, $field, $obj);
@@ -191,9 +195,9 @@ trait HasLegacyRelationsTrait
 
     /**
      * @return mixed|null
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
-    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId)
+    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId): mixed
     {
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);

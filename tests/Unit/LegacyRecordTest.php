@@ -22,7 +22,7 @@ class LegacyRecordTest extends TestCase
     {
         parent::setUp();
         $this->entity = new class() extends LegacyRecord {
-            protected $collection = 'legacy_record';
+            protected ?string $collection = 'legacy_record';
         };
     }
 
@@ -372,7 +372,7 @@ class LegacyRecordTest extends TestCase
     public function testShouldGetCollectionName(): void
     {
         $entity = new class() extends LegacyRecord {
-            protected $collection = 'collection_name';
+            protected ?string $collection = 'collection_name';
         };
 
         $this->assertEquals('collection_name', $entity->getCollectionName());
@@ -381,7 +381,7 @@ class LegacyRecordTest extends TestCase
     public function testShouldAttachToAttribute(): void
     {
         $entity = new class() extends LegacyRecord {
-            protected $collection = 'collection_name';
+            protected ?string $collection = 'collection_name';
 
             public function class()
             {
@@ -399,7 +399,7 @@ class LegacyRecordTest extends TestCase
     public function testShouldEmbedToAttribute(): void
     {
         $entity = new class() extends LegacyRecord {
-            protected $collection = 'collection_name';
+            protected ?string $collection = 'collection_name';
 
             public function classes()
             {
@@ -416,7 +416,7 @@ class LegacyRecordTest extends TestCase
     public function testShouldThrowBadMethodCallExceptionWhenCallingInvalidMethod(): void
     {
         $entity = new class() extends LegacyRecord {
-            protected $collection = 'collection_name';
+            protected ?string $collection = 'collection_name';
         };
 
         $this->expectException(BadMethodCallException::class);

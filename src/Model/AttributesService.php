@@ -1,8 +1,11 @@
 <?php
 namespace Mongolid\Model;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Str;
+use JsonException;
 use Mongolid\Container\Container;
+use stdClass;
 
 class AttributesService
 {
@@ -53,6 +56,7 @@ class AttributesService
 
     /**
      * {@inheritdoc}
+     * @throws JsonException|BindingResolutionException
      */
     public static function fill(
         array $input,
@@ -80,7 +84,7 @@ class AttributesService
             if ($force
                 || ((!$object->fillable || in_array($key, $object->fillable)) && !in_array($key, $object->guarded))) {
                 if ($value instanceof stdClass) {
-                    $value = json_decode(json_encode($value), true); // cast to array
+                    $value = json_decode(json_encode($value, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR); // cast to array
                 }
 
                 $object->setDocumentAttribute($key, $value);

@@ -6,10 +6,7 @@ use Mongolid\LegacyRecord;
 
 class LegacyRecordUser extends LegacyRecord
 {
-    /**
-     * @var string
-     */
-    protected $collection = 'users';
+    protected ?string $collection = 'users';
 
     public bool $mutable = true;
 
@@ -18,10 +15,7 @@ class LegacyRecordUser extends LegacyRecord
      */
     protected $timestamps = true;
 
-    /**
-     * @var bool
-     */
-    public $dynamic = false;
+    public bool $dynamic = false;
 
     protected array $fillable = [
         'name',

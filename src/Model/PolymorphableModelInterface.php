@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 /**
