@@ -115,7 +115,7 @@ class DataMapper implements HasSchemaInterface
     public function insert(mixed $entity, array $options = [], bool $fireEvents = true): bool
     {
         if (
-            $fireEvents && 
+            $fireEvents &&
             false === $this->fireEvent('inserting', $entity, true)
         ) {
             return false;
@@ -581,8 +581,8 @@ class DataMapper implements HasSchemaInterface
                 $changes['$set']["{$keyfix}{$k}"] = $v;
             } elseif ($oldData[$k] != $v) { // changed value
                 if (
-                    $v && is_array($v) && 
-                    is_array($oldData[$k]) && 
+                    $v && is_array($v) &&
+                    is_array($oldData[$k]) &&
                     [] !== $oldData[$k]
                 ) { // check array recursively for changes
                     $this->calculateChanges(

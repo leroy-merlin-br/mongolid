@@ -2,23 +2,10 @@
 
 namespace Mongolid\Model;
 
-use Exception;
 use Illuminate\Support\Str;
 use Mongolid\Container\Container;
-use Mongolid\Model\Casts\CastResolver;
-use stdClass;
 
-/**
- * This trait adds attribute getter, setters and also a useful
- * `fill` method that can be used with $fillable and $guarded
- * properties to make sure that only the correct attributes
- * will be set.
- *
- * It is supposed to be used on model classes in general
- *
- * @mixin HasAttributesInterface
- */
-trait HasAttributesTrait
+class AttributesService
 {
     /**
      * Once you put at least one string in this array, only
@@ -52,11 +39,6 @@ trait HasAttributesTrait
     protected array $mutableCache = [];
 
     /**
-     * Attributes that are cast to another types when fetched from database.
-     */
-    protected array $casts = [];
-
-    /**
      * The model's attributes.
      *
      * @var array<string,mixed>
@@ -70,17 +52,11 @@ trait HasAttributesTrait
      */
     private array $originalAttributes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasDocumentAttribute(string $key): bool
     {
         return !is_null($this->getDocumentAttribute($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &getDocumentAttribute(string $key): mixed
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
@@ -90,13 +66,6 @@ trait HasAttributesTrait
             )}();
 
             return $this->mutableCache[$key];
-        }
-
-        if ($casterName = $this->casts[$key] ?? null) {
-            $caster = CastResolver::resolve($casterName);
-            $value = $caster->get($this->attributes[$key] ?? null);
-
-            return $value;
         }
 
         if (array_key_exists($key, $this->attributes)) {
@@ -112,9 +81,6 @@ trait HasAttributesTrait
         return $this->attributes[$key];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDocumentAttributes(): array
     {
         foreach ($this->attributes as $field => $value) {
@@ -126,9 +92,6 @@ trait HasAttributesTrait
         return $this->attributes ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cleanDocumentAttribute(string $key): void
     {
         unset($this->attributes[$key]);
@@ -138,18 +101,10 @@ trait HasAttributesTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDocumentAttribute(string $key, mixed $value): void
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
             $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
-        }
-
-        if ($casterName = $this->casts[$key] ?? null) {
-            $caster = CastResolver::resolve($casterName);
-            $value = $caster->set($value);
         }
 
         if (null === $value) {
@@ -165,9 +120,6 @@ trait HasAttributesTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function syncOriginalDocumentAttributes(): void
     {
         try {
@@ -179,25 +131,16 @@ trait HasAttributesTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOriginalDocumentAttributes(): array
     {
         return $this->originalAttributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         return $this->getDocumentAttributes();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function fill(
         array $input,
         ?HasAttributesInterface $object = null,
@@ -224,25 +167,26 @@ trait HasAttributesTrait
 
         foreach ($input as $key => $value) {
             if (
-                !$force &&
-                (
-                    ($object->fillable && !in_array($key, $object->fillable)) ||
-                    in_array($key, $object->guarded)
-                )
+                $force
+                || ((!$object->fillable || in_array(
+                            $key,
+                            $object->fillable
+                        )) && !in_array(
+                        $key,
+                        $object->guarded
+                    ))
             ) {
-                continue;
-            }
+                if ($value instanceof stdClass) {
+                    $value = json_decode(
+                        json_encode($value, JSON_THROW_ON_ERROR),
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR
+                    ); // cast to array
+                }
 
-            if ($value instanceof stdClass) {
-                $value = json_decode(
-                    json_encode($value, JSON_THROW_ON_ERROR),
-                    true,
-                    512,
-                    JSON_THROW_ON_ERROR
-                ); // cast to array
+                $object->setDocumentAttribute($key, $value);
             }
-
-            $object->setDocumentAttribute($key, $value);
         }
 
         return $object;
