@@ -23,13 +23,18 @@ class DateTimeCastTest extends IntegrationTestCase
 
         // Assertions
         $this->assertInstanceOf(DateTime::class, $price->expires_at);
-        $this->assertInstanceOf(UTCDateTime::class, $price->getOriginalDocumentAttributes()['expires_at']);
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $price->getOriginalDocumentAttributes()['expires_at']
+        );
 
         $price = ExpirablePrice::first($price->_id);
         $this->assertSame('02/10/2025', $price->expires_at->format('d/m/Y'));
         $this->assertSame(
             '02/10/2025',
-            LocalDateTime::get($price->getOriginalDocumentAttributes()['expires_at'])
+            LocalDateTime::get(
+                $price->getOriginalDocumentAttributes()['expires_at']
+            )
                 ->format('d/m/Y')
         );
     }
@@ -57,13 +62,19 @@ class DateTimeCastTest extends IntegrationTestCase
                 'expires_at' => 'datetime',
             ];
         };
-        $entity->expires_at = DateTime::createFromFormat('d/m/Y', '02/10/2025');
+        $entity->expires_at = DateTime::createFromFormat(
+            'd/m/Y',
+            '02/10/2025'
+        );
 
         // Actions
         $entity->save();
 
         // Assertions
         $this->assertInstanceOf(DateTime::class, $entity->expires_at);
-        $this->assertInstanceOf(UTCDateTime::class, $entity->getOriginalDocumentAttributes()['expires_at']);
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $entity->getOriginalDocumentAttributes()['expires_at']
+        );
     }
 }

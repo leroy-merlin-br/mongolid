@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query;
 
 use InvalidArgumentException;
@@ -56,7 +57,12 @@ final class BuilderTest extends TestCase
             ->with(
                 ['_id' => 123],
                 $model,
-                ['upsert' => true, 'writeConcern' => new WriteConcern($writeConcern)]
+                [
+                    'upsert' => true,
+                    'writeConcern' => new WriteConcern(
+                        $writeConcern
+                    ),
+                ]
             )->andReturn($operationResult);
 
         $operationResult
@@ -243,7 +249,7 @@ final class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
-        $model = new class() extends ReplaceCollectionModel
+        $model = new class () extends ReplaceCollectionModel
         {
             public array $fillable = [
                 'name',
@@ -300,7 +306,7 @@ final class BuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
-        $model = new class() extends ReplaceCollectionModel
+        $model = new class () extends ReplaceCollectionModel
         {
         };
         $collection = m::mock(Collection::class);
@@ -427,7 +433,10 @@ final class BuilderTest extends TestCase
         // Expectations
         $collection
             ->expects('deleteOne')
-            ->with(['_id' => 123], ['writeConcern' => new WriteConcern($writeConcern)])
+            ->with(
+                ['_id' => 123],
+                ['writeConcern' => new WriteConcern($writeConcern)]
+            )
             ->andReturn($operationResult);
 
         $operationResult
@@ -465,7 +474,7 @@ final class BuilderTest extends TestCase
     ): void {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[getCollection]', [$connection]);
+        $builder = m::mock(Builder::class . '[getCollection]', [$connection]);
         $collection = m::mock(Collection::class);
         $model = m::mock(ModelInterface::class);
 
@@ -516,7 +525,10 @@ final class BuilderTest extends TestCase
         $this->assertInstanceOf(Cursor::class, $result);
         $this->assertSame($collection, $collectionResult);
         $this->assertSame('find', $commandResult);
-        $this->assertSame([$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]], $paramsResult);
+        $this->assertSame(
+            [$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]],
+            $paramsResult
+        );
     }
 
     public function testShouldGetWithWhereQueryEagerLoadingModels(): void
@@ -590,14 +602,17 @@ final class BuilderTest extends TestCase
         $this->assertInstanceOf(CacheableCursor::class, $result);
         $this->assertSame($collection, $collectionResult);
         $this->assertSame('find', $commandResult);
-        $this->assertSame([$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]], $paramsResult);
+        $this->assertSame(
+            [$preparedQuery, ['projection' => $projection, 'eagerLoads' => []]],
+            $paramsResult
+        );
     }
 
     public function testShouldGetAll(): void
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[where]', [$connection]);
+        $builder = m::mock(Builder::class . '[where]', [$connection]);
         $mongolidCursor = m::mock(Cursor::class);
         $model = m::mock(ModelInterface::class);
 
@@ -643,7 +658,7 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[where]', [$connection]);
+        $builder = m::mock(Builder::class . '[where]', [$connection]);
         $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -711,7 +726,7 @@ final class BuilderTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[where]', [$connection]);
+        $builder = m::mock(Builder::class . '[where]', [$connection]);
         $builder->shouldAllowMockingProtectedMethods();
         $collection = m::mock(Collection::class);
         $query = 123;
@@ -747,7 +762,9 @@ final class BuilderTest extends TestCase
 
         // Expectations
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model ['.get_class($model).'].');
+        $this->expectExceptionMessage(
+            'No query results for model [' . $model::class . '].'
+        );
 
         // Actions
         $builder->firstOrFail($model, null);
@@ -832,7 +849,9 @@ final class BuilderTest extends TestCase
 
         // Expectations
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid projection: 'invalid-key' => 'invalid-value'");
+        $this->expectExceptionMessage(
+            "Invalid projection: 'invalid-key' => 'invalid-value'"
+        );
 
         // Actions
         $this->callProtected($builder, 'prepareProjection', [$data]);
@@ -923,7 +942,10 @@ final class BuilderTest extends TestCase
     protected function getEventService(): EventTriggerService
     {
         if (!Container::has(EventTriggerService::class)) {
-            Container::instance(EventTriggerService::class, m::mock(EventTriggerService::class));
+            Container::instance(
+                EventTriggerService::class,
+                m::mock(EventTriggerService::class)
+            );
         }
 
         return Container::make(EventTriggerService::class);
@@ -931,7 +953,7 @@ final class BuilderTest extends TestCase
 
     protected function expectEventToBeFired(string $event, ModelInterface $model, bool $halt, bool $return = true): void
     {
-        $event = 'mongolid.'.$event.': '.get_class($model);
+        $event = 'mongolid.' . $event . ': ' . $model::class;
 
         $this->getEventService()
             ->expects()
@@ -941,7 +963,7 @@ final class BuilderTest extends TestCase
 
     protected function expectEventNotToBeFired(string $event, ModelInterface $model): void
     {
-        $event = 'mongolid.'.$event.': '.get_class($model);
+        $event = 'mongolid.' . $event . ': ' . $model::class;
 
         $this->getEventService()
             ->expects()

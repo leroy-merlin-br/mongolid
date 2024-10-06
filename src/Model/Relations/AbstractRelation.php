@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
@@ -15,17 +16,17 @@ abstract class AbstractRelation implements RelationInterface
 
     protected string $key = '_id';
 
+    /**
+     * Retrieve Relation Results.
+     */
+    abstract public function get(): mixed;
+
     public function __construct(
         protected ModelInterface $parent,
         protected string $model,
         protected string $field
     ) {
     }
-
-    /**
-     * Retrieve Relation Results.
-     */
-    abstract public function get(): mixed;
 
     /**
      * Retrieve cached Relation Results.

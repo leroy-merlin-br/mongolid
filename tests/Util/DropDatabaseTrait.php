@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Util;
 
 use Mongolid\Connection\Connection;

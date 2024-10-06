@@ -35,7 +35,10 @@ class EntityAssembler
             $fieldType = $schema->fields[$field] ?? null;
 
             if ($fieldType && str_starts_with($fieldType, 'schema.')) {
-                $value = $this->assembleDocumentsRecursively($value, substr($fieldType, 7));
+                $value = $this->assembleDocumentsRecursively(
+                    $value,
+                    substr($fieldType, 7)
+                );
             }
 
             $model->$field = $value;

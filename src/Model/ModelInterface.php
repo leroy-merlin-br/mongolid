@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use MongoDB\BSON\Persistable;
@@ -16,6 +17,52 @@ use Mongolid\Cursor\CursorInterface;
  */
 interface ModelInterface extends HasAttributesInterface, Persistable
 {
+    /**
+     * Retrieve MongoDB's collection name.
+     *
+     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     */
+    public function getCollectionName(): string;
+
+    /**
+     * Retrieve MongoDB's collection.
+     *
+     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     */
+    public function getCollection(): Collection;
+
+    /**
+     * Getter for $writeConcern attribute.
+     */
+    public function getWriteConcern(): int;
+
+    /**
+     * Setter for $writeConcern attribute.
+     *
+     * @param int $writeConcern level of write concern for the transaction
+     */
+    public function setWriteConcern(int $writeConcern): void;
+
+    /**
+     * Saves this object into database.
+     */
+    public function save(): bool;
+
+    /**
+     * Insert this object into database.
+     */
+    public function insert(): bool;
+
+    /**
+     * Updates this object in database.
+     */
+    public function update(): bool;
+
+    /**
+     * Deletes this object in database.
+     */
+    public function delete(): bool;
+
     /**
      * Gets a cursor of this kind of entities that matches the query from the
      * database.
@@ -64,50 +111,4 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      * @return ModelInterface|null
      */
     public static function firstOrNew($id);
-
-    /**
-     * Retrieve MongoDB's collection name.
-     *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
-     */
-    public function getCollectionName(): string;
-
-    /**
-     * Retrieve MongoDB's collection.
-     *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
-     */
-    public function getCollection(): Collection;
-
-    /**
-     * Getter for $writeConcern attribute.
-     */
-    public function getWriteConcern(): int;
-
-    /**
-     * Setter for $writeConcern attribute.
-     *
-     * @param int $writeConcern level of write concern for the transaction
-     */
-    public function setWriteConcern(int $writeConcern): void;
-
-    /**
-     * Saves this object into database.
-     */
-    public function save(): bool;
-
-    /**
-     * Insert this object into database.
-     */
-    public function insert(): bool;
-
-    /**
-     * Updates this object in database.
-     */
-    public function update(): bool;
-
-    /**
-     * Deletes this object in database.
-     */
-    public function delete(): bool;
 }

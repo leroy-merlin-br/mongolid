@@ -11,8 +11,6 @@ class ModelNotFoundException extends RuntimeException
 {
     /**
      * Exception message.
-     *
-     * @var string
      */
     protected $message = 'No query results for model';
 
