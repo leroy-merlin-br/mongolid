@@ -15,7 +15,7 @@ final class HasLegacyRelationTraitTest extends TestCase
     /**
      * @dataProvider referencesOneScenarios
      */
-    public function testReferenceOneShouldNotHitCache($fieldValue, array $expectedQuery): void
+    public function testReferenceOneShouldNotHitCache(string|ObjectId $fieldValue, array $expectedQuery): void
     {
         // Set
         $model = new Product();
@@ -48,7 +48,7 @@ final class HasLegacyRelationTraitTest extends TestCase
     /**
      * @dataProvider referencesOneScenarios
      */
-    public function testReferenceOneShouldNotHitDatabase($fieldValue, array $expectedQuery): void
+    public function testReferenceOneShouldNotHitDatabase(string|ObjectId $fieldValue, array $expectedQuery): void
     {
         // Set
         $model = new Product();

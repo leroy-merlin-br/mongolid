@@ -23,11 +23,11 @@ class EntityAssemblerTest extends TestCase
      * @dataProvider entityAssemblerFixture
      */
     public function testShouldAssembleEntityForTheGivenSchema(
-        $inputValue,
-        $availableSchemas,
-        $inputSchema,
-        $expectedOutput
-    ) {
+        array|object $inputValue,
+        array $availableSchemas,
+        string $inputSchema,
+        LegacyRecordStudent $expectedOutput
+    ): void {
         // Arrange
         $entityAssembler = new EntityAssembler();
         $schemas = [];
@@ -50,7 +50,7 @@ class EntityAssemblerTest extends TestCase
         $this->assertEquals($expectedOutput, $result);
     }
 
-    public function entityAssemblerFixture()
+    public function entityAssemblerFixture(): array
     {
         return [
             'A simple schema to a entity' => [

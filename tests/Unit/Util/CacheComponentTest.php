@@ -11,7 +11,7 @@ class CacheComponentTest extends TestCase
     /**
      * Current time that will be retrieved by CacheComponent::time().
      */
-    private int $time = 1466710000;
+    private int $time = 1_466_710_000;
 
     public function testShouldImplementCacheComponentInterface(): void
     {
@@ -56,7 +56,7 @@ class CacheComponentTest extends TestCase
         $cacheComponent = m::mock(CacheComponent::class . '[time]');
         $cacheComponent->shouldAllowMockingProtectedMethods();
         $cacheComponent->shouldReceive('time')
-            ->andReturnUsing(fn () => $this->time);
+            ->andReturnUsing(fn (): int => $this->time);
 
         return $cacheComponent;
     }

@@ -103,7 +103,7 @@ class TestCase extends PHPUnitTestCase
     {
         Container::bind(
             $abstract,
-            fn () => $instance
+            fn (): object => $instance
         );
 
         return $instance;

@@ -121,7 +121,7 @@ class SchemaCursorTest extends TestCase
             ->andReturn(5);
 
         // Assert
-        $this->assertEquals(5, count($cursor));
+        $this->assertEquals(5, is_countable($cursor) ? count($cursor) : 0);
     }
 
     public function testShouldRewind(): void

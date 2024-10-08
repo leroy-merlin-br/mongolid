@@ -172,7 +172,7 @@ final class EmbedsManyRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertSiblings($expectedSiblings, EmbeddedUser $model)
+    private function assertSiblings(array $expectedSiblings, EmbeddedUser $model): void
     {
         $expected = [];
         foreach ($expectedSiblings as $sibling) {
@@ -192,7 +192,7 @@ final class EmbedsManyRelationTest extends IntegrationTestCase
         $this->assertSame($expected, $model->embedded_siblings);
     }
 
-    private function assertGrandsons($expectedGrandsons, EmbeddedUser $model)
+    private function assertGrandsons(array $expectedGrandsons, EmbeddedUser $model): void
     {
         $expected = [];
         foreach ($expectedGrandsons as $grandson) {

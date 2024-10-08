@@ -43,8 +43,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * models using this parameter. Every time this
      * model is queried, it will load its referenced
      * models together.
-     *
-     * @var array<string,object>
      */
     public array $with = [];
 
@@ -313,15 +311,16 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     protected function instantiateSchemaInFields(): ?Schema
     {
-        if (is_string($this->fields)) {
-            if (
-                is_subclass_of(
-                    $instance = Container::make($this->fields),
-                    Schema::class
-                )
-            ) {
-                return $instance;
-            }
+        if (!is_string($this->fields)) {
+            return null;
+        }
+        if (
+            is_subclass_of(
+                $instance = Container::make($this->fields),
+                Schema::class
+            )
+        ) {
+            return $instance;
         }
 
         return null;

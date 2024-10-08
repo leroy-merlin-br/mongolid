@@ -1,10 +1,9 @@
 <?php
 
-namespace Integration;
+namespace Mongolid\Tests\Integration;
 
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
-use Mongolid\Tests\Integration\IntegrationTestCase;
 use Mongolid\Tests\Stubs\ExpirablePrice;
 use Mongolid\Tests\Stubs\Legacy\LegacyRecordUser;
 use Mongolid\Util\LocalDateTime;
