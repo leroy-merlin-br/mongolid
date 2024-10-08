@@ -11,11 +11,17 @@ class CastResolver
     private const DATE_TIME = 'datetime';
     private const IMMUTABLE_DATE_TIME = 'immutable_datetime';
 
+    /**
+     * @var array|string[]
+     */
     public static array $validCasts = [
         self::DATE_TIME,
         self::IMMUTABLE_DATE_TIME,
     ];
 
+    /**
+     * @var array<CastInterface>
+     */
     private static array $cache = [];
 
     public static function resolve(string $castName): CastInterface

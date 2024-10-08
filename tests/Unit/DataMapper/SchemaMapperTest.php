@@ -191,6 +191,9 @@ class SchemaMapperTest extends TestCase
         // When instantiating the SchemaMapper with the specified $param as dependency
         Container::bind(
             SchemaMapper::class,
+            /**
+             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             */
             function ($container, $params) use ($value, $mySchema, $test): LegacyMockInterface {
                 // Check if mySchema has been injected correctly
                 $test->assertSame($mySchema, $params['schema']);

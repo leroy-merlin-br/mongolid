@@ -91,8 +91,8 @@ class ModelMapper
 
         if (
             is_null($value) || (is_string($value) && ObjectIdUtils::isObjectId(
-                    $value
-                ))
+                $value
+            ))
         ) {
             $value = Container::make(ObjectId::class, ['id' => $value]);
         }

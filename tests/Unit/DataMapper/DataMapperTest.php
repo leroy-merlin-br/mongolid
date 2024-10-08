@@ -172,6 +172,7 @@ class DataMapperTest extends TestCase
 
     /**
      * @dataProvider getWriteConcernVariations
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public function testShouldInsertWithoutFiringEvents(
         object $entity,

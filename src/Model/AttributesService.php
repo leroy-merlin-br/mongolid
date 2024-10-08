@@ -169,12 +169,12 @@ class AttributesService
             if (
                 $force
                 || ((!$object->fillable || in_array(
-                            $key,
-                            $object->fillable
-                        )) && !in_array(
-                        $key,
-                        $object->guarded
-                    ))
+                    $key,
+                    $object->fillable
+                )) && !in_array(
+                    $key,
+                    $object->guarded
+                ))
             ) {
                 if ($value instanceof stdClass) {
                     $value = json_decode(
