@@ -101,7 +101,7 @@ final class HasAttributesTraitTest extends TestCase
         array $guarded,
         array $input,
         array $expected
-    ) {
+    ): void {
         // Set
         $model = new class ($fillable, $guarded) implements HasAttributesInterface
         {
@@ -334,7 +334,7 @@ final class HasAttributesTraitTest extends TestCase
             public function __construct()
             {
                 $this->attributes = [
-                    function () {
+                    function (): void {
                     },
                 ];
             }

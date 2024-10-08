@@ -4,6 +4,7 @@ namespace Mongolid\DataMapper;
 
 use InvalidArgumentException;
 use Mockery as m;
+use Mockery\MockInterface;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
@@ -572,10 +573,10 @@ class DataMapperTest extends TestCase
      * @dataProvider getWriteConcernVariations
      */
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
-        $entity,
-        $writeConcern,
-        $shouldFireEventAfter,
-        $expected
+        MockInterface $entity,
+        int $writeConcern,
+        bool $shouldFireEventAfter,
+        bool $expected
     ): void {
         // Arrange
         $connection = m::mock(Connection::class);

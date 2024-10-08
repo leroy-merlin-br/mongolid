@@ -131,7 +131,7 @@ final class EmbedsOneRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertParent($expected, EmbeddedUser $model)
+    private function assertParent(EmbeddedUser $expected, EmbeddedUser $model): void
     {
         $parent = $model->parent;
         $this->assertInstanceOf(EmbeddedUser::class, $parent);
@@ -147,7 +147,7 @@ final class EmbedsOneRelationTest extends IntegrationTestCase
         $this->assertSame($expected, $model->embedded_parent);
     }
 
-    private function assertSon($expected, EmbeddedUser $model)
+    private function assertSon(EmbeddedUser $expected, EmbeddedUser $model): void
     {
         $son = $model->son;
         $this->assertInstanceOf(EmbeddedUser::class, $son);

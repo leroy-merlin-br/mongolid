@@ -11,7 +11,7 @@ trait SetupConnectionTrait
     {
         Container::singleton(
             Connection::class,
-            function () use ($host, $database) {
+            function () use ($host, $database): Connection {
                 $connection = new Connection(
                     "mongodb://{$host}:27017/{$database}"
                 );

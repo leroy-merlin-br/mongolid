@@ -26,8 +26,6 @@ trait HasRelationsTrait
 
     /**
      * The bound between relations and fields.
-     *
-     * @var array
      */
     private array $fieldRelations = [];
 
