@@ -34,14 +34,14 @@ class ExtractorTest extends TestCase
         $expected = [
             'price' => [
                 'key' => '_id',
-                'model' => 'Mongolid\Tests\Stubs\Price',
+                'model' => \Mongolid\Tests\Stubs\Price::class,
                 'ids' => [
                     123 => 123,
                 ],
             ],
             'shop' => [
                 'key' => 'skus.shop_id',
-                'model' => 'Mongolid\Tests\Stubs\Legacy\Shop',
+                'model' => \Mongolid\Tests\Stubs\Legacy\Shop::class,
                 'ids' => [
                     12345 => 12345,
                 ],

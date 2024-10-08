@@ -1,6 +1,7 @@
 <?php
 namespace Mongolid\Query;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use InvalidArgumentException;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
@@ -10,6 +11,7 @@ use Mongolid\Cursor\CursorInterface;
 use Mongolid\Cursor\EagerLoadingCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\Exception\ModelNotFoundException;
+use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\ModelInterface;
 
 /**
@@ -21,22 +23,16 @@ class Builder
     private bool $ignoreSoftDelete = false;
 
     /**
-     * Connection that is going to be used to interact with the database.
-     *
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * In order to dispatch events when necessary.
-     *
-     * @var EventTriggerService
      */
-    protected $eventService;
+    protected ?EventTriggerService $eventService = null;
 
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        /**
+         * Connection that is going to be used to interact with the database.
+         */
+        protected Connection $connection
+    ){
     }
 
     /**
@@ -46,8 +42,10 @@ class Builder
      * Notice: Saves with Unacknowledged WriteConcern will not fire `saved` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param ModelInterface $model   the model used in the operation
-     * @param array          $options possible options to send to mongo driver
+     * @param ModelInterface $model the model used in the operation
+     * @param array $options possible options to send to mongo driver
+     * @throws BindingResolutionException
+     * @throws NoCollectionNameException
      */
     public function save(ModelInterface $model, array $options = []): bool
     {
@@ -86,9 +84,11 @@ class Builder
      * Notice: Inserts with Unacknowledged WriteConcern will not fire `inserted` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param ModelInterface $model      the model used in the operation
-     * @param array          $options    possible options to send to mongo driver
-     * @param bool           $fireEvents whether events should be fired
+     * @param ModelInterface $model the model used in the operation
+     * @param array $options possible options to send to mongo driver
+     * @param bool $fireEvents whether events should be fired
+     * @throws BindingResolutionException
+     * @throws NoCollectionNameException
      */
     public function insert(ModelInterface $model, array $options = [], bool $fireEvents = true): bool
     {
@@ -122,8 +122,10 @@ class Builder
      * Notice: Updates with Unacknowledged WriteConcern will not fire `updated` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param ModelInterface $model   the model used in the operation
-     * @param array          $options possible options to send to mongo driver
+     * @param ModelInterface $model the model used in the operation
+     * @param array $options possible options to send to mongo driver
+     * @throws BindingResolutionException
+     * @throws NoCollectionNameException
      */
     public function update(ModelInterface $model, array $options = []): bool
     {
@@ -166,8 +168,10 @@ class Builder
      * Notice: Deletes with Unacknowledged WriteConcern will not fire `deleted` event.
      * Return is always false if write concern is Unacknowledged.
      *
-     * @param ModelInterface $model   the model used in the operation
-     * @param array          $options possible options to send to mongo driver
+     * @param ModelInterface $model the model used in the operation
+     * @param array $options possible options to send to mongo driver
+     * @throws BindingResolutionException
+     * @throws NoCollectionNameException
      */
     public function delete(ModelInterface $model, array $options = []): bool
     {
@@ -198,8 +202,9 @@ class Builder
      * @param mixed          $query      MongoDB query to retrieve documents
      * @param array          $projection fields to project in MongoDB query
      * @param bool           $useCache   retrieves a CacheableCursor instead
+     * @throws NoCollectionNameException
      */
-    public function where(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false): CursorInterface
+    public function where(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): CursorInterface
     {
         $cursor = $useCache ? CacheableCursor::class : Cursor::class;
 
@@ -240,8 +245,9 @@ class Builder
      * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
      * @return ModelInterface|array|null
+     * @throws NoCollectionNameException
      */
-    public function first(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
+    public function first(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): mixed
     {
         if (null === $query) {
             return null;
@@ -275,7 +281,7 @@ class Builder
      *
      * @return ModelInterface|null
      */
-    public function firstOrFail(ModelInterface $model, $query = [], array $projection = [], bool $useCache = false)
+    public function firstOrFail(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): mixed
     {
         if ($result = $this->first($model, $query, $projection, $useCache)) {
             return $result;
@@ -295,14 +301,15 @@ class Builder
      * Triggers an event. May return if that event had success.
      *
      * @param string $event identification of the event
-     * @param mixed  $model event payload
-     * @param bool   $halt  true if the return of the event handler will be used in a conditional
+     * @param ModelInterface $model event payload
+     * @param bool $halt true if the return of the event handler will be used in a conditional
      *
      * @return mixed event handler return
+     * @throws BindingResolutionException
      */
-    protected function fireEvent(string $event, ModelInterface $model, bool $halt = false)
+    protected function fireEvent(string $event, ModelInterface $model, bool $halt = false): mixed
     {
-        $event = "mongolid.{$event}: ".get_class($model);
+        $event = "mongolid.{$event}: ".$model::class;
 
         $this->eventService ?: $this->eventService = Container::make(EventTriggerService::class);
 
@@ -351,7 +358,7 @@ class Builder
 
             if (is_int($key) && is_string($value)) {
                 $key = $value;
-                if (0 === strpos($value, '-')) {
+                if (str_starts_with($value, '-')) {
                     $key = substr($key, 1);
                     $value = false;
                 } else {
@@ -404,7 +411,6 @@ class Builder
         foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
             if (!isset($newData[$k])) { // removed field
                 $changes['$unset']["{$keyfix}{$k}"] = '';
-                continue;
             }
         }
     }
@@ -430,7 +436,7 @@ class Builder
         $model->syncOriginalDocumentAttributes();
     }
 
-    private function getUpdateData($model, array $data): array
+    private function getUpdateData(ModelInterface $model, array $data): array
     {
         $changes = [];
         $this->calculateChanges($changes, $data, $model->getOriginalDocumentAttributes());

@@ -12,17 +12,13 @@ use Mongolid\Query\EagerLoader\Exception\InvalidModelKeyException;
  */
 class Extractor
 {
-    /**
-     * This array will handle all related models extracted
-     * from the models passed by.
-     *
-     * @var array
-     */
-    private $relatedModels;
-
-    public function __construct(array $relatedModels)
-    {
-        $this->relatedModels = $relatedModels;
+    public function __construct(
+        /**
+         * This array will handle all related models extracted
+         * from the models passed by.
+         */
+        private array $relatedModels
+    ){
     }
 
     /**
@@ -30,6 +26,7 @@ class Extractor
      * or a cached model as a serialized array.
      * That's why we always will force an array to be used here.
      * It will ensure that we are only working with model arrays.
+     * @throws EagerLoaderException
      */
     public function extractFrom(array $model): array
     {
@@ -55,7 +52,7 @@ class Extractor
         return $this->relatedModels;
     }
 
-    private function addIdFor(string $eagerLoadKey, $id): void
+    private function addIdFor(string $eagerLoadKey, mixed $id): void
     {
         $this->relatedModels[$eagerLoadKey]['ids'][$id] = $id;
     }
@@ -67,7 +64,7 @@ class Extractor
      *
      * @example 'skus.shop_id' => I want all shop ids from embedded skus.
      */
-    private function keyHasDots($key): bool
+    private function keyHasDots(string $key): bool
     {
         return str_contains($key, '.');
     }
@@ -76,10 +73,11 @@ class Extractor
      * Using dot notations, the user can specify what ids on embedded
      * models he wants to extract. So, our job is to loop on every
      * embedded model to get the id specified on the key.
+     * @throws EagerLoaderException
      */
     private function extractFromEmbeddedModel(string $eagerLoadKey, array $model, string $key): void
     {
-        list($method, $attribute) = explode('.', $key);
+        [$method, $attribute] = explode('.', $key);
 
         // As we are working with models as array, this give us
         // flexibility to use it as array instead of calling methods.
@@ -88,6 +86,9 @@ class Extractor
         }
     }
 
+    /**
+     * @throws EagerLoaderException
+     */
     private function extractFromModel(string $eagerLoadKey, array $model, string $key): void
     {
         if (!$id = $model[$key] ?? false) {
