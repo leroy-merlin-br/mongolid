@@ -200,12 +200,13 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves the first through a CacheableCursor
+     * @throws NoCollectionNameException
      */
     public static function first(
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): ?static {
+    ): static | stdClass | null {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -222,13 +223,14 @@ abstract class AbstractModel implements ModelInterface
      * @param array $projection fields to project in Mongo quer
      * @param bool  $useCache   retrieves the first through a CacheableCursor
      *
-     * @throws ModelNotFoundException If no document was found
+     * @Throws ModelNotFoundException If no document was found
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public static function firstOrFail(
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): ?static {
+    ): static | stdClass | null {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,

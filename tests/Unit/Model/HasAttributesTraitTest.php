@@ -387,6 +387,9 @@ final class HasAttributesTraitTest extends TestCase
         // Set
         $model = new class () extends AbstractModel
         {
+            /**
+             * @var array|string[]
+             */
             protected array $casts = [
                 'expires_at' => 'datetime',
                 'birthdate' => 'immutable_datetime',
@@ -415,6 +418,9 @@ final class HasAttributesTraitTest extends TestCase
         // Set
         $model = new class () extends AbstractModel
         {
+            /**
+             * @var array|string[]
+             */
             protected array $casts = [
                 'expires_at' => 'datetime',
                 'birthdate' => 'immutable_datetime',

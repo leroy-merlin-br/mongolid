@@ -53,6 +53,7 @@ trait HasAttributesTrait
 
     /**
      * Attributes that are cast to another types when fetched from database.
+     * @var string[]
      */
     protected array $casts = [];
 
@@ -224,15 +225,15 @@ trait HasAttributesTrait
 
         foreach ($input as $key => $value) {
             if (
-                !$force && 
+                !$force &&
                 (
-                    ($object->fillable && !in_array($key, $object->fillable)) || 
+                    ($object->fillable && !in_array($key, $object->fillable)) ||
                     in_array($key, $object->guarded)
                 )
             ) {
                 continue;
             }
-            
+
             if ($value instanceof stdClass) {
                 $value = json_decode(
                     json_encode($value, JSON_THROW_ON_ERROR),

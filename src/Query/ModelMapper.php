@@ -90,7 +90,7 @@ class ModelMapper
         $value = $model->_id;
 
         if (
-            is_null($value) || 
+            is_null($value) ||
             (
                 is_string($value) && ObjectIdUtils::isObjectId($value)
             )

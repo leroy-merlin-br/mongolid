@@ -56,6 +56,7 @@ trait HasLegacyAttributesTrait
 
     /**
      * Attributes that are cast to another types when fetched from database.
+     * @var string[]
      */
     protected array $casts = [];
 
