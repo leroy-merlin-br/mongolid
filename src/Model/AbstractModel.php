@@ -199,11 +199,12 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Gets the first model of this kind that matches the query.
      *
-     * @param mixed $query      mongoDB selection criteria
+     * @param mixed $query mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the first through a CacheableCursor
+     * @param bool $useCache retrieves the first through a CacheableCursor
+     * @throws NoCollectionNameException
      */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): static | stdClass | null
     {
         return self::getBuilderInstance()->first(
             new static(),
@@ -223,7 +224,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @throws ModelNotFoundException If no document was found
      */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): static | stdClass | null
     {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
@@ -239,7 +240,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $id document id
      */
-    public static function firstOrNew(mixed $id): ?static
+    public static function firstOrNew(mixed $id): static | stdClass | null
     {
         if (!$model = self::first($id)) {
             $model = new static();
