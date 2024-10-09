@@ -3,7 +3,6 @@
 namespace Mongolid\Model;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use MongoDB\BSON\Document;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
@@ -151,7 +150,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws BindingResolutionException
      */
-    public function bsonSerialize(): array|stdClass|Document
+    public function bsonSerialize(): array
     {
         return Container::make(ModelMapper::class)
             ->map(

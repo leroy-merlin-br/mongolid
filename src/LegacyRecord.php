@@ -3,7 +3,6 @@
 namespace Mongolid;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use MongoDB\BSON\Document;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\BadMethodCallException;
@@ -18,7 +17,6 @@ use Mongolid\Query\ModelMapper;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\HasSchemaInterface;
 use Mongolid\Schema\Schema;
-use stdClass;
 
 /**
  * This class was created to keep v2 compatibility.
@@ -259,7 +257,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * @throws BindingResolutionException
      */
-    public function bsonSerialize(): array|stdClass|Document
+    public function bsonSerialize(): array
     {
         return Container::make(ModelMapper::class)
             ->map(
