@@ -92,8 +92,6 @@ abstract class Schema
 
     /**
      * Prepares the field to be the datetime that the document has been created.
-     *
-     * @param mixed $value value that will be evaluated
      */
     public function createdAtTimestamp(mixed $value): UTCDateTime
     {

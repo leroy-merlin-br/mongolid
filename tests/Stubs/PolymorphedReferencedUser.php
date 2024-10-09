@@ -5,7 +5,7 @@ namespace Mongolid\Tests\Stubs;
 class PolymorphedReferencedUser extends ReferencedUser
 {
     /**
-     * @var array|string[]
+     * @var string[]
      */
     protected array $fillable = [
         'type',

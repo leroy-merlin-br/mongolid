@@ -253,7 +253,7 @@ final class BuilderTest extends TestCase
         $model = new class () extends ReplaceCollectionModel
         {
             /**
-             * @var array|string[]
+             * @var string[]
              */
             public array $fillable = [
                 'name',

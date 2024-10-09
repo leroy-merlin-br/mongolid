@@ -18,7 +18,7 @@ class BulkWrite
 {
     /**
      * Hold bulk write operations to run.
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+     * @var array<array<string,ObjectId|string|array>>
      */
     private array $operations = [];
 

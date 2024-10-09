@@ -12,7 +12,7 @@ class CastResolver
     private const IMMUTABLE_DATE_TIME = 'immutable_datetime';
 
     /**
-     * @var array|string[]
+     * @var string[]
      */
     public static array $validCasts = [
         self::DATE_TIME,

@@ -12,7 +12,6 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
-use stdClass;
 
 /**
  * The Mongolid\Model\Model base class will ensure to enable your model to
@@ -207,7 +206,7 @@ abstract class AbstractModel implements ModelInterface
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): static | stdClass | null {
+    ): ?static {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -231,7 +230,7 @@ abstract class AbstractModel implements ModelInterface
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): static | stdClass | null {
+    ): ?static {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,
@@ -246,7 +245,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $id document id
      */
-    public static function firstOrNew(mixed $id): static | stdClass | null
+    public static function firstOrNew(mixed $id): static
     {
         if (!$model = self::first($id)) {
             $model = new static();

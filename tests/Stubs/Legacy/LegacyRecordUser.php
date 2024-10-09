@@ -16,7 +16,7 @@ class LegacyRecordUser extends LegacyRecord
     protected bool $timestamps = true;
 
     /**
-     * @var array|string[]
+     * @var string[]
      */
     protected array $fillable = [
         'name',

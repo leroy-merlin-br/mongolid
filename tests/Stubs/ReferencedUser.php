@@ -14,7 +14,7 @@ class ReferencedUser extends AbstractModel implements PolymorphableModelInterfac
     protected bool $timestamps = false;
 
     /**
-     * @var array|string[]
+     * @var string[]
      */
     protected array $fillable = [
         'type',

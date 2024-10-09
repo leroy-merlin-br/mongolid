@@ -419,7 +419,7 @@ final class HasAttributesTraitTest extends TestCase
         $model = new class () extends AbstractModel
         {
             /**
-             * @var array|string[]
+             * @var array<string, string>
              */
             protected array $casts = [
                 'expires_at' => 'datetime',

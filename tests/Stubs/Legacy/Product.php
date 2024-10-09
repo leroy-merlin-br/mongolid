@@ -10,7 +10,7 @@ use Mongolid\Tests\Stubs\Price;
 class Product extends LegacyRecord
 {
     /**
-     * @var array<string,object>
+     * @var array<string,array<string,string>>
      */
     public array $with = [
         'price' => [
