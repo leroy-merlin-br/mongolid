@@ -84,48 +84,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     protected bool $timestamps = true;
 
     /**
-     * Gets the first entity of this kind that matches the query.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the entity through a CacheableCursor
-     *
-     * @return LegacyRecord
-     */
-    public static function first(
-        $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->first(
-            $query,
-            $projection,
-            $useCache
-        );
-    }
-
-    /**
-     * Gets the first entity of this kind that matches the query. If no
-     * document was found, a new entity will be returned with the
-     * _if field filled.
-     *
-     * @param mixed $id document id
-     *
-     * @return LegacyRecord
-     */
-    public static function firstOrNew($id)
-    {
-        if ($entity = self::getDataMapperInstance()->first($id)) {
-            return $entity;
-        }
-
-        $entity = new static();
-        $entity->_id = $id;
-
-        return $entity;
-    }
-
-    /**
      * Saves this object into database.
      */
     public function save(): bool
@@ -166,10 +124,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Returns a DataMapper configured with the Schema and collection described
      * in this entity.
-     *
-     * @return DataMapper
      */
-    public function getDataMapper()
+    public function getDataMapper(): DataMapper
     {
         $dataMapper = Container::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
@@ -258,6 +214,46 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     public function fresh(): self
     {
         return static::first($this->_id);
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     */
+    public static function first(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): mixed {
+        return self::getDataMapperInstance()->first(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, a new entity will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     *
+     * @return LegacyRecord
+     */
+    public static function firstOrNew(mixed $id): mixed
+    {
+        if ($entity = self::getDataMapperInstance()->first($id)) {
+            return $entity;
+        }
+
+        $entity = new static();
+        $entity->_id = $id;
+
+        return $entity;
     }
 
     /**
@@ -362,10 +358,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * Returns the valid instance from Ioc.
      *
      * @Throws NoCollectionNameException throws exception when has no collection filled
-     *
-     * @return mixed
      */
-    protected static function getDataMapperInstance(): mixed
+    protected static function getDataMapperInstance(): DataMapper
     {
         $instance = Container::make(static::class);
 
