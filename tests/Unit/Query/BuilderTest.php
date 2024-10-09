@@ -148,6 +148,7 @@ final class BuilderTest extends TestCase
 
     /**
      * @dataProvider getWriteConcernVariations
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public function testShouldInsertWithoutFiringEvents(
         ReplaceCollectionModel $model,
@@ -251,6 +252,9 @@ final class BuilderTest extends TestCase
 
         $model = new class () extends ReplaceCollectionModel
         {
+            /**
+             * @var string[]
+             */
             public array $fillable = [
                 'name',
                 'unchanged',

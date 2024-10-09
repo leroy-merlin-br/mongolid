@@ -12,7 +12,6 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
-use stdClass;
 
 /**
  * The Mongolid\Model\Model base class will ensure to enable your model to
@@ -198,13 +197,16 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Gets the first model of this kind that matches the query.
      *
-     * @param mixed $query mongoDB selection criteria
+     * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
-     * @param bool $useCache retrieves the first through a CacheableCursor
+     * @param bool  $useCache   retrieves the first through a CacheableCursor
      * @throws NoCollectionNameException
      */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): static | stdClass | null
-    {
+    public static function first(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): ?static {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -221,10 +223,14 @@ abstract class AbstractModel implements ModelInterface
      * @param array $projection fields to project in Mongo quer
      * @param bool  $useCache   retrieves the first through a CacheableCursor
      *
-     * @throws ModelNotFoundException If no document was found
+     * @Throws ModelNotFoundException If no document was found
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): static | stdClass | null
-    {
+    public static function firstOrFail(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): ?static {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,
@@ -239,7 +245,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $id document id
      */
-    public static function firstOrNew(mixed $id): static | stdClass | null
+    public static function firstOrNew(mixed $id): static
     {
         if (!$model = self::first($id)) {
             $model = new static();

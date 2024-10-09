@@ -18,6 +18,7 @@ class BulkWrite
 {
     /**
      * Hold bulk write operations to run.
+     * @var array<array<string,ObjectId|string|array>>
      */
     private array $operations = [];
 

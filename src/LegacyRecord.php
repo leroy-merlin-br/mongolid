@@ -9,6 +9,7 @@ use MongoDB\Exception\BadMethodCallException;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
+use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
@@ -44,7 +45,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * model is queried, it will load its referenced
      * models together.
      *
-     * @var array
+     * @var array<string,object>
      */
     public array $with = [];
 
@@ -81,72 +82,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      *
      */
     protected bool $timestamps = true;
-
-    /**
-     * Gets the first entity of this kind that matches the query.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the entity through a CacheableCursor
-     *
-     * @return LegacyRecord
-     */
-    public static function first(
-        $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->first(
-            $query,
-            $projection,
-            $useCache
-        );
-    }
-
-    /**
-     * Gets the first entity of this kind that matches the query. If no
-     * document was found, throws ModelNotFoundException.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves the entity through a CacheableCursor
-     *
-     * @throws ModelNotFoundException if no document was found
-     *
-     * @return LegacyRecord
-     */
-    public static function firstOrFail(
-        $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ) {
-        return self::getDataMapperInstance()->firstOrFail(
-            $query,
-            $projection,
-            $useCache
-        );
-    }
-
-    /**
-     * Gets the first entity of this kind that matches the query. If no
-     * document was found, a new entity will be returned with the
-     * _if field filled.
-     *
-     * @param mixed $id document id
-     *
-     * @return LegacyRecord
-     */
-    public static function firstOrNew($id)
-    {
-        if ($entity = self::getDataMapperInstance()->first($id)) {
-            return $entity;
-        }
-
-        $entity = new static();
-        $entity->_id = $id;
-
-        return $entity;
-    }
 
     /**
      * Saves this object into database.
@@ -189,10 +124,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Returns a DataMapper configured with the Schema and collection described
      * in this entity.
-     *
-     * @return DataMapper
      */
-    public function getDataMapper()
+    public function getDataMapper(): DataMapper
     {
         $dataMapper = Container::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
@@ -284,6 +217,71 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     }
 
     /**
+     * Gets the first entity of this kind that matches the query.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     */
+    public static function first(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): mixed {
+        return self::getDataMapperInstance()->first(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, a new entity will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     *
+     * @return LegacyRecord
+     */
+    public static function firstOrNew(mixed $id): mixed
+    {
+        if ($entity = self::getDataMapperInstance()->first($id)) {
+            return $entity;
+        }
+
+        $entity = new static();
+        $entity->_id = $id;
+
+        return $entity;
+    }
+
+    /**
+     * Gets the first entity of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves the entity through a CacheableCursor
+     *
+     * @Throws ModelNotFoundException if no document was found
+     *
+     * @return mixed
+     * @Throws NoCollectionNameException
+     */
+    public static function firstOrFail(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): mixed {
+        return self::getDataMapperInstance()->firstOrFail(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
      * Gets a cursor of this kind of entities that matches the query from the
      * database.
      *
@@ -317,15 +315,16 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     protected function instantiateSchemaInFields(): ?Schema
     {
-        if (is_string($this->fields)) {
-            if (
-                is_subclass_of(
-                    $instance = Container::make($this->fields),
-                    Schema::class
-                )
-            ) {
-                return $instance;
-            }
+        if (!is_string($this->fields)) {
+            return null;
+        }
+        if (
+            is_subclass_of(
+                $instance = Container::make($this->fields),
+                Schema::class
+            )
+        ) {
+            return $instance;
         }
 
         return null;
@@ -356,13 +355,11 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     }
 
     /**
-     * Returns the a valid instance from Ioc.
+     * Returns the valid instance from Ioc.
      *
-     * @throws NoCollectionNameException throws exception when has no collection filled
-     *
-     * @return mixed
+     * @Throws NoCollectionNameException throws exception when has no collection filled
      */
-    protected static function getDataMapperInstance()
+    protected static function getDataMapperInstance(): DataMapper
     {
         $instance = Container::make(static::class);
 
@@ -379,7 +376,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * @param mixed $method     name of the method that is being called
      * @param mixed $parameters parameters of $method
      *
-     * @throws BadMethodCallException in case of invalid methods be called
+     * @Throws BadMethodCallException in case of invalid methods be called
      *
      * @return mixed
      */

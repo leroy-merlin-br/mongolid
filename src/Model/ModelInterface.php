@@ -86,7 +86,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function first($query = [], array $projection = [], bool $useCache = false);
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no
@@ -99,7 +99,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false);
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no
@@ -110,5 +110,5 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function firstOrNew($id);
+    public static function firstOrNew(mixed $id);
 }

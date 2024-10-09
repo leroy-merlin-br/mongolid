@@ -15,6 +15,9 @@ class LegacyRecordUser extends LegacyRecord
 
     protected bool $timestamps = true;
 
+    /**
+     * @var string[]
+     */
     protected array $fillable = [
         'name',
     ];
@@ -29,7 +32,7 @@ class LegacyRecordUser extends LegacyRecord
         return $this->referencesMany(LegacyRecordUser::class, 'grandsons');
     }
 
-    public function setSecretAttribute($value): string
+    public function setSecretAttribute(): string
     {
         return 'password_override';
     }

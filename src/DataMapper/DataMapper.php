@@ -330,13 +330,13 @@ class DataMapper implements HasSchemaInterface
 
     /**
      * Retrieve one $this->schema->entityClass objects that matches the given
-     * query. If no document was found, throws ModelNotFoundException.
+     * query. If no document was found, Throws ModelNotFoundException.
      *
      * @param mixed $query      mongoDB query to retrieve the document
      * @param array $projection fields to project in Mongo query
      * @param bool  $cacheable  retrieves the first through a SchemaCacheableCursor
      *
-     * @throws ModelNotFoundException if no document was found
+     * @Throws ModelNotFoundException if no document was found
      *
      * @return mixed First document matching query as an $this->schema->entityClass object
      */
@@ -481,7 +481,7 @@ class DataMapper implements HasSchemaInterface
      *
      * @param array $fields fields to project
      *
-     * @throws InvalidArgumentException if the given $fields are not a valid projection
+     * @Throws InvalidArgumentException if the given $fields are not a valid projection
      *
      * @return array<string, bool>
      */
@@ -608,7 +608,7 @@ class DataMapper implements HasSchemaInterface
 
         foreach ($oldData as $k => $v) { // data that used to exist, but now doesn't
             if (!isset($newData[$k])) { // removed field
-                if (is_integer($k)) {
+                if (is_int($k)) {
                     $this->pullNullValues[rtrim($keyfix, '.')] = null;
                 }
                 $changes['$unset']["{$keyfix}{$k}"] = '';

@@ -3,6 +3,8 @@
 namespace Mongolid\Tests\Stubs;
 
 use Mongolid\Model\AbstractModel;
+use Mongolid\Model\Relations\EmbedsMany;
+use Mongolid\Model\Relations\EmbedsOne;
 
 class EmbeddedUser extends AbstractModel
 {
@@ -10,27 +12,27 @@ class EmbeddedUser extends AbstractModel
 
     protected bool $timestamps = true;
 
-    public function parent()
+    public function parent(): EmbedsOne
     {
         return $this->embedsOne(EmbeddedUser::class);
     }
 
-    public function siblings()
+    public function siblings(): EmbedsMany
     {
         return $this->embedsMany(EmbeddedUser::class);
     }
 
-    public function son()
+    public function son(): EmbedsOne
     {
         return $this->embedsOne(EmbeddedUser::class, 'arbitrary_field');
     }
 
-    public function grandsons()
+    public function grandsons(): EmbedsMany
     {
         return $this->embedsMany(EmbeddedUser::class, 'other_arbitrary_field');
     }
 
-    public function sameName()
+    public function sameName(): void
     {
         $this->embedsOne(EmbeddedUser::class, 'sameName');
     }
