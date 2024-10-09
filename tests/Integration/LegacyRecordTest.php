@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
@@ -25,7 +26,10 @@ class LegacyRecordTest extends IntegrationTestCase
         $embedded->name = 'Embedded User';
         $entity->embed('siblings', $embedded);
 
-        $this->assertEquals('Embedded User', $entity->siblings()->first()->name);
+        $this->assertEquals(
+            'Embedded User',
+            $entity->siblings()->first()->name
+        );
     }
 
     public function testShouldFillModel(): void

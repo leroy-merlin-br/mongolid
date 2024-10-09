@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Stubs;
 
 use Mongolid\Model\AbstractModel;
@@ -30,7 +31,11 @@ class ReferencedUser extends AbstractModel implements PolymorphableModelInterfac
 
     public function son(): ReferencesOne
     {
-        return $this->referencesOne(ReferencedUser::class, 'arbitrary_field', 'code');
+        return $this->referencesOne(
+            ReferencedUser::class,
+            'arbitrary_field',
+            'code'
+        );
     }
 
     public function grandsons(): ReferencesMany

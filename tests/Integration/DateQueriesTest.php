@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use DateTime;
@@ -11,14 +12,18 @@ final class DateQueriesTest extends IntegrationTestCase
     {
         // Set
         $user = new ReferencedUser();
-        $user->some_date = new UTCDateTime(new DateTime('2018-10-10 00:00:00'));
+        $user->some_date = new UTCDateTime(
+            new DateTime('2018-10-10 00:00:00')
+        );
 
         $this->assertTrue($user->save());
 
         $greaterEqualResult = ReferencedUser::where(
             [
                 'some_date' => [
-                    '$gte' => new UTCDateTime(new DateTime('2018-10-10 00:00:00')),
+                    '$gte' => new UTCDateTime(
+                        new DateTime('2018-10-10 00:00:00')
+                    ),
                 ],
             ]
         );
@@ -29,7 +34,9 @@ final class DateQueriesTest extends IntegrationTestCase
         $greaterResult = ReferencedUser::where(
             [
                 'some_date' => [
-                    '$gt' => new UTCDateTime(new DateTime('2018-10-10 00:00:00')),
+                    '$gt' => new UTCDateTime(
+                        new DateTime('2018-10-10 00:00:00')
+                    ),
                 ],
             ]
         );
@@ -39,7 +46,9 @@ final class DateQueriesTest extends IntegrationTestCase
         $emptyResult = ReferencedUser::where(
             [
                 'some_date' => [
-                    '$gte' => new UTCDateTime(new DateTime('2018-10-10 00:00:01')),
+                    '$gte' => new UTCDateTime(
+                        new DateTime('2018-10-10 00:00:01')
+                    ),
                 ],
             ]
         );
@@ -80,7 +89,9 @@ final class DateQueriesTest extends IntegrationTestCase
         $emptyResult = ReferencedUser::where(
             [
                 'some_date' => [
-                    '$gte' => new UTCDateTime(new DateTime('+10 days +1 second')),
+                    '$gte' => new UTCDateTime(
+                        new DateTime('+10 days +1 second')
+                    ),
                 ],
             ]
         );

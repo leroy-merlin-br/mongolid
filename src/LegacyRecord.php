@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -28,43 +29,13 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     use HasLegacyRelationsTrait;
 
     /**
-     * Name of the collection where this kind of Entity is going to be saved or
-     * retrieved from.
-     *
-     * @var string
-     */
-    protected $collection = null;
-
-    /**
-     * @see https://docs.mongodb.com/manual/reference/write-concern/
-     *
-     * @var int
-     */
-    protected $writeConcern = 1;
-
-    /**
-     * Describes the Schema fields of the model. Optionally you can set it to
-     * the name of a Schema class to be used.
-     *
-     * @see  Mongolid\Schema\Schema::$fields
-     *
-     * @var string|string[]
-     */
-    protected $fields = [
-        '_id' => 'objectId',
-        'created_at' => 'createdAtTimestamp',
-        'updated_at' => 'updatedAtTimestamp',
-    ];
-
-    /**
      * The $dynamic property tells if the object will accept additional fields
      * that are not specified in the $fields property. This is useful if you
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
      *
-     * @var bool
      */
-    public $dynamic = true;
+    public bool $dynamic = true;
 
     /**
      * This attribute is used to eager load models for
@@ -75,81 +46,41 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      *
      * @var array
      */
-    public $with = [];
+    public array $with = [];
+
+    /**
+     * Name of the collection where this kind of Entity is going to be saved or
+     * retrieved from.
+     *
+     */
+    protected ?string $collection = null;
+
+    /**
+     * @see https://docs.mongodb.com/manual/reference/write-concern/
+     *
+     */
+    protected int $writeConcern = 1;
+
+    /**
+     * Describes the Schema fields of the model. Optionally you can set it to
+     * the name of a Schema class to be used.
+     *
+     * @see  Mongolid\Schema\Schema::$fields
+     *
+     * @var string|string[]
+     */
+    protected string|array $fields = [
+        '_id' => 'objectId',
+        'created_at' => 'createdAtTimestamp',
+        'updated_at' => 'updatedAtTimestamp',
+    ];
 
     /**
      * Whether the model should manage the `created_at` and `updated_at`
      * timestamps automatically.
      *
-     * @var bool
      */
-    protected $timestamps = true;
-
-    /**
-     * Saves this object into database.
-     */
-    public function save(): bool
-    {
-        return $this->execute('save');
-    }
-
-    /**
-     * Insert this object into database.
-     *
-     * @return bool Success
-     */
-    public function insert(): bool
-    {
-        return $this->execute('insert');
-    }
-
-    /**
-     * Updates this object in database.
-     */
-    public function update(): bool
-    {
-        return $this->execute('update');
-    }
-
-    /**
-     * Deletes this object in database.
-     */
-    public function delete(): bool
-    {
-        if ($this->isSoftDeleteEnabled ?? false) {
-            return $this->executeSoftDelete();
-        }
-
-        return $this->execute('delete');
-    }
-
-    /**
-     * Gets a cursor of this kind of entities that matches the query from the
-     * database.
-     *
-     * @param array $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     * @param bool  $useCache   retrieves a CacheableCursor instead
-     */
-    public static function where(
-        array $query = [],
-        array $projection = [],
-        bool $useCache = false
-    ): CursorInterface {
-        return self::getDataMapperInstance()->where(
-            $query,
-            $projection,
-            $useCache
-        );
-    }
-
-    /**
-     * Gets a cursor of this kind of entities from the database.
-     */
-    public static function all(): CursorInterface
-    {
-        return self::getDataMapperInstance()->all();
-    }
+    protected bool $timestamps = true;
 
     /**
      * Gets the first entity of this kind that matches the query.
@@ -218,40 +149,41 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     }
 
     /**
-     * Handle dynamic method calls into the model.
-     *
-     * @param mixed $method     name of the method that is being called
-     * @param mixed $parameters parameters of $method
-     *
-     * @throws BadMethodCallException in case of invalid methods be called
-     *
-     * @return mixed
+     * Saves this object into database.
      */
-    public function __call($method, $parameters)
+    public function save(): bool
     {
-        $value = $parameters[0] ?? null;
+        return $this->execute('save');
+    }
 
-        // Alias to attach
-        if ('attachTo' == substr($method, 0, 8)) {
-            $field = lcfirst(substr($method, 8));
+    /**
+     * Insert this object into database.
+     *
+     * @return bool Success
+     */
+    public function insert(): bool
+    {
+        return $this->execute('insert');
+    }
 
-            return $this->attach($field, $value);
+    /**
+     * Updates this object in database.
+     */
+    public function update(): bool
+    {
+        return $this->execute('update');
+    }
+
+    /**
+     * Deletes this object in database.
+     */
+    public function delete(): bool
+    {
+        if ($this->isSoftDeleteEnabled ?? false) {
+            return $this->executeSoftDelete();
         }
 
-        // Alias to embed
-        if ('embedTo' == substr($method, 0, 7)) {
-            $field = lcfirst(substr($method, 7));
-
-            return $this->embed($field, $value);
-        }
-
-        throw new BadMethodCallException(
-            sprintf(
-                'The following method can not be reached or does not exist: %s@%s',
-                get_class($this),
-                $method
-            )
-        );
+        return $this->execute('delete');
     }
 
     /**
@@ -277,7 +209,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
             throw new NoCollectionNameException();
         }
 
-        return $this->collection ? $this->collection : $this->getSchema()->collection;
+        return $this->collection ?: $this->getSchema()->collection;
     }
 
     /**
@@ -308,7 +240,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         }
 
         $schema = new DynamicSchema();
-        $schema->entityClass = get_class($this);
+        $schema->entityClass = static::class;
         $schema->fields = $this->fields;
         $schema->dynamic = $this->dynamic;
         $schema->collection = $this->collection;
@@ -316,19 +248,87 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         return $schema;
     }
 
+    public function getCollection(): Collection
+    {
+        return $this->getDataMapper()
+            ->getCollection();
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function bsonSerialize(): object|array
+    {
+        return Container::make(ModelMapper::class)
+            ->map(
+                $this,
+                array_merge($this->fillable, $this->guarded),
+                $this->dynamic,
+                $this->timestamps
+            );
+    }
+
+    public function bsonUnserialize(array $data): void
+    {
+        $this->fill($data, true);
+
+        $this->syncOriginalDocumentAttributes();
+    }
+
+    /**
+     * Query model on database to retrieve an updated version of its attributes.
+     */
+    public function fresh(): self
+    {
+        return static::first($this->_id);
+    }
+
+    /**
+     * Gets a cursor of this kind of entities that matches the query from the
+     * database.
+     *
+     * @param array $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     * @param bool  $useCache   retrieves a CacheableCursor instead
+     */
+    public static function where(
+        array $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): CursorInterface {
+        return self::getDataMapperInstance()->where(
+            $query,
+            $projection,
+            $useCache
+        );
+    }
+
+    /**
+     * Gets a cursor of this kind of entities from the database.
+     */
+    public static function all(): CursorInterface
+    {
+        return self::getDataMapperInstance()->all();
+    }
+
     /**
      * Will check if the current value of $fields property is the name of a
      * Schema class and instantiate it if possible.
-     *
-     * @return Schema|null
      */
-    protected function instantiateSchemaInFields()
+    protected function instantiateSchemaInFields(): ?Schema
     {
         if (is_string($this->fields)) {
-            if (is_subclass_of($instance = Container::make($this->fields), Schema::class)) {
+            if (
+                is_subclass_of(
+                    $instance = Container::make($this->fields),
+                    Schema::class
+                )
+            ) {
                 return $instance;
             }
         }
+
+        return null;
     }
 
     /**
@@ -364,7 +364,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     protected static function getDataMapperInstance()
     {
-        $instance = Container::make(get_called_class());
+        $instance = Container::make(static::class);
 
         if (!$instance->getCollectionName()) {
             throw new NoCollectionNameException();
@@ -373,38 +373,40 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         return $instance->getDataMapper();
     }
 
-    public function getCollection(): Collection
-    {
-        return $this->getDataMapper()
-            ->getCollection();
-    }
-
     /**
-     * @return array|object
-     * @throws BindingResolutionException
+     * Handle dynamic method calls into the model.
+     *
+     * @param mixed $method     name of the method that is being called
+     * @param mixed $parameters parameters of $method
+     *
+     * @throws BadMethodCallException in case of invalid methods be called
+     *
+     * @return mixed
      */
-    public function bsonSerialize(): object|array
+    public function __call(mixed $method, mixed $parameters)
     {
-        return Container::make(ModelMapper::class)
-            ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
-    }
+        $value = $parameters[0] ?? null;
 
-    /**
-     * @param array $data
-     * @return void
-     */
-    public function bsonUnserialize(array $data): void
-    {
-        $this->fill($data, true);
+        // Alias to attach
+        if (str_starts_with($method, 'attachTo')) {
+            $field = lcfirst(substr($method, 8));
 
-        $this->syncOriginalDocumentAttributes();
-    }
+            return $this->attach($field, $value);
+        }
 
-    /**
-     * Query model on database to retrieve an updated version of its attributes.
-     */
-    public function fresh(): self
-    {
-        return $this->first($this->_id);
+        // Alias to embed
+        if (str_starts_with($method, 'embedTo')) {
+            $field = lcfirst(substr($method, 7));
+
+            return $this->embed($field, $value);
+        }
+
+        throw new BadMethodCallException(
+            sprintf(
+                'The following method can not be reached or does not exist: %s@%s',
+                static::class,
+                $method
+            )
+        );
     }
 }

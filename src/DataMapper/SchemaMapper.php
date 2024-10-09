@@ -3,7 +3,6 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Container;
-use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
 
 /**
@@ -56,18 +55,6 @@ class SchemaMapper
     }
 
     /**
-     * If the schema is not dynamic, remove all non specified fields.
-     *
-     * @param array $data Reference of the fields. The passed array will be modified.
-     */
-    protected function clearDynamic(array &$data): void
-    {
-        if (!$this->schema->dynamic) {
-            $data = array_intersect_key($data, $this->schema->fields);
-        }
-    }
-
-    /**
      * Parse a value based on a field type of the schema.
      *
      * @param mixed  $value     value to be parsed
@@ -82,7 +69,10 @@ class SchemaMapper
             return $this->schema->$fieldType($value);
         }
         // Returns null or an empty array
-        if (null === $value || is_array($value) && empty($value)) {
+        if (null === $value) {
+            return $value;
+        }
+        if (is_array($value) && empty($value)) {
             return $value;
         }
 
@@ -100,14 +90,24 @@ class SchemaMapper
     }
 
     /**
+     * If the schema is not dynamic, remove all non specified fields.
+     *
+     * @param array $data Reference of the fields. The passed array will be modified.
+     */
+    protected function clearDynamic(array &$data): void
+    {
+        if (!$this->schema->dynamic) {
+            $data = array_intersect_key($data, $this->schema->fields);
+        }
+    }
+
+    /**
      * Uses PHP's set type to cast a value to a type.
      *
      * @see http://php.net/manual/pt_BR/function.settype.php
      *
      * @param mixed  $value value to be casted
      * @param string $type  type to which the $value should be casted to
-     *
-     * @return mixed
      */
     protected function cast(mixed $value, string $type): mixed
     {

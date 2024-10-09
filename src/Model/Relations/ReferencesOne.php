@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
@@ -13,6 +14,7 @@ class ReferencesOne extends AbstractRelation
     public function __construct(ModelInterface $parent, string $model, string $field, string $key)
     {
         parent::__construct($parent, $model, $field);
+
         $this->key = $key;
         $this->modelInstance = Container::make($this->model);
     }
@@ -35,7 +37,11 @@ class ReferencesOne extends AbstractRelation
             return null;
         }
 
-        if (is_string($referencedKey) && ObjectIdUtils::isObjectId($referencedKey)) {
+        if (
+            is_string($referencedKey) && ObjectIdUtils::isObjectId(
+                $referencedKey
+            )
+        ) {
             $referencedKey = new ObjectId($referencedKey);
         }
 

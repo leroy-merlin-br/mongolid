@@ -17,7 +17,10 @@ class CastResolverTest extends TestCase
 
         // Assertions
         $this->assertInstanceOf(DateTimeCast::class, $dateTimeCast);
-        $this->assertInstanceOf(ImmutableDateTimeCast::class, $dateTimeImmutableCast);
+        $this->assertInstanceOf(
+            ImmutableDateTimeCast::class,
+            $dateTimeImmutableCast
+        );
     }
 
     public function testShouldResolveFromCache(): void
@@ -35,7 +38,9 @@ class CastResolverTest extends TestCase
     {
         // Expectations
         $this->expectException(InvalidCastException::class);
-        $this->expectExceptionMessage('Invalid cast attribute: invalid. Use a valid one like datetime,immutable_datetime');
+        $this->expectExceptionMessage(
+            'Invalid cast attribute: invalid. Use a valid one like datetime,immutable_datetime'
+        );
 
         // Actions
         CastResolver::resolve('invalid');

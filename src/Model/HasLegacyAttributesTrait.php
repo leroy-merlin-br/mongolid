@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Mongolid\Model\Casts\CastResolver;
@@ -15,6 +16,13 @@ use Mongolid\Model\Casts\CastResolver;
  */
 trait HasLegacyAttributesTrait
 {
+    /**
+     * Check if model should mutate attributes checking
+     * the existence of a specific method on model
+     * class. Default is false.
+     */
+    public bool $mutable = false;
+
     /**
      * The model's attributes.
      *
@@ -45,13 +53,6 @@ trait HasLegacyAttributesTrait
      * @var string[]
      */
     protected array $guarded = [];
-
-    /**
-     * Check if model should mutate attributes checking
-     * the existence of a specific method on model
-     * class. Default is false.
-     */
-    public bool $mutable = false;
 
     /**
      * Attributes that are cast to another types when fetched from database.
@@ -106,10 +107,13 @@ trait HasLegacyAttributesTrait
 
                 continue;
             }
-
-            if ((empty($this->fillable) || in_array($key, $this->fillable)) && !in_array($key, $this->guarded)) {
-                $this->setAttribute($key, $value);
+            if (!(empty($this->fillable) || in_array($key, $this->fillable))) {
+                continue;
             }
+            if (in_array($key, $this->guarded)) {
+                continue;
+            }
+            $this->setAttribute($key, $value);
         }
 
         return $this;
@@ -162,30 +166,6 @@ trait HasLegacyAttributesTrait
     }
 
     /**
-     * Verify if model has a mutator method defined.
-     *
-     * @param string $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     */
-    protected function hasMutatorMethod(string $key, mixed $prefix): bool
-    {
-        $method = $this->buildMutatorMethod($key, $prefix);
-
-        return method_exists($this, $method);
-    }
-
-    /**
-     * Create mutator method pattern.
-     *
-     * @param string $key    attribute name
-     * @param mixed $prefix method prefix to be used
-     */
-    protected function buildMutatorMethod(string $key, mixed $prefix): string
-    {
-        return $prefix.ucfirst($key).'Attribute';
-    }
-
-    /**
      * Returns the model instance as an Array.
      */
     public function toArray(): array
@@ -193,59 +173,9 @@ trait HasLegacyAttributesTrait
         return $this->getAttributes();
     }
 
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param string $key name of the attribute
-     */
-    public function __get(string $key): mixed
-    {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
-            return $this->{$this->buildMutatorMethod($key, 'get')}();
-        }
-
-        return $this->getAttribute($key);
-    }
-
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * @param string $key   attribute name
-     * @param mixed $value value to be set
-     */
-    public function __set(string $key, mixed $value): void
-    {
-        if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
-            $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
-        }
-
-        $this->setAttribute($key, $value);
-    }
-
-    /**
-     * Determine if an attribute exists on the model.
-     *
-     * @param mixed $key attribute name
-     */
-    public function __isset(mixed $key): bool
-    {
-        return !is_null($this->{$key});
-    }
-
-    /**
-     * Unset an attribute on the model.
-     *
-     * @param mixed $key attribute name
-     */
-    public function __unset(string $key): void
-    {
-        unset($this->attributes[$key]);
-    }
-
     public function hasAttribute(string $key): bool
     {
         return !is_null($this->getAttribute($key));
-
     }
 
     public function hasDocumentAttribute(string $key): bool
@@ -285,5 +215,78 @@ trait HasLegacyAttributesTrait
     public function getOriginalDocumentAttributes(): array
     {
         return $this->originalAttributes();
+    }
+
+    /**
+     * Verify if model has a mutator method defined.
+     *
+     * @param string $key    attribute name
+     * @param mixed  $prefix method prefix to be used
+     */
+    protected function hasMutatorMethod(string $key, mixed $prefix): bool
+    {
+        $method = $this->buildMutatorMethod($key, $prefix);
+
+        return method_exists($this, $method);
+    }
+
+    /**
+     * Create mutator method pattern.
+     *
+     * @param string $key    attribute name
+     * @param mixed  $prefix method prefix to be used
+     */
+    protected function buildMutatorMethod(string $key, mixed $prefix): string
+    {
+        return $prefix . ucfirst($key) . 'Attribute';
+    }
+
+    /**
+     * Dynamically retrieve attributes on the model.
+     *
+     * @param string $key name of the attribute
+     */
+    public function __get(string $key): mixed
+    {
+        if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
+            return $this->{$this->buildMutatorMethod($key, 'get')}();
+        }
+
+        return $this->getAttribute($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param string $key   attribute name
+     * @param mixed  $value value to be set
+     */
+    public function __set(string $key, mixed $value): void
+    {
+        if ($this->mutable && $this->hasMutatorMethod($key, 'set')) {
+            $value = $this->{$this->buildMutatorMethod($key, 'set')}($value);
+        }
+
+        $this->setAttribute($key, $value);
+    }
+
+    /**
+     * Determine if an attribute exists on the model.
+     *
+     * @param mixed $key attribute name
+     */
+    public function __isset(mixed $key): bool
+    {
+        return !is_null($this->{$key});
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param mixed $key attribute name
+     */
+    public function __unset(string $key): void
+    {
+        unset($this->attributes[$key]);
     }
 }

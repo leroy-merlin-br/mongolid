@@ -17,7 +17,9 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertEquals($product, $actualWhereResult);
@@ -32,7 +34,9 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertNull($actualWhereResult);

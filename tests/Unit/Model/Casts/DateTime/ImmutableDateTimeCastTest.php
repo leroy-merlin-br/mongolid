@@ -12,7 +12,10 @@ class ImmutableDateTimeCastTest extends TestCase
     {
         // Set
         $timestamp = new UTCDateTime(
-            DateTimeImmutable::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45')
+            DateTimeImmutable::createFromFormat(
+                'd/m/Y H:i:s',
+                '08/10/2025 12:30:45'
+            )
         );
         $immutableDateTimeCast = new ImmutableDateTimeCast();
 

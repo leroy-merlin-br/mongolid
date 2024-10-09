@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query;
 
 use MongoDB\BSON\ObjectId;
@@ -19,7 +20,12 @@ class ModelMapper
     public function map(ModelInterface $model, array $allowedFields, bool $dynamic, bool $timestamps): array
     {
         $this->clearNullFields($model);
-        $this->clearDynamicFields($model, $allowedFields, $dynamic, $timestamps);
+        $this->clearDynamicFields(
+            $model,
+            $allowedFields,
+            $dynamic,
+            $timestamps
+        );
         $this->manageTimestamps($model, $timestamps);
         $this->manageId($model);
 
@@ -69,7 +75,10 @@ class ModelMapper
         if (!$timestamps) {
             return;
         }
-        $model->updated_at = Container::make(UTCDateTime::class, ['milliseconds' => null]);
+        $model->updated_at = Container::make(
+            UTCDateTime::class,
+            ['milliseconds' => null]
+        );
 
         if (!$model->created_at instanceof UTCDateTime) {
             $model->created_at = $model->updated_at;
@@ -80,7 +89,11 @@ class ModelMapper
     {
         $value = $model->_id;
 
-        if (is_null($value) || (is_string($value) && ObjectIdUtils::isObjectId($value))) {
+        if (
+            is_null($value) || (is_string($value) && ObjectIdUtils::isObjectId(
+                $value
+            ))
+        ) {
             $value = Container::make(ObjectId::class, ['id' => $value]);
         }
 

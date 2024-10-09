@@ -1,21 +1,17 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Support\Str;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorFactory;
 use Mongolid\Cursor\CursorInterface;
 use Mongolid\DataMapper\DataMapper;
-use Mongolid\LegacyRecord;
-use Mongolid\Model\Exception\NotARelationException;
-use Mongolid\Model\Relations\RelationInterface;
 use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
-use MongolidLaravel\MongolidModel;
 
 /**
  * It is supposed to be used on model classes in general.
@@ -25,11 +21,63 @@ trait HasLegacyRelationsTrait
     use CacheKeyGeneratorTrait;
 
     /**
+     * Embed a new document to an attribute. It will also generate an
+     * _id for the document if it's not present.
+     *
+     * @param string $field field to where the $obj will be embedded
+     * @param mixed  $obj   document or model instance
+     */
+    public function embed(string $field, mixed &$obj): void
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->embed($this, $field, $obj);
+    }
+
+    /**
+     * Removes an embedded document from the given field. It does that by using
+     * the _id of the given $obj.
+     *
+     * @param string $field name of the field where the $obj is embeded
+     * @param mixed  $obj   document, model instance or _id
+     */
+    public function unembed(string $field, mixed &$obj): void
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->unembed($this, $field, $obj);
+    }
+
+    /**
+     * Attach document _id reference to an attribute. It will also generate an
+     * _id for the document if it's not present.
+     *
+     * @param string $field name of the field where the reference will be stored
+     * @param mixed  $obj   document, model instance or _id to be referenced
+     */
+    public function attach(string $field, mixed &$obj): void
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->attach($this, $field, $obj);
+    }
+
+    /**
+     * Removes a document _id reference from an attribute. It will remove the
+     * _id of the given $obj from inside the given $field.
+     *
+     * @param string $field field where the reference is stored
+     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
+     */
+    public function detach(string $field, mixed &$obj): void
+    {
+        $embedder = Container::make(DocumentEmbedder::class);
+        $embedder->detach($this, $field, $obj);
+    }
+
+    /**
      * Returns the referenced documents as objects.
      *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field the field where the _id is stored
-     * @param bool $cacheable retrieves a CacheableCursor instead
+     * @param string $entity    class of the entity or of the schema of the entity
+     * @param string $field     the field where the _id is stored
+     * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return mixed
      * @throws BindingResolutionException
@@ -44,7 +92,12 @@ trait HasLegacyRelationsTrait
 
         $entityInstance = Container::make($entity);
 
-        if ($cacheable && $referencedId && $document = $this->getDocumentFromCache($entityInstance, $referencedId)) {
+        if (
+            $cacheable && $referencedId && $document = $this->getDocumentFromCache(
+                $entityInstance,
+                $referencedId
+            )
+        ) {
             return $document;
         }
 
@@ -52,10 +105,18 @@ trait HasLegacyRelationsTrait
             $dataMapper = Container::make(DataMapper::class);
             $dataMapper->setSchema($entityInstance);
 
-            return $dataMapper->first(['_id' => $referencedId], [], $cacheable);
+            return $dataMapper->first(
+                ['_id' => $referencedId],
+                [],
+                $cacheable
+            );
         }
 
-        return $entityInstance::first(['_id' => $referencedId], [], $cacheable);
+        return $entityInstance::first(
+            ['_id' => $referencedId],
+            [],
+            $cacheable
+        );
     }
 
     /**
@@ -96,10 +157,8 @@ trait HasLegacyRelationsTrait
      *
      * @param string $entity class of the entity or of the schema of the entity
      * @param string $field  field where the embedded document is stored
-     *
-     * @return LegacyRecord|Schema|null
      */
-    protected function embedsOne(string $entity, string $field)
+    protected function embedsOne(string $entity, string $field): LegacyRecord|Schema|null
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
@@ -135,58 +194,6 @@ trait HasLegacyRelationsTrait
 
         return Container::make(CursorFactory::class)
             ->createEmbeddedCursor($entity, $items);
-    }
-
-    /**
-     * Embed a new document to an attribute. It will also generate an
-     * _id for the document if it's not present.
-     *
-     * @param string $field field to where the $obj will be embedded
-     * @param mixed  $obj   document or model instance
-     */
-    public function embed(string $field, &$obj)
-    {
-        $embedder = Container::make(DocumentEmbedder::class);
-        $embedder->embed($this, $field, $obj);
-    }
-
-    /**
-     * Removes an embedded document from the given field. It does that by using
-     * the _id of the given $obj.
-     *
-     * @param string $field name of the field where the $obj is embeded
-     * @param mixed  $obj   document, model instance or _id
-     */
-    public function unembed(string $field, &$obj)
-    {
-        $embedder = Container::make(DocumentEmbedder::class);
-        $embedder->unembed($this, $field, $obj);
-    }
-
-    /**
-     * Attach document _id reference to an attribute. It will also generate an
-     * _id for the document if it's not present.
-     *
-     * @param string $field name of the field where the reference will be stored
-     * @param mixed  $obj   document, model instance or _id to be referenced
-     */
-    public function attach(string $field, &$obj)
-    {
-        $embedder = Container::make(DocumentEmbedder::class);
-        $embedder->attach($this, $field, $obj);
-    }
-
-    /**
-     * Removes a document _id reference from an attribute. It will remove the
-     * _id of the given $obj from inside the given $field.
-     *
-     * @param string $field field where the reference is stored
-     * @param mixed  $obj   document, model instance or _id that have been referenced by $field
-     */
-    public function detach(string $field, &$obj)
-    {
-        $embedder = Container::make(DocumentEmbedder::class);
-        $embedder->detach($this, $field, $obj);
     }
 
     /**

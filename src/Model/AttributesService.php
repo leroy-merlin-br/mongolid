@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
@@ -51,45 +52,6 @@ class AttributesService
      */
     private array $originalAttributes = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function fill(
-        array $input,
-        HasAttributesInterface $object = null,
-        bool $force = false
-    ): HasAttributesInterface {
-        if (!$object) {
-            $object = Container::make(static::class);
-        }
-
-        if ($object instanceof PolymorphableModelInterface) {
-            $class = $object->polymorph(array_merge($object->getDocumentAttributes(), $input));
-
-            if ($class !== $object::class) {
-                $originalAttributes = $object->getDocumentAttributes();
-                $object = new $class();
-
-                foreach ($originalAttributes as $key => $value) {
-                    $object->setDocumentAttribute($key, $value);
-                }
-            }
-        }
-
-        foreach ($input as $key => $value) {
-            if ($force
-                || ((!$object->fillable || in_array($key, $object->fillable)) && !in_array($key, $object->guarded))) {
-                if ($value instanceof stdClass) {
-                    $value = json_decode(json_encode($value), true); // cast to array
-                }
-
-                $object->setDocumentAttribute($key, $value);
-            }
-        }
-
-        return $object;
-    }
-
     public function hasDocumentAttribute(string $key): bool
     {
         return !is_null($this->getDocumentAttribute($key));
@@ -98,7 +60,10 @@ class AttributesService
     public function &getDocumentAttribute(string $key): mixed
     {
         if ($this->mutable && $this->hasMutatorMethod($key, 'get')) {
-            $this->mutableCache[$key] = $this->{$this->buildMutatorMethod($key, 'get')}();
+            $this->mutableCache[$key] = $this->{$this->buildMutatorMethod(
+                $key,
+                'get'
+            )}();
 
             return $this->mutableCache[$key];
         }
@@ -158,7 +123,9 @@ class AttributesService
     public function syncOriginalDocumentAttributes(): void
     {
         try {
-            $this->originalAttributes = unserialize(serialize($this->getDocumentAttributes()));
+            $this->originalAttributes = unserialize(
+                serialize($this->getDocumentAttributes())
+            );
         } catch (Exception) {
             $this->originalAttributes = $this->getDocumentAttributes();
         }
@@ -172,6 +139,57 @@ class AttributesService
     public function toArray(): array
     {
         return $this->getDocumentAttributes();
+    }
+
+    public static function fill(
+        array $input,
+        ?HasAttributesInterface $object = null,
+        bool $force = false
+    ): HasAttributesInterface {
+        if (!$object) {
+            $object = Container::make(static::class);
+        }
+
+        if ($object instanceof PolymorphableModelInterface) {
+            $class = $object->polymorph(
+                array_merge($object->getDocumentAttributes(), $input)
+            );
+
+            if ($class !== $object::class) {
+                $originalAttributes = $object->getDocumentAttributes();
+                $object = new $class();
+
+                foreach ($originalAttributes as $key => $value) {
+                    $object->setDocumentAttribute($key, $value);
+                }
+            }
+        }
+
+        foreach ($input as $key => $value) {
+            if (
+                $force
+                || ((!$object->fillable || in_array(
+                    $key,
+                    $object->fillable
+                )) && !in_array(
+                    $key,
+                    $object->guarded
+                ))
+            ) {
+                if ($value instanceof stdClass) {
+                    $value = json_decode(
+                        json_encode($value, JSON_THROW_ON_ERROR),
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR
+                    ); // cast to array
+                }
+
+                $object->setDocumentAttribute($key, $value);
+            }
+        }
+
+        return $object;
     }
 
     /**
@@ -195,6 +213,6 @@ class AttributesService
      */
     protected function buildMutatorMethod(string $key, string $prefix): string
     {
-        return $prefix.Str::studly($key).'DocumentAttribute';
+        return $prefix . Str::studly($key) . 'DocumentAttribute';
     }
 }

@@ -10,12 +10,12 @@ use Mongolid\Model\Casts\CastInterface;
 abstract class BaseDateTimeCast implements CastInterface
 {
     /**
-     * @param UTCDateTime|null $value
+     * @param UTCDateTime $value
      */
     abstract public function get(mixed $value): ?DateTimeInterface;
 
     /**
-     * @param DateTimeInterface|UTCDateTimeInterface|null $value
+     * @param DateTimeInterface|UTCDateTimeInterface $value
      */
     public function set(mixed $value): UTCDateTime|null
     {
