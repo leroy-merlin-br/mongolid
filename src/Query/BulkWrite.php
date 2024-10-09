@@ -22,7 +22,7 @@ class BulkWrite
 
     public function __construct(
         private ModelInterface $model
-    ){
+    ) {
     }
 
     public function isEmpty(): bool

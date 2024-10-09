@@ -39,8 +39,6 @@ class DocumentEmbedder
      * @param mixed  $parent the object where the $entity will be removed
      * @param string $field  name of the field of the object where the document is
      * @param mixed  $entity entity that will be removed from $parent
-     *
-     * @return bool Success
      */
     public function unembed(mixed $parent, string $field, mixed &$entity): bool
     {
@@ -72,10 +70,8 @@ class DocumentEmbedder
         $fieldValue = (array) $parent->$field;
         $newId = $this->getId($entity);
 
-        foreach ($fieldValue as $id) {
-            if ($id == $newId) {
-                return true;
-            }
+        if (in_array($newId, $fieldValue)) {
+            return true;
         }
 
         $fieldValue[] = $newId;
@@ -114,7 +110,6 @@ class DocumentEmbedder
      * _id will be generated and set on the object (while still returning it).
      *
      * @param mixed $object the object|array that the _id will be retrieved from
-     *
      */
     protected function getId(mixed &$object): mixed
     {

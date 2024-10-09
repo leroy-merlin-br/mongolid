@@ -19,7 +19,7 @@ abstract class AbstractRelation implements RelationInterface
         protected ModelInterface $parent,
         protected string $model,
         protected string $field
-    ){
+    ) {
     }
 
     /**

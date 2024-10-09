@@ -179,8 +179,6 @@ trait HasLegacyAttributesTrait
      *
      * @param string $key    attribute name
      * @param mixed $prefix method prefix to be used
-     *
-     * @return string
      */
     protected function buildMutatorMethod(string $key, mixed $prefix): string
     {
@@ -229,7 +227,7 @@ trait HasLegacyAttributesTrait
      *
      * @param mixed $key attribute name
      */
-    public function __isset(mixed $key):bool
+    public function __isset(mixed $key): bool
     {
         return !is_null($this->{$key});
     }
@@ -239,7 +237,7 @@ trait HasLegacyAttributesTrait
      *
      * @param mixed $key attribute name
      */
-    public function __unset(string $key):void
+    public function __unset(string $key): void
     {
         unset($this->attributes[$key]);
     }

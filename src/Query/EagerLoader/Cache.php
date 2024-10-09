@@ -10,9 +10,8 @@ class Cache
     use CacheKeyGeneratorTrait;
 
     public function __construct(
-        private
-        CacheComponentInterface $cacheComponent
-    ){
+        private CacheComponentInterface $cacheComponent
+    ) {
     }
 
     public function cache(array $eagerLoadedModel): void

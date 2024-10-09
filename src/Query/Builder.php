@@ -32,7 +32,7 @@ class Builder
          * Connection that is going to be used to interact with the database.
          */
         protected Connection $connection
-    ){
+    ) {
     }
 
     /**
@@ -277,9 +277,9 @@ class Builder
      * @param array          $projection fields to project in MongoDB query
      * @param boolean        $useCache   retrieves the first through a CacheableCursor
      *
-     * @throws ModelNotFoundException If no model was found
+     * @return ModelInterface|null|array
      *
-     * @return ModelInterface|null
+     * @throws ModelNotFoundException|NoCollectionNameException If no model was found
      */
     public function firstOrFail(ModelInterface $model, mixed $query = [], array $projection = [], bool $useCache = false): mixed
     {
@@ -287,7 +287,7 @@ class Builder
             return $result;
         }
 
-        throw (new ModelNotFoundException())->setModel(get_class($model));
+        throw (new ModelNotFoundException())->setModel($model::class);
     }
 
     public function withoutSoftDelete(): self
@@ -311,7 +311,9 @@ class Builder
     {
         $event = "mongolid.{$event}: ".$model::class;
 
-        $this->eventService ?: $this->eventService = Container::make(EventTriggerService::class);
+        if (!$this->eventService) {
+            $this->eventService = Container::make(EventTriggerService::class);
+        }
 
         return $this->eventService->fire($event, $model, $halt);
     }
@@ -336,8 +338,6 @@ class Builder
      * @param array $fields fields to project
      *
      * @throws InvalidArgumentException If the given $fields are not a valid projection
-     *
-     * @return array
      */
     protected function prepareProjection(array $fields): array
     {
@@ -420,8 +420,6 @@ class Builder
      *
      * @param array $defaultOptions default options array
      * @param array $toMergeOptions to merge options array
-     *
-     * @return array
      */
     private function mergeOptions(array $defaultOptions = [], array $toMergeOptions = []): array
     {

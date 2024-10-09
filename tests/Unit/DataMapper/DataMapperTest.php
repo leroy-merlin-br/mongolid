@@ -651,8 +651,7 @@ class DataMapperTest extends TestCase
         string $operation,
         string $dbOperation,
         string $eventName
-    ): void
-    {
+    ): void {
         // Arrange
         $connection = m::mock(Connection::class);
         $mapper = m::mock(DataMapper::class . '[parseToDocument,getCollection]', [$connection]);
@@ -867,7 +866,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($entity, $result);
     }
 
-    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
+    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
