@@ -183,10 +183,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Returns a DataMapper configured with the Schema and collection described
      * in this entity.
-     *
-     * @return DataMapper
      */
-    public function getDataMapper()
+    public function getDataMapper(): DataMapper
     {
         $dataMapper = Container::make(DataMapper::class);
         $dataMapper->setSchema($this->getSchema());
@@ -351,11 +349,9 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Returns the a valid instance from Ioc.
      *
-     * @throws NoCollectionNameException throws exception when has no collection filled
-     *
-     * @return mixed
+     * @Throws NoCollectionNameException throws exception when has no collection filled
      */
-    protected static function getDataMapperInstance()
+    protected static function getDataMapperInstance(): DataMapper
     {
         $instance = Container::make(static::class);
 
