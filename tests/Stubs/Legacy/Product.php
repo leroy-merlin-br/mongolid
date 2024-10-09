@@ -8,12 +8,9 @@ use Mongolid\Tests\Stubs\Price;
 
 class Product extends LegacyRecord
 {
-    /**
-     * @var string
-     */
-    protected $collection = 'products';
+    protected ?string $collection = 'products';
 
-    public $with = [
+    public array $with = [
         'price' => [
             'key' => '_id',
             'model' => Price::class

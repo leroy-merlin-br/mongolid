@@ -53,7 +53,12 @@ class SchemaCacheableCursor extends SchemaCursor
     protected function getCursor(): Iterator
     {
         // Returns original (non-cached) cursor
-        if ($this->ignoreCache || $this->position >= self::DOCUMENT_LIMIT) {
+        if ($this->ignoreCache) {
+            return $this->getOriginalCursor();
+        }
+
+        // Returns original (non-cached) cursor
+        if ($this->position >= self::DOCUMENT_LIMIT) {
             return $this->getOriginalCursor();
         }
 

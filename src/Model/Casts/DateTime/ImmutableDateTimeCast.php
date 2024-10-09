@@ -8,9 +8,6 @@ use Mongolid\Util\LocalDateTime;
 
 class ImmutableDateTimeCast extends BaseDateTimeCast
 {
-    /**
-     * @param UTCDateTime|null $value
-     */
     public function get(mixed $value): ?DateTimeImmutable
     {
         if (is_null($value)) {

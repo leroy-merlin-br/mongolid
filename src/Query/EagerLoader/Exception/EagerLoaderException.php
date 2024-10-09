@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query\EagerLoader\Exception;
 
 use Exception;

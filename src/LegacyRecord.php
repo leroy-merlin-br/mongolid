@@ -30,17 +30,13 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Name of the collection where this kind of Entity is going to be saved or
      * retrieved from.
-     *
-     * @var string
      */
-    protected $collection = null;
+    protected ?string $collection = null;
 
     /**
      * @see https://docs.mongodb.com/manual/reference/write-concern/
-     *
-     * @var int
      */
-    protected $writeConcern = 1;
+    protected int $writeConcern = 1;
 
     /**
      * Describes the Schema fields of the model. Optionally you can set it to
@@ -48,9 +44,9 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      *
      * @see  Mongolid\Schema\Schema::$fields
      *
-     * @var string|string[]
-     */
-    protected $fields = [
+     * @var string[] | string
+ */
+    protected array | string $fields = [
         '_id' => 'objectId',
         'created_at' => 'createdAtTimestamp',
         'updated_at' => 'updatedAtTimestamp',
@@ -61,10 +57,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * that are not specified in the $fields property. This is useful if you
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
-     *
-     * @var bool
      */
-    public $dynamic = true;
+    public bool $dynamic = true;
 
     /**
      * This attribute is used to eager load models for
@@ -72,10 +66,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * models using this parameter. Every time this
      * model is queried, it will load its referenced
      * models together.
-     *
-     * @var array
      */
-    public $with = [];
+    public array $with = [];
 
     /**
      * Whether the model should manage the `created_at` and `updated_at`
@@ -220,26 +212,24 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Handle dynamic method calls into the model.
      *
-     * @param mixed $method     name of the method that is being called
-     * @param mixed $parameters parameters of $method
+     * @param string $method     name of the method that is being called
+     * @param array $parameters parameters of $method
      *
      * @throws BadMethodCallException in case of invalid methods be called
-     *
-     * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         $value = $parameters[0] ?? null;
 
         // Alias to attach
-        if ('attachTo' == substr($method, 0, 8)) {
+        if (str_starts_with($method, 'attachTo')) {
             $field = lcfirst(substr($method, 8));
 
             return $this->attach($field, $value);
         }
 
         // Alias to embed
-        if ('embedTo' == substr($method, 0, 7)) {
+        if (str_starts_with($method, 'embedTo')) {
             $field = lcfirst(substr($method, 7));
 
             return $this->embed($field, $value);
@@ -248,7 +238,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         throw new BadMethodCallException(
             sprintf(
                 'The following method can not be reached or does not exist: %s@%s',
-                get_class($this),
+                static::class,
                 $method
             )
         );
@@ -277,7 +267,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
             throw new NoCollectionNameException();
         }
 
-        return $this->collection ? $this->collection : $this->getSchema()->collection;
+        return $this->getSchema()->collection;
     }
 
     /**
@@ -308,7 +298,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         }
 
         $schema = new DynamicSchema();
-        $schema->entityClass = get_class($this);
+        $schema->entityClass = static::class;
         $schema->fields = $this->fields;
         $schema->dynamic = $this->dynamic;
         $schema->collection = $this->collection;
@@ -319,26 +309,24 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Will check if the current value of $fields property is the name of a
      * Schema class and instantiate it if possible.
-     *
-     * @return Schema|null
      */
-    protected function instantiateSchemaInFields()
+    protected function instantiateSchemaInFields(): ?Schema
     {
         if (is_string($this->fields)) {
             if (is_subclass_of($instance = Container::make($this->fields), Schema::class)) {
                 return $instance;
             }
         }
+
+        return null;
     }
 
     /**
      * Performs the given action into database.
      *
      * @param string $action datamapper function to execute
-     *
-     * @return bool
      */
-    protected function execute(string $action)
+    protected function execute(string $action): bool
     {
         if (!$this->getCollectionName()) {
             return false;
@@ -364,7 +352,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      */
     protected static function getDataMapperInstance()
     {
-        $instance = Container::make(get_called_class());
+        $instance = Container::make(static::class);
 
         if (!$instance->getCollectionName()) {
             throw new NoCollectionNameException();
@@ -389,10 +377,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
             ->map($this, array_merge($this->fillable, $this->guarded), $this->dynamic, $this->timestamps);
     }
 
-    /**
-     * @param array $data
-     * @return void
-     */
     public function bsonUnserialize(array $data): void
     {
         $this->fill($data, true);
