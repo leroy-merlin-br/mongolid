@@ -257,7 +257,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * @throws BindingResolutionException
      */
-    public function bsonSerialize(): object|array
+    public function bsonSerialize(): array
     {
         return Container::make(ModelMapper::class)
             ->map(
