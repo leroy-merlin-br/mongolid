@@ -149,7 +149,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * @throws BindingResolutionException
      */
-    public function bsonSerialize(): object|array
+    public function bsonSerialize(): array
     {
         return Container::make(ModelMapper::class)
             ->map(
@@ -201,8 +201,11 @@ abstract class AbstractModel implements ModelInterface
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves the first through a CacheableCursor
      */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
+    public static function first(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): ?static {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -221,8 +224,11 @@ abstract class AbstractModel implements ModelInterface
      *
      * @throws ModelNotFoundException If no document was found
      */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
+    public static function firstOrFail(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): ?static {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,
