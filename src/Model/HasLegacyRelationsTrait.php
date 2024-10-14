@@ -126,9 +126,9 @@ trait HasLegacyRelationsTrait
      * @param string $field     the field where the _ids are stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
-     * @return array
+     * @return CursorInterface Array with the embedded documents
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true)
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {
         $referencedIds = (array) $this->$field;
 
@@ -181,7 +181,7 @@ trait HasLegacyRelationsTrait
      *
      * @return CursorInterface Array with the embedded documents
      */
-    protected function embedsMany(string $entity, string $field)
+    protected function embedsMany(string $entity, string $field): CursorInterface
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
@@ -200,7 +200,7 @@ trait HasLegacyRelationsTrait
      * @return mixed|null
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId)
+    private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId): mixed
     {
         /** @var CacheComponentInterface $cacheComponent */
         $cacheComponent = Container::make(CacheComponentInterface::class);
