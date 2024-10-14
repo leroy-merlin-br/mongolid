@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Mockery as m;
@@ -20,7 +21,10 @@ final class HasRelationsTraitTest extends TestCase
         $model = new ReferencedUser();
         $model->parent_id = $fieldValue;
 
-        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
+        $builder = $this->instance(
+            Builder::class,
+            m::mock(Builder::class)->makePartial()
+        );
         $expected = new ReferencedUser();
 
         // Expectations
@@ -41,7 +45,10 @@ final class HasRelationsTraitTest extends TestCase
         // Set
         $model = new ReferencedUser();
 
-        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
+        $builder = $this->instance(
+            Builder::class,
+            m::mock(Builder::class)->makePartial()
+        );
 
         // Expectations
         $builder
@@ -65,7 +72,10 @@ final class HasRelationsTraitTest extends TestCase
         $model = new ReferencedUser();
         $model->siblings_ids = $fieldValue;
 
-        $builder = $this->instance(Builder::class, m::mock(Builder::class)->makePartial());
+        $builder = $this->instance(
+            Builder::class,
+            m::mock(Builder::class)->makePartial()
+        );
         $expected = new EmbeddedCursor([]);
 
         // Expectations
@@ -141,7 +151,10 @@ final class HasRelationsTraitTest extends TestCase
 
         // Assertions
         $this->assertInstanceOf(EmbeddedCursor::class, $result);
-        $this->assertContainsOnlyInstancesOf(EmbeddedUser::class, $result->all());
+        $this->assertContainsOnlyInstancesOf(
+            EmbeddedUser::class,
+            $result->all()
+        );
         $this->assertSame($expectedItems, $result->all());
     }
 
@@ -154,11 +167,19 @@ final class HasRelationsTraitTest extends TestCase
             ],
             'referenced by objectId represented as string' => [
                 'fieldValue' => '577afb0b4d3cec136058fa82',
-                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                'expectedQuery' => [
+                    '_id' => new ObjectId(
+                        '577afb0b4d3cec136058fa82'
+                    ),
+                ],
             ],
             'referenced by an objectId itself' => [
                 'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
-                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                'expectedQuery' => [
+                    '_id' => new ObjectId(
+                        '577afb0b4d3cec136058fa82'
+                    ),
+                ],
             ],
         ];
     }
@@ -172,14 +193,33 @@ final class HasRelationsTraitTest extends TestCase
             ],
             'referenced by objectId represented as string' => [
                 'fieldValue' => '577afb0b4d3cec136058fa82',
-                'expectedQuery' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
+                'expectedQuery' => [
+                    '_id' => [
+                        '$in' => [new ObjectId(
+                            '577afb0b4d3cec136058fa82'
+                        ),
+                        ],
+                    ],
+                ],
             ],
             'referenced by an objectId itself' => [
                 'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
-                'expectedQuery' => ['_id' => ['$in' => [new ObjectId('577afb0b4d3cec136058fa82')]]],
+                'expectedQuery' => [
+                    '_id' => [
+                        '$in' => [new ObjectId(
+                            '577afb0b4d3cec136058fa82'
+                        ),
+                        ],
+                    ],
+                ],
             ],
             'series of objectIds' => [
-                'fieldValue' => [new ObjectId('577afb0b4d3cec136058fa82'), new ObjectId('577afb7e4d3cec136258fa83')],
+                'fieldValue' => [new ObjectId(
+                    '577afb0b4d3cec136058fa82'
+                ), new ObjectId(
+                    '577afb7e4d3cec136258fa83'
+                ),
+                ],
                 'expectedQuery' => [
                     '_id' => [
                         '$in' => [

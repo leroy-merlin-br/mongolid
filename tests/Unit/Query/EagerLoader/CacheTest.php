@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query\EagerLoader;
 
 use Mongolid\Cursor\SchemaEmbeddedCursor;
@@ -21,7 +22,10 @@ class CacheTest extends TestCase
         $product1->_id = 123;
         $product2 = new Product();
         $product2->_id = 456;
-        $products = new SchemaEmbeddedCursor(Product::class, [$product1, $product2]);
+        $products = new SchemaEmbeddedCursor(
+            Product::class,
+            [$product1, $product2]
+        );
 
         $cache = new Cache($cacheComponent);
         $eagerLoadedModels = [

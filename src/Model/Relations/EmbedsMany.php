@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Relations;
 
 use Mongolid\Cursor\EmbeddedCursor;
@@ -57,7 +58,9 @@ class EmbedsMany extends AbstractRelation
             }
         }
 
-        $this->parent->{$this->field} = array_values((array) $this->parent->{$this->field});
+        $this->parent->{$this->field} = array_values(
+            (array) $this->parent->{$this->field}
+        );
         $this->pristine = false;
     }
 

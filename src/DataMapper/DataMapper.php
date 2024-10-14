@@ -24,8 +24,6 @@ use Mongolid\Schema\Schema;
  */
 class DataMapper implements HasSchemaInterface
 {
-    private bool $ignoreSoftDelete = false;
-
     /**
      * Name of the schema class to be used.
      */
@@ -45,6 +43,8 @@ class DataMapper implements HasSchemaInterface
      * In order to dispatch events when necessary.
      */
     protected ?EventTriggerService $eventService = null;
+
+    private bool $ignoreSoftDelete = false;
 
     /**
      * @var array<string,null>
@@ -114,7 +114,13 @@ class DataMapper implements HasSchemaInterface
      */
     public function insert(mixed $entity, array $options = [], bool $fireEvents = true): bool
     {
-        if ($fireEvents && false === $this->fireEvent('inserting', $entity, true)) {
+        if (
+            $fireEvents && false === $this->fireEvent(
+                'inserting',
+                $entity,
+                true
+            )
+        ) {
             return false;
         }
 
@@ -176,7 +182,11 @@ class DataMapper implements HasSchemaInterface
         $filter = ['_id' => $data['_id']];
         $updateOptions = $this->mergeOptions($options);
 
-        $queryResult = $collection->updateOne($filter, $updateData, $updateOptions);
+        $queryResult = $collection->updateOne(
+            $filter,
+            $updateData,
+            $updateOptions
+        );
 
         if ($this->pullNullValues) {
             $collection->updateOne(
@@ -220,7 +230,8 @@ class DataMapper implements HasSchemaInterface
             $this->mergeOptions($options)
         );
 
-        if ($queryResult->isAcknowledged() &&
+        if (
+            $queryResult->isAcknowledged() &&
             $queryResult->getDeletedCount()
         ) {
             $this->fireEvent('deleted', $entity);
@@ -244,9 +255,11 @@ class DataMapper implements HasSchemaInterface
         array $projection = [],
         bool $cacheable = false
     ): CursorInterface {
-        $cursorClass = $cacheable ? SchemaCacheableCursor::class : SchemaCursor::class;
+        $cursorClass = $cacheable
+            ? SchemaCacheableCursor::class
+            : SchemaCursor::class;
 
-        $model = new $this->schema->entityClass;
+        $model = new $this->schema->entityClass();
 
         $query = Resolver::resolveQuery(
             $query,
@@ -296,7 +309,7 @@ class DataMapper implements HasSchemaInterface
             return $this->where($query, $projection, true)->first();
         }
 
-        $model = new $this->schema->entityClass;
+        $model = new $this->schema->entityClass();
 
         $query = Resolver::resolveQuery(
             $query,
@@ -336,7 +349,9 @@ class DataMapper implements HasSchemaInterface
             return $result;
         }
 
-        throw (new ModelNotFoundException())->setModel($this->schema->entityClass);
+        throw (new ModelNotFoundException())->setModel(
+            $this->schema->entityClass
+        );
     }
 
     public function withoutSoftDelete(): self
@@ -344,6 +359,39 @@ class DataMapper implements HasSchemaInterface
         $this->ignoreSoftDelete = true;
 
         return $this;
+    }
+
+    /**
+     * Retrieves the Collection object.
+     */
+    public function getCollection(): Collection
+    {
+        $database = $this->connection->defaultDatabase;
+        $collectionName = $this->schema->collection;
+        $options = [
+            'typeMap' => ['array' => 'array', 'document' => 'array'],
+        ];
+
+        return $this->connection
+            ->getClient()
+            ->selectDatabase($database, $options)
+            ->selectCollection($collectionName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
+    /**
+     * Set a Schema object  that describes an Entity in MongoDB.
+     */
+    public function setSchema(Schema $schema): void
+    {
+        $this->schema = $schema;
     }
 
     /**
@@ -376,24 +424,10 @@ class DataMapper implements HasSchemaInterface
             $this->schema = Container::make($this->schemaClass);
         }
 
-        return Container::make(SchemaMapper::class, ['schema' => $this->schema]);
-    }
-
-    /**
-     * Retrieves the Collection object.
-     */
-    public function getCollection(): Collection
-    {
-        $database = $this->connection->defaultDatabase;
-        $collectionName = $this->schema->collection;
-        $options = [
-            'typeMap' => ['array' => 'array', 'document' => 'array']
-        ];
-
-        return $this->connection
-            ->getClient()
-            ->selectDatabase($database, $options)
-            ->selectCollection($collectionName);
+        return Container::make(
+            SchemaMapper::class,
+            ['schema' => $this->schema]
+        );
     }
 
     /**
@@ -419,7 +453,7 @@ class DataMapper implements HasSchemaInterface
      */
     protected function fireEvent(string $event, mixed $entity, bool $halt = false): mixed
     {
-        $event = "mongolid.{$event}: ".$entity::class;
+        $event = "mongolid.{$event}: " . $entity::class;
 
         if (!$this->eventService) {
             $this->eventService = Container::make(EventTriggerService::class);
@@ -515,22 +549,6 @@ class DataMapper implements HasSchemaInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSchema(): Schema
-    {
-        return $this->schema;
-    }
-
-    /**
-     * Set a Schema object  that describes an Entity in MongoDB.
-     */
-    public function setSchema(Schema $schema): void
-    {
-        $this->schema = $schema;
-    }
-
     private function getUpdateData($model, array $data): array
     {
         $this->pullNullValues = [];
@@ -564,9 +582,18 @@ class DataMapper implements HasSchemaInterface
 
             if (!isset($oldData[$k])) { // new field
                 $changes['$set']["{$keyfix}{$k}"] = $v;
-            } elseif ($oldData[$k] != $v) {  // changed value
-                if (is_array($v) && is_array($oldData[$k]) && $v && $oldData[$k] !== []) { // check array recursively for changes
-                    $this->calculateChanges($changes, $v, $oldData[$k], "{$keyfix}{$k}.");
+            } elseif ($oldData[$k] != $v) { // changed value
+                if (
+                    is_array($v) && is_array(
+                        $oldData[$k]
+                    ) && $v && [] !== $oldData[$k]
+                ) { // check array recursively for changes
+                    $this->calculateChanges(
+                        $changes,
+                        $v,
+                        $oldData[$k],
+                        "{$keyfix}{$k}."
+                    );
                 } else {
                     if (is_array($v)) {
                         $v = $this->filterNullValues($v);
@@ -593,7 +620,7 @@ class DataMapper implements HasSchemaInterface
     {
         $filtered = array_filter(
             $data,
-            fn($value): bool => !is_null($value)
+            fn ($value): bool => !is_null($value)
         );
 
         if ($data == array_values($data)) {

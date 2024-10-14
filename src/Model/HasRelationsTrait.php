@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Illuminate\Support\Str;
@@ -21,14 +22,14 @@ trait HasRelationsTrait
      *
      * @var RelationInterface[]
      */
-    private $relations = [];
+    private array $relations = [];
 
     /**
      * The bound between relations and fields.
      *
      * @var array
      */
-    private $fieldRelations = [];
+    private array $fieldRelations = [];
 
     /**
      * Get a specified relationship.
@@ -66,8 +67,14 @@ trait HasRelationsTrait
 
     public function &getRelationResults(string $relation)
     {
-        if (!$this->relationLoaded($relation) && !$this->$relation() instanceof RelationInterface) {
-            throw new NotARelationException("Called method \"{$relation}\" is not a Relation!");
+        if (
+            !$this->relationLoaded(
+                $relation
+            ) && !$this->$relation() instanceof RelationInterface
+        ) {
+            throw new NotARelationException(
+                "Called method \"{$relation}\" is not a Relation!"
+            );
         }
 
         return $this->getRelation($relation)->getResults();
@@ -81,69 +88,6 @@ trait HasRelationsTrait
     public function getFieldRelation(string $field): string
     {
         return $this->fieldRelations[$field];
-    }
-
-    /**
-     * Create a ReferencesOne Relation.
-     *
-     * @param string      $modelClass class of the referenced model
-     * @param string|null $field      the field where the $key is stored
-     * @param string      $key        the field that the document will be referenced by (usually _id)
-     */
-    protected function referencesOne(string $modelClass, string $field = null, string $key = '_id'): ReferencesOne
-    {
-        $relationName = $this->guessRelationName();
-
-        return $this->getRelationsService()->referencesOne($this, $relationName, $modelClass, $field, $key);
-    }
-
-    /**
-     * Create a ReferencesMany Relation.
-     *
-     * @param string      $modelClass class of the referenced model
-     * @param string|null $field      the field where the _ids are stored
-     * @param string      $key        the field that the document will be referenced by (usually _id)
-     */
-    protected function referencesMany(string $modelClass, string $field = null, string $key = '_id'): ReferencesMany
-    {
-        $relationName = $this->guessRelationName();
-
-        return $this->getRelationsService()->referencesMany($this, $relationName, $modelClass, $field, $key);
-    }
-
-    /**
-     * Create a EmbedsOne Relation.
-     *
-     * @param string      $modelClass class of the embedded model
-     * @param string|null $field      field where the embedded document is stored
-     */
-    protected function embedsOne(string $modelClass, string $field = null): EmbedsOne
-    {
-        $relationName = $this->guessRelationName();
-
-        return $this->getRelationsService()->embedsOne($this, $relationName, $modelClass, $field);
-    }
-
-    /**
-     * Create a EmbedsMany Relation.
-     *
-     * @param string      $modelClass class of the embedded model
-     * @param string|null $field      field where the embedded documents are stored
-     */
-    protected function embedsMany(string $modelClass, string $field = null): EmbedsMany
-    {
-        $relationName = $this->guessRelationName();
-
-        return $this->getRelationsService()->embedsMany($this, $relationName, $modelClass, $field);
-    }
-
-    private function getRelationsService(): RelationsService
-    {
-        if (!$this->relationsService) {
-            $this->relationsService = Container::make(RelationsService::class);
-        }
-
-        return $this->relationsService;
     }
 
     /**
@@ -164,9 +108,97 @@ trait HasRelationsTrait
      */
     public function guessRelationName(): string
     {
-        [$method, $relationType, $relation] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        [$method, $relationType, $relation] = debug_backtrace(
+            DEBUG_BACKTRACE_IGNORE_ARGS,
+            3
+        );
 
         return $relation['function'];
+    }
+
+    /**
+     * Create a ReferencesOne Relation.
+     *
+     * @param string      $modelClass class of the referenced model
+     * @param string|null $field      the field where the $key is stored
+     * @param string      $key        the field that the document will be referenced by (usually _id)
+     */
+    protected function referencesOne(string $modelClass, ?string $field = null, string $key = '_id'): ReferencesOne
+    {
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->referencesOne(
+            $this,
+            $relationName,
+            $modelClass,
+            $field,
+            $key
+        );
+    }
+
+    /**
+     * Create a ReferencesMany Relation.
+     *
+     * @param string      $modelClass class of the referenced model
+     * @param string|null $field      the field where the _ids are stored
+     * @param string      $key        the field that the document will be referenced by (usually _id)
+     */
+    protected function referencesMany(string $modelClass, ?string $field = null, string $key = '_id'): ReferencesMany
+    {
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->referencesMany(
+            $this,
+            $relationName,
+            $modelClass,
+            $field,
+            $key
+        );
+    }
+
+    /**
+     * Create a EmbedsOne Relation.
+     *
+     * @param string      $modelClass class of the embedded model
+     * @param string|null $field      field where the embedded document is stored
+     */
+    protected function embedsOne(string $modelClass, ?string $field = null): EmbedsOne
+    {
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->embedsOne(
+            $this,
+            $relationName,
+            $modelClass,
+            $field
+        );
+    }
+
+    /**
+     * Create a EmbedsMany Relation.
+     *
+     * @param string      $modelClass class of the embedded model
+     * @param string|null $field      field where the embedded documents are stored
+     */
+    protected function embedsMany(string $modelClass, ?string $field = null): EmbedsMany
+    {
+        $relationName = $this->guessRelationName();
+
+        return $this->getRelationsService()->embedsMany(
+            $this,
+            $relationName,
+            $modelClass,
+            $field
+        );
+    }
+
+    private function getRelationsService(): RelationsService
+    {
+        if (!$this->relationsService) {
+            $this->relationsService = Container::make(RelationsService::class);
+        }
+
+        return $this->relationsService;
     }
 
     /**
@@ -185,7 +217,7 @@ trait HasRelationsTrait
         $relationName = Str::snake($relationName);
         $key = $plural ? Str::plural($key) : $key;
 
-        return $relationName.'_'.ltrim($key, '_');
+        return $relationName . '_' . ltrim($key, '_');
     }
 
     /**
@@ -200,7 +232,7 @@ trait HasRelationsTrait
     {
         $relationName = Str::snake($relationName);
 
-        return 'embedded_'.$relationName;
+        return 'embedded_' . $relationName;
     }
 
     /**

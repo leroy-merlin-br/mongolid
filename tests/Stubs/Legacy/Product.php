@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Stubs\Legacy;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -8,18 +9,18 @@ use Mongolid\Tests\Stubs\Price;
 
 class Product extends LegacyRecord
 {
-    protected ?string $collection = 'products';
-
     public array $with = [
         'price' => [
             'key' => '_id',
-            'model' => Price::class
+            'model' => Price::class,
         ],
         'shop' => [
             'key' => 'skus.shop_id',
             'model' => Shop::class,
         ],
     ];
+
+    protected ?string $collection = 'products';
 
     /**
      * @throws BindingResolutionException

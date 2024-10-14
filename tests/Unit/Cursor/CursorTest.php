@@ -2,7 +2,6 @@
 
 namespace Mongolid\Cursor;
 
-use ArrayIterator;
 use ArrayObject;
 use Exception;
 use Iterator;
@@ -11,7 +10,6 @@ use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
 use MongoDB\Driver\Exception\LogicException;
-use MongoDB\Driver\Manager;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
