@@ -128,7 +128,10 @@ trait HasLegacyRelationsTrait
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return CursorInterface Array with the embedded documents
+<<<<<<< HEAD
      * @throws BindingResolutionException
+=======
+>>>>>>> 84bc4d3 (chore: solve comments and remove unnused code)
      */
     protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {
