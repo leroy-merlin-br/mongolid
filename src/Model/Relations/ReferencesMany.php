@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Relations;
 
 use MongoDB\BSON\ObjectId;
@@ -14,6 +15,7 @@ class ReferencesMany extends AbstractRelation
     public function __construct(ModelInterface $parent, string $model, string $field, string $key)
     {
         parent::__construct($parent, $model, $field);
+
         $this->key = $key;
         $this->modelInstance = Container::make($this->model);
     }
@@ -69,8 +71,11 @@ class ReferencesMany extends AbstractRelation
         foreach ((array) $this->parent->{$this->field} as $arrayKey => $documentKey) {
             if ($documentKey == $referencedKey) {
                 unset($this->parent->{$this->field}[$arrayKey]);
-                $this->parent->{$this->field} = array_values((array) $this->parent->{$this->field});
+                $this->parent->{$this->field} = array_values(
+                    (array) $this->parent->{$this->field}
+                );
                 $this->pristine = false;
+
                 return;
             }
         }
@@ -95,6 +100,8 @@ class ReferencesMany extends AbstractRelation
             }
         }
 
-        return $this->modelInstance->where([$this->key => ['$in' => array_values($referencedKeys)]]);
+        return $this->modelInstance->where(
+            [$this->key => ['$in' => array_values($referencedKeys)]]
+        );
     }
 }
