@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
@@ -60,7 +61,11 @@ final class ReferencesManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->siblings()->attach($bob);
         $this->assertSiblings([$bob], $john);
-        $john = ReferencedUser::fill(['siblings_ids' => [$chuck->_id]], $john, true);
+        $john = ReferencedUser::fill(
+            ['siblings_ids' => [$chuck->_id]],
+            $john,
+            true
+        );
         $this->assertSiblings([$chuck], $john);
 
         // detach not attached has no problems
@@ -126,11 +131,15 @@ final class ReferencesManyRelationTest extends IntegrationTestCase
         // changing the field with fillable
         $john->grandsons()->attach($bob);
         $this->assertGrandsons([$bob], $john);
-        $john = ReferencedUser::fill(['grandsons_codes' => [$chuck->code]], $john, true);
+        $john = ReferencedUser::fill(
+            ['grandsons_codes' => [$chuck->code]],
+            $john,
+            true
+        );
         $this->assertGrandsons([$chuck], $john);
     }
 
-    private function createUser(string $name, string $code = null): ReferencedUser
+    private function createUser(string $name, ?string $code = null): ReferencedUser
     {
         $user = new ReferencedUser();
         $user->_id = new ObjectId();

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
@@ -6,16 +7,7 @@ use Mongolid\Tests\Stubs\ReferencedUser;
 
 final class PersistedDataTest extends IntegrationTestCase
 {
-    /**
-     * @var ObjectId
-     */
-    private $_id;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a672');
-    }
+    private ObjectId $_id;
 
     public function testSaveInsertingData(): void
     {
@@ -148,6 +140,13 @@ final class PersistedDataTest extends IntegrationTestCase
          * In this test, User must have his old name after refresh because its model wasn't persisted after setting its name to Jane Doe.
          */
         $this->assertSame('John Doe', $result->name);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->_id = new ObjectId('5bcb310783a7fcdf1bf1a672');
     }
 
     private function getUser(bool $save = false): ReferencedUser

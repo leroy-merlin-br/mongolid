@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use MongoDB\BSON\ObjectId;
@@ -112,7 +113,9 @@ final class EmbedsOneRelationTest extends IntegrationTestCase
 
         // Expectations
         $this->expectException(InvalidFieldNameException::class);
-        $this->expectExceptionMessage('The field for relation "sameName" cannot have the same name as the relation');
+        $this->expectExceptionMessage(
+            'The field for relation "sameName" cannot have the same name as the relation'
+        );
 
         // Actions
         $user->sameName;

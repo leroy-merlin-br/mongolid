@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use Mongolid\Container\Container;
@@ -13,7 +14,10 @@ final class EagerLoadingTest extends IntegrationTestCase
 {
     public function testShouldEagerLoadingAllShops(): void
     {
-        $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
+        $cache = Container::instance(
+            CacheComponentInterface::class,
+            new CacheComponent()
+        );
         $product1 = $this->createProductWithPrice('Playstation', 299.90);
         $product2 = $this->createProductWithPrice('Xbox', 199.90);
         $product3 = $this->createProductWithPrice('Switch', 399.90);
@@ -48,7 +52,10 @@ final class EagerLoadingTest extends IntegrationTestCase
 
     public function testShouldEagerLoadOnlyACertainLimitOfProducts(): void
     {
-        $cache = Container::instance(CacheComponentInterface::class, new CacheComponent);
+        $cache = Container::instance(
+            CacheComponentInterface::class,
+            new CacheComponent()
+        );
         $cacheLimit = 100;
 
         for ($i = 1; $i < 101; $i++) { // DOCUMENT_LIMIT+1

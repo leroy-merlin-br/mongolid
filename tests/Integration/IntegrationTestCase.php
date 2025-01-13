@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Integration;
 
 use Mongolid\TestCase;
@@ -13,6 +14,7 @@ class IntegrationTestCase extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $host = getenv('DB_HOST') ?: 'localhost';
         $database = getenv('DB_DATABASE') ?: 'testing';
 
@@ -23,6 +25,7 @@ class IntegrationTestCase extends TestCase
     protected function tearDown(): void
     {
         $this->dropDatabase();
+
         parent::tearDown();
     }
 }
