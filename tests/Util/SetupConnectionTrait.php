@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Util;
 
 use Mongolid\Connection\Connection;
@@ -11,7 +12,9 @@ trait SetupConnectionTrait
         Container::singleton(
             Connection::class,
             function () use ($host, $database) {
-                $connection = new Connection("mongodb://{$host}:27017/{$database}");
+                $connection = new Connection(
+                    "mongodb://{$host}:27017/{$database}"
+                );
                 $connection->defaultDatabase = $database;
 
                 return $connection;
