@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use DateTime;
@@ -14,7 +15,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldGetAttributeFromMutator(): void
     {
         // Set
-        $model = new class()
+        $model = new class ()
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -41,7 +42,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldIgnoreMutators(): void
     {
         // Set
-        $model = new class()
+        $model = new class ()
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -68,7 +69,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldSetAttributeFromMutator(): void
     {
         // Set
-        $model = new class()
+        $model = new class ()
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -102,7 +103,7 @@ final class HasAttributesTraitTest extends TestCase
         array $expected
     ) {
         // Set
-        $model = new class($fillable, $guarded) implements HasAttributesInterface
+        $model = new class ($fillable, $guarded) implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -264,7 +265,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldForceFillAttributes(): void
     {
         // Set
-        $model = new class() implements HasAttributesInterface
+        $model = new class () implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -286,7 +287,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldBeCastableToArray(): void
     {
         // Set
-        $model = new class()
+        $model = new class ()
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -305,7 +306,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldSetOriginalAttributes(): void
     {
         // Set
-        $model = new class() implements HasAttributesInterface
+        $model = new class () implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -325,7 +326,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldFallbackOriginalAttributesIfUnserializationFails(): void
     {
         // Set
-        $model = new class() implements HasAttributesInterface
+        $model = new class () implements HasAttributesInterface
         {
             use HasAttributesTrait;
             use HasRelationsTrait;
@@ -350,7 +351,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldCheckIfAttributeIsSet(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -366,7 +367,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldCheckIfMutatedAttributeIsSet(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             public bool $mutable = true;
 
@@ -384,13 +385,12 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldCastAttributeToDateTimeWhenLoadingFromDatabase(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             protected array $casts = [
                 'expires_at' => 'datetime',
                 'birthdate' => 'immutable_datetime',
             ];
-
         };
         $model->expires_at = new UTCDateTime(
             DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45')
@@ -401,7 +401,10 @@ final class HasAttributesTraitTest extends TestCase
 
         // Assertions
         $this->assertInstanceOf(DateTime::class, $model->expires_at);
-        $this->assertSame('08/10/2025 12:30:45', $model->expires_at->format('d/m/Y H:i:s'));
+        $this->assertSame(
+            '08/10/2025 12:30:45',
+            $model->expires_at->format('d/m/Y H:i:s')
+        );
 
         $this->assertInstanceOf(DateTimeImmutable::class, $model->birthdate);
         $this->assertSame('02/04/1990', $model->birthdate->format('d/m/Y'));
@@ -410,7 +413,7 @@ final class HasAttributesTraitTest extends TestCase
     public function testShouldCastAttributeToUTCDateTimeWhenSettingAttributes(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             protected array $casts = [
                 'expires_at' => 'datetime',
@@ -419,10 +422,16 @@ final class HasAttributesTraitTest extends TestCase
         };
 
         // Actions
-        $model->expires_at = DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45');
+        $model->expires_at = DateTime::createFromFormat(
+            'd/m/Y H:i:s',
+            '08/10/2025 12:30:45'
+        );
 
         // Assertions
-        $this->assertInstanceOf(UTCDateTime::class, $model->getDocumentAttributes()['expires_at']);
+        $this->assertInstanceOf(
+            UTCDateTime::class,
+            $model->getDocumentAttributes()['expires_at']
+        );
         $this->assertInstanceOf(DateTime::class, $model->expires_at);
     }
 

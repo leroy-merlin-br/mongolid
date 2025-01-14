@@ -11,7 +11,6 @@ use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
 use MongoDB\Driver\Exception\LogicException;
-use MongoDB\Driver\Manager;
 use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
 use Mongolid\LegacyRecord;

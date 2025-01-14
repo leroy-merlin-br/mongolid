@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query\EagerLoader;
 
 use Mongolid\Query\EagerLoader\Exception\EagerLoaderException;
@@ -15,7 +16,7 @@ class ExtractorTest extends TestCase
         $eagerLoader = [
             'price' => [
                 'key' => '_id',
-                'model' => Price::class
+                'model' => Price::class,
             ],
             'shop' => [
                 'key' => 'skus.shop_id',
@@ -28,20 +29,20 @@ class ExtractorTest extends TestCase
         $product->skus = [
             [
                 'name' => 'Playstation',
-                'shop_id' => 12345
-            ]
+                'shop_id' => 12345,
+            ],
         ];
         $expected = [
             'price' => [
                 'key' => '_id',
-                'model' => \Mongolid\Tests\Stubs\Price::class,
+                'model' => Price::class,
                 'ids' => [
                     123 => 123,
                 ],
             ],
             'shop' => [
                 'key' => 'skus.shop_id',
-                'model' => \Mongolid\Tests\Stubs\Legacy\Shop::class,
+                'model' => Shop::class,
                 'ids' => [
                     12345 => 12345,
                 ],
@@ -61,7 +62,7 @@ class ExtractorTest extends TestCase
         $eagerLoader = [
             'price' => [
                 'key' => 'unexistentReferencedId',
-                'model' => Price::class
+                'model' => Price::class,
             ],
         ];
         $extractor = new Extractor($eagerLoader);
@@ -70,8 +71,8 @@ class ExtractorTest extends TestCase
         $product->skus = [
             [
                 'name' => 'Playstation',
-                'shop_id' => 12345
-            ]
+                'shop_id' => 12345,
+            ],
         ];
 
         // Expectations

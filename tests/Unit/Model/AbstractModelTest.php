@@ -1,8 +1,8 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Persistable;
 use MongoDB\BSON\Serializable;
 use MongoDB\BSON\Type;
@@ -16,36 +16,7 @@ use stdClass;
 
 final class AbstractModelTest extends TestCase
 {
-    /**
-     * @var AbstractModel
-     */
-    protected $model;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->model = new class() extends AbstractModel
-        {
-            protected ?string $collection = 'mongolid';
-
-            public function unsetCollection(): void
-            {
-                unset($this->collection);
-            }
-        };
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->model);
-        parent::tearDown();
-    }
+    protected AbstractModel $model;
 
     public function testShouldImplementModelTraits(): void
     {
@@ -157,7 +128,9 @@ final class AbstractModelTest extends TestCase
 
         // Expectations
         $this->expectException(NoCollectionNameException::class);
-        $this->expectExceptionMessage('Collection name not specified into Model instance');
+        $this->expectExceptionMessage(
+            'Collection name not specified into Model instance'
+        );
 
         // Actions
         $this->model->save();
@@ -170,7 +143,9 @@ final class AbstractModelTest extends TestCase
 
         // Expectations
         $this->expectException(NoCollectionNameException::class);
-        $this->expectExceptionMessage('Collection name not specified into Model instance');
+        $this->expectExceptionMessage(
+            'Collection name not specified into Model instance'
+        );
 
         // Actions
         $this->model->update();
@@ -183,7 +158,9 @@ final class AbstractModelTest extends TestCase
 
         // Expectations
         $this->expectException(NoCollectionNameException::class);
-        $this->expectExceptionMessage('Collection name not specified into Model instance');
+        $this->expectExceptionMessage(
+            'Collection name not specified into Model instance'
+        );
 
         // Actions
         $this->model->insert();
@@ -196,7 +173,9 @@ final class AbstractModelTest extends TestCase
 
         // Expectations
         $this->expectException(NoCollectionNameException::class);
-        $this->expectExceptionMessage('Collection name not specified into Model instance');
+        $this->expectExceptionMessage(
+            'Collection name not specified into Model instance'
+        );
 
         // Actions
         $this->model->delete();
@@ -214,7 +193,12 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('where')
-            ->with(m::type(get_class($this->model)), $query, $projection, false)
+            ->with(
+                m::type(get_class($this->model)),
+                $query,
+                $projection,
+                false
+            )
             ->andReturn($cursor);
 
         // Actions
@@ -253,7 +237,12 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $query, $projection, false)
+            ->with(
+                m::type(get_class($this->model)),
+                $query,
+                $projection,
+                false
+            )
             ->andReturn($this->model);
 
         // Actions
@@ -338,7 +327,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallAllFunction(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -352,7 +341,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallFirstFunction(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -366,7 +355,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldRaiseExceptionWhenHasNoCollectionAndTryToCallWhereFunction(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -408,7 +397,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldHaveDynamicSetters(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -434,10 +423,10 @@ final class AbstractModelTest extends TestCase
     public function testShouldHaveDynamicGetters(): void
     {
         // Set
-        $child = new class() extends AbstractModel
+        $child = new class () extends AbstractModel
         {
         };
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -461,7 +450,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldCheckIfAttributeIsSet(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
 
@@ -477,7 +466,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldCheckIfMutatedAttributeIsSet(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             public bool $mutable = true;
 
@@ -495,7 +484,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldUnsetAttributes(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
         };
         $model = $model::fill(
@@ -516,7 +505,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldGetAttributeFromMutator(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             public bool $mutable = true;
 
@@ -537,7 +526,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldIgnoreMutators(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             public function getShortNameDocumentAttribute(): string
             {
@@ -560,7 +549,7 @@ final class AbstractModelTest extends TestCase
     public function testShouldSetAttributeFromMutator(): void
     {
         // Set
-        $model = new class() extends AbstractModel
+        $model = new class () extends AbstractModel
         {
             protected bool $mutable = true;
 
@@ -587,7 +576,12 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), 'some-id-value', [], false)
+            ->with(
+                m::type(get_class($this->model)),
+                'some-id-value',
+                [],
+                false
+            )
             ->andReturn($this->model);
 
         // Actions
@@ -595,5 +589,33 @@ final class AbstractModelTest extends TestCase
 
         // Assertions
         $this->assertSame($this->model, $result);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->model = new class () extends AbstractModel
+        {
+            protected ?string $collection = 'mongolid';
+
+            public function unsetCollection(): void
+            {
+                unset($this->collection);
+            }
+        };
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown(): void
+    {
+        unset($this->model);
+
+        parent::tearDown();
     }
 }
