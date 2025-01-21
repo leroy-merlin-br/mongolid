@@ -115,11 +115,8 @@ class DataMapper implements HasSchemaInterface
     public function insert(mixed $entity, array $options = [], bool $fireEvents = true): bool
     {
         if (
-            $fireEvents && false === $this->fireEvent(
-                'inserting',
-                $entity,
-                true
-            )
+            $fireEvents && 
+            false === $this->fireEvent('inserting', $entity, true)
         ) {
             return false;
         }
