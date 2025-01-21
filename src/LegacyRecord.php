@@ -33,7 +33,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * that are not specified in the $fields property. This is useful if you
      * does not have a strict document format or if you want to take full
      * advantage of the "schemaless" nature of MongoDB.
-     *
      */
     public bool $dynamic = true;
 
@@ -43,8 +42,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * models using this parameter. Every time this
      * model is queried, it will load its referenced
      * models together.
-     *
-     * @var array
      */
     public array $with = [];
 
@@ -78,7 +75,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Whether the model should manage the `created_at` and `updated_at`
      * timestamps automatically.
-     *
      */
     protected bool $timestamps = true;
 
@@ -158,8 +154,6 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
 
     /**
      * Insert this object into database.
-     *
-     * @return bool Success
      */
     public function insert(): bool
     {
@@ -335,10 +329,9 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * Performs the given action into database.
      *
      * @param string $action datamapper function to execute
-     *
-     * @return bool
+     * @throws NoCollectionNameException
      */
-    protected function execute(string $action)
+    protected function execute(string $action): bool
     {
         if (!$this->getCollectionName()) {
             return false;
@@ -380,10 +373,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * @param mixed $parameters parameters of $method
      *
      * @throws BadMethodCallException in case of invalid methods be called
-     *
-     * @return mixed
      */
-    public function __call(mixed $method, mixed $parameters)
+    public function __call(mixed $method, mixed $parameters): mixed
     {
         $value = $parameters[0] ?? null;
 
