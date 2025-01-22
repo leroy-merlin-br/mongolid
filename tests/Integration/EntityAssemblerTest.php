@@ -73,8 +73,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                // Expected output
                 'expectedOutput' => new LegacyRecordStudent(
-                    [ // Expected output
+                    [
                         '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                         'name' => 'John Doe',
                         'age' => 25,
@@ -114,8 +115,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                // Expected output
                 'expectedOutput' => new LegacyRecordStudent(
-                    [ // Expected output
+                    [
                         '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                         'name' => 'John Doe',
                         'age' => 25,
@@ -160,8 +162,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                // Expected output
                 'expectedOutput' => new LegacyRecordStudent(
-                    [ // Expected output
+                    [
                         '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                         'name' => 'John Doe',
                         'age' => 25,
@@ -221,8 +224,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                // Expected output
                 'expectedOutput' => new LegacyRecordStudent(
-                    [ // Expected output
+                    [
                         '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                         'name' => 'John Doe',
                         'age' => 25,
@@ -269,8 +273,9 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
+                // Expected output
                 'expectedOutput' => new LegacyRecordStudent(
-                    [ // Expected output
+                    [
                         '_id' => new ObjectID('507f1f77bcf86cd799439011'),
                         'name' => 'John Doe',
                         'age' => 25,
