@@ -93,7 +93,8 @@ trait HasLegacyRelationsTrait
         $entityInstance = Container::make($entity);
 
         if (
-            $cacheable && $referencedId && $document = $this->getDocumentFromCache(
+            $cacheable && $referencedId &&
+            $document = $this->getDocumentFromCache(
                 $entityInstance,
                 $referencedId
             )
@@ -127,6 +128,7 @@ trait HasLegacyRelationsTrait
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return CursorInterface Array with the embedded documents
+     * @throws BindingResolutionException
      */
     protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {

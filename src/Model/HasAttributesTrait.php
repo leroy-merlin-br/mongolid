@@ -224,14 +224,11 @@ trait HasAttributesTrait
 
         foreach ($input as $key => $value) {
             if (
-                $force
-                || ((!$object->fillable || in_array(
-                            $key,
-                            $object->fillable
-                        )) && !in_array(
-                        $key,
-                        $object->guarded
-                    ))
+                $force ||
+                (
+                    (!$object->fillable || in_array($key, $object->fillable)) &&
+                    !in_array($key, $object->guarded)
+                )
             ) {
                 if ($value instanceof stdClass) {
                     $value = json_decode(

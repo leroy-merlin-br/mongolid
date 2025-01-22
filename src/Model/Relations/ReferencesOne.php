@@ -38,9 +38,8 @@ class ReferencesOne extends AbstractRelation
         }
 
         if (
-            is_string($referencedKey) && ObjectIdUtils::isObjectId(
-                $referencedKey
-            )
+            is_string($referencedKey) &&
+            ObjectIdUtils::isObjectId($referencedKey)
         ) {
             $referencedKey = new ObjectId($referencedKey);
         }

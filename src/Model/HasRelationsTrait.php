@@ -26,8 +26,6 @@ trait HasRelationsTrait
 
     /**
      * The bound between relations and fields.
-     *
-     * @var array
      */
     private array $fieldRelations = [];
 
@@ -65,12 +63,11 @@ trait HasRelationsTrait
         unset($this->relations[$relation]);
     }
 
-    public function &getRelationResults(string $relation)
+    public function &getRelationResults(string $relation): mixed
     {
         if (
-            !$this->relationLoaded(
-                $relation
-            ) && !$this->$relation() instanceof RelationInterface
+            !$this->relationLoaded($relation) &&
+            !$this->$relation() instanceof RelationInterface
         ) {
             throw new NotARelationException(
                 "Called method \"{$relation}\" is not a Relation!"
