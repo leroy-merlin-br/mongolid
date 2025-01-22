@@ -93,11 +93,8 @@ class Builder
     public function insert(ModelInterface $model, array $options = [], bool $fireEvents = true): bool
     {
         if (
-            $fireEvents && false === $this->fireEvent(
-                'inserting',
-                $model,
-                true
-            )
+            $fireEvents && 
+            false === $this->fireEvent('inserting', $model, true)
         ) {
             return false;
         }
@@ -424,9 +421,8 @@ class Builder
                 $changes['$set']["{$keyfix}{$k}"] = $v;
             } elseif ($oldData[$k] != $v) { // changed value
                 if (
-                    is_array($v) && is_array(
-                        $oldData[$k]
-                    ) && $v
+                    $v && is_array($v) && 
+                    is_array($oldData[$k])
                 ) { // check array recursively for changes
                     $this->calculateChanges(
                         $changes,
