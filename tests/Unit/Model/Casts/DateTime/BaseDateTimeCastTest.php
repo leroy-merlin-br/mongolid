@@ -11,7 +11,10 @@ class BaseDateTimeCastTest extends TestCase
     public function testShouldSet(): void
     {
         // Set
-        $dateInDateTime = DateTime::createFromFormat('d/m/Y H:i:s', '08/10/2025 12:30:45');
+        $dateInDateTime = DateTime::createFromFormat(
+            'd/m/Y H:i:s',
+            '08/10/2025 12:30:45'
+        );
         $dateTimeCast = new DateTimeCast();
 
         // Actions

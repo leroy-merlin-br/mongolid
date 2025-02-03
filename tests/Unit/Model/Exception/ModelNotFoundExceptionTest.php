@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model\Exception;
 
 use Mongolid\TestCase;
@@ -17,6 +18,9 @@ final class ModelNotFoundExceptionTest extends TestCase
 
         // Assertions
         $this->assertSame('User', $modelResult);
-        $this->assertSame('No query results for model [User].', $messageResult);
+        $this->assertSame(
+            'No query results for model [User].',
+            $messageResult
+        );
     }
 }

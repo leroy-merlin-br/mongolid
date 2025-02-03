@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Model;
 
 use Mockery as m;
@@ -19,7 +20,10 @@ final class HasLegacyRelationTraitTest extends TestCase
         // Set
         $model = new Product();
         $model->_id = $fieldValue;
-        $priceModel = $this->instance(Price::class, m::mock(Price::class)->makePartial());
+        $priceModel = $this->instance(
+            Price::class,
+            m::mock(Price::class)->makePartial()
+        );
         $cacheComponent = $this->instance(
             CacheComponentInterface::class,
             m::mock(CacheComponent::class)->makePartial()
@@ -50,7 +54,10 @@ final class HasLegacyRelationTraitTest extends TestCase
         $model = new Product();
         $model->_id = $fieldValue;
         $expected = new Price();
-        $builder = $this->instance(Price::class, m::mock(Price::class)->makePartial());
+        $builder = $this->instance(
+            Price::class,
+            m::mock(Price::class)->makePartial()
+        );
         $cacheComponent = $this->instance(
             CacheComponentInterface::class,
             m::mock(CacheComponent::class)->makePartial()
@@ -81,11 +88,19 @@ final class HasLegacyRelationTraitTest extends TestCase
             ],
             'referenced by objectId represented as string' => [
                 'fieldValue' => '577afb0b4d3cec136058fa82',
-                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                'expectedQuery' => [
+                    '_id' => new ObjectId(
+                        '577afb0b4d3cec136058fa82'
+                    ),
+                ],
             ],
             'referenced by an objectId itself' => [
                 'fieldValue' => new ObjectId('577afb0b4d3cec136058fa82'),
-                'expectedQuery' => ['_id' => new ObjectId('577afb0b4d3cec136058fa82')],
+                'expectedQuery' => [
+                    '_id' => new ObjectId(
+                        '577afb0b4d3cec136058fa82'
+                    ),
+                ],
             ],
         ];
     }

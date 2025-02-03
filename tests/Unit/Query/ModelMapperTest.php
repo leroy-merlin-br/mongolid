@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query;
 
 use DateTime;

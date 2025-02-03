@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Query\EagerLoader;
 
 use ArrayIterator;
@@ -16,7 +17,10 @@ class EagerLoaderTest extends TestCase
     public function testShouldCacheQueries(): void
     {
         // Set
-        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $cacheComponent = Container::instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
         $price = Container::instance(Price::class, m::mock(Price::class));
         $eagerLoader = new EagerLoader();
         $product = new Product();
@@ -41,15 +45,18 @@ class EagerLoaderTest extends TestCase
         $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
-                'model' => Price::class
-            ]
+                'model' => Price::class,
+            ],
         ]);
     }
 
     public function testShouldCacheQueriesWithObjectIds(): void
     {
         // Set
-        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $cacheComponent = Container::instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
         $price = Container::instance(Price::class, m::mock(Price::class));
         $eagerLoader = new EagerLoader();
         $product = new Product();
@@ -75,15 +82,18 @@ class EagerLoaderTest extends TestCase
         $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
-                'model' => Price::class
-            ]
+                'model' => Price::class,
+            ],
         ]);
     }
 
     public function testShouldNotCacheIfEagerLoadingIsEmpty(): void
     {
         // Set
-        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $cacheComponent = Container::instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
         $price = Container::instance(Price::class, m::mock(Price::class));
         $eagerLoader = new EagerLoader();
         $product = new Product();
@@ -107,7 +117,10 @@ class EagerLoaderTest extends TestCase
     public function testShouldNotCacheIfCursorIsEmpty(): void
     {
         // Set
-        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $cacheComponent = Container::instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
         $price = Container::instance(Price::class, m::mock(Price::class));
         $eagerLoader = new EagerLoader();
         $products = new ArrayIterator([]);
@@ -125,15 +138,18 @@ class EagerLoaderTest extends TestCase
         $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
-                'model' => Price::class
-            ]
+                'model' => Price::class,
+            ],
         ]);
     }
 
     public function testShouldNotCacheIfItDidNotFindAnyIdsOnModels(): void
     {
         // Set
-        $cacheComponent = Container::instance(CacheComponentInterface::class, m::mock(CacheComponentInterface::class));
+        $cacheComponent = Container::instance(
+            CacheComponentInterface::class,
+            m::mock(CacheComponentInterface::class)
+        );
         $price = Container::instance(Price::class, m::mock(Price::class));
         $eagerLoader = new EagerLoader();
         $product = new Product();
@@ -156,8 +172,8 @@ class EagerLoaderTest extends TestCase
         $eagerLoader->cache($products, [
             'price' => [
                 'key' => '_id',
-                'model' => Price::class
-            ]
+                'model' => Price::class,
+            ],
         ]);
     }
 }
