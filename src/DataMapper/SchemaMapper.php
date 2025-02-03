@@ -3,7 +3,6 @@
 namespace Mongolid\DataMapper;
 
 use Mongolid\Container\Container;
-use Mongolid\Container\Ioc;
 use Mongolid\Schema\Schema;
 
 /**
@@ -56,18 +55,6 @@ class SchemaMapper
     }
 
     /**
-     * If the schema is not dynamic, remove all non specified fields.
-     *
-     * @param array $data Reference of the fields. The passed array will be modified.
-     */
-    protected function clearDynamic(array &$data): void
-    {
-        if (!$this->schema->dynamic) {
-            $data = array_intersect_key($data, $this->schema->fields);
-        }
-    }
-
-    /**
      * Parse a value based on a field type of the schema.
      *
      * @param mixed  $value     value to be parsed
@@ -103,6 +90,18 @@ class SchemaMapper
         }
 
         return $value;
+    }
+
+    /**
+     * If the schema is not dynamic, remove all non specified fields.
+     *
+     * @param array $data Reference of the fields. The passed array will be modified.
+     */
+    protected function clearDynamic(array &$data): void
+    {
+        if (!$this->schema->dynamic) {
+            $data = array_intersect_key($data, $this->schema->fields);
+        }
     }
 
     /**
