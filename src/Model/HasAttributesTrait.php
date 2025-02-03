@@ -224,23 +224,25 @@ trait HasAttributesTrait
 
         foreach ($input as $key => $value) {
             if (
-                $force ||
+                !$force && 
                 (
-                    (!$object->fillable || in_array($key, $object->fillable)) &&
-                    !in_array($key, $object->guarded)
+                    ($object->fillable && !in_array($key, $object->fillable)) || 
+                    in_array($key, $object->guarded)
                 )
             ) {
-                if ($value instanceof stdClass) {
-                    $value = json_decode(
-                        json_encode($value, JSON_THROW_ON_ERROR),
-                        true,
-                        512,
-                        JSON_THROW_ON_ERROR
-                    ); // cast to array
-                }
-
-                $object->setDocumentAttribute($key, $value);
+                continue;
             }
+            
+            if ($value instanceof stdClass) {
+                $value = json_decode(
+                    json_encode($value, JSON_THROW_ON_ERROR),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                ); // cast to array
+            }
+
+            $object->setDocumentAttribute($key, $value);
         }
 
         return $object;

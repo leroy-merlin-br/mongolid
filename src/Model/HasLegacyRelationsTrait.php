@@ -200,7 +200,7 @@ trait HasLegacyRelationsTrait
 
     /**
      * @return mixed|null
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
     private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId): mixed
     {
