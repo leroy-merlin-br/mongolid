@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Stubs\Legacy;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
