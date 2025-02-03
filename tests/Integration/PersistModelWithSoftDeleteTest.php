@@ -2,7 +2,6 @@
 
 namespace Mongolid\Tests\Integration;
 
-use DateTime;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Model\ModelInterface;
@@ -20,7 +19,9 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertEquals($product, $actualWhereResult);
@@ -35,7 +36,9 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertNull($actualWhereResult);
@@ -97,8 +100,8 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
         $product = $this->persistProductWithSoftDeleteTrait();
 
         // Actions
-         $isDeleted = $product->delete();
-         $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $isDeleted = $product->delete();
+        $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertTrue($isDeleted);
@@ -113,11 +116,13 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
     {
         // Set
         $product = $this->persistProductWithSoftDeleteTrait();
-        $product2 = $this->persistProductWithSoftDeleteTrait('5bcb310783a7fcdf1bf1a123');
+        $product2 = $this->persistProductWithSoftDeleteTrait(
+            '5bcb310783a7fcdf1bf1a123'
+        );
 
         // Actions
-         $isDeleted = $product->forceDelete();
-         $result = ProductWithSoftDelete::withTrashed();
+        $isDeleted = $product->forceDelete();
+        $result = ProductWithSoftDelete::withTrashed();
 
         // Assertions
         $this->assertTrue($isDeleted);
@@ -131,8 +136,8 @@ final class PersistModelWithSoftDeleteTest extends IntegrationTestCase
         $product = $this->persistProduct();
 
         // Actions
-         $isDeleted = $product->delete();
-         $result = ProductWithSoftDelete::first($this->_id);
+        $isDeleted = $product->delete();
+        $result = ProductWithSoftDelete::first($this->_id);
 
         // Assertions
         $this->assertTrue($isDeleted);

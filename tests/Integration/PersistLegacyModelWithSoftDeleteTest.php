@@ -17,7 +17,9 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertEquals($product, $actualWhereResult);
@@ -32,7 +34,9 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
 
         // Actions
         $actualWhereResult = ProductWithSoftDelete::where()->first();
-        $actualFirstResult = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $actualFirstResult = ProductWithSoftDelete::first(
+            '5bcb310783a7fcdf1bf1a672'
+        );
 
         // Assertions
         $this->assertNull($actualWhereResult);
@@ -94,9 +98,9 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
         $product = $this->persistProductWithSoftDeleteTrait();
 
         // Actions
-         $isDeleted = $product->delete();
-         $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
-         $deletedProduct = ProductWithSoftDelete::withTrashed()->first();
+        $isDeleted = $product->delete();
+        $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $deletedProduct = ProductWithSoftDelete::withTrashed()->first();
 
         // Assertions
         $this->assertTrue($isDeleted);
@@ -117,8 +121,8 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
         );
 
         // Actions
-         $isDeleted = $product->forceDelete();
-         $result = ProductWithSoftDelete::withTrashed();
+        $isDeleted = $product->forceDelete();
+        $result = ProductWithSoftDelete::withTrashed();
 
         // Assertions
         $this->assertTrue($isDeleted);
@@ -132,8 +136,8 @@ final class PersistLegacyModelWithSoftDeleteTest extends IntegrationTestCase
         $product = $this->persistProduct();
 
         // Actions
-         $isDeleted = $product->delete();
-         $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
+        $isDeleted = $product->delete();
+        $result = ProductWithSoftDelete::first('5bcb310783a7fcdf1bf1a672');
 
         // Assertions
         $this->assertTrue($isDeleted);

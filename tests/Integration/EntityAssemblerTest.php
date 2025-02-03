@@ -15,6 +15,7 @@ class EntityAssemblerTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+
         m::close();
     }
 
@@ -31,7 +32,7 @@ class EntityAssemblerTest extends TestCase
         $entityAssembler = new EntityAssembler();
         $schemas = [];
         foreach ($availableSchemas as $key => $value) {
-            $schemas[$key] = m::mock(Schema::class.'[]');
+            $schemas[$key] = m::mock(Schema::class . '[]');
             $schemas[$key]->entityClass = $value['entityClass'];
             $schemas[$key]->fields = $value['fields'];
         }
@@ -42,7 +43,10 @@ class EntityAssemblerTest extends TestCase
         }
 
         // Assert
-        $result = $entityAssembler->assemble($inputValue, $schemas[$inputSchema]);
+        $result = $entityAssembler->assemble(
+            $inputValue,
+            $schemas[$inputSchema]
+        );
         $this->assertEquals($expectedOutput, $result);
     }
 
@@ -69,12 +73,15 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new LegacyRecordStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
-                    'name' => 'John Doe',
-                    'age' => 25,
-                    'grade' => 7.25,
-                ]),
+                // Expected output
+                'expectedOutput' => new LegacyRecordStudent(
+                    [
+                        '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                        'name' => 'John Doe',
+                        'age' => 25,
+                        'grade' => 7.25,
+                    ]
+                ),
             ],
 
             //---------------------------
@@ -108,13 +115,16 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new LegacyRecordStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
-                    'name' => 'John Doe',
-                    'age' => 25,
-                    'tests' => null,
-                    'finalGrade' => 7.25,
-                ]),
+                // Expected output
+                'expectedOutput' => new LegacyRecordStudent(
+                    [
+                        '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                        'name' => 'John Doe',
+                        'age' => 25,
+                        'tests' => null,
+                        'finalGrade' => 7.25,
+                    ]
+                ),
             ],
 
             //---------------------------
@@ -152,19 +162,24 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new LegacyRecordStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
-                    'name' => 'John Doe',
-                    'age' => 25,
-                    'tests' => [
-                        new LegacyRecordStudent([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
-                            'subject' => 'math',
-                            'grade' => 7.25,
-                        ]),
-                    ],
-                    'finalGrade' => 7.25,
-                ]),
+                // Expected output
+                'expectedOutput' => new LegacyRecordStudent(
+                    [
+                        '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                        'name' => 'John Doe',
+                        'age' => 25,
+                        'tests' => [
+                            new LegacyRecordStudent([
+                                '_id' => new ObjectID(
+                                    '507f1f77bcf86cd7994390ea'
+                                ),
+                                'subject' => 'math',
+                                'grade' => 7.25,
+                            ]),
+                        ],
+                        'finalGrade' => 7.25,
+                    ]
+                ),
             ],
 
             //---------------------------
@@ -209,24 +224,31 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new LegacyRecordStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
-                    'name' => 'John Doe',
-                    'age' => 25,
-                    'tests' => [
-                        new LegacyRecordStudent([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390ea'),
-                            'subject' => 'math',
-                            'grade' => 7.25,
-                        ]),
-                        new LegacyRecordStudent([
-                            '_id' => new ObjectID('507f1f77bcf86cd7994390eb'),
-                            'subject' => 'english',
-                            'grade' => 9.0,
-                        ]),
-                    ],
-                    'finalGrade' => 7.25,
-                ]),
+                // Expected output
+                'expectedOutput' => new LegacyRecordStudent(
+                    [
+                        '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                        'name' => 'John Doe',
+                        'age' => 25,
+                        'tests' => [
+                            new LegacyRecordStudent([
+                                '_id' => new ObjectID(
+                                    '507f1f77bcf86cd7994390ea'
+                                ),
+                                'subject' => 'math',
+                                'grade' => 7.25,
+                            ]),
+                            new LegacyRecordStudent([
+                                '_id' => new ObjectID(
+                                    '507f1f77bcf86cd7994390eb'
+                                ),
+                                'subject' => 'english',
+                                'grade' => 9.0,
+                            ]),
+                        ],
+                        'finalGrade' => 7.25,
+                    ]
+                ),
             ],
 
             //---------------------------
@@ -251,12 +273,15 @@ class EntityAssemblerTest extends TestCase
                     ],
                 ],
                 'inputSchema' => 'studentSchema', // Schema that will be used to assembly $inputValue
-                'expectedOutput' => new LegacyRecordStudent([ // Expected output
-                    '_id' => new ObjectID('507f1f77bcf86cd799439011'),
-                    'name' => 'John Doe',
-                    'age' => 25,
-                    'grade' => 7.25,
-                ]),
+                // Expected output
+                'expectedOutput' => new LegacyRecordStudent(
+                    [
+                        '_id' => new ObjectID('507f1f77bcf86cd799439011'),
+                        'name' => 'John Doe',
+                        'age' => 25,
+                        'grade' => 7.25,
+                    ]
+                ),
             ],
         ];
     }
