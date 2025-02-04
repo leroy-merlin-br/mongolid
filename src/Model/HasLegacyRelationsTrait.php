@@ -80,7 +80,7 @@ trait HasLegacyRelationsTrait
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return mixed
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     protected function referencesOne(string $entity, string $field, bool $cacheable = true)
     {
@@ -128,7 +128,7 @@ trait HasLegacyRelationsTrait
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
      * @return CursorInterface Array with the embedded documents
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
     {
@@ -200,7 +200,7 @@ trait HasLegacyRelationsTrait
 
     /**
      * @return mixed|null
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     private function getDocumentFromCache(ModelInterface $entityInstance, string $referencedId): mixed
     {

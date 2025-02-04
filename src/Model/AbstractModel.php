@@ -149,7 +149,7 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function bsonSerialize(): array|stdClass|Document
     {
@@ -202,7 +202,7 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $query mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      * @param bool $useCache retrieves the first through a CacheableCursor
-     * @throws NoCollectionNameException
+     * @Throws NoCollectionNameException
      */
     public static function first(
         mixed $query = [],

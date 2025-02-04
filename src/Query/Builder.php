@@ -44,8 +44,8 @@ class Builder
      *
      * @param ModelInterface $model   the model used in the operation
      * @param array          $options possible options to send to mongo driver
-     * @throws BindingResolutionException
-     * @throws NoCollectionNameException
+     * @Throws BindingResolutionException
+     * @Throws NoCollectionNameException
      */
     public function save(ModelInterface $model, array $options = []): bool
     {
@@ -87,13 +87,13 @@ class Builder
      * @param ModelInterface $model      the model used in the operation
      * @param array          $options    possible options to send to mongo driver
      * @param bool           $fireEvents whether events should be fired
-     * @throws BindingResolutionException
-     * @throws NoCollectionNameException
+     * @Throws BindingResolutionException
+     * @Throws NoCollectionNameException
      */
     public function insert(ModelInterface $model, array $options = [], bool $fireEvents = true): bool
     {
         if (
-            $fireEvents && 
+            $fireEvents &&
             false === $this->fireEvent('inserting', $model, true)
         ) {
             return false;
@@ -127,8 +127,8 @@ class Builder
      *
      * @param ModelInterface $model   the model used in the operation
      * @param array          $options possible options to send to mongo driver
-     * @throws BindingResolutionException
-     * @throws NoCollectionNameException
+     * @Throws BindingResolutionException
+     * @Throws NoCollectionNameException
      */
     public function update(ModelInterface $model, array $options = []): bool
     {
@@ -173,8 +173,8 @@ class Builder
      *
      * @param ModelInterface $model   the model used in the operation
      * @param array          $options possible options to send to mongo driver
-     * @throws BindingResolutionException
-     * @throws NoCollectionNameException
+     * @Throws BindingResolutionException
+     * @Throws NoCollectionNameException
      */
     public function delete(ModelInterface $model, array $options = []): bool
     {
@@ -206,7 +206,7 @@ class Builder
      * @param mixed          $query      MongoDB query to retrieve documents
      * @param array          $projection fields to project in MongoDB query
      * @param bool           $useCache   retrieves a CacheableCursor instead
-     * @throws NoCollectionNameException
+     * @Throws NoCollectionNameException
      */
     public function where(
         ModelInterface $model,
@@ -254,7 +254,7 @@ class Builder
      * @param bool           $useCache   retrieves the first through a CacheableCursor
      *
      * @return ModelInterface|array|null
-     * @throws NoCollectionNameException
+     * @Throws NoCollectionNameException
      */
     public function first(
         ModelInterface $model,
@@ -297,7 +297,7 @@ class Builder
      *
      * @return ModelInterface|array|null
      *
-     * @throws ModelNotFoundException|NoCollectionNameException If no model was found
+     * @Throws ModelNotFoundException|NoCollectionNameException If no model was found
      */
     public function firstOrFail(
         ModelInterface $model,
@@ -327,7 +327,7 @@ class Builder
      * @param bool           $halt  true if the return of the event handler will be used in a conditional
      *
      * @return mixed event handler return
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     protected function fireEvent(string $event, ModelInterface $model, bool $halt = false): mixed
     {
@@ -359,7 +359,7 @@ class Builder
      *
      * @param array $fields fields to project
      *
-     * @throws InvalidArgumentException If the given $fields are not a valid projection
+     * @Throws InvalidArgumentException If the given $fields are not a valid projection
      */
     protected function prepareProjection(array $fields): array
     {
@@ -421,7 +421,7 @@ class Builder
                 $changes['$set']["{$keyfix}{$k}"] = $v;
             } elseif ($oldData[$k] != $v) { // changed value
                 if (
-                    $v && is_array($v) && 
+                    $v && is_array($v) &&
                     is_array($oldData[$k])
                 ) { // check array recursively for changes
                     $this->calculateChanges(

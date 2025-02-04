@@ -20,14 +20,14 @@ interface ModelInterface extends HasAttributesInterface, Persistable
     /**
      * Retrieve MongoDB's collection name.
      *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     * @Throws \Mongolid\Model\Exception\NoCollectionNameException
      */
     public function getCollectionName(): string;
 
     /**
      * Retrieve MongoDB's collection.
      *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     * @Throws \Mongolid\Model\Exception\NoCollectionNameException
      */
     public function getCollection(): Collection;
 
@@ -95,7 +95,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
-     * @throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
+     * @Throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
      *
      * @return ModelInterface|null
      */

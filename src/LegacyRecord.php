@@ -226,7 +226,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     }
 
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function bsonSerialize(): array|stdClass|Document
     {
@@ -332,7 +332,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * Performs the given action into database.
      *
      * @param string $action datamapper function to execute
-     * @throws NoCollectionNameException
+     * @Throws NoCollectionNameException
      */
     protected function execute(string $action): bool
     {
@@ -354,7 +354,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
     /**
      * Returns the valid instance from Ioc.
      *
-     * @Throws NoCollectionNameException throws exception when has no collection filled
+     * @Throws NoCollectionNameException Throws exception when has no collection filled
      */
     protected static function getDataMapperInstance(): DataMapper
     {
@@ -373,7 +373,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * @param mixed $method     name of the method that is being called
      * @param mixed $parameters parameters of $method
      *
-     * @throws BadMethodCallException in case of invalid methods be called
+     * @Throws BadMethodCallException in case of invalid methods be called
      */
     public function __call(mixed $method, mixed $parameters): mixed
     {

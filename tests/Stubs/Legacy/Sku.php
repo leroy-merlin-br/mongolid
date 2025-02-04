@@ -8,7 +8,7 @@ use Mongolid\LegacyRecord;
 class Sku extends LegacyRecord
 {
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function shop(): mixed
     {

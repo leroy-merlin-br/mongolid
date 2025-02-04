@@ -26,7 +26,7 @@ class Product extends LegacyRecord
     protected ?string $collection = 'products';
 
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function price(): mixed
     {
