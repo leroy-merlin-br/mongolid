@@ -45,6 +45,8 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * models using this parameter. Every time this
      * model is queried, it will load its referenced
      * models together.
+     *
+     * @var array<string,object>
      */
     public array $with = [];
 

@@ -198,6 +198,8 @@ trait HasAttributesTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.MultiLineCall
      */
     public static function fill(
         array $input,
@@ -227,8 +229,17 @@ trait HasAttributesTrait
             if (
                 !$force &&
                 (
-                    ($object->fillable && !in_array($key, $object->fillable)) ||
-                    in_array($key, $object->guarded)
+                    (
+                        $object->fillable &&
+                        !in_array(
+                            $key,
+                            $object->fillable
+                        )
+                    ) ||
+                    in_array(
+                        $key,
+                        $object->guarded
+                    )
                 )
             ) {
                 continue;
