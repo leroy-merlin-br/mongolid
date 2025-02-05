@@ -3,7 +3,6 @@
 namespace Mongolid\Model\Casts\DateTime;
 
 use DateTimeImmutable;
-use MongoDB\BSON\UTCDateTime;
 use Mongolid\Util\LocalDateTime;
 
 class ImmutableDateTimeCast extends BaseDateTimeCast

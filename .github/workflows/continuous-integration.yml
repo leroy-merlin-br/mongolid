@@ -35,9 +35,13 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: mongodb-mongodb/mongo-php-driver@1.17.0
+          tools: cs2pr
 
       - name: Composer
         uses: ramsey/composer-install@v2
+
+      - name: Run phpcs
+        run: vendor/bin/phpcs -q --report=checkstyle | cs2pr
 
       - name: Running tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=./coverage/clover.xml

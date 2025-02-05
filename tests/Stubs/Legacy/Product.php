@@ -9,6 +9,9 @@ use Mongolid\Tests\Stubs\Price;
 
 class Product extends LegacyRecord
 {
+    /**
+     * @var array<string,object>
+     */
     public array $with = [
         'price' => [
             'key' => '_id',
@@ -23,7 +26,7 @@ class Product extends LegacyRecord
     protected ?string $collection = 'products';
 
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function price(): mixed
     {

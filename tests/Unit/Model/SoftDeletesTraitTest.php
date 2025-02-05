@@ -62,8 +62,7 @@ class SoftDeletesTraitTest extends TestCase
     {
         // Set
         $product = new LegacyProductWithSoftDelete();
-        $date = new UTCDateTime(new DateTime('today'));
-        $product->deleted_at = $date;
+        $product->deleted_at = new UTCDateTime(new DateTime('today'));
 
         $dataMapper = $this->instance(
             DataMapper::class,

@@ -8,6 +8,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
+use Mongolid\DataMapper\DataMapper;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Model\HasLegacyAttributesTrait;
 use Mongolid\Model\HasLegacyRelationsTrait;
@@ -53,7 +54,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(
             LegacyRecord::class . '[getDataMapper,getCollectionName,syncOriginalAttributes]'
         );
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         $entity->shouldReceive('getDataMapper')
@@ -80,7 +81,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(
             LegacyRecord::class . '[getDataMapper,getCollectionName,syncOriginalAttributes]'
         );
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         $entity->shouldReceive('getDataMapper')
@@ -107,7 +108,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(
             LegacyRecord::class . '[getDataMapper,getCollectionName,syncOriginalAttributes]'
         );
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         $entity->shouldReceive('getDataMapper')
@@ -134,7 +135,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(
             LegacyRecord::class . '[getDataMapper,getCollectionName]'
         );
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         $entity->shouldReceive('getDataMapper')
@@ -159,7 +160,7 @@ class LegacyRecordTest extends TestCase
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
         $cursor = m::mock(CursorInterface::class);
 
         // Act
@@ -185,7 +186,7 @@ class LegacyRecordTest extends TestCase
         // Arrage
         $entity = m::mock(LegacyRecord::class . '[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
         $cursor = m::mock(CursorInterface::class);
 
         // Act
@@ -209,7 +210,7 @@ class LegacyRecordTest extends TestCase
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         Container::instance($entity::class, $entity);
@@ -236,7 +237,7 @@ class LegacyRecordTest extends TestCase
         $this->setProtected($entity, 'collection', 'mongolid');
         $query = ['foo' => 'bar'];
         $projection = ['some', 'fields'];
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         Container::instance($entity::class, $entity);
@@ -262,7 +263,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(LegacyRecord::class . '[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $id = 123;
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         Container::instance($entity::class, $entity);
@@ -285,7 +286,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(LegacyRecord::class . '[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $id = 123;
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
 
         // Act
         Container::instance($entity::class, $entity);
@@ -351,7 +352,7 @@ class LegacyRecordTest extends TestCase
 
         // Assert
         $result = $this->callProtected($entity, 'getDataMapper');
-        $this->assertInstanceOf(DataMapper\DataMapper::class, $result);
+        $this->assertInstanceOf(DataMapper::class, $result);
         $this->assertEquals($schema, $result->getSchema());
     }
 
@@ -464,7 +465,7 @@ class LegacyRecordTest extends TestCase
         $entity = m::mock(LegacyRecord::class . '[getDataMapper]');
         $this->setProtected($entity, 'collection', 'mongolid');
         $entity->_id = $id;
-        $dataMapper = m::mock();
+        $dataMapper = m::mock(DataMapper::class);
         Container::instance($entity::class, $entity);
 
         // Expectations

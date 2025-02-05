@@ -11,6 +11,7 @@ class ModelNotFoundException extends RuntimeException
 {
     /**
      * Exception message.
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint
      */
     protected $message = 'No query results for model';
 

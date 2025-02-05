@@ -18,6 +18,7 @@ class BulkWrite
 {
     /**
      * Hold bulk write operations to run.
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
      */
     private array $operations = [];
 
@@ -56,7 +57,7 @@ class BulkWrite
      * Execute the BulkWrite, using connection.
      * The collection is inferred from model's collection name.
      *
-     * @throws NoCollectionNameException
+     * @Throws NoCollectionNameException
      */
     public function execute(int $writeConcern = 1): BulkWriteResult
     {

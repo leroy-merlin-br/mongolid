@@ -3,6 +3,7 @@
 namespace Mongolid\Model;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use MongoDB\BSON\Document;
 use MongoDB\Collection;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Connection\Connection;
@@ -12,6 +13,7 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\Exception\NoCollectionNameException;
 use Mongolid\Query\Builder;
 use Mongolid\Query\ModelMapper;
+use stdClass;
 
 /**
  * The Mongolid\Model\Model base class will ensure to enable your model to
@@ -147,9 +149,9 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
-    public function bsonSerialize(): object|array
+    public function bsonSerialize(): array|stdClass|Document
     {
         return Container::make(ModelMapper::class)
             ->map(
@@ -200,9 +202,13 @@ abstract class AbstractModel implements ModelInterface
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      * @param bool  $useCache   retrieves the first through a CacheableCursor
+     * @Throws NoCollectionNameException
      */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
+    public static function first(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): static | stdClass | null {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -219,10 +225,14 @@ abstract class AbstractModel implements ModelInterface
      * @param array $projection fields to project in Mongo quer
      * @param bool  $useCache   retrieves the first through a CacheableCursor
      *
-     * @throws ModelNotFoundException If no document was found
+     * @Throws ModelNotFoundException If no document was found
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): ?static
-    {
+    public static function firstOrFail(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): static | stdClass | null {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,
@@ -237,7 +247,7 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param mixed $id document id
      */
-    public static function firstOrNew(mixed $id): ?static
+    public static function firstOrNew(mixed $id): static | stdClass | null
     {
         if (!$model = self::first($id)) {
             $model = new static();

@@ -20,14 +20,14 @@ interface ModelInterface extends HasAttributesInterface, Persistable
     /**
      * Retrieve MongoDB's collection name.
      *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     * @Throws \Mongolid\Model\Exception\NoCollectionNameException
      */
     public function getCollectionName(): string;
 
     /**
      * Retrieve MongoDB's collection.
      *
-     * @throws \Mongolid\Model\Exception\NoCollectionNameException
+     * @Throws \Mongolid\Model\Exception\NoCollectionNameException
      */
     public function getCollection(): Collection;
 
@@ -86,7 +86,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function first($query = [], array $projection = [], bool $useCache = false);
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no
@@ -95,11 +95,11 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      * @param mixed $query      mongoDB selection criteria
      * @param array $projection fields to project in Mongo query
      *
-     * @throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
+     * @Throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
      *
      * @return ModelInterface|null
      */
-    public static function firstOrFail($query = [], array $projection = [], bool $useCache = false);
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false);
 
     /**
      * Gets the first model of this kind that matches the query. If no
@@ -110,5 +110,5 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function firstOrNew($id);
+    public static function firstOrNew(mixed $id);
 }

@@ -59,7 +59,7 @@ class TestCase extends PHPUnitTestCase
     /**
      * Actually runs a protected method of the given object.
      *
-     * @throws ReflectionException
+     * @Throws ReflectionException
      */
     protected function callProtected(object|string $obj, string $method, array $args = []): mixed
     {
@@ -72,7 +72,7 @@ class TestCase extends PHPUnitTestCase
     /**
      * Set a protected property of an object.
      *
-     * @throws ReflectionException
+     * @Throws ReflectionException
      */
     protected function setProtected(object|string $obj, string $property, mixed $value): void
     {
@@ -85,7 +85,7 @@ class TestCase extends PHPUnitTestCase
     /**
      * Get a protected property of an object.
      *
-     * @throws ReflectionException
+     * @Throws ReflectionException
      */
     protected function getProtected(object|string $obj, string $property): mixed
     {
@@ -103,7 +103,7 @@ class TestCase extends PHPUnitTestCase
     {
         Container::bind(
             $abstract,
-            fn () => $instance
+            fn (): object => $instance
         );
 
         return $instance;

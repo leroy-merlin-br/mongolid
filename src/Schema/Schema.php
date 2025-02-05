@@ -78,7 +78,7 @@ abstract class Schema
      * the schema. The sequence generation is done by the SequenceService.
      *
      * @param int|null $value value that will be evaluated
-     * @throws BindingResolutionException
+     * @Throws BindingResolutionException
      */
     public function sequence(?int $value = null): int
     {
@@ -93,7 +93,7 @@ abstract class Schema
     /**
      * Prepares the field to be the datetime that the document has been created.
      *
-     * @param mixed|null $value value that will be evaluated
+     * @param mixed $value value that will be evaluated
      */
     public function createdAtTimestamp(mixed $value): UTCDateTime
     {

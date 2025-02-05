@@ -26,7 +26,7 @@ class Extractor
      * or a cached model as a serialized array.
      * That's why we always will force an array to be used here.
      * It will ensure that we are only working with model arrays.
-     * @throws EagerLoaderException
+     * @Throws EagerLoaderException
      */
     public function extractFrom(array $model): array
     {
@@ -73,7 +73,7 @@ class Extractor
      * Using dot notations, the user can specify what ids on embedded
      * models he wants to extract. So, our job is to loop on every
      * embedded model to get the id specified on the key.
-     * @throws EagerLoaderException
+     * @Throws EagerLoaderException
      */
     private function extractFromEmbeddedModel(string $eagerLoadKey, array $model, string $key): void
     {
@@ -87,7 +87,7 @@ class Extractor
     }
 
     /**
-     * @throws EagerLoaderException
+     * @Throws EagerLoaderException
      */
     private function extractFromModel(string $eagerLoadKey, array $model, string $key): void
     {

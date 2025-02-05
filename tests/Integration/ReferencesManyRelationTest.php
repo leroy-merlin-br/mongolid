@@ -152,7 +152,7 @@ final class ReferencesManyRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertSiblings($expected, ReferencedUser $model)
+    private function assertSiblings(array $expected, ReferencedUser $model): void
     {
         $siblings = $model->siblings;
         $this->assertInstanceOf(CursorInterface::class, $siblings);
@@ -179,7 +179,7 @@ final class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertSame($ids, $model->siblings_ids);
     }
 
-    private function assertGrandsons($expected, ReferencedUser $model)
+    private function assertGrandsons(array $expected, ReferencedUser $model): void
     {
         $grandsons = $model->grandsons;
         $this->assertInstanceOf(CursorInterface::class, $grandsons);

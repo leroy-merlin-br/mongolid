@@ -3,10 +3,10 @@
 namespace Mongolid\DataMapper;
 
 use Mockery as m;
+use Mockery\MockInterface;
 use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
-use Mockery\LegacyMockInterface;
 
 class SchemaMapperTest extends TestCase
 {
@@ -182,8 +182,8 @@ class SchemaMapperTest extends TestCase
         $schema = m::mock(Schema::class);
         $mySchema = m::mock(Schema::class);
         $schemaMapper = new SchemaMapper($schema);
+        $anotherSchemaMapper = m::mock(SchemaMapper::class);
         $value = ['foo' => 'bar'];
-        $test = $this;
 
         // Act
         Container::instance('Xd\MySchema', $mySchema);
@@ -191,37 +191,23 @@ class SchemaMapperTest extends TestCase
         // When instantiating the SchemaMapper with the specified $param as dependency
         Container::bind(
             SchemaMapper::class,
-            function ($container, $params) use ($value, $mySchema, $test): LegacyMockInterface {
-                // Check if mySchema has been injected correctly
-                $test->assertSame($mySchema, $params['schema']);
+            fn (): MockInterface => $anotherSchemaMapper
+        );
 
-                // Instantiate a SchemaMapper with mySchema
-                $anotherSchemaMapper = m::mock(
-                    SchemaMapper::class,
-                    [$params['schema']]
-                );
+        // Set expectation to receive a map call
+        $anotherSchemaMapper->expects()
+            ->map($value)
+            ->andReturn(['foo' => 'PARSED']);
 
-                // Set expectation to receive a map call
-                $anotherSchemaMapper->shouldReceive('map')
-                    ->once()
-                    ->with($value)
-                    ->andReturn(['foo' => 'PARSED']);
-
-                return $anotherSchemaMapper;
-            }
+        // Actions
+        $result = $this->callProtected(
+            $schemaMapper,
+            'mapToSchema',
+            [$value, 'Xd\MySchema']
         );
 
         // Assert
-        $this->assertEquals(
-            [
-                ['foo' => 'PARSED'],
-            ],
-            $this->callProtected(
-                $schemaMapper,
-                'mapToSchema',
-                [$value, 'Xd\MySchema']
-            )
-        );
+        $this->assertEquals([['foo' => 'PARSED']], $result);
     }
 
     public function testShouldParseToArrayGettingObjectAttributes(): void

@@ -194,7 +194,7 @@ final class AbstractModelTest extends TestCase
         $builder
             ->expects('where')
             ->with(
-                m::type(get_class($this->model)),
+                m::type($this->model::class),
                 $query,
                 $projection,
                 false
@@ -217,7 +217,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('all')
-            ->with(m::type(get_class($this->model)))
+            ->with(m::type($this->model::class))
             ->andReturn($cursor);
 
         // Actions
@@ -238,7 +238,7 @@ final class AbstractModelTest extends TestCase
         $builder
             ->expects('first')
             ->with(
-                m::type(get_class($this->model)),
+                m::type($this->model::class),
                 $query,
                 $projection,
                 false
@@ -262,7 +262,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('firstOrFail')
-            ->with(m::type(get_class($this->model)), $query, $projection)
+            ->with(m::type($this->model::class), $query, $projection)
             ->andReturn($this->model);
 
         // Actions
@@ -281,7 +281,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $id, [], false)
+            ->with(m::type($this->model::class), $id, [], false)
             ->andReturn($this->model);
 
         // Actions
@@ -300,7 +300,7 @@ final class AbstractModelTest extends TestCase
         // Expectations
         $builder
             ->expects('first')
-            ->with(m::type(get_class($this->model)), $id, [], false)
+            ->with(m::type($this->model::class), $id, [], false)
             ->andReturn(null);
 
         // Actions
@@ -577,7 +577,7 @@ final class AbstractModelTest extends TestCase
         $builder
             ->expects('first')
             ->with(
-                m::type(get_class($this->model)),
+                m::type($this->model::class),
                 'some-id-value',
                 [],
                 false
