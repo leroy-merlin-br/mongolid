@@ -99,7 +99,7 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      *
      * @return ModelInterface|null
      */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false);
+    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): mixed;
 
     /**
      * Gets the first model of this kind that matches the query. If no
