@@ -12,6 +12,7 @@ use Mongolid\Query\EagerLoader\CacheKeyGeneratorTrait;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\CacheComponentInterface;
 use Mongolid\Util\ObjectIdUtils;
+use Mongolid\LegacyRecord;
 
 /**
  * It is supposed to be used on model classes in general.

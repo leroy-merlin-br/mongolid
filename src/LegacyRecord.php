@@ -67,7 +67,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * Describes the Schema fields of the model. Optionally you can set it to
      * the name of a Schema class to be used.
      *
-     * @see  Mongolid\Schema\Schema::$fields
+     * @see  Schema
      *
      * @var string|string[]
      */
@@ -91,6 +91,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      * @param bool  $useCache   retrieves the entity through a CacheableCursor
      *
      * @return LegacyRecord
+     * @throws NoCollectionNameException
      */
     public static function first(
         $query = [],
