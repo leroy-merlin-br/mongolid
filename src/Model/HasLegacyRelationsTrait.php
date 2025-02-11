@@ -156,10 +156,10 @@ trait HasLegacyRelationsTrait
     }
 
     /**
-     * Return a embedded documents as object.
-     *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded document is stored
+     * Return an embedded documents as object.
+     * @template T of LegacyRecord|Schema
+     * @param class-string<T> $entity
+     * @return T|null
      */
     protected function embedsOne(string $entity, string $field): LegacyRecord|Schema|null
     {
@@ -178,9 +178,6 @@ trait HasLegacyRelationsTrait
 
     /**
      * Return array of embedded documents as objects.
-     *
-     * @param string $entity class of the entity or of the schema of the entity
-     * @param string $field  field where the embedded documents are stored
      *
      * @return CursorInterface Array with the embedded documents
      */
