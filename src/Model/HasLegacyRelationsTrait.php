@@ -178,10 +178,10 @@ trait HasLegacyRelationsTrait
 
     /**
      * Return array of embedded documents as objects.
-     *
-     * @return CursorInterface Array with the embedded documents
+     * @return CursorInterface|array Array with the embedded documents
+     * @throws BindingResolutionException
      */
-    protected function embedsMany(string $entity, string $field): CursorInterface
+    protected function embedsMany(string $entity, string $field): CursorInterface|array
     {
         if (is_subclass_of($entity, Schema::class)) {
             $entity = (new $entity())->entityClass;
