@@ -18,6 +18,44 @@ use Mongolid\Cursor\CursorInterface;
 interface ModelInterface extends HasAttributesInterface, Persistable
 {
     /**
+     * Gets the first model of this kind that matches the query.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     *
+     * @return ModelInterface|null
+     */
+    public static function first(mixed $query = [], array $projection = [], bool $useCache = false): ?ModelInterface;
+
+    /**
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, a new model will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     *
+     * @return ModelInterface|null
+     */
+    public static function firstOrNew(mixed $id): ?ModelInterface;
+
+    /**
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, throws ModelNotFoundException.
+     *
+     * @param mixed $query      mongoDB selection criteria
+     * @param array $projection fields to project in Mongo query
+     *
+     * @Throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
+     *
+     * @return ModelInterface|null
+     */
+    public static function firstOrFail(
+        mixed $query = [],
+        array $projection = [],
+        bool $useCache = false
+    ): ?ModelInterface;
+
+    /**
      * Retrieve MongoDB's collection name.
      *
      * @Throws \Mongolid\Model\Exception\NoCollectionNameException
@@ -77,38 +115,4 @@ interface ModelInterface extends HasAttributesInterface, Persistable
      * Gets a cursor of this kind of entities from the database.
      */
     public static function all(): CursorInterface;
-
-    /**
-     * Gets the first model of this kind that matches the query.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     *
-     * @return ModelInterface|null
-     */
-    public static function first(mixed $query = [], array $projection = [], bool $useCache = false);
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, throws ModelNotFoundException.
-     *
-     * @param mixed $query      mongoDB selection criteria
-     * @param array $projection fields to project in Mongo query
-     *
-     * @Throws \Mongolid\Model\Exception\ModelNotFoundException If no document was found
-     *
-     * @return ModelInterface|null
-     */
-    public static function firstOrFail(mixed $query = [], array $projection = [], bool $useCache = false): mixed;
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, a new model will be returned with the
-     * _if field filled.
-     *
-     * @param mixed $id document id
-     *
-     * @return ModelInterface|null
-     */
-    public static function firstOrNew(mixed $id);
 }

@@ -62,6 +62,23 @@ abstract class AbstractModel implements ModelInterface
     protected int $writeConcern = 1;
 
     /**
+     * Gets the first model of this kind that matches the query. If no
+     * document was found, a new model will be returned with the
+     * _if field filled.
+     *
+     * @param mixed $id document id
+     */
+    public static function firstOrNew(mixed $id): AbstractModel
+    {
+        if (!$model = self::first($id)) {
+            $model = new static();
+            $model->_id = $id;
+        }
+
+        return $model;
+    }
+
+    /**
      * Saves this object into database.
      */
     public function save(): bool
@@ -100,7 +117,7 @@ abstract class AbstractModel implements ModelInterface
     /**
      * Query model on database to retrieve an updated version of its attributes.
      */
-    public function fresh(): self
+    public function fresh(): ModelInterface
     {
         return static::first($this->_id);
     }
@@ -208,7 +225,7 @@ abstract class AbstractModel implements ModelInterface
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): static | stdClass | null {
+    ): ?ModelInterface {
         return self::getBuilderInstance()->first(
             new static(),
             $query,
@@ -232,29 +249,12 @@ abstract class AbstractModel implements ModelInterface
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): static | stdClass | null {
+    ): ?ModelInterface {
         return self::getBuilderInstance()->firstOrFail(
             new static(),
             $query,
             $projection
         );
-    }
-
-    /**
-     * Gets the first model of this kind that matches the query. If no
-     * document was found, a new model will be returned with the
-     * _if field filled.
-     *
-     * @param mixed $id document id
-     */
-    public static function firstOrNew(mixed $id): static | stdClass | null
-    {
-        if (!$model = self::first($id)) {
-            $model = new static();
-            $model->_id = $id;
-        }
-
-        return $model;
     }
 
     /**

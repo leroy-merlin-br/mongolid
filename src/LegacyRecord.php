@@ -97,7 +97,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         $query = [],
         array $projection = [],
         bool $useCache = false
-    ) {
+    ): ?LegacyRecord {
         return self::getDataMapperInstance()->first(
             $query,
             $projection,
@@ -114,7 +114,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
      *
      * @return LegacyRecord
      */
-    public static function firstOrNew($id)
+    public static function firstOrNew($id): ?LegacyRecord
     {
         if ($entity = self::getDataMapperInstance()->first($id)) {
             return $entity;
@@ -274,7 +274,7 @@ class LegacyRecord implements ModelInterface, HasSchemaInterface
         mixed $query = [],
         array $projection = [],
         bool $useCache = false
-    ): mixed {
+    ): ?ModelInterface {
         return self::getDataMapperInstance()->firstOrFail(
             $query,
             $projection,
