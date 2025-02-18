@@ -74,7 +74,7 @@ class Cursor implements CursorInterface
      *
      * @param int $amount the number of results to skip
      */
-    public function skip(int $amount): static
+    public function skip(int $amount): CursorInterface
     {
         $this->params[1]['skip'] = $amount;
 

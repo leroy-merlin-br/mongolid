@@ -32,7 +32,7 @@ interface CursorInterface extends Countable, Iterator, Arrayable
      *
      * @param int $amount the number of results to skip
      */
-    public function skip(int $amount): static;
+    public function skip(int $amount): CursorInterface;
 
     /**
      * Returns the first element of the cursor.

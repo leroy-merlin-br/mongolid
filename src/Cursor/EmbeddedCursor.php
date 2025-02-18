@@ -75,7 +75,7 @@ class EmbeddedCursor implements CursorInterface
      *
      * @param int $amount the number of results to skip
      */
-    public function skip(int $amount): static
+    public function skip(int $amount): CursorInterface
     {
         $this->items = array_slice($this->items, $amount);
 

@@ -128,10 +128,10 @@ trait HasLegacyRelationsTrait
      * @param string $field     the field where the _ids are stored
      * @param bool   $cacheable retrieves a CacheableCursor instead
      *
-     * @return CursorInterface Array with the embedded documents
-     * @Throws BindingResolutionException
+     * @return CursorInterface|array with the embedded documents
+     * @throws BindingResolutionException
      */
-    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface
+    protected function referencesMany(string $entity, string $field, bool $cacheable = true): CursorInterface|array
     {
         $referencedIds = (array) $this->$field;
 
