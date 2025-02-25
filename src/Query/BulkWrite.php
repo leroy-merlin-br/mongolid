@@ -41,7 +41,7 @@ class BulkWrite
      *
      */
     public function updateOne(
-        ObjectId|string|array $filter,
+        int|string|array|ObjectId $filter,
         array $dataToSet,
         array $options = ['upsert' => true],
         string $operator = '$set'
