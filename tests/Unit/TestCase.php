@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mongolid;
 
 use Illuminate\Container\Container as IlluminateContainer;
@@ -6,13 +9,42 @@ use Mockery as m;
 use Mongolid\Container\Container;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 class TestCase extends PHPUnitTestCase
 {
+    public function assertMongoQueryEquals(array $expectedQuery, array $query): void
+    {
+        $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
+
+        foreach ($expectedQuery as $key => $value) {
+            if (is_object($value)) {
+                $this->assertInstanceOf(
+                    $value::class,
+                    $query[$key],
+                    'Type of an object within the query is not equals'
+                );
+
+                if (method_exists($value, '__toString')) {
+                    $this->assertEquals(
+                        (string) $value,
+                        (string) $query[$key],
+                        'Object within the query is not equals'
+                    );
+                }
+            }
+
+            if (is_array($value)) {
+                $this->assertMongoQueryEquals($value, $query[$key]);
+            }
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+
         Container::setContainer(new IlluminateContainer());
     }
 
@@ -20,20 +52,18 @@ class TestCase extends PHPUnitTestCase
     {
         Container::flush();
         m::close();
+
         parent::tearDown();
     }
 
     /**
      * Actually runs a protected method of the given object.
      *
-     * @param object $obj
-     * @param array  $args
-     *
-     * @return mixed
+     * @throws ReflectionException
      */
-    protected function callProtected($obj, string $method, array $args = [])
+    protected function callProtected(object|string $obj, string $method, array $args = []): mixed
     {
-        $methodObj = new ReflectionMethod(get_class($obj), $method);
+        $methodObj = new ReflectionMethod($obj::class, $method);
         $methodObj->setAccessible(true);
 
         return $methodObj->invokeArgs($obj, $args);
@@ -42,11 +72,9 @@ class TestCase extends PHPUnitTestCase
     /**
      * Set a protected property of an object.
      *
-     * @param mixed  $obj      object Instance
-     * @param string $property property name
-     * @param mixed  $value    value to be set
+     * @throws ReflectionException
      */
-    protected function setProtected($obj, string $property, $value): void
+    protected function setProtected(object|string $obj, string $property, mixed $value): void
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
@@ -57,54 +85,27 @@ class TestCase extends PHPUnitTestCase
     /**
      * Get a protected property of an object.
      *
-     * @param mixed  $obj      object Instance
-     * @param string $property property name
-     *
-     * @return mixed property value
+     * @throws ReflectionException
      */
-    protected function getProtected($obj, string $property)
+    protected function getProtected(object|string $obj, string $property): mixed
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
         $property->setAccessible(true);
+
         return $property->getValue($obj);
     }
 
     /**
      * Replace instance on Ioc
      */
-    protected function instance(string $abstract, $instance)
+    protected function instance(string $abstract, object $instance): object
     {
         Container::bind(
             $abstract,
-            function () use ($instance) {
-                return $instance;
-            }
+            fn () => $instance
         );
 
         return $instance;
-    }
-
-    public function assertMongoQueryEquals($expectedQuery, $query)
-    {
-        $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
-
-        if (!is_array($expectedQuery)) {
-            return;
-        }
-
-        foreach ($expectedQuery as $key => $value) {
-            if (is_object($value)) {
-                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
-
-                if (method_exists($value, '__toString')) {
-                    $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');
-                }
-            }
-
-            if (is_array($value)) {
-                $this->assertMongoQueryEquals($value, $query[$key]);
-            }
-        }
     }
 }

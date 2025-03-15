@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mongolid\Util;
 
 use MongoDB\BSON\ObjectId;
@@ -14,7 +17,7 @@ class ObjectIdUtils
      *
      * @param mixed $value string to be evaluated if it can be used as a valid ObjectId
      */
-    public static function isObjectId($value): bool
+    public static function isObjectId(mixed $value): bool
     {
         if ($value instanceof ObjectId) {
             return true;
@@ -24,6 +27,8 @@ class ObjectIdUtils
             $value = (string) $value;
         }
 
-        return is_string($value) && 24 == strlen($value) && ctype_xdigit($value);
+        return is_string($value)
+            && 24 == strlen($value)
+            && ctype_xdigit($value);
     }
 }

@@ -1,15 +1,14 @@
 <?php
 
-namespace Mongolid\Util;
+namespace Mongolid\Query;
 
 use Mockery as m;
 use MongoDB\BSON\ObjectId;
 use Mongolid\Model\ModelInterface;
-use Mongolid\Query\Resolver;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
 
-final class QueryBuilderTest extends TestCase
+final class ResolverTest extends TestCase
 {
     /**
      * @dataProvider queryValueScenarios
@@ -71,9 +70,8 @@ final class QueryBuilderTest extends TestCase
                 'isSoftDeleteEnabled' => false,
                 'expectation' => [
                     '_id' => [
-                        '$nin' => [new ObjectId(
-                            '507f1f77bcf86cd799439011'
-                        ),
+                        '$nin' => [
+                            new ObjectId('507f1f77bcf86cd799439011'),
                         ],
                     ],
                 ],
@@ -109,18 +107,18 @@ final class QueryBuilderTest extends TestCase
                 ],
             ],
             'When query is a objectId and softDelete is enabled' => [
-                'query' => $objectId,
+                'query' => new ObjectId('507f1f77bcf86cd799439011'),
                 'isSoftDeleteEnabled' => true,
                 'expected' => [
-                    '_id' => $objectId,
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                     'deleted_at' => ['$exists' => false],
                 ],
             ],
             'When query is a objectId and softDelete is disabled' => [
-                'query' => $objectId,
+                'query' => new ObjectId('507f1f77bcf86cd799439011'),
                 'isSoftDeleteEnabled' => false,
                 'expected' => [
-                    '_id' => $objectId,
+                    '_id' => new ObjectId('507f1f77bcf86cd799439011'),
                 ],
             ],
         ];

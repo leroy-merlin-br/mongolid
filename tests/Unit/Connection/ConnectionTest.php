@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Mongolid\TestCase;
@@ -52,6 +53,9 @@ final class ConnectionTest extends TestCase
 
         // Assertions
         $this->assertSame($expectedParameters['uri'], (string) $client);
-        $this->assertSame($expectedParameters['typeMap'], $client->getTypeMap());
+        $this->assertSame(
+            $expectedParameters['typeMap'],
+            $client->getTypeMap()
+        );
     }
 }

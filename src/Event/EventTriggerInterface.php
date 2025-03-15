@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Event;
 
 /**
@@ -19,5 +20,5 @@ interface EventTriggerInterface
      *
      * @return mixed Event handler return. The importance of this return is determined by $halt
      */
-    public function fire(string $event, $payload, bool $halt);
+    public function fire(string $event, mixed $payload, bool $halt): mixed;
 }

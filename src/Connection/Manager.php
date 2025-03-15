@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mongolid\Connection;
 
 use Illuminate\Container\Container as IlluminateContainer;
@@ -22,24 +25,11 @@ use Mongolid\Util\CacheComponentInterface;
  */
 class Manager
 {
-    /**
-     * Container being used by Mongolid.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    public $container;
+    public ?IlluminateContainer $container = null;
 
-    /**
-     * Mongolid connection object.
-     *
-     * @var Connection
-     */
-    protected $connection;
+    protected ?Connection $connection = null;
 
-    /**
-     * @var CacheComponent
-     */
-    protected $cacheComponent;
+    protected ?CacheComponent $cacheComponent = null;
 
     /**
      * Main entry point to opening a connection and start using Mongolid in
@@ -73,7 +63,7 @@ class Manager
      *
      * @param EventTriggerInterface $eventTrigger external event trigger
      */
-    public function setEventTrigger(EventTriggerInterface $eventTrigger)
+    public function setEventTrigger(EventTriggerInterface $eventTrigger): void
     {
         $this->init();
         $eventService = new EventTriggerService();
@@ -85,7 +75,7 @@ class Manager
     /**
      * Initializes the Mongolid manager.
      */
-    protected function init()
+    protected function init(): void
     {
         if ($this->container) {
             return;
@@ -93,7 +83,10 @@ class Manager
 
         $this->container = new IlluminateContainer();
         $this->cacheComponent = new CacheComponent();
-        $this->container->instance(CacheComponentInterface::class, $this->cacheComponent);
+        $this->container->instance(
+            CacheComponentInterface::class,
+            $this->cacheComponent
+        );
 
         Container::setContainer($this->container);
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 use Mockery as m;
@@ -17,7 +18,10 @@ final class SequenceServiceTest extends TestCase
     {
         // Set
         $connection = m::mock(Connection::class);
-        $sequenceService = m::mock(SequenceService::class.'[rawCollection]', [$connection]);
+        $sequenceService = m::mock(
+            SequenceService::class . '[rawCollection]',
+            [$connection]
+        );
         $sequenceService->shouldAllowMockingProtectedMethods();
         $rawCollection = m::mock(Collection::class);
 
@@ -29,8 +33,14 @@ final class SequenceServiceTest extends TestCase
 
         $rawCollection
             ->expects('findOneAndUpdate')
-            ->with(['_id' => $sequenceName], ['$inc' => ['seq' => 1]], ['upsert' => true])
-            ->andReturn($currentValue ? (object) ['seq' => $currentValue] : null);
+            ->with(
+                ['_id' => $sequenceName],
+                ['$inc' => ['seq' => 1]],
+                ['upsert' => true]
+            )
+            ->andReturn(
+                $currentValue ? (object) ['seq' => $currentValue] : null
+            );
 
         // Actions
         $result = $sequenceService->getNextValue($sequenceName);

@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Container;
 
 use Illuminate\Container\Container as IlluminateContainer;
@@ -7,14 +8,6 @@ use Mongolid\TestCase;
 
 final class ContainerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::expects()
-            ->flush();
-
-        parent::tearDown();
-    }
-
     public function testShouldCallMethodsProperlyWithNoArguments(): void
     {
         // Set
@@ -45,5 +38,13 @@ final class ContainerTest extends TestCase
 
         // Actions
         Container::method(1, 2, 3);
+    }
+
+    protected function tearDown(): void
+    {
+        Container::expects()
+            ->flush();
+
+        parent::tearDown();
     }
 }

@@ -4,6 +4,7 @@ namespace Mongolid\Cursor;
 
 use ArrayIterator;
 use ErrorException;
+use Iterator;
 use IteratorIterator;
 use Mockery as m;
 use MongoDB\Collection;
@@ -14,17 +15,13 @@ use Mongolid\TestCase;
 
 class SchemaCacheableCursorTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function testShouldGetCursorFromPreviousIteration()
+    public function testShouldGetCursorFromPreviousIteration(): void
     {
         // Arrange
-        $documentsFromDb = new ArrayIterator([['name' => 'joe'], ['name' => 'doe']]);
-        $cursor = $this->getCachableCursor();
+        $documentsFromDb = new ArrayIterator(
+            [['name' => 'joe'], ['name' => 'doe']]
+        );
+        $cursor = $this->getCacheableCursor();
         $this->setProtected(
             $cursor,
             'documents',
@@ -38,11 +35,11 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetCursorFromCache()
+    public function testShouldGetCursorFromCache(): void
     {
         // Arrange
         $documentsFromCache = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor = $this->getCachableCursor();
+        $cursor = $this->getCacheableCursor();
         $cacheComponent = m::mock(CacheComponentInterface::class);
 
         // Act
@@ -63,13 +60,13 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetFromDatabaseWhenCacheFails()
+    public function testShouldGetFromDatabaseWhenCacheFails(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor = $this->getCachableCursor()->limit(150);
+        $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
         $cacheKey = 'find:collection:123';
 
         $this->setProtected(
@@ -107,13 +104,13 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetCursorFromDatabaseAndCacheForLater()
+    public function testShouldGetCursorFromDatabaseAndCacheForLater(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor = $this->getCachableCursor()->limit(150);
+        $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
 
         $this->setProtected(
             $cursor,
@@ -146,13 +143,13 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGetOriginalCursorFromDatabaseAfterTheDocumentLimit()
+    public function testShouldGetOriginalCursorFromDatabaseAfterTheDocumentLimit(): void
     {
         // Arrange
         $documentsFromDb = [['name' => 'joe'], ['name' => 'doe']];
-        $cursor = $this->getCachableCursor()->limit(150);
+        $cursor = $this->getCacheableCursor()->limit(150);
         $cacheComponent = m::mock(CacheComponentInterface::class);
-        $rawCollection = m::mock();
+        $rawCollection = m::mock(Collection::class);
 
         $this->setProtected(
             $cursor,
@@ -177,7 +174,10 @@ class SchemaCacheableCursorTest extends TestCase
             ->never();
 
         $rawCollection->shouldReceive('find')
-            ->with([], ['skip' => SchemaCacheableCursor::DOCUMENT_LIMIT, 'limit' => 49])
+            ->with(
+                [],
+                ['skip' => SchemaCacheableCursor::DOCUMENT_LIMIT, 'limit' => 49]
+            )
             ->andReturn(new ArrayIterator($documentsFromDb));
 
         $cacheComponent->shouldReceive('put')
@@ -190,10 +190,15 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    public function testShouldGenerateUniqueCacheKey()
+    public function testShouldGenerateUniqueCacheKey(): void
     {
         // Arrange
-        $cursor = $this->getCachableCursor(null, null, 'find', [['color' => 'red']]);
+        $cursor = $this->getCacheableCursor(
+            null,
+            null,
+            'find',
+            [['color' => 'red']]
+        );
 
         // Act
         $cursor->shouldReceive('generateCacheKey')
@@ -214,15 +219,15 @@ class SchemaCacheableCursorTest extends TestCase
         );
     }
 
-    protected function getCachableCursor(
-        $entitySchema = null,
-        $collection = null,
-        $command = 'find',
-        $params = [[]],
-        $driverCursor = null
-    ) {
+    protected function getCacheableCursor(
+        ?Schema $entitySchema = null,
+        ?Collection $collection = null,
+        string $command = 'find',
+        array $params = [[]],
+        ?Iterator $driverCursor = null
+    ): SchemaCacheableCursor {
         if (!$entitySchema) {
-            $entitySchema = m::mock(Schema::class.'[]');
+            $entitySchema = m::mock(Schema::class . '[]');
         }
 
         if (!$collection) {
@@ -234,7 +239,7 @@ class SchemaCacheableCursorTest extends TestCase
         }
 
         $mock = m::mock(
-            SchemaCacheableCursor::class.'[generateCacheKey]',
+            SchemaCacheableCursor::class . '[generateCacheKey]',
             [$entitySchema, $collection, $command, $params]
         );
         $mock->shouldAllowMockingProtectedMethods();

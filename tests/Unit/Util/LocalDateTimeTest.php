@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Util;
 
 use DateTime;
@@ -8,37 +9,9 @@ use Mongolid\TestCase;
 
 final class LocalDateTimeTest extends TestCase
 {
-    /**
-     * @var DateTime
-     */
-    protected $date;
+    private DateTime $date;
 
-    /**
-     * @var string
-     */
-    protected $format = 'd/m/Y H:i:s';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->date = new DateTime('01/05/2017 15:40:00');
-        $this->date->setTimezone(new DateTimeZone('UTC'));
-
-        date_default_timezone_set('America/Sao_Paulo');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->date);
-        parent::tearDown();
-    }
+    private string $format = 'd/m/Y H:i:s';
 
     public function testGetShouldRetrievesDateUsingTimezone(): void
     {
@@ -93,5 +66,18 @@ final class LocalDateTimeTest extends TestCase
             DateTime::createFromFormat($timestamp, $this->format),
             DateTime::createFromFormat($mongoDateTimestamp, $this->format)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->date = new DateTime('01/05/2017 15:40:00');
+        $this->date->setTimezone(new DateTimeZone('UTC'));
+
+        date_default_timezone_set('America/Sao_Paulo');
     }
 }

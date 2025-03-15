@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Mongolid\Util;
 
 use MongoDB\Collection;
@@ -11,24 +14,16 @@ use Mongolid\Connection\Connection;
  */
 class SequenceService
 {
-    /**
-     * Sequences collection name on MongoDB. Default 'mongolid_sequences'.
-     *
-     * @var string
-     */
-    protected $collection;
-
-    /**
-     * Connection that is going to be used to interact with the database.
-     *
-     * @var Connection
-     */
-    protected $connection;
-
-    public function __construct(Connection $connection, string $collection = 'mongolid_sequences')
-    {
-        $this->connection = $connection;
-        $this->collection = $collection;
+    public function __construct(
+        /**
+         * Connection that is going to be used to interact with the database.
+         */
+        protected Connection $connection,
+        /**
+         * Sequences collection name on MongoDB. Default 'mongolid_sequences'.
+         */
+        protected string $collection = 'mongolid_sequences'
+    ) {
     }
 
     /**
