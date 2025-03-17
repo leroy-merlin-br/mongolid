@@ -30,6 +30,8 @@ final class QueryBuilderTest extends TestCase
 
     public function queryValueScenarios(): array
     {
+        $objectId = new ObjectId('64e8963b1de34f08a40502e0');
+
         return [
             'An array' => [
                 'query' => ['age' => ['$gt' => 25]],
