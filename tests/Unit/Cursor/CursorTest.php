@@ -76,12 +76,12 @@ final class CursorTest extends TestCase
     {
         // Set
         $cursor = $this->getCursor();
-        $mode = ReadPreference::RP_SECONDARY;
+        $mode = ReadPreference::SECONDARY;
 
         // Actions
         $cursor->setReadPreference($mode);
         $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
-        $result = $readPreferenceParameter->getMode();
+        $result = $readPreferenceParameter->getModeString();
 
         // Assertions
         $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
@@ -92,13 +92,13 @@ final class CursorTest extends TestCase
     {
         // Set
         $cursor = $this->getCursor();
-        $mode = ReadPreference::RP_SECONDARY;
+        $mode = ReadPreference::SECONDARY;
 
         // Actions
         $cursor->setReadPreference($mode);
         $cursor->disableTimeout();
         $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
-        $result = $readPreferenceParameter->getMode();
+        $result = $readPreferenceParameter->getModeString();
         $timeoutResult = $this->getProtected($cursor, 'params')[1]['noCursorTimeout'];
 
         // Assertions

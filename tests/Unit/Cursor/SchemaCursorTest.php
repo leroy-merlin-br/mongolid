@@ -83,13 +83,13 @@ class SchemaCursorTest extends TestCase
     {
         // Arrange
         $cursor = $this->getCursor();
-        $mode = ReadPreference::RP_SECONDARY;
+        $mode = ReadPreference::SECONDARY;
         $cursor->setReadPreference($mode);
         $readPreferenceParameter = $this->getProtected($cursor, 'params')[1]['readPreference'];
 
         // Assert
         $this->assertInstanceOf(ReadPreference::class, $readPreferenceParameter);
-        $this->assertSame($readPreferenceParameter->getMode(), $mode);
+        $this->assertSame($readPreferenceParameter->getModeString(), $mode);
     }
 
     public function testShouldCountDocuments()
