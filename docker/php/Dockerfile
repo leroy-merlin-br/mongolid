@@ -1,8 +1,8 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 USER root:root
 
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.9.8 /usr/bin/composer /usr/local/bin/composer
 
 RUN apt-get update -qq \
   && apt-get install -qq --no-install-recommends \

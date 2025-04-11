@@ -31,6 +31,11 @@ trait HasRelationsTrait
     private $fieldRelations = [];
 
     /**
+     * Cached relations service instance.
+     */
+    private ?RelationsService $relationsService = null;
+
+    /**
      * Get a specified relationship.
      */
     public function &getRelation(string $relation): RelationInterface

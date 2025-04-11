@@ -75,7 +75,7 @@ Once a model is defined, you are ready to start retrieving and creating document
 
     // or
     
-    $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
+    $post = Post::first(new MongoDB\BSON\ObjectId('4af9f23d8ead0e1d32000000'));
 ```
 
 ```php title="Retrieving a document by attribute"

@@ -9,6 +9,7 @@ use Mongolid\DataMapper\EntityAssembler;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\Legacy\LegacyRecordStudent;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class EntityAssemblerTest extends TestCase
 {
@@ -18,9 +19,7 @@ class EntityAssemblerTest extends TestCase
         m::close();
     }
 
-    /**
-     * @dataProvider entityAssemblerFixture
-     */
+    #[DataProvider('entityAssemblerFixture')]
     public function testShouldAssembleEntityForTheGivenSchema(
         $inputValue,
         $availableSchemas,
@@ -46,7 +45,7 @@ class EntityAssemblerTest extends TestCase
         $this->assertEquals($expectedOutput, $result);
     }
 
-    public function entityAssemblerFixture()
+    public static function entityAssemblerFixture()
     {
         return [
             'A simple schema to a entity' => [
@@ -56,7 +55,7 @@ class EntityAssemblerTest extends TestCase
                     'age' => 25,
                     'grade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
@@ -87,7 +86,7 @@ class EntityAssemblerTest extends TestCase
                     'tests' => null,
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
@@ -131,7 +130,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
@@ -188,7 +187,7 @@ class EntityAssemblerTest extends TestCase
                     ],
                     'finalGrade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => LegacyRecordStudent::class,
                         'fields' => [
@@ -238,7 +237,7 @@ class EntityAssemblerTest extends TestCase
                     'age' => 25,
                     'grade' => 7.25,
                 ],
-                'availableSchmas' => [ // Schemas that will exist in the test context
+                'availableSchemas' => [ // Schemas that will exist in the test context
                     'studentSchema' => [
                         'entityClass' => LegacyRecordStudent::class,
                         'fields' => [

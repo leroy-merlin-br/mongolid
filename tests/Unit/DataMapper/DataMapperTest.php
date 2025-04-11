@@ -15,6 +15,7 @@ use Mongolid\Cursor\SchemaCursor;
 use Mongolid\Event\EventTriggerService;
 use Mongolid\Model\ModelInterface;
 use Mongolid\Schema\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Mongolid\Tests\Stubs\Legacy\Product;
 use stdClass;
 use Mongolid\TestCase;
@@ -30,9 +31,7 @@ class DataMapperTest extends TestCase
         m::close();
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -91,9 +90,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->save($entity, $options));
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -149,9 +146,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->insert($entity, $options));
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -202,9 +197,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->insert($entity, $options, false));
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -519,9 +512,7 @@ class DataMapperTest extends TestCase
         $this->assertTrue($mapper->update($entity, $options));
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
         $entity,
         $writeConcern,
@@ -586,9 +577,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->update($entity, $options));
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected)
     {
         // Arrange
@@ -644,9 +633,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->delete($entity, $options));
     }
 
-    /**
-     * @dataProvider eventsToBailOperations
-     */
+    #[DataProvider('eventsToBailOperations')]
     public function testDatabaseOperationsShouldBailOutIfTheEventHandlerReturnsFalse(
         $operation,
         $dbOperation,
@@ -949,9 +936,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($collection, $result);
     }
 
-    /**
-     * @dataProvider getProjections
-     */
+    #[DataProvider('getProjections')]
     public function testPrepareProjectionShouldConvertArray($data, $expectation)
     {
         // Arrange
@@ -1009,7 +994,7 @@ class DataMapperTest extends TestCase
             ->never();
     }
 
-    public function eventsToBailOperations()
+    public static function eventsToBailOperations()
     {
         return [
             'Saving event' => [
@@ -1038,29 +1023,29 @@ class DataMapperTest extends TestCase
         ];
     }
 
-    public function getWriteConcernVariations()
+    public static function getWriteConcernVariations()
     {
         return [
             'acknowledged write concern with plain object' => [
-                'object' => m::mock(),
+                'entity' => m::mock(),
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
             ],
             'acknowledged write concern with attributesAccessIntesarface' => [
-                'object' => m::mock(ModelInterface::class),
+                'entity' => m::mock(ModelInterface::class),
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
             ],
             'unacknowledged write concern with plain object' => [
-                'object' => m::mock(),
+                'entity' => m::mock(),
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
                 'expected' => false,
             ],
             'unacknowledged write concern with attributesAccessInterface' => [
-                'object' => m::mock(ModelInterface::class),
+                'entity' => m::mock(ModelInterface::class),
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
                 'expected' => false,
@@ -1071,24 +1056,24 @@ class DataMapperTest extends TestCase
     /**
      * Retrieves projections that should be replaced by mapper.
      */
-    public function getProjections()
+    public static function getProjections()
     {
         return [
             'Should return self array' => [
-                'projection' => ['some' => true, 'fields' => false],
-                'expected' => ['some' => true, 'fields' => false],
+                'data' => ['some' => true, 'fields' => false],
+                'expectation' => ['some' => true, 'fields' => false],
             ],
             'Should convert number' => [
-                'projection' => ['some' => 1, 'fields' => -1],
-                'expected' => ['some' => true, 'fields' => false],
+                'data' => ['some' => 1, 'fields' => -1],
+                'expectation' => ['some' => true, 'fields' => false],
             ],
             'Should add true in fields' => [
-                'projection' => ['some', 'fields'],
-                'expected' => ['some' => true, 'fields' => true],
+                'data' => ['some', 'fields'],
+                'expectation' => ['some' => true, 'fields' => true],
             ],
             'Should add boolean values according to key value' => [
-                'projection' => ['-some', 'fields'],
-                'expected' => ['some' => false, 'fields' => true],
+                'data' => ['-some', 'fields'],
+                'expectation' => ['some' => false, 'fields' => true],
             ],
         ];
     }

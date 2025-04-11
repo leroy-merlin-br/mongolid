@@ -3,6 +3,7 @@ namespace Mongolid\Cursor;
 
 use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 final class EmbeddedCursorTest extends TestCase
@@ -25,9 +26,7 @@ final class EmbeddedCursorTest extends TestCase
         $this->assertSame([['name' => 'A'], ['name' => 'B']], $result);
     }
 
-    /**
-     * @dataProvider getDocumentsToSort
-     */
+    #[DataProvider('getDocumentsToSort')]
     public function testShouldSortDocuments(array $items, array $parameters, array $expected): void
     {
         // Set
@@ -322,7 +321,7 @@ final class EmbeddedCursorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function getDocumentsToSort(): array
+    public static function getDocumentsToSort(): array
     {
         $age24 = (object) ['age' => 24];
 

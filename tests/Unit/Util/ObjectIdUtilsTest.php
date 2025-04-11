@@ -3,12 +3,11 @@ namespace Mongolid\Util;
 
 use MongoDB\BSON\ObjectId;
 use Mongolid\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ObjectIdUtilsTest extends TestCase
 {
-    /**
-     * @dataProvider objectIdStringScenarios
-     */
+    #[DataProvider('objectIdStringScenarios')]
     public function testShouldEvaluateIfValueIsAnObjectId($value, bool $expectation): void
     {
         // Actions
@@ -18,7 +17,7 @@ final class ObjectIdUtilsTest extends TestCase
         $this->assertSame($expectation, $result);
     }
 
-    public function objectIdStringScenarios(): array
+    public static function objectIdStringScenarios(): array
     {
         $object = new class {
             public function __toString()

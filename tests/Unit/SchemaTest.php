@@ -3,11 +3,12 @@
 namespace Mongolid;
 
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Mongolid\Container\Container;
 use Mongolid\Schema\Schema;
 use Mongolid\Util\SequenceService;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaTest extends TestCase
 {
@@ -44,7 +45,7 @@ class SchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
     }
@@ -72,7 +73,7 @@ class SchemaTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(
-            ObjectID::class,
+            ObjectId::class,
             $schema->objectId($value)
         );
 
@@ -152,9 +153,7 @@ class SchemaTest extends TestCase
         $this->assertNotEquals(25000, (string) $result);
     }
 
-    /**
-     * @dataProvider createdAtTimestampsFixture
-     */
+    #[DataProvider('createdAtTimestampsFixture')]
     public function testShouldNotRefreshCreatedAtTimestamps(
         $value,
         $expectation,
@@ -172,7 +171,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function createdAtTimestampsFixture()
+    public static function createdAtTimestampsFixture()
     {
         return [
             'MongoDB driver UTCDateTime' => [

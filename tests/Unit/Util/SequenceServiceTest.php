@@ -7,12 +7,11 @@ use MongoDB\Collection;
 use MongoDB\Database;
 use Mongolid\Connection\Connection;
 use Mongolid\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SequenceServiceTest extends TestCase
 {
-    /**
-     * @dataProvider sequenceScenarios
-     */
+    #[DataProvider('sequenceScenarios')]
     public function testShouldGetNextValue(string $sequenceName, int $currentValue, int $expectation): void
     {
         // Set
@@ -74,7 +73,7 @@ final class SequenceServiceTest extends TestCase
         $this->assertSame($collection, $result);
     }
 
-    public function sequenceScenarios(): array
+    public static function sequenceScenarios(): array
     {
         return [
             'New sequence in collection "products"' => [

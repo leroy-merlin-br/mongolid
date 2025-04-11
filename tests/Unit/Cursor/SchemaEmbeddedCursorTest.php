@@ -3,8 +3,9 @@
 namespace Mongolid\Cursor;
 
 use Mockery as m;
-use stdClass;
 use Mongolid\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use stdClass;
 
 class SchemaEmbeddedCursorTest extends TestCase
 {
@@ -35,9 +36,7 @@ class SchemaEmbeddedCursorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getDocumentsToSort
-     */
+    #[DataProvider('getDocumentsToSort')]
     public function testShouldSortDocuments($items, $parameters, $expected)
     {
         // Arrange
@@ -201,7 +200,7 @@ class SchemaEmbeddedCursorTest extends TestCase
         return new SchemaEmbeddedCursor($entityClass, $items);
     }
 
-    public function getDocumentsToSort()
+    public static function getDocumentsToSort()
     {
         $age24 = (object) ['age' => 24];
 
