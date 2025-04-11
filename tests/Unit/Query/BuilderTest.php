@@ -15,6 +15,7 @@ use Mongolid\Model\Exception\ModelNotFoundException;
 use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\ReplaceCollectionModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BuilderTest extends TestCase
 {
@@ -31,9 +32,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($connection, $result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldSave(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -89,9 +88,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldInsert(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -140,9 +137,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldInsertWithoutFiringEvents(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -186,9 +181,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldUpdate(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -357,9 +350,7 @@ final class BuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testUpdateShouldCallInsertWhenObjectHasNoId(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -411,9 +402,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider getWriteConcernVariations
-     */
+    #[DataProvider('getWriteConcernVariations')]
     public function testShouldDelete(
         ReplaceCollectionModel $model,
         int $writeConcern,
@@ -461,9 +450,7 @@ final class BuilderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider eventsToBailOperations
-     */
+    #[DataProvider('eventsToBailOperations')]
     public function testDatabaseOperationsShouldBailOutIfTheEventHandlerReturnsFalse(
         string $operation,
         string $dbOperation,
@@ -817,9 +804,7 @@ final class BuilderTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @dataProvider getProjections
-     */
+    #[DataProvider('getProjections')]
     public function testPrepareProjectionShouldConvertArray($data, $expectation): void
     {
         // Set
@@ -848,7 +833,7 @@ final class BuilderTest extends TestCase
         $this->callProtected($builder, 'prepareProjection', [$data]);
     }
 
-    public function eventsToBailOperations(): array
+    public static function eventsToBailOperations(): array
     {
         return [
             'Saving event' => [
@@ -874,7 +859,7 @@ final class BuilderTest extends TestCase
         ];
     }
 
-    public function getWriteConcernVariations(): array
+    public static function getWriteConcernVariations(): array
     {
         $model = new ReplaceCollectionModel();
         $model2 = new ReplaceCollectionModel();
@@ -883,13 +868,13 @@ final class BuilderTest extends TestCase
 
         return [
             'acknowledged write concern' => [
-                'object' => $model,
+                'model' => $model,
                 'writeConcern' => 1,
                 'shouldFireEventAfter' => true,
                 'expected' => true,
             ],
             'unacknowledged write concern' => [
-                'object' => $model2,
+                'model' => $model2,
                 'writeConcern' => 0,
                 'shouldFireEventAfter' => false,
                 'expected' => false,
@@ -900,32 +885,32 @@ final class BuilderTest extends TestCase
     /**
      * Retrieves projections that should be replaced by mapper.
      */
-    public function getProjections(): array
+    public static function getProjections(): array
     {
         return [
             'Should return self array' => [
-                'projection' => ['some' => true, 'fields' => false],
-                'expected' => ['some' => true, 'fields' => false, '__pclass' => true],
+                'data' => ['some' => true, 'fields' => false],
+                'expectation' => ['some' => true, 'fields' => false, '__pclass' => true],
             ],
             'Should convert number' => [
-                'projection' => ['some' => 1, 'fields' => -1],
-                'expected' => ['some' => true, 'fields' => false, '__pclass' => true],
+                'data' => ['some' => 1, 'fields' => -1],
+                'expectation' => ['some' => true, 'fields' => false, '__pclass' => true],
             ],
             'Should add true in fields' => [
-                'projection' => ['some', 'fields'],
-                'expected' => ['some' => true, 'fields' => true, '__pclass' => true],
+                'data' => ['some', 'fields'],
+                'expectation' => ['some' => true, 'fields' => true, '__pclass' => true],
             ],
             'Should add boolean values according to key value' => [
-                'projection' => ['-some', 'fields'],
-                'expected' => ['some' => false, 'fields' => true, '__pclass' => true],
+                'data' => ['-some', 'fields'],
+                'expectation' => ['some' => false, 'fields' => true, '__pclass' => true],
             ],
             'Should not exclude __pclass from projection' => [
-                'projection' => ['fields' => true, '__pclass' => false],
-                'expected' => ['fields' => true, '__pclass' => true],
+                'data' => ['fields' => true, '__pclass' => false],
+                'expectation' => ['fields' => true, '__pclass' => true],
             ],
             'Empty should not include __pclass' => [
-                'projection' => [],
-                'expected' => [],
+                'data' => [],
+                'expectation' => [],
             ],
         ];
     }

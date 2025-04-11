@@ -117,6 +117,11 @@ trait HasLegacyAttributesTrait
         return $this;
     }
 
+    public function forceFill(array $attributes): HasAttributesInterface
+    {
+        return $this->fill($attributes, true);
+    }
+
     /**
      * Set a given attribute on the model.
      *

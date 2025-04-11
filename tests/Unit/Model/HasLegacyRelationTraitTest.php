@@ -8,12 +8,11 @@ use Mongolid\Tests\Stubs\Price;
 use Mongolid\Tests\Stubs\Legacy\Product;
 use Mongolid\Util\CacheComponent;
 use Mongolid\Util\CacheComponentInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class HasLegacyRelationTraitTest extends TestCase
 {
-    /**
-     * @dataProvider referencesOneScenarios
-     */
+    #[DataProvider('referencesOneScenarios')]
     public function testReferenceOneShouldNotHitCache($fieldValue, array $expectedQuery): void
     {
         // Set
@@ -42,9 +41,7 @@ final class HasLegacyRelationTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @dataProvider referencesOneScenarios
-     */
+    #[DataProvider('referencesOneScenarios')]
     public function testReferenceOneShouldNotHitDatabase($fieldValue, array $expectedQuery): void
     {
         // Set
@@ -73,7 +70,7 @@ final class HasLegacyRelationTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function referencesOneScenarios(): array
+    public static function referencesOneScenarios(): array
     {
         return [
             'referenced by string id' => [

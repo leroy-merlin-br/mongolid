@@ -8,12 +8,11 @@ use Mongolid\Model\ModelInterface;
 use Mongolid\Query\Resolver;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class QueryBuilderTest extends TestCase
 {
-    /**
-     * @dataProvider queryValueScenarios
-     */
+    #[DataProvider('queryValueScenarios')]
     public function testShouldPrepareQueryValue(
         mixed $query,
         bool $isSoftDeleteEnabled,
@@ -28,7 +27,7 @@ final class QueryBuilderTest extends TestCase
         $this->assertMongoQueryEquals($expectation, $result);
     }
 
-    public function queryValueScenarios(): array
+    public static function queryValueScenarios(): array
     {
         $objectId = new ObjectId('64e8963b1de34f08a40502e0');
 
@@ -83,7 +82,7 @@ final class QueryBuilderTest extends TestCase
             'When query is a string and softDelete is enabled' => [
                 'query' => '123',
                 'isSoftDeleteEnabled' => true,
-                'expected' => [
+                'expectation' => [
                     '_id' => '123',
                     'deleted_at' => ['$exists' => false],
                 ],
@@ -91,14 +90,14 @@ final class QueryBuilderTest extends TestCase
             'When query is a string and softDelete is disabled' => [
                 'query' => '123',
                 'isSoftDeleteEnabled' => false,
-                'expected' => [
+                'expectation' => [
                     '_id' => '123',
                 ],
             ],
             'When query is a int and softDelete is enabled' => [
                 'query' => 123,
                 'isSoftDeleteEnabled' => true,
-                'expected' => [
+                'expectation' => [
                     '_id' => 123,
                     'deleted_at' => ['$exists' => false],
                 ],
@@ -106,14 +105,14 @@ final class QueryBuilderTest extends TestCase
             'When query is a int and softDelete is disabled' => [
                 'query' => 123,
                 'isSoftDeleteEnabled' => false,
-                'expected' => [
+                'expectation' => [
                     '_id' => 123,
                 ],
             ],
             'When query is a objectId and softDelete is enabled' => [
                 'query' => $objectId,
                 'isSoftDeleteEnabled' => true,
-                'expected' => [
+                'expectation' => [
                     '_id' => $objectId,
                     'deleted_at' => ['$exists' => false],
                 ],
@@ -121,16 +120,14 @@ final class QueryBuilderTest extends TestCase
             'When query is a objectId and softDelete is disabled' => [
                 'query' => $objectId,
                 'isSoftDeleteEnabled' => false,
-                'expected' => [
+                'expectation' => [
                     '_id' => $objectId,
                 ],
             ],
         ];
     }
 
-    /**
-     * @dataProvider  setDefaultClass
-     */
+    #[DataProvider('setDefaultClass')]
     public function testShouldGetDeleteAtColumn(bool $isDefault, string $expected): void
     {
         // Set
@@ -143,7 +140,7 @@ final class QueryBuilderTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function setDefaultClass(): array
+    public static function setDefaultClass(): array
     {
         return [
             'Get class with DELETED_AT default' => [
