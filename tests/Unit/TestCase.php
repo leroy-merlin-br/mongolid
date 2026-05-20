@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid;
 
 use Illuminate\Container\Container as IlluminateContainer;
@@ -13,6 +14,7 @@ class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         Container::setContainer(new IlluminateContainer());
     }
 
@@ -20,20 +22,20 @@ class TestCase extends PHPUnitTestCase
     {
         Container::flush();
         m::close();
+
         parent::tearDown();
     }
 
     /**
      * Actually runs a protected method of the given object.
      *
-     * @param object $obj
-     * @param array  $args
+     * @param array<int, mixed> $args
      *
      * @return mixed
      */
-    protected function callProtected($obj, string $method, array $args = [])
+    protected function callProtected(object $obj, string $method, array $args = []): mixed
     {
-        $methodObj = new ReflectionMethod(get_class($obj), $method);
+        $methodObj = new ReflectionMethod($obj::class, $method);
         $methodObj->setAccessible(true);
 
         return $methodObj->invokeArgs($obj, $args);
@@ -42,11 +44,10 @@ class TestCase extends PHPUnitTestCase
     /**
      * Set a protected property of an object.
      *
-     * @param mixed  $obj      object Instance
      * @param string $property property name
      * @param mixed  $value    value to be set
      */
-    protected function setProtected($obj, string $property, $value): void
+    protected function setProtected(object $obj, string $property, mixed $value): void
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
@@ -57,27 +58,27 @@ class TestCase extends PHPUnitTestCase
     /**
      * Get a protected property of an object.
      *
-     * @param mixed  $obj      object Instance
      * @param string $property property name
      *
      * @return mixed property value
      */
-    protected function getProtected($obj, string $property)
+    protected function getProtected(object $obj, string $property): mixed
     {
         $class = new ReflectionClass($obj);
         $property = $class->getProperty($property);
         $property->setAccessible(true);
+
         return $property->getValue($obj);
     }
 
     /**
      * Replace instance on Ioc
      */
-    protected function instance(string $abstract, $instance)
+    protected function instance(string $abstract, mixed $instance): mixed
     {
         Container::bind(
             $abstract,
-            function () use ($instance) {
+            static function () use ($instance) {
                 return $instance;
             }
         );
@@ -85,7 +86,7 @@ class TestCase extends PHPUnitTestCase
         return $instance;
     }
 
-    public function assertMongoQueryEquals($expectedQuery, $query)
+    protected function assertMongoQueryEquals(mixed $expectedQuery, mixed $query): void
     {
         $this->assertEquals($expectedQuery, $query, 'Queries are not equals');
 
@@ -95,7 +96,7 @@ class TestCase extends PHPUnitTestCase
 
         foreach ($expectedQuery as $key => $value) {
             if (is_object($value)) {
-                $this->assertInstanceOf(get_class($value), $query[$key], 'Type of an object within the query is not equals');
+                $this->assertInstanceOf($value::class, $query[$key], 'Type of an object within the query is not equals');
 
                 if (method_exists($value, '__toString')) {
                     $this->assertEquals((string) $expectedQuery[$key], (string) $query[$key], 'Object within the query is not equals');

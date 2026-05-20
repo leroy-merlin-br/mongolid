@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Tests\Stubs;
 
 use MongoDB\Collection;
@@ -16,10 +17,7 @@ class ReplaceCollectionModel extends AbstractModel
      */
     protected $collection = 'models';
 
-    /**
-     * @var Collection
-     */
-    protected $rawCollection;
+    protected Collection $rawCollection;
 
     public function setCollection(Collection $collection): void
     {
