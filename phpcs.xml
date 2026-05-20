@@ -13,5 +13,17 @@
     <file>src</file>
     <file>tests</file>
 
-    <rule ref="LeroyMerlin"/>
+    <rule ref="LeroyMerlin">
+        <exclude name="Squiz.WhiteSpace.LanguageConstructSpacing"/>
+    </rule>
+
+    <rule ref="Generic.WhiteSpace.LanguageConstructSpacing"/>
+
+    <rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineCondition.RequiredMultiLineCondition">
+        <type>warning</type>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall">
+        <type>warning</type>
+    </rule>
 </ruleset>

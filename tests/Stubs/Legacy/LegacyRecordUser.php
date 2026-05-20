@@ -1,48 +1,63 @@
 <?php
+
 namespace Mongolid\Tests\Stubs\Legacy;
 
+use Mongolid\Cursor\CursorInterface;
 use Mongolid\LegacyRecord;
 
 class LegacyRecordUser extends LegacyRecord
 {
     /**
-     * @var string
-     */
-    protected $collection = 'users';
-
-    /**
      * @var bool
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $mutable = true;
 
     /**
      * @var bool
-     */
-    protected $timestamps = true;
-
-    /**
-     * @var bool
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $dynamic = false;
 
     /**
-     * @var string[]
+     * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $collection = 'users';
+
+    /**
+     * @var bool
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $timestamps = true;
+
+    /**
+     * @var list<string>
      */
     protected $fillable = [
         'name',
     ];
 
-    public function siblings()
+    public function siblings(): CursorInterface
     {
         return $this->embedsMany(LegacyRecordUser::class, 'siblings');
     }
 
+    /**
+     * @return CursorInterface|array
+     */
     public function grandsons()
     {
-        return $this->referencesMany(LegacyRecordUser::class, 'grandsons');
+        /** @var CursorInterface|array $grandsons */
+        $grandsons = $this->referencesMany(LegacyRecordUser::class, 'grandsons');
+
+        return $grandsons;
     }
 
-    public function setSecretAttribute($value)
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function setSecretAttribute(mixed $_value): string
     {
         return 'password_override';
     }

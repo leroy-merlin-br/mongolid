@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use MongoDB\Client;
@@ -10,32 +11,25 @@ class Connection
 {
     /**
      * The default database where mongolid will store the documents.
-     *
-     * @var string
      */
-    public $defaultDatabase = 'mongolid';
+    public string $defaultDatabase = 'mongolid';
 
     /**
      * MongoDB Client object that represents this connection.
-     *
-     * @var Client
      */
-    protected $client;
+    protected ?Client $client = null;
+
+    private string $server;
 
     /**
-     * @var string
+     * @var array<array-key, mixed>
      */
-    private $server;
+    private array $options;
 
     /**
-     * @var array
+     * @var array<array-key, mixed>
      */
-    private $options;
-
-    /**
-     * @var array
-     */
-    private $driverOptions;
+    private array $driverOptions;
 
     /**
      * Constructs a new Mongolid connection. It uses the same constructor
@@ -43,9 +37,9 @@ class Connection
      *
      * @see   http://php.net/manual/en/mongodb-driver-manager.construct.php
      *
-     * @param string $server        the specified connection string
-     * @param array  $options       the mongodb client options
-     * @param array  $driverOptions the mongodb driver options when opening a connection
+     * @param string                  $server        the specified connection string
+     * @param array<array-key, mixed> $options       the mongodb client options
+     * @param array<array-key, mixed> $driverOptions the mongodb driver options when opening a connection
      */
     public function __construct(
         string $server = 'mongodb://localhost:27017',
@@ -79,7 +73,7 @@ class Connection
      *
      * @param string $connectionString mongoDB connection string
      */
-    protected function findDefaultDatabase(string $connectionString)
+    protected function findDefaultDatabase(string $connectionString): void
     {
         preg_match('/\S+\/(\w*)/', $connectionString, $matches);
 

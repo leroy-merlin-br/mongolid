@@ -1,4 +1,5 @@
 <?php
+
 namespace Mongolid\Connection;
 
 use Illuminate\Container\Container as IlluminateContainer;

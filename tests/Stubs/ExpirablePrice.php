@@ -2,10 +2,11 @@
 
 namespace Mongolid\Tests\Stubs;
 
-use DateTime;
-
 class ExpirablePrice extends Price
 {
+    /**
+     * @var array<string, string>
+     */
     protected array $casts = [
         'expires_at' => 'datetime',
     ];
