@@ -21,14 +21,14 @@
         "php": "^8.2",
         "ext-mongodb": "^1.20.0",
         "ext-ctype": "*",
-        "illuminate/container": "^11.0",
-        "illuminate/support": "^11.0",
+        "illuminate/container": "^12.60",
+        "illuminate/support": "^12.60",
         "mongodb/mongodb": "^1.20.0"
     },
     "require-dev": {
         "leroy-merlin-br/coding-standard": "^v3.1.0",
         "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^9.6.33 || ^10.5.62 || ^11.5.50"
+        "phpunit/phpunit": "^11.5.50"
     },
     "autoload": {
         "psr-4": {
