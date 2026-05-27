@@ -14,12 +14,11 @@ use Mongolid\Tests\Stubs\Legacy\ProductWithSoftDelete as LegacyProductWithSoftDe
 use Mongolid\Tests\Stubs\Legacy\Product as LegacyProduct;
 use Mongolid\Tests\Stubs\Product;
 use Mongolid\Tests\Stubs\ProductWithSoftDelete;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SoftDeletesTraitTest extends TestCase
 {
-    /**
-     * @dataProvider getSoftDeleteStatus
-     */
+    #[DataProvider('getSoftDeleteStatus')]
     public function testShouldReturnStatusOfSoftDelete(
         ?UTCDateTime $date,
         bool $expected,
@@ -39,21 +38,21 @@ class SoftDeletesTraitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function getSoftDeleteStatus(): array
+    public static function getSoftDeleteStatus(): array
     {
         return [
             'When deleted_at field is filled' => [
-                'deletedAt' => new UTCDateTime(new DateTime('today')),
+                'date' => new UTCDateTime(new DateTime('today')),
                 'expected' => true,
             ],
             'When deleted_at field is null' => [
-                'deletedAt' => null,
+                'date' => null,
                 'expected' => false,
             ],
             'When there is not an deleted_at field' => [
-                'deletedAt' => null,
+                'date' => null,
                 'expected' => false,
-                'isFillable ' => false,
+                'isFillable' => false,
             ],
         ];
     }

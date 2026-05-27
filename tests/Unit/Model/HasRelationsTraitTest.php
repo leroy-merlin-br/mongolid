@@ -8,12 +8,11 @@ use Mongolid\Query\Builder;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\EmbeddedUser;
 use Mongolid\Tests\Stubs\ReferencedUser;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class HasRelationsTraitTest extends TestCase
 {
-    /**
-     * @dataProvider referencesOneScenarios
-     */
+    #[DataProvider('referencesOneScenarios')]
     public function testShouldReferenceOne($fieldValue, array $expectedQuery): void
     {
         // Set
@@ -56,9 +55,7 @@ final class HasRelationsTraitTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @dataProvider referencesManyScenarios
-     */
+    #[DataProvider('referencesManyScenarios')]
     public function testShouldReferenceMany($fieldValue, array $expectedQuery): void
     {
         // Set
@@ -127,9 +124,7 @@ final class HasRelationsTraitTest extends TestCase
         $this->assertSame($newEmbeddedModel, $result);
     }
 
-    /**
-     * @dataProvider embedsManyScenarios
-     */
+    #[DataProvider('embedsManyScenarios')]
     public function testShouldEmbedMany($fieldValue, array $expectedItems): void
     {
         // Set
@@ -145,7 +140,7 @@ final class HasRelationsTraitTest extends TestCase
         $this->assertSame($expectedItems, $result->all());
     }
 
-    public function referencesOneScenarios(): array
+    public static function referencesOneScenarios(): array
     {
         return [
             'referenced by string id' => [
@@ -163,7 +158,7 @@ final class HasRelationsTraitTest extends TestCase
         ];
     }
 
-    public function referencesManyScenarios(): array
+    public static function referencesManyScenarios(): array
     {
         return [
             'referenced by string id' => [
@@ -207,7 +202,7 @@ final class HasRelationsTraitTest extends TestCase
         ];
     }
 
-    public function embedsManyScenarios(): array
+    public static function embedsManyScenarios(): array
     {
         $model1 = new EmbeddedUser();
         $model1->_id = 12345;

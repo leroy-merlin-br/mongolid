@@ -110,6 +110,13 @@ trait HasAttributesTrait
         return $object;
     }
 
+    public function forceFill(array $attributes): static
+    {
+        static::fill($attributes, $this, true);
+
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      */

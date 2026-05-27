@@ -4,7 +4,7 @@ namespace Mongolid;
 
 use BadMethodCallException;
 use Mockery as m;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\WriteConcern;
 use Mongolid\Container\Container;
 use Mongolid\Cursor\CursorInterface;
@@ -49,6 +49,31 @@ class LegacyRecordTest extends TestCase
             [HasLegacyAttributesTrait::class, HasLegacyRelationsTrait::class],
             array_keys(class_uses(LegacyRecord::class))
         );
+    }
+
+    public function testForceFillShouldReturnSameInstanceAndIgnoreMassAssignmentRestrictions(): void
+    {
+        // Arrange
+        $entity = new class() extends LegacyRecord {
+            protected $collection = 'legacy_record';
+
+            protected $fillable = ['name'];
+
+            protected $guarded = ['is_admin'];
+        };
+
+        $input = [
+            'name' => 'Josh',
+            'role' => 'editor',
+            'is_admin' => true,
+        ];
+
+        // Actions
+        $result = $entity->forceFill($input);
+
+        // Assertions
+        $this->assertSame($entity, $result);
+        $this->assertSame($input, $entity->getAttributes());
     }
 
     public function testShouldSave(): void
@@ -395,7 +420,7 @@ class LegacyRecordTest extends TestCase
             }
         };
         $embedded = new stdClass();
-        $embedded->_id = new ObjectID();
+        $embedded->_id = new ObjectId();
         $embedded->name = 'Course Class #1';
         $entity->attachToCourseClass($embedded);
 

@@ -5,7 +5,7 @@ sidebar_position: 1
 # Quick Start
 
 :::info Requirements
-- PHP **8.0**
+- PHP **8.2**
 - [MongoDB Driver](http://php.net/manual/en/set.mongodb.php)
 :::
 
@@ -75,7 +75,7 @@ Once a model is defined, you are ready to start retrieving and creating document
 
     // or
     
-    $post = Post::first(new MongoDB\BSON\ObjectID('4af9f23d8ead0e1d32000000'));
+    $post = Post::first(new MongoDB\BSON\ObjectId('4af9f23d8ead0e1d32000000'));
 ```
 
 ```php title="Retrieving a document by attribute"

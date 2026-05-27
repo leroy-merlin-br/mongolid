@@ -8,6 +8,7 @@ use MongoDB\BSON\UTCDateTime;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\PolymorphedReferencedUser;
 use Mongolid\Tests\Stubs\ReferencedUser;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class HasAttributesTraitTest extends TestCase
 {
@@ -92,9 +93,7 @@ final class HasAttributesTraitTest extends TestCase
         $this->assertSame('MY AWESOME NAME', $result);
     }
 
-    /**
-     * @dataProvider getFillableOptions
-     */
+    #[DataProvider('getFillableOptions')]
     public function testShouldFillOnlyPermittedAttributes(
         array $fillable,
         array $guarded,
@@ -283,6 +282,35 @@ final class HasAttributesTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testForceFillShouldReturnSameInstanceAndIgnoreMassAssignmentRestrictions(): void
+    {
+        // Set
+        $model = new class(['name'], ['is_admin']) implements HasAttributesInterface
+        {
+            use HasAttributesTrait;
+            use HasRelationsTrait;
+
+            public function __construct(array $fillable, array $guarded)
+            {
+                $this->fillable = $fillable;
+                $this->guarded = $guarded;
+            }
+        };
+
+        $input = [
+            'name' => 'Josh',
+            'role' => 'editor',
+            'is_admin' => true,
+        ];
+
+        // Actions
+        $result = $model->forceFill($input);
+
+        // Assertions
+        $this->assertSame($model, $result);
+        $this->assertSame($input, $model->getDocumentAttributes());
+    }
+
     public function testShouldBeCastableToArray(): void
     {
         // Set
@@ -307,6 +335,9 @@ final class HasAttributesTraitTest extends TestCase
         // Set
         $model = new class() implements HasAttributesInterface
         {
+            public string $name;
+            public int $age;
+
             use HasAttributesTrait;
             use HasRelationsTrait;
         };
@@ -429,7 +460,7 @@ final class HasAttributesTraitTest extends TestCase
         $this->assertInstanceOf(DateTime::class, $model->expires_at);
     }
 
-    public function getFillableOptions(): array
+    public static function getFillableOptions(): array
     {
         return [
             '$fillable = []; $guarded = []' => [
