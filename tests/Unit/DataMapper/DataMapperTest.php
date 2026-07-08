@@ -19,6 +19,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Mongolid\Tests\Stubs\Legacy\Product;
 use stdClass;
 use Mongolid\TestCase;
+use MongoDB\DeleteResult;
+use MongoDB\InsertOneResult;
+use MongoDB\UpdateResult;
 
 class DataMapperTest extends TestCase
 {
@@ -32,7 +35,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getWriteConcernVariations')]
-    public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldSave($entity, $writeConcern, $shouldFireEventAfter, $expected): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -41,7 +44,7 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
 
         $entity->_id = null;
 
@@ -91,7 +94,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getWriteConcernVariations')]
-    public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsert($entity, $writeConcern, $shouldFireEventAfter, $expected): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -100,7 +103,7 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
 
         $entity->_id = null;
 
@@ -147,7 +150,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getWriteConcernVariations')]
-    public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldInsertWithoutFiringEvents($entity, $writeConcern, $shouldFireEventAfter, $expected): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -156,7 +159,7 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
 
         $entity->_id = null;
 
@@ -198,7 +201,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getWriteConcernVariations')]
-    public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldUpdate($entity, $writeConcern, $shouldFireEventAfter, $expected): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -206,7 +209,7 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $entity->_id = 123;
@@ -261,7 +264,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expected, $mapper->update($entity, $options));
     }
 
-    public function testDifferentialUpdateShouldWork()
+    public function testDifferentialUpdateShouldWork(): void
     {
         // Arrange
         $entity = m::mock(ModelInterface::class);
@@ -269,7 +272,7 @@ class DataMapperTest extends TestCase
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $entity->_id = 123;
@@ -354,7 +357,7 @@ class DataMapperTest extends TestCase
         $this->assertTrue($mapper->update($entity, $options));
     }
 
-    public function testDifferentialUpdateShouldWorkHandlingNullValuesInArrays()
+    public function testDifferentialUpdateShouldWorkHandlingNullValuesInArrays(): void
     {
         // Arrange
         $entity = m::mock(ModelInterface::class);
@@ -362,7 +365,7 @@ class DataMapperTest extends TestCase
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern(1)];
 
         $entity->_id = 123;
@@ -469,7 +472,7 @@ class DataMapperTest extends TestCase
         $this->assertTrue($mapper->update($entity, $options));
     }
 
-    public function testDifferentialUpdateShouldReturnTrueIfThereIsNothingToUpdate()
+    public function testDifferentialUpdateShouldReturnTrueIfThereIsNothingToUpdate(): void
     {
         // Arrange
         $entity = m::mock(ModelInterface::class);
@@ -518,14 +521,14 @@ class DataMapperTest extends TestCase
         $writeConcern,
         $shouldFireEventAfter,
         $expected
-    ) {
+    ): void {
         // Arrange
         $connection = m::mock(Connection::class);
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $entity->_id = null;
@@ -578,7 +581,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getWriteConcernVariations')]
-    public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected)
+    public function testShouldDelete($entity, $writeConcern, $shouldFireEventAfter, $expected): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -586,7 +589,7 @@ class DataMapperTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(DeleteResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $entity->_id = null;
@@ -638,7 +641,7 @@ class DataMapperTest extends TestCase
         $operation,
         $dbOperation,
         $eventName
-    ) {
+    ): void {
         // Arrange
         $connection = m::mock(Connection::class);
         $mapper = m::mock(DataMapper::class.'[parseToDocument,getCollection]', [$connection]);
@@ -668,7 +671,7 @@ class DataMapperTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testShouldGetWithWhereQuery()
+    public function testShouldGetWithWhereQuery(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -705,7 +708,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($schema, $cacheableResult->entitySchema);
     }
 
-    public function testShouldGetAll()
+    public function testShouldGetAll(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -725,7 +728,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($mongolidCursor, $result);
     }
 
-    public function testShouldGetNullIfFirstCantFindAnything()
+    public function testShouldGetNullIfFirstCantFindAnything(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -761,7 +764,7 @@ class DataMapperTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldGetFirstProjectingFields()
+    public function testShouldGetFirstProjectingFields(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -800,7 +803,7 @@ class DataMapperTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldGetFirstTroughACacheableCursor()
+    public function testShouldGetFirstTroughACacheableCursor(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -826,7 +829,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($entity, $result);
     }
 
-    public function testShouldGetFirstTroughACacheableCursorProjectingFields()
+    public function testShouldGetFirstTroughACacheableCursorProjectingFields(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -853,7 +856,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($entity, $result);
     }
 
-    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject()
+    public function testShouldParseObjectToDocumentAndPutResultingIdIntoTheGivenObject(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -885,7 +888,7 @@ class DataMapperTest extends TestCase
         );
     }
 
-    public function testShouldGetSchemaMapper()
+    public function testShouldGetSchemaMapper(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -903,7 +906,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($schema, $result->schema);
     }
 
-    public function testShouldGetRawCollection()
+    public function testShouldGetRawCollection(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -937,7 +940,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('getProjections')]
-    public function testPrepareProjectionShouldConvertArray($data, $expectation)
+    public function testPrepareProjectionShouldConvertArray($data, $expectation): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -950,7 +953,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals($expectation, $result);
     }
 
-    public function testPrepareProjectionShouldThrownAnException()
+    public function testPrepareProjectionShouldThrownAnException(): void
     {
         // Arrange
         $connection = m::mock(Connection::class);
@@ -964,7 +967,7 @@ class DataMapperTest extends TestCase
         $this->callProtected($mapper, 'prepareProjection', [$data]);
     }
 
-    protected function getEventService()
+    protected function getEventService(): EventTriggerService
     {
         if (!($this->eventService ?? false)) {
             $this->eventService = m::mock(EventTriggerService::class);
@@ -974,7 +977,7 @@ class DataMapperTest extends TestCase
         return $this->eventService;
     }
 
-    protected function expectEventToBeFired($event, $entity, bool $halt, $return = true)
+    protected function expectEventToBeFired($event, $entity, bool $halt, $return = true): void
     {
         $event = 'mongolid.'.$event.': '.get_class($entity);
 
@@ -985,7 +988,7 @@ class DataMapperTest extends TestCase
             ->andReturn($return);
     }
 
-    protected function expectEventNotToBeFired($event, $entity)
+    protected function expectEventNotToBeFired($event, $entity): void
     {
         $event = 'mongolid.'.$event.': '.get_class($entity);
 
@@ -994,7 +997,7 @@ class DataMapperTest extends TestCase
             ->never();
     }
 
-    public static function eventsToBailOperations()
+    public static function eventsToBailOperations(): array
     {
         return [
             'Saving event' => [
@@ -1023,7 +1026,7 @@ class DataMapperTest extends TestCase
         ];
     }
 
-    public static function getWriteConcernVariations()
+    public static function getWriteConcernVariations(): array
     {
         return [
             'acknowledged write concern with plain object' => [
@@ -1056,7 +1059,7 @@ class DataMapperTest extends TestCase
     /**
      * Retrieves projections that should be replaced by mapper.
      */
-    public static function getProjections()
+    public static function getProjections(): array
     {
         return [
             'Should return self array' => [

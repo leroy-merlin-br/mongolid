@@ -116,7 +116,7 @@ final class ReferencesOneRelationTest extends IntegrationTestCase
         $user->invalid;
     }
 
-    private function createUser(string $name, string $code = null): ReferencedUser
+    private function createUser(string $name, ?string $code = null): ReferencedUser
     {
         $user = new ReferencedUser();
         $user->_id = new ObjectId();
@@ -129,7 +129,7 @@ final class ReferencesOneRelationTest extends IntegrationTestCase
         return $user;
     }
 
-    private function assertParent($expected, ReferencedUser $model)
+    private function assertParent($expected, ReferencedUser $model): void
     {
         $parent = $model->parent;
         $this->assertInstanceOf(ReferencedUser::class, $parent);
@@ -143,7 +143,7 @@ final class ReferencesOneRelationTest extends IntegrationTestCase
         $this->assertSame($expected->_id, $model->parent_id);
     }
 
-    private function assertSon($expected, ReferencedUser $model)
+    private function assertSon($expected, ReferencedUser $model): void
     {
         $son = $model->son;
         $this->assertInstanceOf(ReferencedUser::class, $son);
