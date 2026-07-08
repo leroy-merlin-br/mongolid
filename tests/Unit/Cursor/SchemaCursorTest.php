@@ -7,17 +7,19 @@ use Exception;
 use Iterator;
 use IteratorIterator;
 use Mockery as m;
+use MongoDB\BSON\Int64;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
+use MongoDB\Driver\CursorInterface as DriverCursorInterface;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
+use MongoDB\Driver\Server;
 use Mongolid\Connection\Connection;
 use Mongolid\LegacyRecord;
 use Mongolid\Schema\DynamicSchema;
 use Mongolid\Schema\Schema;
 use Mongolid\TestCase;
-use Traversable;
 
 class SchemaCursorTest extends TestCase
 {
@@ -27,7 +29,7 @@ class SchemaCursorTest extends TestCase
         m::close();
     }
 
-    public function testShouldLimitDocumentQuantity()
+    public function testShouldLimitDocumentQuantity(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -40,7 +42,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSortDocumentsOfCursor()
+    public function testShouldSortDocumentsOfCursor(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -53,7 +55,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSkipDocuments()
+    public function testShouldSkipDocuments(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -66,7 +68,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSetNoCursorTimeoutToTrue()
+    public function testShouldSetNoCursorTimeoutToTrue(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -79,7 +81,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSetReadPreferenceParameterAccordingly()
+    public function testShouldSetReadPreferenceParameterAccordingly(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -92,14 +94,14 @@ class SchemaCursorTest extends TestCase
         $this->assertSame($readPreferenceParameter->getModeString(), $mode);
     }
 
-    public function testShouldCountDocuments()
+    public function testShouldCountDocuments(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
+        $collection->shouldReceive('countDocuments')
             ->once()
             ->with([])
             ->andReturn(5);
@@ -108,14 +110,14 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(5, $cursor->count());
     }
 
-    public function testShouldCountDocumentsWithCountFunction()
+    public function testShouldCountDocumentsWithCountFunction(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
+        $collection->shouldReceive('countDocuments')
             ->once()
             ->with([])
             ->andReturn(5);
@@ -124,7 +126,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(5, count($cursor));
     }
 
-    public function testShouldRewind()
+    public function testShouldRewind(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -142,7 +144,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
+    public function testShouldRewindACursorThatHasAlreadyBeenInitialized(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -165,7 +167,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldGetCurrentUsingLegacyRecordClasses()
+    public function testShouldGetCurrentUsingLegacyRecordClasses(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -181,7 +183,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals('John Doe', $entity->name);
     }
 
-    public function testShouldGetFirstWhenEmpty()
+    public function testShouldGetFirstWhenEmpty(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -201,7 +203,7 @@ class SchemaCursorTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldRefreshTheCursor()
+    public function testShouldRefreshTheCursor(): void
     {
         // Arrange
         $driverCursor = m::mock(IteratorIterator::class);
@@ -213,7 +215,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(null, $cursor->key());
     }
 
-    public function testShouldImplementKeyMethodFromIterator()
+    public function testShouldImplementKeyMethodFromIterator(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -224,7 +226,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(7, $cursor->key());
     }
 
-    public function testShouldImplementNextMethodFromIterator()
+    public function testShouldImplementNextMethodFromIterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -242,7 +244,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(8, $cursor->key());
     }
 
-    public function testShouldImplementValidMethodFromIterator()
+    public function testShouldImplementValidMethodFromIterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -257,13 +259,12 @@ class SchemaCursorTest extends TestCase
         $this->assertTrue($cursor->valid());
     }
 
-    public function testShouldWrapMongoDriverCursorWithIteratoriterator()
+    public function testShouldWrapMongoDriverCursorWithIteratoriterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor(null, $collection, 'find', [['bacon' => true]]);
-        $driverCursor = m::mock(Traversable::class);
-        $driverIterator = m::mock(Iterator::class);
+        $driverCursor = $this->getMongoDriverCursorStub([['bacon' => true]]);
 
         // Act
         $collection->shouldReceive('find')
@@ -271,21 +272,12 @@ class SchemaCursorTest extends TestCase
             ->with(['bacon' => true])
             ->andReturn($driverCursor);
 
-        $driverCursor->shouldReceive('getIterator')
-            ->andReturn($driverIterator);
-
-        // Because when creating an IteratorIterator with the driverCursor
-        // this methods will be called once to initialize the iterable object.
-        $driverIterator->shouldReceive('rewind', 'valid', 'current', 'key')
-            ->once()
-            ->andReturn(true);
-
         // Assert
         $result = $this->callProtected($cursor, 'getCursor');
         $this->assertInstanceOf(IteratorIterator::class, $result);
     }
 
-    public function testShouldReturnResultsToArray()
+    public function testShouldReturnResultsToArray(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -318,7 +310,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSerializeAnActiveCursor()
+    public function testShouldSerializeAnActiveCursor(): void
     {
         // Arrange
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
@@ -340,11 +332,10 @@ class SchemaCursorTest extends TestCase
             ->andReturn($database);
 
         $database->shouldReceive('selectCollection')
+            ->with('my_collection')
             ->andReturn($driverCollection);
 
         $connection->defaultDatabase = 'db';
-        $connection->db = $connection;
-        $connection->my_collection = $driverCollection; // Return the same driver Collection
 
         // Assert
         $result = unserialize(serialize($cursor));
@@ -357,7 +348,7 @@ class SchemaCursorTest extends TestCase
         $command = 'find',
         $params = [[]],
         $driverCursor = null
-    ) {
+    ): SchemaCursor {
         if (!$entitySchema) {
             $entitySchema = m::mock(Schema::class.'[]');
         }
@@ -388,24 +379,74 @@ class SchemaCursorTest extends TestCase
      * Since the MongoDB\Collection is not serializable. This method will
      * emulate an unserializable collection from mongoDb driver.
      */
-    protected function getDriverCollection()
+    protected function getDriverCollection(): Collection
     {
-        /*
-         * Emulates a MongoDB\Collection non serializable behavior.
-         */
-        return new class() {
-            public function __serialize()
+        $collection = m::mock(Collection::class);
+        $collection->shouldReceive('getCollectionName')
+            ->andReturn('my_collection');
+
+        return $collection;
+    }
+
+    protected function getMongoDriverCursorStub(array $documents): DriverCursorInterface
+    {
+        return new class($documents) implements DriverCursorInterface {
+            private ArrayIterator $iterator;
+
+            public function __construct(array $documents)
             {
-                throw new Exception('Unable to serialize', 1);
+                $this->iterator = new ArrayIterator($documents);
             }
 
-            public function __unserialize($serialized)
+            public function current(): array|object|null
+            {
+                return $this->iterator->valid() ? $this->iterator->current() : null;
+            }
+
+            public function getId(): Int64
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function getServer(): Server
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function isDead(): bool
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function key(): ?int
+            {
+                $key = $this->iterator->key();
+
+                return is_int($key) ? $key : null;
+            }
+
+            public function next(): void
+            {
+                $this->iterator->next();
+            }
+
+            public function rewind(): void
+            {
+                $this->iterator->rewind();
+            }
+
+            public function setTypeMap(array $typemap): void
             {
             }
 
-            public function getCollectionName()
+            public function toArray(): array
             {
-                return 'my_collection';
+                return iterator_to_array($this->iterator);
+            }
+
+            public function valid(): bool
+            {
+                return $this->iterator->valid();
             }
         };
     }

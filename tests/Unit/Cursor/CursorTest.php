@@ -6,16 +6,18 @@ use ArrayObject;
 use Exception;
 use Iterator;
 use Mockery as m;
+use MongoDB\BSON\Int64;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Database;
+use MongoDB\Driver\CursorInterface as DriverCursorInterface;
 use MongoDB\Driver\Exception\LogicException;
 use MongoDB\Driver\ReadPreference;
+use MongoDB\Driver\Server;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Model\AbstractModel;
 use Mongolid\TestCase;
-use Traversable;
 
 final class CursorTest extends TestCase
 {
@@ -115,7 +117,7 @@ final class CursorTest extends TestCase
 
         // Expectations
         $collection
-            ->expects('count')
+            ->expects('countDocuments')
             ->with([])
             ->andReturn(5);
 
@@ -134,7 +136,7 @@ final class CursorTest extends TestCase
 
         // Expectations
         $collection->expects()
-            ->count([])
+            ->countDocuments([])
             ->andReturn(5);
 
         // Actions
@@ -148,7 +150,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -169,7 +171,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -278,7 +280,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 7);
@@ -298,7 +300,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Expectations
@@ -318,35 +320,12 @@ final class CursorTest extends TestCase
         // Set
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor($collection, 'find', [['bacon' => true]]);
-        $driverCursor = m::mock(Traversable::class);
-        $driverIterator = m::mock(Iterator::class);
+        $driverCursor = $this->getMongoDriverCursorStub([['bacon' => true]]);
 
         // Expectations
         $collection->expects()
             ->find(['bacon' => true])
             ->andReturn($driverCursor);
-
-        $driverCursor->expects()
-            ->getIterator()
-            ->andReturn($driverIterator);
-
-        // Because when creating an IteratorIterator with the driverCursor
-        // this methods will be called once to initialize the iterable object.
-        $driverIterator->expects()
-            ->rewind()
-            ->andReturn(true);
-
-        $driverIterator->expects()
-            ->valid()
-            ->andReturn(true);
-
-        $driverIterator->expects()
-            ->current()
-            ->andReturn(true);
-
-        $driverIterator->expects()
-            ->key()
-            ->andReturn(true);
 
         // Actions
         $result = $this->callProtected($cursor, 'getCursor');
@@ -394,7 +373,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Expectations
@@ -451,11 +430,11 @@ final class CursorTest extends TestCase
             ->andReturn($client);
 
         $client->expects()
-            ->selectDatabase('db')
+            ->getDatabase('db')
             ->andReturn($database);
 
         $database->expects()
-            ->selectCollection('my_collection')
+            ->getCollection('my_collection')
             ->andReturn($driverCollection);
 
         // Actions
@@ -498,24 +477,75 @@ final class CursorTest extends TestCase
      * Since the MongoDB\Collection is not serializable. This method will
      * emulate an unserializable collection from mongoDb driver.
      */
-    protected function getDriverCollection()
+    protected function getDriverCollection(): Collection
     {
-        /*
-         * Emulates a MongoDB\Collection non serializable behavior.
-         */
-        return new class() {
-            public function __serialize()
+        $collection = m::mock(Collection::class);
+        $collection->allows()
+            ->getCollectionName()
+            ->andReturn('my_collection');
+
+        return $collection;
+    }
+
+    protected function getMongoDriverCursorStub(array $documents): DriverCursorInterface
+    {
+        return new class($documents) implements DriverCursorInterface {
+            private ArrayIterator $iterator;
+
+            public function __construct(array $documents)
             {
-                throw new Exception('Unable to serialize', 1);
+                $this->iterator = new ArrayIterator($documents);
             }
 
-            public function __unserialize($serialized)
+            public function current(): array|object|null
+            {
+                return $this->iterator->valid() ? $this->iterator->current() : null;
+            }
+
+            public function getId(): Int64
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function getServer(): Server
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function isDead(): bool
+            {
+                throw new Exception('Not implemented');
+            }
+
+            public function key(): ?int
+            {
+                $key = $this->iterator->key();
+
+                return is_int($key) ? $key : null;
+            }
+
+            public function next(): void
+            {
+                $this->iterator->next();
+            }
+
+            public function rewind(): void
+            {
+                $this->iterator->rewind();
+            }
+
+            public function setTypeMap(array $typemap): void
             {
             }
 
-            public function getCollectionName()
+            public function toArray(): array
             {
-                return 'my_collection';
+                return iterator_to_array($this->iterator);
+            }
+
+            public function valid(): bool
+            {
+                return $this->iterator->valid();
             }
         };
     }
