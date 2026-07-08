@@ -10,7 +10,6 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\CachingIterator;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
-use Serializable;
 
 /**
  * This class wraps the query execution and the actual creation of the driver cursor.
@@ -133,13 +132,13 @@ class Cursor implements CursorInterface
      *
      * @see http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
      *
-     * @param int|string $mode preference mode that the Cursor will use
+     * @param string $mode preference mode that the Cursor will use
      *
      * @see ReadPreference::class To get a glance of the constants available
      *
      * @return $this
      */
-    public function setReadPreference(int|string $mode): static
+    public function setReadPreference(string $mode): static
     {
         $this->params[1]['readPreference'] = new ReadPreference($mode);
 
@@ -153,7 +152,7 @@ class Cursor implements CursorInterface
      */
     public function count(): int
     {
-        return $this->collection->count(...$this->params);
+        return $this->collection->countDocuments(...$this->params);
     }
 
     /**

@@ -76,7 +76,7 @@ trait HasAttributesTrait
      */
     public static function fill(
         array $input,
-        HasAttributesInterface $object = null,
+        ?HasAttributesInterface $object = null,
         bool $force = false
     ): HasAttributesInterface {
         if (!$object) {
