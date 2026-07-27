@@ -154,13 +154,13 @@ class SchemaCursor implements CursorInterface
      *
      * @see http://php.net/manual/pt_BR/class.mongodb-driver-readpreference.php
      *
-     * @param int|string $mode preference mode that the Cursor will use
+     * @param string $mode preference mode that the Cursor will use
      *
      * @see ReadPreference::class To get a glance of the constants available
      *
      * @return $this
      */
-    public function setReadPreference(int|string $mode): static
+    public function setReadPreference(string $mode): static
     {
         $this->params[1]['readPreference'] = new ReadPreference($mode);
 
@@ -174,7 +174,7 @@ class SchemaCursor implements CursorInterface
      */
     public function count(): int
     {
-        return $this->collection->count(...$this->params);
+        return $this->collection->countDocuments(...$this->params);
     }
 
     public function params(): array

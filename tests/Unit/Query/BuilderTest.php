@@ -16,6 +16,9 @@ use Mongolid\Model\ModelInterface;
 use Mongolid\TestCase;
 use Mongolid\Tests\Stubs\ReplaceCollectionModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use MongoDB\DeleteResult;
+use MongoDB\InsertOneResult;
+use MongoDB\UpdateResult;
 
 final class BuilderTest extends TestCase
 {
@@ -45,7 +48,7 @@ final class BuilderTest extends TestCase
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
 
         $model->setCollection($collection);
 
@@ -101,7 +104,7 @@ final class BuilderTest extends TestCase
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
 
         $model->setCollection($collection);
         $model->_id = null;
@@ -143,14 +146,14 @@ final class BuilderTest extends TestCase
         int $writeConcern,
         bool $shouldFireEventAfter,
         bool $expected
-    ) {
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
 
         $model->setCollection($collection);
         $model->_id = null;
@@ -194,7 +197,7 @@ final class BuilderTest extends TestCase
 
         $collection = m::mock(Collection::class);
         $parsedObject = ['_id' => 123];
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $model->setCollection($collection);
@@ -252,7 +255,7 @@ final class BuilderTest extends TestCase
             protected $dynamic = false;
         };
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern(1)];
         $model->setCollection($collection);
 
@@ -303,7 +306,7 @@ final class BuilderTest extends TestCase
         {
         };
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(UpdateResult::class);
         $options = ['writeConcern' => new WriteConcern(1)];
         $model->setCollection($collection);
 
@@ -356,13 +359,13 @@ final class BuilderTest extends TestCase
         int $writeConcern,
         bool $shouldFireEventAfter,
         bool $expected
-    ) {
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(InsertOneResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $model->setCollection($collection);
@@ -414,7 +417,7 @@ final class BuilderTest extends TestCase
         $builder = new Builder($connection);
 
         $collection = m::mock(Collection::class);
-        $operationResult = m::mock();
+        $operationResult = m::mock(DeleteResult::class);
         $options = ['writeConcern' => new WriteConcern($writeConcern)];
 
         $model->setCollection($collection);
@@ -455,7 +458,7 @@ final class BuilderTest extends TestCase
         string $operation,
         string $dbOperation,
         string $eventName
-    ) {
+    ): void {
         // Set
         $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[getCollection]', [$connection]);

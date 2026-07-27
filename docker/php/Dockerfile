@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 USER root:root
 
@@ -35,4 +35,3 @@ COPY custom.ini /usr/local/etc/php/conf.d/custom.ini
 USER www-data:www-data
 WORKDIR /var/www/html
 ENV PATH=$PATH:/var/www/.composer/vendor/bin
-
