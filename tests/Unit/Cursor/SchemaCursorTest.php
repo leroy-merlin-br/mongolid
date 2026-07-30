@@ -27,7 +27,7 @@ class SchemaCursorTest extends TestCase
         m::close();
     }
 
-    public function testShouldLimitDocumentQuantity()
+    public function testShouldLimitDocumentQuantity(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -40,7 +40,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSortDocumentsOfCursor()
+    public function testShouldSortDocumentsOfCursor(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -53,7 +53,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSkipDocuments()
+    public function testShouldSkipDocuments(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -66,7 +66,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSetNoCursorTimeoutToTrue()
+    public function testShouldSetNoCursorTimeoutToTrue(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -79,7 +79,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSetReadPreferenceParameterAccordingly()
+    public function testShouldSetReadPreferenceParameterAccordingly(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -92,14 +92,14 @@ class SchemaCursorTest extends TestCase
         $this->assertSame($readPreferenceParameter->getModeString(), $mode);
     }
 
-    public function testShouldCountDocuments()
+    public function testShouldCountDocuments(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
+        $collection->shouldReceive('countDocuments')
             ->once()
             ->with([])
             ->andReturn(5);
@@ -108,14 +108,14 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(5, $cursor->count());
     }
 
-    public function testShouldCountDocumentsWithCountFunction()
+    public function testShouldCountDocumentsWithCountFunction(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
         $cursor = $this->getCursor(null, $collection);
 
         // Act
-        $collection->shouldReceive('count')
+        $collection->shouldReceive('countDocuments')
             ->once()
             ->with([])
             ->andReturn(5);
@@ -124,7 +124,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(5, count($cursor));
     }
 
-    public function testShouldRewind()
+    public function testShouldRewind(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -142,7 +142,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldRewindACursorThatHasAlreadyBeenInitialized()
+    public function testShouldRewindACursorThatHasAlreadyBeenInitialized(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -165,7 +165,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(0, $cursor->key());
     }
 
-    public function testShouldGetCurrentUsingLegacyRecordClasses()
+    public function testShouldGetCurrentUsingLegacyRecordClasses(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -181,7 +181,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals('John Doe', $entity->name);
     }
 
-    public function testShouldGetFirstWhenEmpty()
+    public function testShouldGetFirstWhenEmpty(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -201,7 +201,7 @@ class SchemaCursorTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testShouldRefreshTheCursor()
+    public function testShouldRefreshTheCursor(): void
     {
         // Arrange
         $driverCursor = m::mock(IteratorIterator::class);
@@ -213,7 +213,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(null, $cursor->key());
     }
 
-    public function testShouldImplementKeyMethodFromIterator()
+    public function testShouldImplementKeyMethodFromIterator(): void
     {
         // Arrange
         $cursor = $this->getCursor();
@@ -224,7 +224,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(7, $cursor->key());
     }
 
-    public function testShouldImplementNextMethodFromIterator()
+    public function testShouldImplementNextMethodFromIterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -242,7 +242,7 @@ class SchemaCursorTest extends TestCase
         $this->assertEquals(8, $cursor->key());
     }
 
-    public function testShouldImplementValidMethodFromIterator()
+    public function testShouldImplementValidMethodFromIterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -257,7 +257,7 @@ class SchemaCursorTest extends TestCase
         $this->assertTrue($cursor->valid());
     }
 
-    public function testShouldWrapMongoDriverCursorWithIteratoriterator()
+    public function testShouldWrapMongoDriverCursorWithIteratoriterator(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -285,7 +285,7 @@ class SchemaCursorTest extends TestCase
         $this->assertInstanceOf(IteratorIterator::class, $result);
     }
 
-    public function testShouldReturnResultsToArray()
+    public function testShouldReturnResultsToArray(): void
     {
         // Arrange
         $collection = m::mock(Collection::class);
@@ -318,7 +318,7 @@ class SchemaCursorTest extends TestCase
         );
     }
 
-    public function testShouldSerializeAnActiveCursor()
+    public function testShouldSerializeAnActiveCursor(): void
     {
         // Arrange
         $connection = $this->instance(Connection::class, m::mock(Connection::class));
@@ -357,7 +357,7 @@ class SchemaCursorTest extends TestCase
         $command = 'find',
         $params = [[]],
         $driverCursor = null
-    ) {
+    ): SchemaCursor {
         if (!$entitySchema) {
             $entitySchema = m::mock(Schema::class.'[]');
         }

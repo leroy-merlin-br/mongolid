@@ -115,7 +115,7 @@ final class CursorTest extends TestCase
 
         // Expectations
         $collection
-            ->expects('count')
+            ->expects('countDocuments')
             ->with([])
             ->andReturn(5);
 
@@ -134,7 +134,7 @@ final class CursorTest extends TestCase
 
         // Expectations
         $collection->expects()
-            ->count([])
+            ->countDocuments([])
             ->andReturn(5);
 
         // Actions
@@ -148,7 +148,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -169,7 +169,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         $this->setProtected($cursor, 'position', 10);
@@ -394,7 +394,7 @@ final class CursorTest extends TestCase
     {
         // Set
         $collection = m::mock(Collection::class);
-        $driverCursor = m::mock(CachingIterator::class);
+        $driverCursor = m::mock(Iterator::class);
         $cursor = $this->getCursor($collection, 'find', [[]], $driverCursor);
 
         // Expectations
