@@ -38,7 +38,8 @@ jobs:
         run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=./coverage/clover.xml
 
       - name: Report coverage
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ./coverage/clover.xml
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          .codacy/get.sh report --project-token "$CODACY_PROJECT_TOKEN" -r ./coverage/clover.xml --partial
+          .codacy/get.sh final --project-token "$CODACY_PROJECT_TOKEN"
