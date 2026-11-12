@@ -15,12 +15,18 @@ jobs:
           - "8.5"
         mongo:
           - "7.0"
-          - "8.0"
+          # Includes the fix for Ubuntu's kernel version check (SERVER-125742).
+          - "8.0.38"
     services:
       mongodb:
         image: mongo:${{ matrix.mongo }}
         ports:
           - "27017:27017"
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
