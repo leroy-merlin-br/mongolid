@@ -15,7 +15,8 @@ jobs:
           - "8.5"
         mongo:
           - "7.0"
-          - "8.0"
+          # Includes the fix for Ubuntu's kernel version check (SERVER-125742).
+          - "8.0.38"
     services:
       mongodb:
         image: mongo:${{ matrix.mongo }}
