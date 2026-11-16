@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "ext-mongodb": "^1.20.0",
+        "ext-mongodb": "^1.21.13",
         "ext-ctype": "*",
         "illuminate/container": "^12.60",
         "illuminate/support": "^12.60",
