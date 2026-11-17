@@ -259,7 +259,9 @@ abstract class AbstractModel implements ModelInterface
         $database = $connection->defaultDatabase;
         $collectionName = $this->getCollectionName();
 
-        return $connection->getClient()->$database->$collectionName;
+        return $connection->getClient()
+            ->selectDatabase($database)
+            ->selectCollection($collectionName);
     }
 
     /**

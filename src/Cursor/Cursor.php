@@ -278,7 +278,9 @@ class Cursor implements CursorInterface
     {
         $connection = Container::make(Connection::class);
         $db = $connection->defaultDatabase;
-        $collectionObject = $connection->getClient()->$db->{$attributes['collection']};
+        $collectionObject = $connection->getClient()
+            ->selectDatabase($db)
+            ->selectCollection($attributes['collection']);
 
         foreach ($attributes as $key => $value) {
             $this->$key = $value;
