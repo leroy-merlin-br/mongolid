@@ -59,7 +59,7 @@ class SequenceService
         $database = $this->connection->defaultDatabase;
 
         return $this->connection->getClient()
-            ->$database
-            ->{$this->collection};
+            ->selectDatabase($database)
+            ->selectCollection($this->collection);
     }
 }

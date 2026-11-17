@@ -15,7 +15,11 @@ const config = {
     url: 'https://leroy-merlin-br.github.io/',
     baseUrl: '/mongolid/',
     onBrokenLinks: 'throw',
-    onBrokenMarkdownLinks: 'warn',
+    markdown: {
+        hooks: {
+            onBrokenMarkdownLinks: 'warn',
+        },
+    },
     trailingSlash: false,
     favicon: 'img/mongolid.ico',
 
