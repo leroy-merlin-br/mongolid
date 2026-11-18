@@ -36,14 +36,23 @@ The inverse of `fillable` is `guarded`, and serves as a "black-list" instead of 
     }
 ```
 
-In the example above, the `id` and `votes` attributes may **not** be mass assigned.
+In the example above, the `_id` and `votes` attributes may **not** be mass assigned.
 All other attributes will be mass assignable.
 
-You can mass assign attributes using the `fill` static method:
+You can mass assign attributes using the static `fill` method. It receives the input array, an optional model instance to fill and an optional `$force` flag. When no instance is given, a new one is created:
 
 ```php title="Mass assigning attributes"
     $post = new Post;
-    $post = $post->fill(['title' => 'Bacon'], $post);
-    // or
-    $post = Post::fill(['title' => 'Bacon'], $post);
+    $post = Post::fill(['title' => 'Bacon']);
+    // or fill an existing instance
+    $post = Post::fill(['title' => 'Bacon'], new Post);
+```
+
+## Bypassing mass assignment protection
+
+Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
+
+```php title="Forcing attributes"
+    $post = new Post;
+    $post->forceFill(['_id' => '4af9f23d8ead0e1d32000000', 'votes' => 10]);
 ```

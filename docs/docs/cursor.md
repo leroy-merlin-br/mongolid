@@ -42,6 +42,24 @@ For example:
     
     // Returns the first result
     $cursor->first();
+
+    // Counts the documents that match the query
+    $cursor->count();
+
+    // Returns an array of model instances
+    $cursor->all();
+
+    // Returns an array of arrays
+    $cursor->toArray();
+
+    // Prevents the server from closing the cursor after the idle timeout
+    $cursor->disableTimeout();
+
+    // Routes reads to replica set members, using a MongoDB\Driver\ReadPreference mode
+    $cursor->setReadPreference(\MongoDB\Driver\ReadPreference::RP_SECONDARY);
+
+    // Resets the cursor so it can be iterated again, making a new request to the database
+    $cursor->fresh();
 ```
 
 You can also chain some methods:

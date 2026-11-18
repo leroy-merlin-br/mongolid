@@ -20,7 +20,10 @@ class Person extends \Mongolid\Model\AbstractModel {
 
 When you define an attribute to be cast as `DateTime` or `DateTimeImmutable`, Mongolid will load it from database will do its trick to return an `DateTime` instance(or `DateTimeImmutable`)  anytime you try to access it with property accessor operator (`->`).
 
-If you need to manipulate its original value on MongoDB, then you can access it through `getDocumentAttributes()` method
+If you need the raw value stored for the attribute, you can access it through the `getDocumentAttributes()` method. 
+To get the values as they were when the model was loaded or last persisted, use `getOriginalDocumentAttributes()`.
+
+Only `datetime` and `immutable_datetime` are valid cast names. Any other name throws `Mongolid\Model\Casts\Exceptions\InvalidCastException` when the attribute is accessed or set.
 
 To write a value on an attribute with `DateTime` cast, you can use both an `\MongoDB\BSON\UTCDateTime`, `\DateTime` or `\DateTimeImmutable` instance.
 Internally, Mongolid will manage to set the property as an UTCDateTime, because it is the datetime format accepted by MongoDB.
