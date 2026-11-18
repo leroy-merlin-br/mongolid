@@ -8,7 +8,6 @@ use MongoDB\Driver\ReadPreference;
 use Mongolid\Connection\Connection;
 use Mongolid\Container\Container;
 use Mongolid\LegacyRecord;
-use Serializable;
 use Traversable;
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor as DriverCursor;
@@ -160,7 +159,7 @@ class SchemaCursor implements CursorInterface
      *
      * @return $this
      */
-    public function setReadPreference(int|string $mode): static
+    public function setReadPreference(string $mode): static
     {
         $this->params[1]['readPreference'] = new ReadPreference($mode);
 
@@ -174,7 +173,7 @@ class SchemaCursor implements CursorInterface
      */
     public function count(): int
     {
-        return $this->collection->count(...$this->params);
+        return $this->collection->countDocuments(...$this->params);
     }
 
     public function params(): array

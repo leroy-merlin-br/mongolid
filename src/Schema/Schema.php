@@ -87,7 +87,7 @@ abstract class Schema
      *
      * @return int
      */
-    public function sequence(int $value = null)
+    public function sequence(?int $value = null)
     {
         if ($value) {
             return $value;

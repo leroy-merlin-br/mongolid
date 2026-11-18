@@ -57,12 +57,12 @@ final class SequenceServiceTest extends TestCase
             ->andReturn($client);
 
         $client
-            ->expects('selectDatabase')
+            ->expects('getDatabase')
             ->with('production')
             ->andReturn($database);
 
         $database
-            ->expects('selectCollection')
+            ->expects('getCollection')
             ->with('foobar')
             ->andReturn($collection);
 
