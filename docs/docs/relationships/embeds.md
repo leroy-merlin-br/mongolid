@@ -1,4 +1,4 @@
-# Embeds
+``# Embeds
 
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
@@ -48,7 +48,7 @@ Once the relationship is defined, we can retrieve and embed documents.
 1. First we get the relation:
 
     ```php
-        $relation = User::find('4af9f23d8ead0e1d32000000')->phone();
+        $relation = User::first('4af9f23d8ead0e1d32000000')->phone();
     ```
 
     :::info **Explanation**:
@@ -67,7 +67,7 @@ Once the relationship is defined, we can retrieve and embed documents.
     OR inline:
 
     ```php
-        $phone = User::find('4af9f23d8ead0e1d32000000')->phone()->get();
+        $phone = User::first('4af9f23d8ead0e1d32000000')->phone()->get();
     ```
 
     :::info **Explanation**
@@ -129,7 +129,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
 Now we can access the post's comments `EmbeddedCursor` through the comments method:
 
 ```php
-    $comments = Post::find('4af9f23d8ead0e1d32000000')->comments()->get();
+    $comments = Post::first('4af9f23d8ead0e1d32000000')->comments()->get();
 ```
 
 Now you can iterate and perform cursor operations in the `EmbeddedCursor` that is retrieved

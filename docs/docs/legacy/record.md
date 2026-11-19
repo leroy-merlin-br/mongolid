@@ -8,6 +8,11 @@ Here you find the differences that `AbstractModel` can't do anymore, but `Legacy
     $post->fill(['title' => 'Bacon']);
 ```
 
-```php title="Converting a model to json"
-    return User::find(1)->toJson();
+```php title="Converting a model to an array"
+    $user = User::first(1);
+    return $user->toArray();
+```
+
+```php title="Reloading a model from the database"
+    $fresh = $user->fresh();
 ```

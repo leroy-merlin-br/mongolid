@@ -51,7 +51,7 @@ the second argument is the attribute where the referenced model `_id` will be st
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $user = Post::find('4af9f23d8ead0e1d32000000')->author()->get();
+    $user = Post::first('4af9f23d8ead0e1d32000000')->author()->get();
 ```
 
 :::info Explanation:
@@ -112,7 +112,7 @@ the second argument is the attribute where the `_id`s will be stored.
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $posts = User::find('4af9f23d8ead0e1d32000000')->posts()->get();
+    $posts = User::first('4af9f23d8ead0e1d32000000')->posts()->get();
 ```
 
 :::info Explanation:
