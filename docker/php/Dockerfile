@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 USER root:root
 
@@ -11,7 +11,7 @@ RUN apt-get update -qq \
     zlib1g-dev libicu-dev \
     && apt-get clean
 
-RUN pecl install xdebug-3.4.2 mongodb-1.20.1 \
+RUN pecl install xdebug-3.4.2 mongodb-1.21.13 \
   && docker-php-ext-enable \
     mongodb xdebug \
   && docker-php-ext-configure  \
