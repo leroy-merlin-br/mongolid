@@ -11,7 +11,7 @@ on:
         description: Branch targeted by the pull request
         required: false
         type: string
-        default: main
+        default: master
       title:
         description: Pull request title
         required: true
