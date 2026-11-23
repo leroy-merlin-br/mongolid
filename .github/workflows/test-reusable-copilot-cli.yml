@@ -1,13 +1,16 @@
 name: Test Reusable Copilot CLI
 
 on:
+  # TEMPORARY: remove before merging to master
+  push:
+    branches: [ci/add-workflow-to-document-changes-automatically]
   workflow_dispatch:
     inputs:
       base-branch:
         description: Base branch for edit mode tests
         required: true
         type: string
-        default: main
+        default: master
       model:
         description: Copilot model ID
         required: true
@@ -23,7 +26,7 @@ jobs:
     uses: ./.github/workflows/reusable-copilot-cli.yml
     with:
       prompt: "Responda em uma frase curta: o que é um pull request? Não use ferramentas."
-      model: ${{ inputs.model }}
+      model: ${{ inputs.model || 'auto' }}
     secrets:
       COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
 
@@ -39,8 +42,8 @@ jobs:
         contendo o título Markdown "Teste do Copilot" e uma frase curta dizendo que esta é uma alteração de teste.
         Não altere outros arquivos.
       execution-mode: edit
-      model: ${{ inputs.model }}
-      base-branch: ${{ inputs.base-branch }}
+      model: ${{ inputs.model || 'auto' }}
+      base-branch: ${{ inputs.base-branch || 'master' }}
       pr-branch: automation/test-copilot-${{ github.run_id }}-${{ github.run_attempt }}
       pr-title: "test: validate Copilot edit mode"
       pr-body: "PR criada para testar o modo edit do workflow do Copilot. Pode ser fechada após a validação."
@@ -58,8 +61,8 @@ jobs:
     with:
       prompt: "Não crie, modifique, renomeie ou exclua nenhum arquivo. Responda somente: nenhuma alteração necessária."
       execution-mode: edit
-      model: ${{ inputs.model }}
-      base-branch: ${{ inputs.base-branch }}
+      model: ${{ inputs.model || 'auto' }}
+      base-branch: ${{ inputs.base-branch || 'master' }}
       pr-branch: automation/test-copilot-no-changes-${{ github.run_id }}-${{ github.run_attempt }}
       pr-title: "test: unexpected Copilot changes"
       pr-body: "Esta PR foi criada inesperadamente durante o teste sem alterações. Investigue e feche após a validação."
