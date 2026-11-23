@@ -1,11 +1,14 @@
 ---
-name: mongolid-docs
+name: mongolid-documenter
 description: Write and update the Mongolid library behavior documentation in docs/docs (Docusaurus). Use when asked to document, update, or review docs for Mongolid features, or when source code in src/ changes public behavior.
 ---
 
 # Mongolid documentation
 
-`docs/docs/` is the official, human-readable description of how the Mongolid library behaves for its users. The site is built with Docusaurus (`docs/`) and published by CI. Developers review the docs in a pull request before merge. Your output is a draft for that review, so be accurate and conservative.
+`docs/docs/` is the official, human-readable description of how the Mongolid library behaves for its users. 
+The site is built with Docusaurus (`docs/`) and published by CI. 
+Developers review the docs in a pull request before merge. 
+Your output is a draft for that review, so be accurate and conservative.
 
 ## Source of truth
 
@@ -20,6 +23,7 @@ Document **library behavior** only:
 - Public API a user calls (models, relations, query builder, cursor, casting, mass assignment, soft delete, events, schema, cache, sequences, and so on).
 - Configuration users must set, such as the connection, collection name, and casts.
 - Observable behavior, edge cases, and errors users may hit.
+- Legacy behavior that is still supported, such as `LegacyRecord` and `HasLegacyAttributesTrait`.
 
 Do not document:
 - Internal classes or private methods, unless they are part of the public API.
@@ -77,7 +81,8 @@ When feasible, validate the docs build:
 cd docs && npm ci && npm run build
 ```
 
-Do not run the PHP test suite just to validate docs. Use it only to confirm a behavior you are unsure about, with the smallest targeted filter, for example `vendor/bin/phpunit --filter <Name>`.
+Do not run the PHP test suite just to validate docs. 
+Use it only to confirm a behavior you are unsure about, with the smallest targeted filter, for example `vendor/bin/phpunit --filter <Name>`.
 
 ## Output
 
