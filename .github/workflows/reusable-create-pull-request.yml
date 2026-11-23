@@ -1,0 +1,176 @@
+name: Reusable Create Pull Request
+
+on:
+  workflow_call:
+    inputs:
+      head-branch:
+        description: Branch for the pull request in the caller repository
+        required: true
+        type: string
+      base-branch:
+        description: Branch targeted by the pull request
+        required: false
+        type: string
+        default: main
+      title:
+        description: Pull request title
+        required: true
+        type: string
+      body:
+        description: Pull request body (Markdown)
+        required: false
+        type: string
+        default: ""
+      labels:
+        description: Comma-separated existing labels to add to the pull request
+        required: false
+        type: string
+        default: ""
+      changes-artifact:
+        description: Optional artifact in this run containing a Git patch named changes.patch
+        required: false
+        type: string
+        default: ""
+      base-sha:
+        description: Base commit used to generate the patch; required with changes-artifact
+        required: false
+        type: string
+        default: ""
+      commit-message:
+        description: Commit message used when publishing a patch
+        required: false
+        type: string
+        default: "chore: apply automated changes"
+    secrets:
+      PR_TOKEN:
+        description: Optional GitHub App or PAT token for creating PRs and triggering downstream workflows
+        required: false
+    outputs:
+      pull-request-number:
+        description: Pull request number
+        value: ${{ jobs.pull-request.outputs.number }}
+      pull-request-url:
+        description: Pull request URL
+        value: ${{ jobs.pull-request.outputs.url }}
+      operation:
+        description: Whether the pull request was created or updated
+        value: ${{ jobs.pull-request.outputs.operation }}
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      number: ${{ steps.pr.outputs.number }}
+      url: ${{ steps.pr.outputs.url }}
+      operation: ${{ steps.pr.outputs.operation }}
+    steps:
+      - name: Validate inputs
+        env:
+          HEAD_BRANCH: ${{ inputs.head-branch }}
+          BASE_BRANCH: ${{ inputs.base-branch }}
+          TITLE: ${{ inputs.title }}
+          ARTIFACT: ${{ inputs.changes-artifact }}
+          BASE_SHA: ${{ inputs.base-sha }}
+          COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -n "${TITLE//[[:space:]]/}" ]] || { echo '::error::title must not be empty'; exit 1; }
+          git check-ref-format "refs/heads/$HEAD_BRANCH" || { echo '::error::invalid head-branch'; exit 1; }
+          git check-ref-format "refs/heads/$BASE_BRANCH" || { echo '::error::invalid base-branch'; exit 1; }
+          [[ "$HEAD_BRANCH" != "$BASE_BRANCH" ]] || { echo '::error::head-branch and base-branch must be different'; exit 1; }
+          if [[ -n "$ARTIFACT" ]]; then
+            [[ "$BASE_SHA" =~ ^[0-9a-f]{40,64}$ ]] || { echo '::error::base-sha must be the full base commit SHA'; exit 1; }
+            [[ -n "${COMMIT_MESSAGE//[[:space:]]/}" ]] || { echo '::error::commit-message must not be empty'; exit 1; }
+          fi
+
+      - name: Checkout base branch
+        if: inputs.changes-artifact != ''
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base-branch }}
+          token: ${{ secrets.PR_TOKEN || github.token }}
+          persist-credentials: false
+
+      - name: Download changes
+        if: inputs.changes-artifact != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.changes-artifact }}
+          path: ${{ runner.temp }}/pull-request-changes
+
+      - name: Commit and publish changes
+        if: inputs.changes-artifact != ''
+        env:
+          GH_TOKEN: ${{ secrets.PR_TOKEN || github.token }}
+          GH_ENTERPRISE_TOKEN: ${{ secrets.PR_TOKEN || github.token }}
+          SERVER_URL: ${{ github.server_url }}
+          HEAD_BRANCH: ${{ inputs.head-branch }}
+          BASE_SHA: ${{ inputs.base-sha }}
+          COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GH_HOST="${SERVER_URL#https://}"
+          [[ "$(git rev-parse HEAD)" == "$BASE_SHA" ]] || { echo '::error::base branch changed since the patch was generated; rerun the workflow'; exit 1; }
+          git apply --index "$RUNNER_TEMP/pull-request-changes/changes.patch"
+          git diff --cached --quiet && { echo '::error::patch contains no changes'; exit 1; }
+          git switch -c "$HEAD_BRANCH"
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            -c core.hooksPath=/dev/null commit -m "$COMMIT_MESSAGE"
+          gh auth setup-git --hostname "$GH_HOST" --force
+          # A fixed automation branch is replaced only if it has not moved since this check.
+          remote_sha="$(git ls-remote --heads origin "refs/heads/$HEAD_BRANCH" | cut -f1)"
+          git push --force-with-lease="refs/heads/$HEAD_BRANCH:$remote_sha" \
+            origin "HEAD:refs/heads/$HEAD_BRANCH"
+
+      - name: Create or update pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.PR_TOKEN || github.token }}
+          GH_ENTERPRISE_TOKEN: ${{ secrets.PR_TOKEN || github.token }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          HEAD_BRANCH: ${{ inputs.head-branch }}
+          BASE_BRANCH: ${{ inputs.base-branch }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+          LABELS: ${{ inputs.labels }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GH_HOST="${SERVER_URL#https://}"
+          api="repos/$REPOSITORY/pulls"
+          number="$(gh api --method GET "$api" -f state=open -f base="$BASE_BRANCH" \
+            -f head="$OWNER:$HEAD_BRANCH" --jq '.[0].number // empty')"
+          if [[ -n "$number" ]]; then
+            result="$(gh api --method PATCH "$api/$number" -f title="$TITLE" -f body="$BODY")"
+            operation=updated
+          else
+            result="$(gh api --method POST "$api" -f title="$TITLE" -f body="$BODY" \
+              -f head="$HEAD_BRANCH" -f base="$BASE_BRANCH")"
+            operation=created
+          fi
+
+          number="$(jq -er '.number | select(type == "number")' <<< "$result")"
+          url="$(jq -er '.html_url | select(type == "string" and length > 0)' <<< "$result")"
+          IFS=',' read -r -a labels <<< "$LABELS"
+          label_args=()
+          for label in "${labels[@]}"; do
+            label="${label#"${label%%[![:space:]]*}"}"
+            label="${label%"${label##*[![:space:]]}"}"
+            [[ -z "$label" ]] || label_args+=(-f "labels[]=$label")
+          done
+          if (( ${#label_args[@]} )); then
+            gh api --method POST "repos/$REPOSITORY/issues/$number/labels" "${label_args[@]}" >/dev/null
+          fi
+          {
+            printf 'number=%s\n' "$number"
+            printf 'url=%s\n' "$url"
+            printf 'operation=%s\n' "$operation"
+          } >> "$GITHUB_OUTPUT"
