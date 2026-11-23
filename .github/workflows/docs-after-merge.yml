@@ -1,0 +1,85 @@
+name: Update Docs After Merge
+
+on:
+  push:
+    branches:
+      - master
+      # TEMPORARY: remove before merging to master
+      - temp/docs-tests
+  workflow_dispatch:
+    inputs:
+      base-branch:
+        description: Branch whose merge commits are analyzed and targeted by the PR
+        required: true
+        type: string
+        default: master
+
+permissions:
+  contents: read
+
+jobs:
+  list-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.merges.outputs.ready }}
+      from: ${{ steps.merges.outputs.from }}
+      to: ${{ steps.merges.outputs.to }}
+      pr-branch: ${{ steps.pr-branch.outputs.name }}
+    steps:
+      - name: Checkout with full history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base-branch || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Compute versioned PR branch name
+        id: pr-branch
+        run: |
+          echo "name=automation/docs-after-merge-$(TZ=America/Sao_Paulo date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: List changes between the last commit and the last merge
+        id: merges
+        run: |
+          set -euo pipefail
+          # Search from HEAD~1 so a merge commit at HEAD does not compare against itself
+          old=$(git rev-list --merges -n 1 HEAD~1 || true)
+          if [[ -z "$old" ]]; then
+            echo '::notice::no merge commit found before HEAD; skipping docs update'
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          new=$(git rev-parse HEAD)
+          {
+            echo '## Mudanças entre o último commit e o último merge'
+            printf '\nDe: `%s` (último merge)\nAté: `%s` (último commit)\n' "$old" "$new"
+            echo '### Commits'
+            git log --oneline "$old..$new" | sed 's/^/- /'
+            echo '### Arquivos alterados'
+            git diff --name-status "$old" "$new" | sed 's/^/- /'
+          } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo 'ready=true'
+            echo "from=$old"
+            echo "to=$new"
+          } >> "$GITHUB_OUTPUT"
+
+  update-docs:
+    needs: list-changes
+    if: needs.list-changes.outputs.ready == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
+      copilot-requests: write
+    uses: ./.github/workflows/reusable-copilot-cli.yml
+    with:
+      command: make docs FROM=${{ needs.list-changes.outputs.from }} TO=${{ needs.list-changes.outputs.to }}
+      fetch-depth: 0
+      execution-mode: edit
+      base-branch: ${{ inputs.base-branch || github.ref_name }}
+      pr-branch: ${{ needs.list-changes.outputs.pr-branch }}
+      pr-title: "docs: atualização da documentação após merge na master"
+      pr-body: "Documentação atualizada automaticamente pelo comando make docs após merge na master. Revise antes de aprovar e mesclar."
+      commit-paths: docs/
+    secrets:
+      COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+      PR_TOKEN: ${{ secrets.PR_TOKEN }}
