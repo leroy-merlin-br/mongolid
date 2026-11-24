@@ -130,7 +130,7 @@ final class ReferencesManyRelationTest extends IntegrationTestCase
         $this->assertGrandsons([$chuck], $john);
     }
 
-    private function createUser(string $name, string $code = null): ReferencedUser
+    private function createUser(string $name, ?string $code = null): ReferencedUser
     {
         $user = new ReferencedUser();
         $user->_id = new ObjectId();
