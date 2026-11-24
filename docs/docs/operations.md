@@ -41,6 +41,8 @@ To delete a model, simply call the `delete` method on the instance:
     
     $post->delete();
 ```
+`update` sends only the changed attributes (`$set` and `$unset`) and returns `false` when nothing was modified. `save` also returns `false` when the document is unchanged.
+
 ## Reload a model from database
 
 You can reload an instance from database by using the `fresh()` method (or its alias `refresh()`):
@@ -69,6 +71,8 @@ You can reload an instance from database by using the `fresh()` method (or its a
     $post = Post::firstOrNew('4af9f23d8ead0e1d32000000');
 ```
 
+A projection accepts `['title' => 1]`, `['title' => true]`, `['title', 'body']` or `['title', '-body']` (a leading `-` excludes the field). Any other format throws `InvalidArgumentException`.
+
 Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache.
 
 ```php title="Using the cache"
@@ -96,7 +100,7 @@ Use `Mongolid\Query\BulkWrite` to group several `updateOne` operations in a sing
     $result = $bulk->execute(); // MongoDB\BulkWriteResult
 ```
 
-The operations list is cleared after `execute`. Use `isEmpty()` and `count()` to inspect it.
+`execute` accepts an optional write concern (default `1`). The operations list is cleared after `execute`. Use `isEmpty()` and `count()` to inspect it.
 
 ## Updating many documents
 

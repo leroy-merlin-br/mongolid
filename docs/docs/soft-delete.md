@@ -41,6 +41,8 @@ To use another attribute name, define a `DELETED_AT` constant on the model:
     $products = Product::withTrashed(['category' => 'tools']);
 ```
 
+`delete()` and `restore()` run through `update()`, so they fire the `updating` and `updated` events, not `deleting` and `deleted`. `forceDelete()` fires `deleting` and `deleted`. See [Events](events.md).
+
 :::info
-Set the public property `$isSoftDeleteEnabled` to `false` on a model to make `delete()` remove the document permanently.
+Set the public property `$isSoftDeleteEnabled` to `false` on a model to make `delete()` remove the document permanently. Queries then also stop filtering out documents that have the `deleted_at` attribute.
 :::

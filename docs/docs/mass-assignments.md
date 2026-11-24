@@ -48,6 +48,29 @@ You can mass assign attributes using the static `fill` method. It receives the i
     $post = Post::fill(['title' => 'Bacon'], new Post);
 ```
 
+## Attribute mutators
+
+Set the `$mutable` property to `true` to run custom methods when an attribute is read or written. The method names are `get{StudlyName}DocumentAttribute` and `set{StudlyName}DocumentAttribute`. The setter receives the value and returns the value to store.
+
+```php title="Defining mutators"
+    class Post extends \Mongolid\Model\AbstractModel {
+
+        protected $mutable = true;
+
+        public function getShortNameDocumentAttribute(): string
+        {
+            return 'Other name';
+        }
+
+        public function setShortNameDocumentAttribute($value): string
+        {
+            return strtoupper($value);
+        }
+    }
+```
+
+When a getter exists, its return value is used instead of the stored value. Without `$mutable = true`, the methods are ignored.
+
 ## Bypassing mass assignment protection
 
 Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
