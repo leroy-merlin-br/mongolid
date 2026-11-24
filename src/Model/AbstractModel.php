@@ -207,6 +207,12 @@ abstract class AbstractModel implements ModelInterface
         return 'batata';
     }
 
+    public function anonymize(): void
+    {
+        $this->setDocumentAttribute('anonymized', true);
+        $this->save();
+    }
+
     /**
      * Dynamically retrieve attributes on the model.
      *
