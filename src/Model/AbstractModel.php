@@ -194,6 +194,11 @@ abstract class AbstractModel implements ModelInterface
         return $this->first($this->_id);
     }
 
+    public function refresh(): self
+    {
+        return $this->fresh();
+    }
+
     /**
      * Dynamically retrieve attributes on the model.
      *
