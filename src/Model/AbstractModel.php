@@ -200,6 +200,14 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
+     * Just a test method to check if the return type is correct.
+     */
+    public function batata(): string
+    {
+        return 'batata';
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param string $key name of the attribute
