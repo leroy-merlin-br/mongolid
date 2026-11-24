@@ -32,8 +32,10 @@ If you try to create references between documents like you would do in a relatio
 
 ```php
     class Post extends \Mongolid\LegacyRecord {
-        {
-            // highlight-next-line
+        protected $collection = 'posts';
+    
+        public function author()
+        {          
             return $this->referencesOne(User::class, 'author');
         }
     }
