@@ -97,6 +97,20 @@ On `AbstractModel`, the third argument only caches query results. It does not ea
 `AbstractModel::firstOrFail` accepts `$useCache` but does not pass it on, so it always reads from the database.
 :::
 
+### Projections
+
+The second argument of `where`, `first` and `firstOrFail` selects the fields to return. You can use the MongoDB format, with `1` or `true` to include a field and `0` or `false` to exclude it, or a list of field names.
+
+```php title="Projections"
+    $posts = Post::where([], ['title' => 1]);
+    $posts = Post::where([], ['title' => true]);
+
+    // Include title and exclude _id
+    $posts = Post::where([], ['title', '-_id']);
+```
+
+Prefix a name with `-` in a list to exclude it. Any other value throws `InvalidArgumentException`.
+
 ## Bulk writes
 
 Use `Mongolid\Query\BulkWrite` to group several `updateOne` operations in a single request. The collection comes from the given model.
