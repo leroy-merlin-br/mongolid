@@ -80,7 +80,7 @@ On `LegacyRecord`, `first` and `firstOrFail` also accept `$useCache` as the thir
 
 ## Limits and cache
 
-- Only the first 100 models of the query are cached, and only the first 100 related models of each `$with` entry. Models after that limit are fetched normally.
+- Mongolid reads the ids from the first 100 models of the query only, and caches at most 100 related models of each `$with` entry. Models after that limit are fetched normally.
 - Related models are stored in the registered `Mongolid\Util\CacheComponentInterface` under the key `{collection}:{_id}` (for example `prices:5f...`).
 - Entries are stored for 36 minutes.
 - If `$with` is empty or the query returns no documents, nothing is cached.

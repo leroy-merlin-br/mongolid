@@ -28,6 +28,8 @@ Only `datetime` and `immutable_datetime` are valid cast names. Any other name th
 To write a value on an attribute with `DateTime` cast, you can use both an `\MongoDB\BSON\UTCDateTime`, `\DateTime` or `\DateTimeImmutable` instance.
 Internally, Mongolid will manage to set the property as an UTCDateTime, because it is the datetime format accepted by MongoDB.
 
+`LegacyRecord` also supports `$casts`. See [Legacy Record](legacy/record.md).
+
 Check out some usages and examples:
 
 ```php
@@ -45,3 +47,27 @@ $user->birthdate = DateTime::createFromFormat('d/m/Y', '01/03/1970');
 
 ```
 
+
+## Mutators
+
+Set `$mutable` to `true` on the model to transform attributes when they are read or written. Mongolid looks for a method named `get` or `set`, the studly case name of the attribute and `DocumentAttribute`.
+
+```php
+class Person extends \Mongolid\Model\AbstractModel {
+    protected $mutable = true;
+
+    // Runs on $person->short_name. It takes no arguments and replaces the stored value.
+    public function getShortNameDocumentAttribute(): string
+    {
+        return strtoupper($this->name);
+    }
+
+    // Runs on $person->short_name = 'abc'. The returned value is stored.
+    public function setShortNameDocumentAttribute($value): string
+    {
+        return strtolower($value);
+    }
+}
+```
+
+Without `$mutable`, the methods are ignored. `isset($person->short_name)` also uses the `get` mutator.

@@ -48,6 +48,20 @@ You can mass assign attributes using the static `fill` method. It receives the i
     $post = Post::fill(['title' => 'Bacon'], new Post);
 ```
 
+When the model implements `Mongolid\Model\PolymorphableModelInterface`, `fill` calls `polymorph(array $input)` with the current attributes merged with the input. It must return a class name. When the class differs from the model's, `fill` returns an instance of that class with the same attributes.
+
+```php title="Polymorphic models"
+    class User extends \Mongolid\Model\AbstractModel implements \Mongolid\Model\PolymorphableModelInterface
+    {
+        public function polymorph(array $input): string
+        {
+            return 'admin' === ($input['type'] ?? '') ? Admin::class : static::class;
+        }
+    }
+
+    $user = User::fill(['type' => 'admin']); // Admin instance
+```
+
 ## Bypassing mass assignment protection
 
 Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
