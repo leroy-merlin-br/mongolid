@@ -41,6 +41,10 @@ To use another attribute name, define a `DELETED_AT` constant on the model:
     $products = Product::withTrashed(['category' => 'tools']);
 ```
 
+## Events
+Soft deleting runs `update()`, so it fires the `updating` and `updated` [events](./events.md), not `deleting` and `deleted`. `forceDelete()` fires `deleting` and `deleted`.
+
+
 :::info
 Set the public property `$isSoftDeleteEnabled` to `false` on a model to make `delete()` remove the document permanently.
 :::
