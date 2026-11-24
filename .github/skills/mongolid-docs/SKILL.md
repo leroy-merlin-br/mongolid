@@ -21,6 +21,7 @@ Your output is a draft for that review, so be accurate and conservative.
 
 Document **library behavior** only:
 - Public API a user calls (models, relations, query builder, cursor, casting, mass assignment, soft delete, events, schema, cache, sequences, and so on).
+- Public methods inserted or updated on AbstractModel, LegacyRecord, HasAttributesTrait, HasLegacyAttributesTrait, HasLegacyRelationsTrait, and other public classes.
 - Configuration users must set, such as the connection, collection name, and casts.
 - Observable behavior, edge cases, and errors users may hit.
 - Legacy behavior that is still supported, such as `LegacyRecord` and `HasLegacyAttributesTrait`.
