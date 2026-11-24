@@ -45,7 +45,7 @@ It does not change the instance you call it on.
 Keep these points in mind:
 
 - Unsaved changes on `$user` are not included in `$fresh`.
-- `fresh` returns `null` when no document with that `_id` exists anymore, for example after the document was deleted.
+- `fresh` is declared to return a model. When no document with that `_id` exists anymore, for example after it was deleted, PHP throws a `TypeError`. Use `User::first($user->_id)` if the document may be gone.
 - `fresh` always queries the database and does not use the cache.
 
 ## Mutators

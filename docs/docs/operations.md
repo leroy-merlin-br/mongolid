@@ -46,6 +46,7 @@ To delete a model, simply call the `delete` method on the instance:
 - `insert` returns `true` when a document is inserted.
 - `save` and `update` return `true` only when the write is acknowledged and the database inserted or modified a document, so they return `false` when nothing changed.
 - `delete` returns `true` when a document is deleted.
+- `update` on a model without an `_id` inserts the document instead.
 
 ## Reload a model from database
 
@@ -60,8 +61,8 @@ You can reload an instance from database by using the `fresh()` method (or its a
 
 Keep these points in mind:
 
-- Unsaved changes on `$user` are not included in `$fresh`.
-- `fresh` returns `null` when no document with that `_id` exists anymore, for example after the document was deleted.
+- Unsaved changes on `$post` are not included in `$updatedPost`.
+- `fresh` is declared to return a model. When no document with that `_id` exists anymore, for example after it was deleted, PHP throws a `TypeError`. Use `Post::first($post->_id)` if the document may be gone.
 - `fresh` always queries the database and does not use the cache.
 
 
@@ -83,7 +84,7 @@ Keep these points in mind:
     $post = Post::firstOrNew('4af9f23d8ead0e1d32000000');
 ```
 
-Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache.
+Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache. The cached results are kept for 36 minutes, and only the first 100 documents of the query are cached. Documents after that limit are read from the database.
 
 ```php title="Using the cache"
     $post = Post::first($id, [], true);
