@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # References Relationships
 
 Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports four types of relationships:
@@ -32,6 +36,9 @@ If you try to create references between documents like you would do in a relatio
 
 ```php
     class Post extends \Mongolid\LegacyRecord {
+        protected $collection = 'posts';
+
+        public function author()
         {
             // highlight-next-line
             return $this->referencesOne(User::class, 'author');
@@ -126,32 +133,32 @@ the second argument is the attribute where the `_id`s will be stored.
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $posts = User::first('4af9f23d8ead0e1d32000000')->posts();
+    $questions = User::first('4af9f23d8ead0e1d32000000')->questions();
 ```
 
 :::info
 This statement will perform the following:
 
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
-- Query for all the posts with the `_id` in the user's _posts_ attribute
-- Return a cursor with the related posts
+- Query for all the questions with the `_id` in the user's _questions_ attribute
+- Return a cursor with the related questions
 :::
 
 In order to set a reference to a document use the attachment method, or it's alias. For example:
 
 ```php
-    $postA = new Post();
-    $postA->title = 'Nice post';
+    $questionA = new Question();
+    $questionA->title = 'Nice question';
     
-    $postB = new Post();
-    $postB->title = 'Nicer post';
+    $questionB = new Question();
+    $questionB->title = 'Nicer question';
     
     $user = User::first('4af9f23d8ead0e1d32000000');
     
     // Both ways work
     // highlight-start
-    $user->attachToPosts($postA);
-    $user->attach('posts', $postB);
+    $user->attachToQuestions($questionA);
+    $user->attach('questions', $questionB);
     // highlight-end
     
     $user->save();

@@ -1,4 +1,4 @@
-``---
+---
 sidebar_position: 3
 ---
 
@@ -9,7 +9,17 @@ sidebar_position: 3
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 `save` is an upsert: it inserts the document or replaces the existing one with the same `_id`.
 Use `insert` to force an insertion, which fails if the `_id` already exists.
-All of them return `true` when the write is acknowledged.
+All of them return a `bool`:
+
+- `save` returns `true` when the document was inserted or modified. It returns `false` when the write modified nothing.
+- `insert` returns `true` when the document was inserted.
+- `update` returns `true` when the document was modified. It returns `false` when nothing was modified. If the model has no `_id`, `update` inserts it.
+- `delete` returns `true` when a document was removed.
+
+With an unacknowledged write concern, all of them return `false`.
+
+Before each write, Mongolid sets `updated_at` (and `created_at`, if it is not set) to a `UTCDateTime`. Set `protected $timestamps = false;` on the model to disable this.
+The model write concern is `1` by default. Change it with `protected $writeConcern` or `setWriteConcern()`.
 
 ```php title="Saving a new model"
     $post = new Post();
@@ -43,7 +53,7 @@ To delete a model, simply call the `delete` method on the instance:
 ```
 ## Reload a model from database
 
-You can reload an instance from database by using `fresh()` method:
+You can reload an instance from database by using `fresh()` method. `refresh()` is an alias of it. Both return a new instance and do not change the current one:
 
 ```php
     $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -68,6 +78,17 @@ You can reload an instance from database by using `fresh()` method:
     // Returns the existing model, or a new one with the given _id
     $post = Post::firstOrNew('4af9f23d8ead0e1d32000000');
 ```
+
+The projection accepts these formats:
+
+```php title="Projection formats"
+    Post::where([], ['title' => true, '_id' => false]);
+    Post::where([], ['title' => 1, '_id' => -1]); // values >= 1 include, others exclude
+    Post::where([], ['title', 'body']); // include
+    Post::where([], ['title', '-_id']); // a leading "-" excludes
+```
+
+Any other format throws `InvalidArgumentException`. Passing `null` as the query to `first` returns `null`.
 
 Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache.
 

@@ -84,6 +84,7 @@ On `LegacyRecord`, `first` and `firstOrFail` also accept `$useCache` as the thir
 - Related models are stored in the registered `Mongolid\Util\CacheComponentInterface` under the key `{collection}:{_id}` (for example `prices:5f...`).
 - Entries are stored for 36 minutes.
 - If `$with` is empty or the query returns no documents, nothing is cached.
+- Dot notation in `key` supports one level only (`embedded_field.attribute`).
 
 ## Errors
 

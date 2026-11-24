@@ -56,3 +56,41 @@ Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
     $post = new Post;
     $post->forceFill(['_id' => '4af9f23d8ead0e1d32000000', 'votes' => 10]);
 ```
+
+## Null values
+
+Setting an attribute to `null` removes it from the model. Reading an attribute that is not set returns `null`, and `isset($post->title)` is `false` for `null` values.
+
+## Mutators
+
+Set `protected $mutable = true;` to run accessor and mutator methods. The method name is `get` or `set` + the attribute name in StudlyCase + `DocumentAttribute`:
+
+```php title="Defining mutators"
+    class Post extends \Mongolid\Model\AbstractModel {
+
+        protected $mutable = true;
+
+        public function getTitleDocumentAttribute()
+        {
+            return strtoupper($this->getDocumentAttributes()['title'] ?? '');
+        }
+
+        public function setTitleDocumentAttribute($value)
+        {
+            return trim($value);
+        }
+    }
+```
+
+The set mutator receives the value and must return the value to store.
+
+## Polymorphic models
+
+If a model implements `Mongolid\Model\PolymorphableModelInterface`, `fill` calls its `polymorph(array $input): string` method with the current attributes merged with the input. When it returns a different class, `fill` returns an instance of that class with the same attributes.
+
+```php
+    public function polymorph(array $input): string
+    {
+        return 'video' === ($input['type'] ?? '') ? VideoContent::class : Content::class;
+    }
+```

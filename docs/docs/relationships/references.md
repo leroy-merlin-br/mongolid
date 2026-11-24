@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # References
 
 In Mongolid a reference is made by storing the `_id` of the referenced object.
@@ -21,7 +25,7 @@ If you try to create references between documents like you would do in a relatio
 
 
 
-[Legacy References](docs/legacy/references.md) *For compatibility with version 2.x*
+[Legacy References](../legacy/references.md) *For compatibility with version 2.x*
 
 ---
 
@@ -36,7 +40,7 @@ If you try to create references between documents like you would do in a relatio
         public function author()
         {
             // highlight-next-line
-            return $this->referencesOne(User::class, 'author');
+            return $this->referencesOne(User::class, 'author_id');
         }
     
     }
@@ -48,21 +52,27 @@ If you try to create references between documents like you would do in a relatio
 
 The first argument passed to the `referencesOne` method is the name of the related model, 
 the second argument is the attribute where the referenced model `_id` will be stored. 
+The attribute **cannot** have the same name as the relation method. Mongolid throws `Mongolid\Model\Exception\InvalidFieldNameException` in that case.
+The optional third argument is the key of the referenced model (default `_id`).
+If you omit the second argument, Mongolid uses the snake case relation name + `_` + the key without the leading underscore (`author_id` in this example, `author_code` for key `code`).
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
     $user = Post::first('4af9f23d8ead0e1d32000000')->author()->get();
+
+    // or, reading the relation as a property
+    $user = Post::first('4af9f23d8ead0e1d32000000')->author;
 ```
 
 :::info Explanation:
 - Query for the post with the `_id` _'4af9f23d8ead0e1d32000000'_
-- Query for the user with the `_id` equals to the _author_ attribute of the post that returns relationship object
-- Get method to return the Author model filled
+- Query for the user with the `_id` equals to the _author_id_ attribute of the post that returns relationship object
+- Get method to return the User model filled, or `null` when the attribute is not set
 :::
 
 In order to set a reference to a document:
 ```php
-    // The object that will be embedded
+    // The object that will be referenced
     $user = new User();
     $user->name = 'John';
     $user->save() // This will populate the $user->_id
@@ -70,7 +80,7 @@ In order to set a reference to a document:
     // The object that will contain the user
     $post = Post::first('4af9f23d8ead0e1d32000000');
     
-    // This method will attach the $phone _id into the phone attribute of the user
+    // This method will attach the $user _id into the author_id attribute of the post
     // highlight-next-line
     $post->author()->attach($user);
     
@@ -78,6 +88,8 @@ In order to set a reference to a document:
     
     $post->author()->get(); // Will return a User object
 ```
+
+To remove the reference, call `$post->author()->detach()` and then `save()`.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 
@@ -97,7 +109,7 @@ In Mongolid a _References Many_ is made by storing the `_id`s of the referenced 
         public function questions()
         {
             // highlight-next-line
-            return $this->referencesMany(Question::class, 'questions');
+            return $this->referencesMany(Question::class, 'question_ids');
         }
     
     }
@@ -109,46 +121,49 @@ In Mongolid a _References Many_ is made by storing the `_id`s of the referenced 
 
 The first argument passed to the `referencesMany` method is the name of the related model, 
 the second argument is the attribute where the `_id`s will be stored. 
+The same naming rules of `referencesOne` apply. When the second argument is omitted, the attribute is the snake case relation name + `_` + the pluralized key (`questions_ids` in this example).
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $posts = User::first('4af9f23d8ead0e1d32000000')->posts()->get();
+    $questions = User::first('4af9f23d8ead0e1d32000000')->questions()->get();
 ```
 
 :::info Explanation:
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
-- Query for all the posts with the `_id` in the user's _posts_ attribute and return a relationship object
-- Method `get()` will return the [`Mongolid\Cursor\Cursor`](docs/cursor.md) with the related posts
+- Query for all the questions with the `_id` in the user's _question_ids_ attribute and return a relationship object
+- Method `get()` will return the [`Mongolid\Cursor\Cursor`](../cursor.md) with the related questions
 :::
 
 In order to set a reference to a document use the `attach` method. For example:
 
 ```php
-    $postA = new Post();
-    $postA->title = 'Nice post';
+    $questionA = new Question();
+    $questionA->title = 'Nice question';
     
-    $postB = new Post();
-    $postB->title = 'Nicer post';
+    $questionB = new Question();
+    $questionB->title = 'Nicer question';
     
     $user = User::first('4af9f23d8ead0e1d32000000');
     
     // To attach a document
-    $user->posts()->attach($postA);
+    $user->questions()->attach($questionA);
     
     // To attach many documents
-    $user->posts()->attachMany([$postA, $postB]);
+    $user->questions()->attachMany([$questionA, $questionB]);
     
     // To replace the current documents
-    $user->posts()->replace([$postA, $postB]);
+    $user->questions()->replace([$questionA, $questionB]);
     
     // To detach a single document
-    $user->posts()->detach($postA);
+    $user->questions()->detach($questionA);
     
     // To detach all documents
-    $user->posts()->detachAll();
+    $user->questions()->detachAll();
     
     $user->save();
 ```
+
+`attach` ignores a document that is already attached, and it generates an `_id` for documents that do not have one.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 

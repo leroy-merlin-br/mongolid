@@ -1,9 +1,13 @@
-``# Embeds
+---
+sidebar_position: 2
+---
+
+# Embeds
 
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
 
-- [Legacy embeds](docs/legacy/embeds.md) *For compatibility with version 2.x*
+- [Legacy embeds](../legacy/embeds.md) *For compatibility with version 2.x*
 
 ---
 
@@ -24,7 +28,7 @@ We can define this relation in Mongolid:
         public function phone()
         {
             // highlight-next-line
-            return $this->embedsOne(Phone::class, 'phone');
+            return $this->embedsOne(Phone::class, 'phone_data');
         }
     }
     
@@ -41,6 +45,8 @@ We can define this relation in Mongolid:
 
 The first argument passed to the `embedsOne` method is the name of the related model.
 The second argument is in what attribute that object will be embedded.
+The attribute **cannot** have the same name as the relation method. Mongolid throws `Mongolid\Model\Exception\InvalidFieldNameException` in that case.
+If you omit the second argument, Mongolid uses `embedded_` + the snake case relation name (`embedded_phone` in this example).
 Once the relationship is defined, we can retrieve and embed documents.
 
 ### To retrieve an embedded document:
@@ -48,12 +54,12 @@ Once the relationship is defined, we can retrieve and embed documents.
 1. First we get the relation:
 
     ```php
-        $relation = User::first('4af9f23d8ead0e1d32000000')->phone();
+        $relation = Person::first('4af9f23d8ead0e1d32000000')->phone();
     ```
 
     :::info **Explanation**:
 
-    - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
+    - Query for the person with the `_id` _'4af9f23d8ead0e1d32000000'_
     - The `phone()` method will return an `EmbedsOne` instance, that is extended of an `AbstractRelation` class.
     - That is, the relationship we were trying to obtain.
     :::
@@ -67,13 +73,18 @@ Once the relationship is defined, we can retrieve and embed documents.
     OR inline:
 
     ```php
-        $phone = User::first('4af9f23d8ead0e1d32000000')->phone()->get();
+        $phone = Person::first('4af9f23d8ead0e1d32000000')->phone()->get();
+    ```
+
+    OR by reading the relation as a property, which returns the cached result:
+
+    ```php
+        $phone = Person::first('4af9f23d8ead0e1d32000000')->phone;
     ```
 
     :::info **Explanation**
 
-    - Instantiate a **Phone** object with the attributes found in `phone` attribute of the user
-    - Return that object
+    - Return the object stored in the `phone_data` attribute of the person
     :::
 
 ### In order to embed a document:
@@ -85,17 +96,19 @@ Once the relationship is defined, we can retrieve and embed documents.
     $phone->number = '1532323232';
     
     // The object that will contain the phone
-    $user = User::first('4af9f23d8ead0e1d32000000');
+    $person = Person::first('4af9f23d8ead0e1d32000000');
     
-    // This method will embed the $phone into the phone attribute of the user
+    // This method will embed the $phone into the phone_data attribute of the person
     // highlight-next-line
-    $user->phone()->add($phone);
+    $person->phone()->add($phone);
     
-    $user->save();
+    $person->save();
     
     // Now we can retrieve the relationship by calling
-    $user->phone(); // Will return Embeds object
+    $person->phone(); // Will return an EmbedsOne object
 ```
+
+To remove the embedded document, call `$person->phone()->remove()` and then `save()`.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embeding or attaching objects. 
@@ -115,7 +128,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
         public function comments()
         {
             // highlight-next-line
-            return $this->embedsMany(Comment::class, 'comments');
+            return $this->embedsMany(Comment::class, 'embedded_comments');
         }
     
     }
@@ -125,6 +138,8 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
         protected $collection = null;
     }
 ```
+
+As with `embedsOne`, the attribute cannot have the same name as the relation method. When omitted, it is `embedded_` + the snake case relation name.
 
 Now we can access the post's comments `EmbeddedCursor` through the comments method:
 
@@ -180,6 +195,8 @@ Like:
     
     $post->save();
 ```
+
+`add` removes any embedded document with the same `_id` before adding, so adding a document again updates it. Mongolid generates an `_id` for embedded documents that do not have one.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embeding or attaching objects. 

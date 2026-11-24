@@ -35,7 +35,7 @@ To use another attribute name, define a `DELETED_AT` constant on the model:
 
 ## Querying
 
-`where`, `all` and `first` skip trashed documents. Use `withTrashed` to include them. It accepts the same arguments as `where`:
+`where`, `all` and `first` skip trashed documents (the ones with the `deleted_at` attribute set). `firstOrFail`, `firstOrNew` and `fresh` use `first`, so they skip trashed documents too. Use `withTrashed` to include them. It accepts the same arguments as `where`:
 
 ```php
     $products = Product::withTrashed(['category' => 'tools']);

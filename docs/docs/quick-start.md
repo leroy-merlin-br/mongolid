@@ -34,6 +34,11 @@ $manager->setConnection(new Connection('mongodb://localhost:27017'));
 
 Now you are ready to create your own models :smile:
 
+`Connection` receives the connection string, the `MongoDB\Client` options and the driver options. The default server is `mongodb://localhost:27017`.
+Mongolid uses the database named in the connection string, so include it (for example, `mongodb://localhost:27017/blog`).
+
+You can also register an event trigger with `$manager->setEventTrigger()`. See [Events](events.md).
+
 ## Basic usage
 
 ```php title="Post.php"
@@ -42,7 +47,7 @@ class Post extends \Mongolid\Model\AbstractModel
 }
 ```
 
-Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**.
+Note that we did not tell Mongolid which collection to use for our `Post` model. In this case, the model **cannot be saved or queried**: Mongolid throws `Mongolid\Model\Exception\NoCollectionNameException` when it needs the collection.
 This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
 
 You may specify a collection by defining a `collection` property on your model:
@@ -83,7 +88,7 @@ Once a model is defined, you are ready to start retrieving and creating document
 ```
 
 ```php title="Retrieving many documents by attribute"
-    $posts = Post::where(['category' => 'coding']); // where() method returns a MongolidCursor
+    $posts = Post::where(['category' => 'coding']); // where() method returns a Mongolid\Cursor\Cursor
 ```
 
 ```php title="Querying using mongolid models"
