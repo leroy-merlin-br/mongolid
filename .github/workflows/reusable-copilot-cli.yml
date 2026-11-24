@@ -4,9 +4,15 @@ on:
   workflow_call:
     inputs:
       prompt:
-        description: Prompt sent to GitHub Copilot CLI
-        required: true
+        description: Prompt sent to GitHub Copilot CLI (required unless command is set)
+        required: false
         type: string
+        default: ""
+      command:
+        description: Shell command to run instead of the Copilot prompt; requires execution-mode edit
+        required: false
+        type: string
+        default: ""
       execution-mode:
         description: "Execution mode: text returns a response; edit modifies repository files and optionally opens a PR"
         required: false
@@ -93,11 +99,16 @@ jobs:
         env:
           MODE: ${{ inputs.execution-mode }}
           PROMPT: ${{ inputs.prompt }}
+          COMMAND: ${{ inputs.command }}
           COMMIT_PATHS: ${{ inputs.commit-paths }}
         run: |
           set -euo pipefail
           [[ "$MODE" == text || "$MODE" == edit ]] || { echo '::error::execution-mode must be text or edit'; exit 1; }
-          [[ -n "${PROMPT//[[:space:]]/}" ]] || { echo '::error::prompt must not be empty'; exit 1; }
+          if [[ -n "${COMMAND//[[:space:]]/}" ]]; then
+            [[ "$MODE" == edit ]] || { echo '::error::command requires execution-mode edit'; exit 1; }
+          else
+            [[ -n "${PROMPT//[[:space:]]/}" ]] || { echo '::error::prompt must not be empty when command is not set'; exit 1; }
+          fi
           if [[ "$MODE" == edit ]]; then
             [[ -n "${COMMIT_PATHS//[[:space:]]/}" ]] || { echo '::error::commit-paths must not be empty'; exit 1; }
           fi
@@ -133,11 +144,15 @@ jobs:
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN || github.token }}
           PROMPT: ${{ inputs.prompt }}
+          COMMAND: ${{ inputs.command }}
           MODEL: ${{ inputs.model }}
           MODE: ${{ inputs.execution-mode }}
         run: |
           set -euo pipefail
-          if [[ "$MODE" == edit ]]; then
+          if [[ -n "${COMMAND//[[:space:]]/}" ]]; then
+            # The command may call Copilot itself, e.g. `make docs`.
+            timeout 10m bash -c "$COMMAND"
+          elif [[ "$MODE" == edit ]]; then
             # Only allow Copilot's file-writing tools; do not grant blanket shell access.
             timeout 10m copilot --model="$MODEL" -p "$PROMPT" \
               --no-auto-update --no-ask-user --allow-tool='write' > "$RUNNER_TEMP/copilot-response.txt"
