@@ -1,4 +1,4 @@
-``---
+---
 sidebar_position: 3
 ---
 
@@ -49,7 +49,7 @@ To delete a model, simply call the `delete` method on the instance:
 
 ## Reload a model from database
 
-You can reload an instance from database by using `fresh()` method:
+You can reload an instance from database by using the `fresh()` method (or its alias `refresh()`):
 
 ```php
     $post = Post::first('4af9f23d8ead0e1d32000000');

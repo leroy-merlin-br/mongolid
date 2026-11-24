@@ -18,7 +18,7 @@ class Person extends \Mongolid\Model\AbstractModel {
 }
 ```
 
-When you define an attribute to be cast as `DateTime` or `DateTimeImmutable`, Mongolid will load it from database will do its trick to return an `DateTime` instance(or `DateTimeImmutable`)  anytime you try to access it with property accessor operator (`->`).
+When you define an attribute to be cast as `DateTime` or `DateTimeImmutable`, Mongolid returns a `DateTime` (or `DateTimeImmutable`) instance anytime you try to access it with property accessor operator (`->`).
 
 If you need the raw value stored for the attribute, you can access it through the `getDocumentAttributes()` method. 
 To get the values as they were when the model was loaded or last persisted, use `getOriginalDocumentAttributes()`.
