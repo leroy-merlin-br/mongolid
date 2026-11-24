@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ready: ${{ steps.merges.outputs.ready }}
+      pr-branch: ${{ steps.pr-branch.outputs.name }}
     steps:
       - name: Checkout with full history
         uses: actions/checkout@v4
@@ -29,21 +30,26 @@ jobs:
           ref: ${{ inputs.base-branch || github.ref_name }}
           fetch-depth: 0
 
-      - name: List changes between the last two merges
+      - name: Compute versioned PR branch name
+        id: pr-branch
+        run: |
+          echo "name=automation/docs-after-merge-$(TZ=America/Sao_Paulo date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: List changes between the last commit and the last merge
         id: merges
         run: |
           set -euo pipefail
-          mapfile -t merges < <(git rev-list --merges -n 2 HEAD)
-          if (( ${#merges[@]} < 2 )); then
-            echo '::notice::fewer than two merge commits on master; skipping docs update'
+          # Search from HEAD~1 so a merge commit at HEAD does not compare against itself
+          old=$(git rev-list --merges -n 1 HEAD~1 || true)
+          if [[ -z "$old" ]]; then
+            echo '::notice::no merge commit found before HEAD; skipping docs update'
             echo 'ready=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          new="${merges[0]}"
-          old="${merges[1]}"
+          new=$(git rev-parse HEAD)
           {
-            echo '## Mudanças entre os dois últimos merges na master'
-            printf '\nDe: `%s`\nAté: `%s`\n' "$old" "$new"
+            echo '## Mudanças entre o último commit e o último merge'
+            printf '\nDe: `%s` (último merge)\nAté: `%s` (último commit)\n' "$old" "$new"
             echo '### Commits'
             git log --oneline "$old..$new" | sed 's/^/- /'
             echo '### Arquivos alterados'
@@ -63,7 +69,7 @@ jobs:
       command: make docs
       execution-mode: edit
       base-branch: ${{ inputs.base-branch || github.ref_name }}
-      pr-branch: automation/docs-after-merge
+      pr-branch: ${{ needs.list-changes.outputs.pr-branch }}
       pr-title: "docs: atualizar documentação após merge"
       pr-body: "Documentação atualizada automaticamente pelo comando make docs após merge na master. Revise antes de aprovar."
       commit-paths: docs/
