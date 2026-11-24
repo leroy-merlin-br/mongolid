@@ -23,4 +23,4 @@ Each sequence is a document in the `mongolid_sequences` collection of the defaul
 
 ## In a Schema
 
-On `LegacyRecord` and `Schema` classes, a field with the `sequence` type gets the next value of the sequence when its value is empty. See [Schema](legacy/schema.md).
+On `LegacyRecord` and `Schema` classes, a field with the `sequence` type gets the next value of the sequence when its value is empty. The sequence name is the collection name of the schema, or its entity class when the schema has no collection. See [Schema](legacy/schema.md).

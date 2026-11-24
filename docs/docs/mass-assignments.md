@@ -48,6 +48,8 @@ You can mass assign attributes using the static `fill` method. It receives the i
     $post = Post::fill(['title' => 'Bacon'], new Post);
 ```
 
+When you pass a `stdClass` value, `fill` converts it to an array.
+
 ## Bypassing mass assignment protection
 
 Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
@@ -56,3 +58,44 @@ Use `forceFill` to set attributes ignoring `fillable` and `guarded`:
     $post = new Post;
     $post->forceFill(['_id' => '4af9f23d8ead0e1d32000000', 'votes' => 10]);
 ```
+
+## Polymorphic models
+
+If a model implements `Mongolid\Model\PolymorphableModelInterface`, `fill` calls its `polymorph(array $input): string` method. The input is merged with the model's current attributes. When the method returns another class name, `fill` returns an instance of that class with the same attributes.
+
+```php title="Choosing the class on fill"
+    class Content extends \Mongolid\Model\AbstractModel implements \Mongolid\Model\PolymorphableModelInterface
+    {
+        protected $collection = 'contents';
+
+        public function polymorph(array $input): string
+        {
+            return 'video' === ($input['type'] ?? '') ? VideoContent::class : static::class;
+        }
+    }
+
+    $content = Content::fill(['type' => 'video']); // VideoContent instance
+```
+
+## Mutators
+
+Set `$mutable` to `true` on the model to transform attributes with methods named `get<Name>DocumentAttribute` and `set<Name>DocumentAttribute`, where `<Name>` is the studly case of the attribute name. Without `$mutable`, these methods are ignored.
+
+```php title="Defining mutators"
+    class Person extends \Mongolid\Model\AbstractModel
+    {
+        protected $mutable = true;
+
+        public function setShortNameDocumentAttribute($value): string
+        {
+            return strtoupper($value); // stored value
+        }
+
+        public function getShortNameDocumentAttribute(): string
+        {
+            return 'Name: ' . $this->getDocumentAttributes()['short_name']; // returned on read
+        }
+    }
+```
+
+The setter returns the value to store. The getter return value replaces the attribute on read and is not stored.
