@@ -9,7 +9,6 @@ sidebar_position: 3
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 `save` is an upsert: it inserts the document or replaces the existing one with the same `_id`.
 Use `insert` to force an insertion, which fails if the `_id` already exists.
-All of them return `true` when the write is acknowledged.
 
 ```php title="Saving a new model"
     $post = new Post();
@@ -41,6 +40,13 @@ To delete a model, simply call the `delete` method on the instance:
     
     $post->delete();
 ```
+
+### About operations returns
+
+- `insert` returns `true` when a document is inserted.
+- `save` and `update` return `true` only when the write is acknowledged and the database inserted or modified a document, so they return `false` when nothing changed.
+- `delete` returns `true` when a document is deleted.
+
 ## Reload a model from database
 
 You can reload an instance from database by using `fresh()` method:
