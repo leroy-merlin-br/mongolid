@@ -9,7 +9,7 @@ sidebar_position: 3
 To create a new document in the database from a model, simply create a new model instance and call the `save` method.
 `save` is an upsert: it inserts the document or replaces the existing one with the same `_id`.
 Use `insert` to force an insertion, which fails if the `_id` already exists.
-All of them return `true` when the write is acknowledged.
+`insert` returns `true` when a document is inserted. `save` and `update` return `true` only when the write is acknowledged and the database inserted or modified a document, so they return `false` when nothing changed. `delete` returns `true` when a document is deleted.
 
 ```php title="Saving a new model"
     $post = new Post();
@@ -68,6 +68,8 @@ You can reload an instance from database by using the `fresh()` method (or its a
     // Returns the existing model, or a new one with the given _id
     $post = Post::firstOrNew('4af9f23d8ead0e1d32000000');
 ```
+
+The projection accepts the MongoDB format (`['title' => 1]` or `['title' => true]`), or a list of field names. Prefix a name with `-` to exclude it, as in `['title', '-_id']`. Any other value throws `InvalidArgumentException`.
 
 Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache.
 

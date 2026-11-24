@@ -32,7 +32,11 @@ $manager = new Manager();
 $manager->setConnection(new Connection('mongodb://localhost:27017'));
 ```
 
-The database is taken from the connection string (for example `mongodb://localhost:27017/blog`). When the string has no database, Mongolid uses `mongolid`. You can read or change it through `$connection->defaultDatabase`.
+The database is taken from the connection string (for example `mongodb://localhost:27017/blog`). You can read or change it through `$connection->defaultDatabase`, which is `mongolid` until the connection reads the string.
+
+:::warning
+Always include the database name in the connection string. Mongolid reads the text after the last `/` of the string. With `mongodb://localhost:27017`, that text is the host, so the database becomes `localhost`. The `mongolid` default is only kept when the string ends with `/`, as in `mongodb://localhost:27017/`.
+:::
 
 Now you are ready to create your own models :smile:
 

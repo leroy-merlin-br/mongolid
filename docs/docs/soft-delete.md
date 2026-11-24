@@ -27,6 +27,8 @@ class Product extends \Mongolid\Model\AbstractModel
     $product->forceDelete(); // removes the document from the collection
 ```
 
+Soft deleting runs `update()`, so it fires the `updating` and `updated` [events](./events.md), not `deleting` and `deleted`. `forceDelete()` fires `deleting` and `deleted`.
+
 To use another attribute name, define a `DELETED_AT` constant on the model:
 
 ```php

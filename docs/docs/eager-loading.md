@@ -50,7 +50,7 @@ Each entry accepts:
 | `model` | Class of the related model. |
 | `key` | Attribute that holds the referenced `_id`. Defaults to `_id`. |
 
-Use dot notation in `key` to read ids from embedded documents. In the example above, `skus.shop_id` loads the shop of every embedded `Sku`.
+Use dot notation in `key` to read ids from embedded documents. In the example above, `skus.shop_id` loads the shop of every embedded `Sku`. Only one level is supported: the part before the dot is the attribute with the embedded documents, and the part after it is the attribute that holds the id.
 
 ## Using `$useCache`
 
