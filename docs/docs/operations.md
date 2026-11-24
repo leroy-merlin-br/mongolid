@@ -51,6 +51,14 @@ You can reload an instance from database by using `fresh()` method:
     $updatedPost = $post->fresh();
 ```
 
+
+Keep these points in mind:
+
+- Unsaved changes on `$user` are not included in `$fresh`.
+- `fresh` returns `null` when no document with that `_id` exists anymore, for example after the document was deleted.
+- `fresh` always queries the database and does not use the cache.
+
+
 ## Querying
 
 `where`, `all`, `first` and `firstOrFail` are available statically on every model.
