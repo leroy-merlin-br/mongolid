@@ -23,7 +23,6 @@ Note that [cursors](cursor.md) can be converted to array too:
 ```
 :::
 
-:::caution **Converting a model to json**
-This resource is still present only on `LegacyRecord`.
-You can see here [LegacyRecord](legacy/record.md) *For compatibility with version 2.x*
+:::info
+Mongolid has no `toJson` method. Use `json_encode($model->toArray())`. See [LegacyRecord](legacy/record.md) for the legacy `toArray`.
 :::

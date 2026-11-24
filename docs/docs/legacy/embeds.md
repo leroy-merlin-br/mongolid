@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Embeds Relationships
 
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
@@ -87,9 +91,6 @@ It's recommended that you don't embed your models by setting the attribute direc
 The `embed` method will include an `_id` to identify your embedded document and allow the usage of `unembed` and `embed` to update models.
 ```php title="Not recommended ways to embed"
     // Not recomended, but also works
-    $user->phone = $phone->toArray();
-    
-    // Or (not recomended)
     $user->phone = $phone->toArray();
     
     // Or even (not recomended)
