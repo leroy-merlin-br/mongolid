@@ -139,6 +139,15 @@ abstract class AbstractModel implements ModelInterface
         return $model;
     }
 
+    public static function findLastInserted(array $attributes = []): self
+    {
+        $model = self::where(['created_at' => ['$exists' => true]])
+            ->sort(['created_at' => -1])
+            ->first();
+
+        return $model;
+    }
+
     /**
      * Returns a valid instance from Ioc.
      */
