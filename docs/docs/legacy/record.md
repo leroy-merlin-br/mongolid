@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Legacy Record
 
 With `LegacyRecord` you can do pretty most the same actions that you can do with `AbstractModel`.

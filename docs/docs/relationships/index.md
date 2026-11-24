@@ -1,6 +1,6 @@
 # Relationships
 
-Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports four types of relationships:
+Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports two types of relationships:
 
 :::info
 MongoDB **relationships doesn't work like in a Relational database**. 

@@ -32,6 +32,8 @@ $manager = new Manager();
 $manager->setConnection(new Connection('mongodb://localhost:27017'));
 ```
 
+The database is taken from the connection string (for example `mongodb://localhost:27017/blog`). When the string has no database, Mongolid uses `mongolid`. You can read or change it through `$connection->defaultDatabase`.
+
 Now you are ready to create your own models :smile:
 
 ## Basic usage
@@ -42,7 +44,8 @@ class Post extends \Mongolid\Model\AbstractModel
 }
 ```
 
-Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**.
+Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **cannot save or query the model**:
+calling `getCollectionName()`, `save()` or `where()` throws `Mongolid\Model\Exception\NoCollectionNameException`.
 This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
 
 You may specify a collection by defining a `collection` property on your model:
@@ -54,6 +57,14 @@ class Post extends \Mongolid\Model\AbstractModel {
 
 }
 ```
+
+Other properties you can set on a model:
+
+| Property | Default | Description |
+|---|---|---|
+| `$dynamic` | `true` | When `false`, only `_id`, the timestamps and the attributes listed in `$fillable` or `$guarded` are saved. |
+| `$timestamps` | `true` | Sets `created_at` and `updated_at` when the model is saved. |
+| `$writeConcern` | `1` | Write concern used by `save`, `insert`, `update` and `delete`. Use `setWriteConcern()` to change it. |
 
 Mongolid will also assume each collection has a primary key attribute named `_id`, since MongoDB requires an `_id` for every single document.
 The `_id` attribute can be of any type. The default type for this attribute is `ObjectId`.
@@ -83,7 +94,7 @@ Once a model is defined, you are ready to start retrieving and creating document
 ```
 
 ```php title="Retrieving many documents by attribute"
-    $posts = Post::where(['category' => 'coding']); // where() method returns a MongolidCursor
+    $posts = Post::where(['category' => 'coding']); // where() method returns a Mongolid\Cursor\Cursor
 ```
 
 ```php title="Querying using mongolid models"
