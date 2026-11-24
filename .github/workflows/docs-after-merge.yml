@@ -1,0 +1,72 @@
+name: Update Docs After Merge
+
+on:
+  push:
+    branches:
+      - master
+      # TEMPORARY: remove before merging to master
+      - temp/docs-tests
+  workflow_dispatch:
+    inputs:
+      base-branch:
+        description: Branch whose merge commits are analyzed and targeted by the PR
+        required: true
+        type: string
+        default: master
+
+permissions:
+  contents: read
+
+jobs:
+  list-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.merges.outputs.ready }}
+    steps:
+      - name: Checkout with full history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base-branch || github.ref_name }}
+          fetch-depth: 0
+
+      - name: List changes between the last two merges
+        id: merges
+        run: |
+          set -euo pipefail
+          mapfile -t merges < <(git rev-list --merges -n 2 HEAD)
+          if (( ${#merges[@]} < 2 )); then
+            echo '::notice::fewer than two merge commits on master; skipping docs update'
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          new="${merges[0]}"
+          old="${merges[1]}"
+          {
+            echo '## Mudanças entre os dois últimos merges na master'
+            printf '\nDe: `%s`\nAté: `%s`\n' "$old" "$new"
+            echo '### Commits'
+            git log --oneline "$old..$new" | sed 's/^/- /'
+            echo '### Arquivos alterados'
+            git diff --name-status "$old" "$new" | sed 's/^/- /'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+
+  update-docs:
+    needs: list-changes
+    if: needs.list-changes.outputs.ready == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
+      copilot-requests: write
+    uses: ./.github/workflows/reusable-copilot-cli.yml
+    with:
+      command: make docs
+      execution-mode: edit
+      base-branch: ${{ inputs.base-branch || github.ref_name }}
+      pr-branch: automation/docs-after-merge
+      pr-title: "docs: atualizar documentação após merge"
+      pr-body: "Documentação atualizada automaticamente pelo comando make docs após merge na master. Revise antes de aprovar."
+      commit-paths: docs/
+    secrets:
+      COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+      PR_TOKEN: ${{ secrets.PR_TOKEN }}
