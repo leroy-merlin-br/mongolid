@@ -39,12 +39,13 @@ The return value of the other events is ignored.
 - `deleted` fires only when a document was removed.
 - With an unacknowledged write concern, the "after" events do not fire.
 - Soft delete calls `update()`, so it fires `updating` and `updated`. See [Soft delete](./soft-delete.md#events).
+- When no trigger is registered, events are ignored and operations are not cancelled.
 
 ## Models and DataMapper
 
 `AbstractModel` and `LegacyRecord` fire the same events, with the model as the payload. The `DataMapper` fires them with the entity as the payload.
 
-## Setting up a custom listener
+## Setting up a listener
 
 Mongolid fires the events, but it cannot run any listener by itself. You are responsible for configuring the listeners. To connect them, provide an object that implements `Mongolid\Event\EventTriggerInterface`. Mongolid calls that object for every event, and it is up to you to forward the event to your listeners. The example below, `EventTrigger`, is a minimal implementation. Adapt it to your application, for example by forwarding the events to your framework's dispatcher.
 
