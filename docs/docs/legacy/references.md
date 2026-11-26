@@ -1,9 +1,11 @@
 # References Relationships
 
-Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports four types of relationships:
+Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports two types of reference relationships:
 
 - [References One](#references-one)
 - [References Many](#references-many)
+
+To store related data inside the document instead, see [Embeds](../relationships/embeds.md).
 
 :::note
 MongoDB **relationships doesn't work like in a Relational database**. 
