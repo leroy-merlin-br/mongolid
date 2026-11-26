@@ -32,6 +32,8 @@ $manager = new Manager();
 $manager->setConnection(new Connection('mongodb://localhost:27017'));
 ```
 
+`Connection` receives the connection string (default `mongodb://localhost:27017`), the MongoDB client options and the driver options. The database is the name after the host in the connection string, for example `mongodb://localhost:27017/blog`. When the string has no database name, Mongolid uses `mongolid`.
+
 Now you are ready to create your own models :smile:
 
 ## Basic usage
@@ -42,7 +44,7 @@ class Post extends \Mongolid\Model\AbstractModel
 }
 ```
 
-Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**.
+Note that we did not tell Mongolid which collection to use for our `Post` model. So, in this case, Mongolid **will not save the model into the database**: `save`, `insert`, `update`, `delete` and the query methods throw `Mongolid\Model\Exception\NoCollectionNameException`.
 This can be used for models that represents objects that will be embedded within another object and will not have their own collection.
 
 You may specify a collection by defining a `collection` property on your model:

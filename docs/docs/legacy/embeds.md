@@ -3,6 +3,19 @@
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
 
+:::warning LegacyRecord and AbstractModel work differently
+This page documents embeds for `Mongolid\LegacyRecord`. It is **not** the same as `Mongolid\Model\AbstractModel` ([current embeds](../relationships/embeds.md)):
+
+|  | `LegacyRecord` (this page) | `AbstractModel` ([current](../relationships/embeds.md)) |
+|---|---|---|
+| What `phone()` returns | The embedded `Phone` model itself | An `EmbedsOne` relation object |
+| Getting the embedded model | `$user->phone()` | `$user->phone()->get()` or `$user->phone` |
+| Embedding | `$user->embed('phone', $phone)` or `$user->embedToPhone($phone)` | `$user->phone()->add($phone)` |
+| Removing | `$user->unembed('phone', $phone)` | `$user->phone()->remove()` |
+
+Do not mix the two. For example, `$user->phone()->get()` does not exist on a `LegacyRecord`.
+:::
+
 ---
 
 ## Embeds One

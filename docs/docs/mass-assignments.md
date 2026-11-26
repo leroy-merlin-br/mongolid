@@ -48,6 +48,12 @@ You can mass assign attributes using the static `fill` method. It receives the i
     $post = Post::fill(['title' => 'Bacon'], new Post);
 ```
 
+When `fillable` is empty, every attribute that is not in `guarded` is assignable. When both are set, an attribute must be in `fillable` and not in `guarded`.
+
+## Polymorphic models
+
+A model that implements `Mongolid\Model\PolymorphableModelInterface` can choose its class from the input. `fill` calls `polymorph(array $input): string` with the current attributes merged with the input. When it returns a different class, `fill` returns a new instance of that class with the current attributes copied to it. See [Polymorphic models](polymorphic-models.md).
+
 ## Bypassing mass assignment protection
 
 Use `forceFill` to set attributes ignoring `fillable` and `guarded`:

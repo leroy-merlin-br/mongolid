@@ -41,15 +41,28 @@ To delete a model, simply call the `delete` method on the instance:
     $post->delete();
 ```
 
+`update` on a model without an `_id` inserts the document instead.
+
+### What a write does to the model
+
+Before `save`, `insert` or `update` write the document, Mongolid:
+
+- Removes attributes set to `null`.
+- Generates an `ObjectId` for `_id` when it is empty, and converts an ObjectId string to `ObjectId`.
+- Sets `updated_at` to the current time, and sets `created_at` when it is not a `UTCDateTime` yet. Set `protected $timestamps = false;` on the model to turn this off. It defaults to `true`.
+- Keeps attributes that are not in `$fillable` or `$guarded`, because `protected $dynamic` defaults to `true`. When it is `false`, only `_id`, the timestamps (when enabled) and the names listed in `$fillable` and `$guarded` are saved.
+
+Writes use a write concern of `1`. Change it with `setWriteConcern(int $writeConcern)` or by overriding `protected $writeConcern`. `getWriteConcern()` returns the current value.
+
 ### About operations returns
 
 - `insert` returns `true` when a document is inserted.
 - `save` and `update` return `true` only when the write is acknowledged and the database inserted or modified a document, so they return `false` when nothing changed.
-- `delete` returns `true` when a document is deleted.
+- `delete` returns `true` when a document is deleted. On a model that uses [soft delete](./soft-delete.md), it updates the document instead.
 
 ## Reload a model from database
 
-You can reload an instance from database by using `fresh()` method:
+You can reload an instance from database by using `fresh()` method. It returns a new instance and does not change the one you call it on:
 
 ```php
     $post = Post::first('4af9f23d8ead0e1d32000000');
@@ -61,7 +74,7 @@ You can reload an instance from database by using `fresh()` method:
 Keep these points in mind:
 
 - Unsaved changes on `$user` are not included in `$fresh`.
-- `fresh` returns `null` when no document with that `_id` exists anymore, for example after the document was deleted.
+- The return type of `fresh` is `self`. When no document with that `_id` exists anymore, for example after the document was deleted, PHP throws a `TypeError` because `first` returns `null`.
 - `fresh` always queries the database and does not use the cache.
 
 
@@ -82,6 +95,8 @@ Keep these points in mind:
     // Returns the existing model, or a new one with the given _id
     $post = Post::firstOrNew('4af9f23d8ead0e1d32000000');
 ```
+
+The `where`, `all`, `first` and `firstOrFail` methods read the first argument as a query. It can be an array, or a single value that is used as `_id`. When the `_id` is a string in ObjectId format, or an `$in` / `$nin` list of them, it is converted to `ObjectId`. `first(null)` returns `null` without querying.
 
 Pass `true` as the last argument of `where` and `first` to store the query results in the `Mongolid\Util\CacheComponentInterface` bound in the container. The next identical query reads from the cache.
 
@@ -124,7 +139,9 @@ Use `Mongolid\Query\BulkWrite` to group several `updateOne` operations in a sing
     $result = $bulk->execute(); // MongoDB\BulkWriteResult
 ```
 
-The operations list is cleared after `execute`. Use `isEmpty()` and `count()` to inspect it.
+`updateOne` receives the filter (an array, or an `_id` value), the data, the options and the update operator. The options default to `['upsert' => true]` and the operator to `$set`. Pass `[]` as the options to disable the upsert.
+
+`execute` receives an optional write concern (default `1`). It throws `Mongolid\Model\Exception\NoCollectionNameException` when the model has no collection. The operations list is cleared after `execute`. Use `isEmpty()` and `count()` to inspect it.
 
 ## Updating many documents
 
