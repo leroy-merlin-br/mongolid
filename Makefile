@@ -16,6 +16,6 @@ mkapi:
 	docker run --rm --user ${CONTAINER_USER} -v ${PWD}:/app --workdir /app --entrypoint /bin/doctum botsudo/action-doctum:v5 update bin/generate-api-docs
 
 docs:
-	copilot --prompt="Use the mongolid-docs skill to review and update the library behavior documentation in docs/docs so it matches the current code in src/ and tests/. Report every file changed and the code that supports each change." --allow-all-tools
+	copilot --prompt="Use the mongolid-documenter skill to review and update the library behavior documentation in docs/docs so it matches the current code in src/ and tests/. Report every file changed and the code that supports each change." --allow-tool='shell, read, write'
 
 .PHONY: docs
