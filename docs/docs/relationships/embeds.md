@@ -40,7 +40,7 @@ We can define this relation in Mongolid:
 ```
 
 The first argument passed to the `embedsOne` method is the name of the related model.
-The second argument is in what attribute that object will be embedded.
+The optional second argument is the attribute where the document will be embedded. When it is omitted, Mongolid uses `embedded_` followed by the snake case name of the relation method. For example, a `phone()` relation without the second argument stores the document in `embedded_phone`.
 Once the relationship is defined, we can retrieve and embed documents.
 
 ### To retrieve an embedded document:
@@ -75,6 +75,18 @@ Once the relationship is defined, we can retrieve and embed documents.
     - Instantiate a **Phone** object with the attributes found in `phone` attribute of the user
     - Return that object
     :::
+
+You can also read the relation as a property. `$user->phone` returns the same model as `$user->phone()->get()`:
+
+```php
+    $phone = User::first('4af9f23d8ead0e1d32000000')->phone;
+```
+
+:::info **Notes**
+
+- The property returns a cached result. `->phone()->get()` does not use that cache.
+- If the field name is also an attribute of the model, the attribute value is returned instead of the relation. The default field, `embedded_phone`, avoids this.
+:::
 
 ### In order to embed a document:
 
