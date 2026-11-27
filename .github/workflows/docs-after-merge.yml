@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ready: ${{ steps.merges.outputs.ready }}
+      from: ${{ steps.merges.outputs.from }}
+      to: ${{ steps.merges.outputs.to }}
       pr-branch: ${{ steps.pr-branch.outputs.name }}
     steps:
       - name: Checkout with full history
@@ -55,7 +57,11 @@ jobs:
             echo '### Arquivos alterados'
             git diff --name-status "$old" "$new" | sed 's/^/- /'
           } >> "$GITHUB_STEP_SUMMARY"
-          echo 'ready=true' >> "$GITHUB_OUTPUT"
+          {
+            echo 'ready=true'
+            echo "from=$old"
+            echo "to=$new"
+          } >> "$GITHUB_OUTPUT"
 
   update-docs:
     needs: list-changes
@@ -66,7 +72,8 @@ jobs:
       copilot-requests: write
     uses: ./.github/workflows/reusable-copilot-cli.yml
     with:
-      command: make docs
+      command: make docs FROM=${{ needs.list-changes.outputs.from }} TO=${{ needs.list-changes.outputs.to }}
+      fetch-depth: 0
       execution-mode: edit
       base-branch: ${{ inputs.base-branch || github.ref_name }}
       pr-branch: ${{ needs.list-changes.outputs.pr-branch }}
