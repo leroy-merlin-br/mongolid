@@ -3,7 +3,20 @@
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
 
-- [Legacy embeds](docs/legacy/embeds.md) *For compatibility with version 2.x*
+:::warning AbstractModel and LegacyRecord work differently
+This page documents embeds for `Mongolid\Model\AbstractModel`. It is **not** the same as `Mongolid\LegacyRecord`:
+
+|  | `AbstractModel` (this page) | `LegacyRecord` ([legacy](../legacy/embeds.md)) |
+|---|---|---|
+| What `phone()` returns | An `EmbedsOne` relation object | The embedded `Phone` model itself |
+| Getting the embedded model | `$user->phone()->get()` or `$user->phone` | `$user->phone()` |
+| Embedding | `$user->phone()->add($phone)` | `$user->embed('phone', $phone)` or `$user->embedToPhone($phone)` |
+| Removing | `$user->phone()->remove()` | `$user->unembed('phone', $phone)` |
+
+Do not mix the two. For example, calling `->get()` on the result of `phone()` only works with `AbstractModel`.
+:::
+
+- [Legacy embeds](../legacy/embeds.md) *For compatibility with version 2.x*
 
 ---
 
@@ -23,8 +36,7 @@ We can define this relation in Mongolid:
         // Method that will be used to access the phone
         public function phone()
         {
-            // highlight-next-line
-            return $this->embedsOne(Phone::class, 'phone');
+            return $this->embedsOne(Phone::class, 'embedded_phone');
         }
     }
     
@@ -40,7 +52,7 @@ We can define this relation in Mongolid:
 ```
 
 The first argument passed to the `embedsOne` method is the name of the related model.
-The second argument is in what attribute that object will be embedded.
+The optional second argument is the attribute where the document will be embedded. When it is omitted, Mongolid uses `embedded_` followed by the snake case name of the relation method. For example, a `phone()` relation without the second argument stores the document in `embedded_phone`.
 Once the relationship is defined, we can retrieve and embed documents.
 
 ### To retrieve an embedded document:
@@ -48,7 +60,7 @@ Once the relationship is defined, we can retrieve and embed documents.
 1. First we get the relation:
 
     ```php
-        $relation = User::find('4af9f23d8ead0e1d32000000')->phone();
+        $relation = User::first('4af9f23d8ead0e1d32000000')->phone();
     ```
 
     :::info **Explanation**:
@@ -67,7 +79,7 @@ Once the relationship is defined, we can retrieve and embed documents.
     OR inline:
 
     ```php
-        $phone = User::find('4af9f23d8ead0e1d32000000')->phone()->get();
+        $phone = User::first('4af9f23d8ead0e1d32000000')->phone()->get();
     ```
 
     :::info **Explanation**
@@ -75,6 +87,19 @@ Once the relationship is defined, we can retrieve and embed documents.
     - Instantiate a **Phone** object with the attributes found in `phone` attribute of the user
     - Return that object
     :::
+
+You can also read the relation as a property. `$user->phone` returns the same model as `$user->phone()->get()`:
+
+```php
+    $phone = User::first('4af9f23d8ead0e1d32000000')->phone;
+```
+
+:::info **Notes**
+
+- The property keeps the result of its first read and reuses it on later reads. `->phone()->get()` has no such cache and reads the embedded document again on every call. The cached value is refreshed after `add()` and `remove()`, or when you assign the field of the relation.
+- The field cannot have the same name as the relation method. Mongolid throws `Mongolid\Model\Exception\InvalidFieldNameException`. The default field, `embedded_phone`, avoids this.
+- `$user->phone` throws `Mongolid\Model\Exception\NotARelationException` when the `phone()` method does not return a relation.
+:::
 
 ### In order to embed a document:
 
@@ -87,14 +112,16 @@ Once the relationship is defined, we can retrieve and embed documents.
     // The object that will contain the phone
     $user = User::first('4af9f23d8ead0e1d32000000');
     
-    // This method will embed the $phone into the phone attribute of the user
-    // highlight-next-line
+    // This method will embed the $phone into the embedded_phone attribute of the user  
     $user->phone()->add($phone);
     
     $user->save();
     
     // Now we can retrieve the relationship by calling
     $user->phone(); // Will return Embeds object
+
+    // To remove the embedded document
+    $user->phone()->remove();
 ```
 
 :::info
@@ -115,7 +142,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
         public function comments()
         {
             // highlight-next-line
-            return $this->embedsMany(Comment::class, 'comments');
+            return $this->embedsMany(Comment::class, 'embedded_comments');
         }
     
     }
@@ -129,7 +156,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
 Now we can access the post's comments `EmbeddedCursor` through the comments method:
 
 ```php
-    $comments = Post::find('4af9f23d8ead0e1d32000000')->comments()->get();
+    $comments = Post::first('4af9f23d8ead0e1d32000000')->comments()->get();
 ```
 
 Now you can iterate and perform cursor operations in the `EmbeddedCursor` that is retrieved
@@ -142,6 +169,8 @@ Now you can iterate and perform cursor operations in the `EmbeddedCursor` that i
 ```
 
 Once you have the EmbedsMany relationship, you are able to use the methods of this object in order to manipulate this embedded documents.
+
+`add` and `remove` identify a comment by its `_id`. `add` generates an `ObjectId` for a comment that has none, and replaces an embedded comment that has the same `_id`. `remove` leaves the other comments in place. The field is re-indexed after each change.
 
 Like:
 

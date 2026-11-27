@@ -1,9 +1,15 @@
+---
+sidebar_position: 3
+---
+
 # References Relationships
 
-Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports four types of relationships:
+Of course, your database collections are probably related to one another. For example, a blog post may have many comments, or an order could be related to the user who placed it. Mongolid makes managing and working with these relationships easy. MongoDB and Mongolid in short supports two types of reference relationships:
 
 - [References One](#references-one)
 - [References Many](#references-many)
+
+To store related data inside the document instead, see [Embeds](../relationships/embeds.md).
 
 :::note
 MongoDB **relationships doesn't work like in a Relational database**. 
@@ -31,17 +37,17 @@ If you try to create references between documents like you would do in a relatio
 ### Defining A References One Relation
 
 ```php
-    class Post extends \Mongolid\Model\AbstractModel {
+    class Post extends \Mongolid\LegacyRecord {
         protected $collection = 'posts';
     
         public function author()
-        {
+        {          
             // highlight-next-line
             return $this->referencesOne(User::class, 'author');
         }
     }
     
-    class User extends \Mongolid\Model\AbstractModel {
+    class User extends \Mongolid\LegacyRecord {
         protected $collection = 'users';
     }
 ```
@@ -51,7 +57,7 @@ the second argument is the attribute where the referenced model `_id` will be st
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $user = Post::find('4af9f23d8ead0e1d32000000')->author();
+    $user = Post::first('4af9f23d8ead0e1d32000000')->author();
 ```
 
 :::info
@@ -62,19 +68,21 @@ This statement will perform the following:
 - Return that object
 :::
 
+By default, the referenced model is read from the cache when it is available. Pass `false` as the third argument, for example `referencesOne(User::class, 'author', false)`, to always query the database.
+
 In order to set a reference to a document, simply set the attribute used in the relationship to the reference's `_id` 
 or use the attachment method, or it's alias. For example:
 
 ```php
-    // The object that will be embedded
+    // The object that will be referenced
     $user = new User();
     $user->name = 'John';
     $user->save() // This will populate the $user->_id
     
-    // The object that will contain the user
+    // The object that will hold the reference
     $post = Post::first('4af9f23d8ead0e1d32000000');
     
-    // This method will attach the $phone _id into the phone attribute of the user
+    // This method will attach the $user _id into the author attribute of the post
     // highlight-next-line
     $post->attach('author', $user);
     
@@ -106,7 +114,7 @@ In general, use references when embedding would result in duplication of data an
 ### Defining A References Many Relation
 
 ```php
-    class User extends \Mongolid\Model\AbstractModel {
+    class User extends \Mongolid\LegacyRecord {
         protected $collection = 'users';
     
         public function questions()
@@ -117,7 +125,7 @@ In general, use references when embedding would result in duplication of data an
     
     }
     
-    class Question extends \Mongolid\Model\AbstractModel {
+    class Question extends \Mongolid\LegacyRecord {
         protected $collection = 'questions';
     }
 ```
@@ -127,7 +135,7 @@ the second argument is the attribute where the `_id`s will be stored.
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $posts = User::find('4af9f23d8ead0e1d32000000')->posts();
+    $posts = User::first('4af9f23d8ead0e1d32000000')->posts();
 ```
 
 :::info
@@ -135,7 +143,7 @@ This statement will perform the following:
 
 - Query for the user with the `_id` _'4af9f23d8ead0e1d32000000'_
 - Query for all the posts with the `_id` in the user's _posts_ attribute
-- Return the [`Mongolid\Cursor\Cursor`](docs/cursor.md) with the related posts
+- Return a cursor with the related posts
 :::
 
 In order to set a reference to a document use the attachment method, or it's alias. For example:
