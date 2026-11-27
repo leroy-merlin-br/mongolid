@@ -1,0 +1,50 @@
+---
+sidebar_position: 7
+---
+
+# Soft delete
+
+Add `Mongolid\Model\SoftDeleteTrait` to a model to keep deleted documents in the collection.
+
+```php title="Product.php"
+class Product extends \Mongolid\Model\AbstractModel
+{
+    use \Mongolid\Model\SoftDeleteTrait;
+
+    protected $collection = 'products';
+}
+```
+
+## Deleting and restoring
+
+`delete()` does not remove the document. It sets the `deleted_at` attribute to the current date.
+
+```php
+    $product->delete();
+    $product->isTrashed(); // true
+
+    $product->restore(); // true. Returns false if the model is not trashed
+    $product->forceDelete(); // removes the document from the collection
+```
+
+To use another attribute name, define a `DELETED_AT` constant on the model:
+
+```php
+    const DELETED_AT = 'removed_at';
+```
+
+## Querying
+
+`where`, `all` and `first` skip trashed documents. Use `withTrashed` to include them. It accepts the same arguments as `where`:
+
+```php
+    $products = Product::withTrashed(['category' => 'tools']);
+```
+
+## Events
+Soft deleting runs `update()`, so it fires the `updating` and `updated` [events](./events.md), not `deleting` and `deleted`. `forceDelete()` fires `deleting` and `deleted`.
+
+
+:::info
+Set the public property `$isSoftDeleteEnabled` to `false` on a model to make `delete()` remove the document permanently.
+:::
