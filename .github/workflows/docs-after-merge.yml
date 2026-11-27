@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - master
-      # TEMPORARY: remove before merging to master
-      - temp/docs-tests
+      - v2.x
+      - v3.x
+      - v4.x
   workflow_dispatch:
     inputs:
       base-branch:
