@@ -323,4 +323,19 @@ abstract class AbstractModel implements ModelInterface
     {
         return Container::make(Builder::class);
     }
+
+    public function refresh(): AbstractModel
+    {
+        return $this->fresh();
+    }
+
+    public function purge(): void
+    {
+        $this->delete();
+    }
+
+    public function createIndex($keys, $options = []): void
+    {
+        $this->getCollection()->createIndex($keys, $options);
+    }
 }
