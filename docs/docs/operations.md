@@ -77,6 +77,20 @@ Keep these points in mind:
 - The return type of `fresh` is `self`. When no document with that `_id` exists anymore, for example after the document was deleted, PHP throws a `TypeError` because `first` returns `null`.
 - `fresh` always queries the database and does not use the cache.
 
+`refresh()` is an alias of `fresh()`: it returns a new instance and has the same behavior and edge cases.
+
+## Purge and create indexes
+
+`purge()` is an alias of `delete()`. It returns nothing, so use `delete()` when you need the boolean result. On a model that uses [soft delete](./soft-delete.md), it soft deletes the document.
+
+`createIndex($keys, $options = [])` creates an index on the model's collection and returns nothing. `$keys` and `$options` are passed as they are to the MongoDB driver's `createIndex`. See [MongoDB - Indexes](https://docs.mongodb.org/manual/indexes/).
+
+```php
+    $post = new Post();
+
+    $post->createIndex(['title' => 1], ['unique' => true]);
+```
+
 
 ## Querying
 
