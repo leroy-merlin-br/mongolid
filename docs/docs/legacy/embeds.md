@@ -3,6 +3,19 @@
 Read [MongoDB - Embedded Data Models](https://docs.mongodb.org/manual/core/data-model-design/#embedded-data-models) 
 to learn more how to take advantage of document embedding.
 
+:::warning LegacyRecord and AbstractModel work differently
+This page documents embeds for `Mongolid\LegacyRecord`. It is **not** the same as `Mongolid\Model\AbstractModel` ([current embeds](../relationships/embeds.md)):
+
+|  | `LegacyRecord` (this page) | `AbstractModel` ([current](../relationships/embeds.md)) |
+|---|---|---|
+| What `phone()` returns | The embedded `Phone` model itself | An `EmbedsOne` relation object |
+| Getting the embedded model | `$user->phone()` | `$user->phone()->get()` or `$user->phone` |
+| Embedding | `$user->embed('phone', $phone)` or `$user->embedToPhone($phone)` | `$user->phone()->add($phone)` |
+| Removing | `$user->unembed('phone', $phone)` | `$user->phone()->remove()` |
+
+Do not mix the two. For example, `$user->phone()->get()` does not exist on a `LegacyRecord`.
+:::
+
 ---
 
 ## Embeds One
@@ -11,7 +24,7 @@ An Embeds One relationship is a very basic relation. For example, a `User` model
 We can define this relation in Mongolid:
 
 ```php title="Defining an embeds one relation"
-    class Person extends \Mongolid\Model\AbstractModel {
+    class Person extends \Mongolid\LegacyRecord {
         // This model is saved in the collection people
         protected $collection = 'people';
     
@@ -23,7 +36,7 @@ We can define this relation in Mongolid:
         }
     }
     
-    class Phone extends \Mongolid\Model\AbstractModel {
+    class Phone extends \Mongolid\LegacyRecord {
         // This model will be embedded only
         protected $collection = null;
     
@@ -39,7 +52,7 @@ The second argument is in what attribute that object will be embedded.
 Once the relationship is defined, we may retrieve it using:
 
 ```php title="Retrieving relation"
-    $phone = User::find('4af9f23d8ead0e1d32000000')->phone();
+    $phone = User::first('4af9f23d8ead0e1d32000000')->phone();
 ```
 
 :::info
@@ -75,6 +88,8 @@ In order to embed a document to be used in a Embeds One relationship, simply do 
     $user->phone(); // Will return a Phone object similar to $phone
 ```
 
+`embed` and `unembed` take the field name and the object by reference, so pass a variable, not a literal.
+
 :::info
 When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 
 The changes will only persist after you call the 'save()' method.
@@ -85,7 +100,7 @@ It's recommended that you don't embed your models by setting the attribute direc
 The `embed` method will include an `_id` to identify your embedded document and allow the usage of `unembed` and `embed` to update models.
 ```php title="Not recommended ways to embed"
     // Not recomended, but also works
-    $user->phone = $phone->attributes();
+    $user->phone = $phone->toArray();
     
     // Or (not recomended)
     $user->phone = $phone->toArray();
@@ -99,11 +114,11 @@ The `embed` method will include an `_id` to identify your embedded document and 
 :::
 
 ```php title="Updating embedded document"
-    $user->embed('phone', $phone); // Now, $phone have an _id
+    $user->embed('phone', $phone); // Now, $phone has an _id
     
     $phone->regionCode = 77; // Update the region code
     
-    $user->embed($phone); // Will update
+    $user->embed('phone', $phone); // Will update the embedded document with the same _id
 ```
 
 ## Embeds many
@@ -111,7 +126,7 @@ The `embed` method will include an `_id` to identify your embedded document and 
 An example of an Embeds Many relation is a blog post that "has many" comments. We can model this relation like so:
 
 ```php title="Defining an embeds many relation"
-    class Post extends \Mongolid\Model\AbstractModel {
+    class Post extends \Mongolid\LegacyRecord {
         protected $collection = 'posts';
     
         public function comments()
@@ -122,7 +137,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
     
     }
     
-    class Comment extends \Mongolid\Model\AbstractModel {
+    class Comment extends \Mongolid\LegacyRecord {
         // This model will be embedded only
         protected $collection = null;
     }
@@ -131,7 +146,7 @@ An example of an Embeds Many relation is a blog post that "has many" comments. W
 Now we can access the post's comments `EmbeddedCursor` through the comments method:
 
 ```php title="Retrieving relation"
-    $comments = Post::find('4af9f23d8ead0e1d32000000')->comments();
+    $comments = Post::first('4af9f23d8ead0e1d32000000')->comments();
 ```
 
 Now you can iterate and perform cursor operations in the `EmbeddedCursor` that is retrieved
@@ -157,14 +172,14 @@ In order to embed a document to be used in an Embeds Many relationship, you shou
     // Both ways work
     // highlight-start
     $post->embedToComments($commentA);
-    $post->embed('Comments', $commentB);
+    $post->embed('comments', $commentB);
     // highlight-end
     
     $post->save();
 ```
 
 :::info
-When using Mongolid models you will need to call the `save()` method after embeding or attaching objects. 
+When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 
 The changes will only persist after you call the 'save()' method.
 :::
 
@@ -175,6 +190,6 @@ The `embed` method will include an `_id` to identify your embedded document and 
 ```php title="Example"
     $commentB->content = "Pretty awesome!";
     
-    $post->unembed($commentA); // Removes 'Cool feature bro!'
-    $post->embed($commentB);   // Updates 'Awesome' to 'Pretty awesome'
+    $post->unembed('comments', $commentA); // Removes 'Cool feature bro!'
+    $post->embed('comments', $commentB);   // Updates 'Awesome' to 'Pretty awesome'
 ```

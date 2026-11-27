@@ -36,7 +36,7 @@ If you try to create references between documents like you would do in a relatio
         public function author()
         {
             // highlight-next-line
-            return $this->referencesOne(User::class, 'author');
+            return $this->referencesOne(User::class, 'author_id');
         }
     
     }
@@ -48,10 +48,12 @@ If you try to create references between documents like you would do in a relatio
 
 The first argument passed to the `referencesOne` method is the name of the related model, 
 the second argument is the attribute where the referenced model `_id` will be stored. 
+The second argument is optional. When it is omitted, Mongolid uses the snake case relation name followed by `_` and the key without its leading underscore. For example, `author()` stores the reference in `author_id`. Use a field name that differs from the method name, or Mongolid throws `Mongolid\Model\Exception\InvalidFieldNameException`.
+The optional third argument is the attribute of the related model used to find it. It defaults to `_id`. For example, `referencesOne(User::class, 'author_code', 'code')` queries the user by `code`.
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $user = Post::find('4af9f23d8ead0e1d32000000')->author()->get();
+    $user = Post::first('4af9f23d8ead0e1d32000000')->author()->get();
 ```
 
 :::info Explanation:
@@ -77,7 +79,12 @@ In order to set a reference to a document:
     $post->save();
     
     $post->author()->get(); // Will return a User object
+
+    // To remove the reference
+    $post->author()->detach();
 ```
+
+`get()` returns `null` when the attribute is empty. `attach` generates an `_id` for the attached model when it has none.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 
@@ -97,7 +104,7 @@ In Mongolid a _References Many_ is made by storing the `_id`s of the referenced 
         public function questions()
         {
             // highlight-next-line
-            return $this->referencesMany(Question::class, 'questions');
+            return $this->referencesMany(Question::class, 'questions_ids');
         }
     
     }
@@ -109,10 +116,14 @@ In Mongolid a _References Many_ is made by storing the `_id`s of the referenced 
 
 The first argument passed to the `referencesMany` method is the name of the related model, 
 the second argument is the attribute where the `_id`s will be stored. 
+When the second argument is omitted, Mongolid uses the snake case relation name followed by `_` and the plural of the key without its leading underscore. 
+For example, `questions()` stores the references in `questions_ids`. 
+The optional third argument is the attribute of the related model used to find the documents, and defaults to `_id`. 
+For example, `referencesMany(Question::class, 'questions_codes', 'code')` stores the `code` of each attached question in `questions_codes`, and queries the questions where `code` is in that list.
 Once the relationship is defined, we may retrieve it using the following method:
 
 ```php
-    $posts = User::find('4af9f23d8ead0e1d32000000')->posts()->get();
+    $posts = User::first('4af9f23d8ead0e1d32000000')->posts()->get();
 ```
 
 :::info Explanation:
@@ -149,6 +160,8 @@ In order to set a reference to a document use the `attach` method. For example:
     
     $user->save();
 ```
+
+Attaching a document that is already attached does nothing. `detach` receives the model, not an `_id`.
 
 :::info
 When using Mongolid models you will need to call the `save()` method after embedding or attaching objects. 

@@ -40,8 +40,28 @@ For example:
     // Checks if the cursor is reading a valid result.
     $cursor->valid();
     
-    // Returns the first result
+    // Returns the first result, or null when there is none
     $cursor->first();
+
+    // Counts the documents that match the query
+    $cursor->count();
+
+    // Returns an array of model instances
+    $cursor->all();
+
+    // Returns an array of arrays
+    $cursor->toArray();
+
+    // Prevents the server from closing the cursor after the idle timeout.
+    // Pass false to turn it back on. Call it before iterating the cursor
+    $cursor->disableTimeout();
+    $cursor->disableTimeout(false); // enables timeout
+
+    // Routes reads to replica set members, using a MongoDB\Driver\ReadPreference mode
+    $cursor->setReadPreference(\MongoDB\Driver\ReadPreference::RP_SECONDARY);
+
+    // Resets the cursor so it can be iterated again, making a new request to the database
+    $cursor->fresh();
 ```
 
 You can also chain some methods:
@@ -57,3 +77,9 @@ You can also chain some methods:
         // do something
     }
 ```
+
+`limit`, `sort`, `skip`, `disableTimeout` and `setReadPreference` return the cursor, so you can chain them.
+
+## Embedded cursors
+
+[Embeds Many](relationships/embeds.md) relations return a `Mongolid\Cursor\EmbeddedCursor`. It has `limit`, `sort`, `skip`, `count`, `first`, `all` and `toArray`, and works on the documents already loaded in the parent, without querying the database. It does not have `disableTimeout`, `setReadPreference` or `fresh`.
